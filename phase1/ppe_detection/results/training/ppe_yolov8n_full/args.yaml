@@ -1,7 +1,7 @@
 task: detect
 mode: train
 model: yolov8n.pt
-data: C:\Users\Aljawharah\Documents\DC-Guardian\phase1\ppe_detection\data\processed\sh17_yolo\dataset.yaml
+data: phase1/ppe_detection/data/processed/sh17_yolo/dataset.yaml
 epochs: 50
 time: null
 patience: 100
@@ -12,7 +12,7 @@ save_period: -1
 cache: false
 device: '0'
 workers: 4
-project: C:\Users\Aljawharah\Documents\DC-Guardian\phase1\ppe_detection\results\training
+project: phase1/ppe_detection/results/training
 name: ppe_yolov8n_full
 exist_ok: true
 pretrained: true
