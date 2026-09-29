@@ -1,0 +1,51 @@
+{
+  "configuration_version": "PPE-v1",
+  "configuration_frozen": true,
+
+  "model_family": "YOLOv8",
+  "architecture": "YOLOv8n",
+  "weights": "ppe_yolov8_best.pt",
+  "dataset": "SH17",
+  "class_count": 17,
+
+  "image_size": 640,
+  "training_epochs": 50,
+  "batch_size": 16,
+  "seed": 42,
+
+  "train_images": 6479,
+  "validation_images": 810,
+  "locked_test_images": 810,
+
+  "model_selection_source": "training_and_validation_only",
+  "locked_test_accessed_when_frozen": false,
+
+  "compliance_policy_frozen": true,
+  "policy_version": "PPE-POLICY-v1",
+  "policy_name": "BASELINE_DC_MAINTENANCE",
+
+  "required_ppe": [
+    "helmet",
+    "safety-vest"
+  ],
+
+  "confidence_threshold": 0.25,
+  "iou_threshold": 0.7,
+
+  "association_method": "object_containment",
+  "association_minimum_containment": 0.5,
+  "person_assignment": "strongest_eligible_match",
+
+  "runtime_statuses": [
+    "COMPLIANT",
+    "NON_COMPLIANT",
+    "NO_PERSON"
+  ],
+
+  "policy_semantics": "NON_COMPLIANT means one or more required PPE classes were not detected for at least one detected person. It does not prove physical absence.",
+
+  "policy_source": "project_defined_baseline",
+  "policy_development_source": "development_validation_only",
+
+  "notes": "PPE-v1 detector and PPE-POLICY-v1 runtime configuration frozen. Helmet and safety-vest are project-defined baseline requirements for the controlled DC-Guardian maintenance scenario. Required PPE not detected is treated as non-compliant evidence, not proof of physical absence."
+}

@@ -1,0 +1,607 @@
+{
+  "artifact_type": "DC_GUARDIAN_FACE_ENROLLMENT",
+  "artifact_version": "1.0",
+  "created_utc": "2026-09-24T16:27:36.731953+00:00",
+  "model_name": "ArcFace",
+  "detector_backend": "retinaface",
+  "distance_metric": "cosine",
+  "embedding_dimension": 512,
+  "employee_count": 5,
+  "employee_ids": [
+    "P001",
+    "P002",
+    "P003",
+    "P004",
+    "P005"
+  ],
+  "embedding_count": 18,
+  "counts_by_employee": {
+    "P001": 3,
+    "P002": 3,
+    "P003": 4,
+    "P004": 4,
+    "P005": 4
+  },
+  "deepface_version": "0.0.101",
+  "dataset_split": "enrollment",
+  "validation_accessed": false,
+  "final_test_accessed": false,
+  "image_records": [
+    {
+      "embedding_index": 0,
+      "employee_id": "P001",
+      "source_file": "P001/P001_enroll_01.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 3,
+        "y": 0,
+        "w": 84,
+        "h": 99,
+        "left_eye": [
+          69,
+          30
+        ],
+        "right_eye": [
+          28,
+          30
+        ],
+        "nose": [
+          51,
+          59
+        ],
+        "mouth_left": [
+          63,
+          74
+        ],
+        "mouth_right": [
+          33,
+          75
+        ]
+      }
+    },
+    {
+      "embedding_index": 1,
+      "employee_id": "P001",
+      "source_file": "P001/P001_enroll_02.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 12,
+        "y": 0,
+        "w": 67,
+        "h": 97,
+        "left_eye": [
+          66,
+          38
+        ],
+        "right_eye": [
+          37,
+          40
+        ],
+        "nose": [
+          59,
+          59
+        ],
+        "mouth_left": [
+          68,
+          68
+        ],
+        "mouth_right": [
+          40,
+          70
+        ]
+      }
+    },
+    {
+      "embedding_index": 2,
+      "employee_id": "P001",
+      "source_file": "P001/P001_enroll_03.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 18,
+        "y": 0,
+        "w": 71,
+        "h": 99,
+        "left_eye": [
+          65,
+          39
+        ],
+        "right_eye": [
+          32,
+          39
+        ],
+        "nose": [
+          46,
+          63
+        ],
+        "mouth_left": [
+          67,
+          69
+        ],
+        "mouth_right": [
+          34,
+          69
+        ]
+      }
+    },
+    {
+      "embedding_index": 3,
+      "employee_id": "P002",
+      "source_file": "P002/P002_enroll_01.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 16,
+        "y": 0,
+        "w": 65,
+        "h": 88,
+        "left_eye": [
+          61,
+          38
+        ],
+        "right_eye": [
+          32,
+          39
+        ],
+        "nose": [
+          46,
+          60
+        ],
+        "mouth_left": [
+          63,
+          63
+        ],
+        "mouth_right": [
+          33,
+          64
+        ]
+      }
+    },
+    {
+      "embedding_index": 4,
+      "employee_id": "P002",
+      "source_file": "P002/P002_enroll_02.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 15,
+        "y": 1,
+        "w": 73,
+        "h": 94,
+        "left_eye": [
+          66,
+          39
+        ],
+        "right_eye": [
+          32,
+          40
+        ],
+        "nose": [
+          49,
+          63
+        ],
+        "mouth_left": [
+          68,
+          68
+        ],
+        "mouth_right": [
+          35,
+          69
+        ]
+      }
+    },
+    {
+      "embedding_index": 5,
+      "employee_id": "P002",
+      "source_file": "P002/P002_enroll_03.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 14,
+        "y": 0,
+        "w": 71,
+        "h": 99,
+        "left_eye": [
+          65,
+          37
+        ],
+        "right_eye": [
+          32,
+          39
+        ],
+        "nose": [
+          50,
+          61
+        ],
+        "mouth_left": [
+          66,
+          68
+        ],
+        "mouth_right": [
+          36,
+          70
+        ]
+      }
+    },
+    {
+      "embedding_index": 6,
+      "employee_id": "P003",
+      "source_file": "P003/P003_enroll_01.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 19,
+        "y": 2,
+        "w": 65,
+        "h": 92,
+        "left_eye": [
+          66,
+          41
+        ],
+        "right_eye": [
+          35,
+          42
+        ],
+        "nose": [
+          49,
+          60
+        ],
+        "mouth_left": [
+          65,
+          70
+        ],
+        "mouth_right": [
+          37,
+          71
+        ]
+      }
+    },
+    {
+      "embedding_index": 7,
+      "employee_id": "P003",
+      "source_file": "P003/P003_enroll_02.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 16,
+        "y": 0,
+        "w": 68,
+        "h": 94,
+        "left_eye": [
+          66,
+          39
+        ],
+        "right_eye": [
+          33,
+          39
+        ],
+        "nose": [
+          49,
+          61
+        ],
+        "mouth_left": [
+          62,
+          73
+        ],
+        "mouth_right": [
+          37,
+          73
+        ]
+      }
+    },
+    {
+      "embedding_index": 8,
+      "employee_id": "P003",
+      "source_file": "P003/P003_enroll_03.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 15,
+        "y": 0,
+        "w": 70,
+        "h": 97,
+        "left_eye": [
+          67,
+          39
+        ],
+        "right_eye": [
+          35,
+          42
+        ],
+        "nose": [
+          53,
+          61
+        ],
+        "mouth_left": [
+          69,
+          68
+        ],
+        "mouth_right": [
+          37,
+          71
+        ]
+      }
+    },
+    {
+      "embedding_index": 9,
+      "employee_id": "P003",
+      "source_file": "P003/P003_enroll_04.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 17,
+        "y": 2,
+        "w": 65,
+        "h": 92,
+        "left_eye": [
+          65,
+          41
+        ],
+        "right_eye": [
+          35,
+          41
+        ],
+        "nose": [
+          50,
+          57
+        ],
+        "mouth_left": [
+          63,
+          70
+        ],
+        "mouth_right": [
+          37,
+          71
+        ]
+      }
+    },
+    {
+      "embedding_index": 10,
+      "employee_id": "P004",
+      "source_file": "P004/P004_enroll_01.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 9,
+        "y": 0,
+        "w": 72,
+        "h": 99,
+        "left_eye": [
+          63,
+          38
+        ],
+        "right_eye": [
+          30,
+          38
+        ],
+        "nose": [
+          48,
+          57
+        ],
+        "mouth_left": [
+          60,
+          76
+        ],
+        "mouth_right": [
+          34,
+          77
+        ]
+      }
+    },
+    {
+      "embedding_index": 11,
+      "employee_id": "P004",
+      "source_file": "P004/P004_enroll_02.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 19,
+        "y": 2,
+        "w": 64,
+        "h": 93,
+        "left_eye": [
+          64,
+          40
+        ],
+        "right_eye": [
+          35,
+          41
+        ],
+        "nose": [
+          48,
+          59
+        ],
+        "mouth_left": [
+          62,
+          71
+        ],
+        "mouth_right": [
+          37,
+          72
+        ]
+      }
+    },
+    {
+      "embedding_index": 12,
+      "employee_id": "P004",
+      "source_file": "P004/P004_enroll_03.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 13,
+        "y": 0,
+        "w": 69,
+        "h": 99,
+        "left_eye": [
+          66,
+          39
+        ],
+        "right_eye": [
+          34,
+          41
+        ],
+        "nose": [
+          53,
+          60
+        ],
+        "mouth_left": [
+          65,
+          73
+        ],
+        "mouth_right": [
+          37,
+          74
+        ]
+      }
+    },
+    {
+      "embedding_index": 13,
+      "employee_id": "P004",
+      "source_file": "P004/P004_enroll_04.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 17,
+        "y": 6,
+        "w": 64,
+        "h": 91,
+        "left_eye": [
+          64,
+          42
+        ],
+        "right_eye": [
+          34,
+          42
+        ],
+        "nose": [
+          48,
+          60
+        ],
+        "mouth_left": [
+          59,
+          76
+        ],
+        "mouth_right": [
+          38,
+          76
+        ]
+      }
+    },
+    {
+      "embedding_index": 14,
+      "employee_id": "P005",
+      "source_file": "P005/P005_enroll_01.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 13,
+        "y": 4,
+        "w": 67,
+        "h": 90,
+        "left_eye": [
+          68,
+          38
+        ],
+        "right_eye": [
+          37,
+          38
+        ],
+        "nose": [
+          58,
+          57
+        ],
+        "mouth_left": [
+          66,
+          72
+        ],
+        "mouth_right": [
+          42,
+          73
+        ]
+      }
+    },
+    {
+      "embedding_index": 15,
+      "employee_id": "P005",
+      "source_file": "P005/P005_enroll_02.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 21,
+        "y": 3,
+        "w": 73,
+        "h": 96,
+        "left_eye": [
+          70,
+          39
+        ],
+        "right_eye": [
+          36,
+          42
+        ],
+        "nose": [
+          52,
+          64
+        ],
+        "mouth_left": [
+          74,
+          69
+        ],
+        "mouth_right": [
+          41,
+          72
+        ]
+      }
+    },
+    {
+      "embedding_index": 16,
+      "employee_id": "P005",
+      "source_file": "P005/P005_enroll_03.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 17,
+        "y": 6,
+        "w": 69,
+        "h": 86,
+        "left_eye": [
+          65,
+          40
+        ],
+        "right_eye": [
+          34,
+          43
+        ],
+        "nose": [
+          49,
+          63
+        ],
+        "mouth_left": [
+          65,
+          70
+        ],
+        "mouth_right": [
+          40,
+          73
+        ]
+      }
+    },
+    {
+      "embedding_index": 17,
+      "employee_id": "P005",
+      "source_file": "P005/P005_enroll_04.jpg",
+      "face_confidence": 1.0,
+      "facial_area": {
+        "x": 16,
+        "y": 2,
+        "w": 74,
+        "h": 97,
+        "left_eye": [
+          67,
+          38
+        ],
+        "right_eye": [
+          32,
+          40
+        ],
+        "nose": [
+          47,
+          60
+        ],
+        "mouth_left": [
+          66,
+          73
+        ],
+        "mouth_right": [
+          36,
+          74
+        ]
+      }
+    }
+  ]
+}

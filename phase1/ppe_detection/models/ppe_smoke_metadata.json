@@ -1,0 +1,23 @@
+{
+  "model_family": "YOLOv8",
+  "architecture": "YOLOv8n",
+  "pretrained_initialization": "yolov8n.pt",
+  "dataset": "SH17",
+  "class_count": 17,
+  "train_images": 6479,
+  "validation_images": 810,
+  "locked_test_images": 810,
+  "locked_test_accessed": false,
+  "epochs": 2,
+  "image_size": 640,
+  "batch_size": 16,
+  "seed": 42,
+  "device": "cuda:0",
+  "gpu": "NVIDIA GeForce RTX 3080 Ti",
+  "pytorch": "2.14.0+cu126",
+  "cuda": "12.6",
+  "smoke_test": true,
+  "training_run": "C:\\Users\\Aljawharah\\Documents\\DC-Guardian\\phase1\\ppe_detection\\results\\training\\ppe_yolov8n_smoke",
+  "best_checkpoint": "C:\\Users\\Aljawharah\\Documents\\DC-Guardian\\phase1\\ppe_detection\\models\\ppe_yolov8n_smoke.pt",
+  "last_training_checkpoint": "C:\\Users\\Aljawharah\\Documents\\DC-Guardian\\phase1\\ppe_detection\\results\\training\\ppe_yolov8n_smoke\\weights\\last.pt"
+}

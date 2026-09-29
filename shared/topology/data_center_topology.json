@@ -1,0 +1,201 @@
+{
+  "topology_version": "1.0",
+  "topology_type": "SYNTHETIC",
+  "description": "Synthetic data-center topology for controlled DC-Guardian Phase 2 integration and cross-domain reasoning.",
+
+  "data_center": {
+    "data_center_id": "DC-01",
+    "name": "DC-Guardian Synthetic Data Center",
+
+    "zones": [
+      {
+        "zone_id": "ZONE-A",
+        "name": "Server Hall A",
+        "zone_type": "SERVER_HALL",
+        "criticality": "HIGH",
+
+        "access_points": [
+          {
+            "access_point_id": "DOOR-A",
+            "name": "Server Hall A Entrance"
+          }
+        ],
+
+        "cameras": [
+          {
+            "camera_id": "CAM-A-01",
+            "name": "Server Hall A Camera",
+            "monitors": [
+              "ZONE-A",
+              "DOOR-A"
+            ]
+          }
+        ],
+
+        "sensors": [
+          {
+            "sensor_id": "SEN-A-01",
+            "name": "Server Hall A Environmental Sensor",
+            "sensor_type": "ENVIRONMENTAL",
+            "monitors": [
+              "ZONE-A"
+            ]
+          }
+        ],
+
+        "racks": [
+          {
+            "rack_id": "RACK-A1",
+            "name": "Rack A1",
+
+            "servers": [
+              {
+                "server_id": "SRV-A1-01",
+                "name": "Application Server A1-01",
+                "asset_type": "SERVER",
+                "criticality": "HIGH"
+              },
+              {
+                "server_id": "SRV-A1-02",
+                "name": "Application Server A1-02",
+                "asset_type": "SERVER",
+                "criticality": "MEDIUM"
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        "zone_id": "ZONE-B",
+        "name": "Server Hall B",
+        "zone_type": "SERVER_HALL",
+        "criticality": "HIGH",
+
+        "access_points": [
+          {
+            "access_point_id": "DOOR-B",
+            "name": "Server Hall B Entrance"
+          }
+        ],
+
+        "cameras": [
+          {
+            "camera_id": "CAM-B-01",
+            "name": "Server Hall B Camera",
+            "monitors": [
+              "ZONE-B",
+              "DOOR-B"
+            ]
+          }
+        ],
+
+        "sensors": [
+          {
+            "sensor_id": "SEN-B-01",
+            "name": "Server Hall B Environmental Sensor",
+            "sensor_type": "ENVIRONMENTAL",
+            "monitors": [
+              "ZONE-B"
+            ]
+          }
+        ],
+
+        "racks": [
+          {
+            "rack_id": "RACK-B1",
+            "name": "Rack B1",
+
+            "servers": [
+              {
+                "server_id": "SRV-B1-01",
+                "name": "Database Server B1-01",
+                "asset_type": "SERVER",
+                "criticality": "CRITICAL"
+              },
+              {
+                "server_id": "SRV-B1-02",
+                "name": "Application Server B1-02",
+                "asset_type": "SERVER",
+                "criticality": "HIGH"
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        "zone_id": "ZONE-C",
+        "name": "Cooling and Utilities",
+        "zone_type": "UTILITIES",
+        "criticality": "CRITICAL",
+
+        "access_points": [
+          {
+            "access_point_id": "DOOR-C",
+            "name": "Cooling and Utilities Entrance"
+          }
+        ],
+
+        "cameras": [
+          {
+            "camera_id": "CAM-C-01",
+            "name": "Utilities Camera",
+            "monitors": [
+              "ZONE-C",
+              "DOOR-C"
+            ]
+          }
+        ],
+
+        "sensors": [
+          {
+            "sensor_id": "SEN-C-01",
+            "name": "Cooling Environmental Sensor",
+            "sensor_type": "ENVIRONMENTAL",
+            "monitors": [
+              "ZONE-C",
+              "CHILLER-C1"
+            ]
+          }
+        ],
+
+        "equipment": [
+          {
+            "equipment_id": "CHILLER-C1",
+            "name": "Primary Cooling Unit",
+            "asset_type": "COOLING_SYSTEM",
+            "criticality": "CRITICAL"
+          }
+        ]
+      }
+    ]
+  },
+
+  "people": [
+    {
+      "person_id": "P001",
+      "role": "SYSTEM_ADMINISTRATOR",
+      "authorized_zones": [
+        "ZONE-A",
+        "ZONE-B"
+      ]
+    },
+    {
+      "person_id": "P002",
+      "role": "DATA_CENTER_TECHNICIAN",
+      "authorized_zones": [
+        "ZONE-A",
+        "ZONE-B",
+        "ZONE-C"
+      ]
+    },
+    {
+      "person_id": "P003",
+      "role": "MAINTENANCE_ENGINEER",
+      "authorized_zones": [
+        "ZONE-C"
+      ]
+    }
+  ]
+}

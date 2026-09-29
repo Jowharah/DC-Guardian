@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dc-guardian.local/schemas/event_schema.json",
+  "title": "DC-Guardian Common Event Schema",
+  "description": "Common normalized event format used to pass Phase 1 model outputs into the DC-Guardian Phase 2 reasoning architecture.",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "event_id",
+    "schema_version",
+    "timestamp",
+    "domain",
+    "event_type",
+    "source",
+    "entities",
+    "location",
+    "assessment",
+    "evidence",
+    "provenance"
+  ],
+
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique DC-Guardian event identifier."
+    },
+
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Primary timestamp associated with the event."
+    },
+
+    "window": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+
+    "domain": {
+      "type": "string",
+      "enum": [
+        "CYBERSECURITY",
+        "PHYSICAL_SECURITY",
+        "SAFETY",
+        "MAINTENANCE",
+        "ENVIRONMENTAL"
+      ]
+    },
+
+    "event_type": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "component_version"
+      ],
+      "properties": {
+        "component": {
+          "type": "string"
+        },
+        "component_version": {
+          "type": "string"
+        },
+        "model_name": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+
+    "entities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "person_id": {
+          "type": ["string", "null"]
+        },
+        "source_ip": {
+          "type": ["string", "null"]
+        },
+        "asset_id": {
+          "type": ["string", "null"]
+        },
+        "server_id": {
+          "type": ["string", "null"]
+        },
+        "camera_id": {
+          "type": ["string", "null"]
+        },
+        "sensor_id": {
+          "type": ["string", "null"]
+        },
+        "equipment_id": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "data_center_id": {
+          "type": ["string", "null"]
+        },
+        "zone_id": {
+          "type": ["string", "null"]
+        },
+        "rack_id": {
+          "type": ["string", "null"]
+        },
+        "access_point_id": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "confidence"
+      ],
+      "properties": {
+        "state": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": ["string", "number", "null"]
+        },
+        "score": {
+          "type": ["number", "null"]
+        },
+        "anomaly_detected": {
+          "type": ["boolean", "null"]
+        }
+      }
+    },
+
+    "evidence": {
+      "type": "object",
+      "description": "Domain-specific evidence preserved from the originating model or detector."
+    },
+
+    "provenance": {
+    "type": "object",
+    "additionalProperties": false,
+
+    "required": [
+        "source_type",
+        "synthetic_mapping",
+        "mapping_type",
+        "original_timestamp",
+        "scenario_id"
+    ],
+
+    "properties": {
+        "source_type": {
+        "type": "string",
+        "enum": [
+            "REAL_DATASET",
+            "PUBLIC_DATASET",
+            "SYNTHETIC",
+            "CONTROLLED_TEST",
+            "LIVE"
+        ]
+        },
+
+        "dataset_name": {
+        "type": ["string", "null"]
+        },
+
+        "original_event_id": {
+        "type": ["string", "null"]
+        },
+
+        "synthetic_mapping": {
+        "type": "boolean"
+        },
+
+        "mapping_type": {
+        "type": ["string", "null"],
+        "enum": [
+            "NONE",
+            "SYNTHETIC_TOPOLOGY",
+            "SYNTHETIC_SCENARIO",
+            null
+        ]
+        },
+
+        "original_timestamp": {
+        "type": ["string", "null"],
+        "format": "date-time"
+        },
+
+        "scenario_id": {
+        "type": ["string", "null"]
+        }
+    }
+    }
+  }
+}

@@ -1,0 +1,241 @@
+# ============================================================
+# DC-GUARDIAN
+# ============================================================
+
+
+# ------------------------------------------------------------
+# Secrets / local environment configuration
+# ------------------------------------------------------------
+
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+
+secrets/
+credentials/
+
+
+# ------------------------------------------------------------
+# Python virtual environments
+# ------------------------------------------------------------
+
+.venv/
+.venv-*/
+venv/
+env/
+ENV/
+
+
+# ------------------------------------------------------------
+# Python generated files / caches
+# ------------------------------------------------------------
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+.coverage
+htmlcov/
+
+
+# ------------------------------------------------------------
+# IDE / editor files
+# ------------------------------------------------------------
+
+.vscode/
+.idea/
+
+*.swp
+*.swo
+
+
+# ------------------------------------------------------------
+# Operating system files
+# ------------------------------------------------------------
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# ============================================================
+# PHASE 1 - PREDICTIVE MAINTENANCE
+# ============================================================
+
+# Backblaze raw datasets
+phase1/predictive_maintenance/data/raw/
+
+# Large generated / processed datasets
+phase1/predictive_maintenance/data/processed/**/*.parquet
+phase1/predictive_maintenance/data/processed/**/*.csv
+phase1/predictive_maintenance/data/processed/**/*.npy
+phase1/predictive_maintenance/data/processed/**/*.npz
+
+# Keep JSON evaluation/configuration artifacts.
+# Keep frozen models.
+#
+# temporal_rf_v2.joblib is intentionally NOT ignored.
+# It will be stored using Git LFS:
+#
+# phase1/predictive_maintenance/models/rf/temporal_rf_v2.joblib
+#
+# Keep:
+# phase1/predictive_maintenance/models/gru/gru_v1.pt
+
+
+# ============================================================
+# PHASE 1 - FACE RECOGNITION
+# ============================================================
+
+# Private biometric image data - NEVER COMMIT
+phase1/face_recognition/data/controlled_faces/
+phase1/face_recognition/data/raw/
+
+# Generated/processed biometric data
+phase1/face_recognition/data/processed/
+
+# Biometric enrollment embeddings - NEVER COMMIT
+phase1/face_recognition/models/employee_embeddings.npz
+
+# Keep non-sensitive metadata/config/evaluation artifacts such as:
+# enrollment_metadata.json
+# face_recognition_config.json
+# validation_summary.json
+# face_recognition_final_test.json
+
+
+# ============================================================
+# PHASE 1 - PPE DETECTION
+# ============================================================
+
+# SH17 raw dataset
+phase1/ppe_detection/data/raw/
+
+# Generated processed dataset
+phase1/ppe_detection/data/processed/
+
+# Compatibility with existing project path if present
+phase1/ppe_detection/processed/raw/
+
+# Generated training checkpoints
+# The canonical frozen model under models/ is retained.
+phase1/ppe_detection/results/training/**/weights/
+
+# Smoke-test model is not a final artifact
+phase1/ppe_detection/models/ppe_yolov8n_smoke.pt
+
+# Keep final frozen model:
+# phase1/ppe_detection/models/ppe_yolov8_best.pt
+
+# Keep evaluation/configuration JSON and YAML files.
+# PPE smoke-test training outputs
+phase1/ppe_detection/results/training/ppe_yolov8n_smoke/
+
+# PPE generated training visualizations
+
+
+# ============================================================
+# PHASE 1 - SSH ANOMALY DETECTION
+# ============================================================
+
+# Raw Loghub/OpenSSH data
+phase1/ssh_anomaly/data/raw/
+
+# Generated processed data
+phase1/ssh_anomaly/data/processed/
+
+# External honeypot / validation datasets
+phase1/ssh_anomaly/data/external/
+
+# Keep canonical frozen models under:
+# phase1/ssh_anomaly/models/
+
+# ============================================================
+# PHASE 2 - INTELLIGENT REASONING & INTEGRATION
+# ============================================================
+
+# Python caches
+phase2/**/__pycache__/
+phase2/**/*.py[cod]
+
+# Local / temporary outputs
+phase2/tmp/
+phase2/temp/
+phase2/.cache/
+
+# Generated logs
+phase2/**/*.log
+
+# Local test/runtime output if generated
+phase2/results/
+phase2/outputs/
+
+# Future local RAG/vector-store artifacts
+phase2/rag/vector_store/
+phase2/rag/chroma_db/
+phase2/rag/faiss_index/
+phase2/rag/cache/
+
+# Future downloaded/generated embeddings
+phase2/rag/**/*.npy
+phase2/rag/**/*.npz
+
+# Local LLM/model downloads if added later
+phase2/models/
+
+
+# ============================================================
+# NEO4J LOCAL RUNTIME DATA
+# ============================================================
+
+neo4j/data/
+neo4j/logs/
+neo4j/import/
+
+data/databases/
+data/transactions/
+
+
+# ============================================================
+# TEMPORARY / GENERATED LOCAL FILES
+# ============================================================
+
+tmp/
+temp/
+.cache/
+
+*.log
+
+# ============================================================
+# ROOT-LEVEL DOWNLOADED / GENERATED MODEL WEIGHTS
+# ============================================================
+
+/weights/
+/yolov8n.pt
+
+
+# ============================================================
+# FINAL REPOSITORY CLEANUP
+# ============================================================
+
+# PPE smoke-test outputs
+phase1/ppe_detection/results/training/ppe_yolov8n_smoke/
+
+# PPE full-training generated visualizations
+phase1/ppe_detection/results/training/ppe_yolov8n_full/*.png
+phase1/ppe_detection/results/training/ppe_yolov8n_full/*.jpg
+
+# PPE locked-test batch preview images
+phase1/ppe_detection/results/final_test/ultralytics_eval/val_batch*_labels.jpg
+phase1/ppe_detection/results/final_test/ultralytics_eval/val_batch*_pred.jpg
+
+# Old/duplicate maintenance notebook
+phase1/predictive_maintenance/notebooks/DC_Guardian_Predictive_Maintenance_Backblaze (1).ipynb

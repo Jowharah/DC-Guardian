@@ -1,0 +1,14 @@
+split,image,actual_id,is_known,best_employee_id,distance,similarity,nearest_identity_correct
+validation_known,P001_val_01.jpg,P001,True,P001,0.2977439761161804,0.7022560238838196,True
+validation_known,P002_val_01.jpg,P002,True,P002,0.06823629140853882,0.9317637085914612,True
+validation_known,P003_val_01.jpg,P003,True,P003,0.09222829341888428,0.9077717065811157,True
+validation_known,P003_val_02.jpg,P003,True,P003,0.09201747179031372,0.9079825282096863,True
+validation_known,P004_val_01.jpg,P004,True,P004,0.24548053741455078,0.7545194625854492,True
+validation_known,P004_val_02.jpg,P004,True,P004,0.3270450234413147,0.6729549765586853,True
+validation_known,P005_val_01.jpg,P005,True,P005,0.1575866937637329,0.8424133062362671,True
+validation_unknown,VU001_val_01.jpg,VU001,False,P005,0.7906464338302612,0.20935356616973877,False
+validation_unknown,VU001_val_02.jpg,VU001,False,P001,0.7865409851074219,0.21345902979373932,False
+validation_unknown,VU002_val_01.jpg,VU002,False,P004,0.8978955149650574,0.10210447013378143,False
+validation_unknown,VU002_val_02.jpg,VU002,False,P004,0.8396786451339722,0.16032135486602783,False
+validation_unknown,VU003_val_01.jpg,VU003,False,P001,0.8443869352340698,0.1556130349636078,False
+validation_unknown,VU003_val_02.jpg,VU003,False,P002,0.8730871677398682,0.12691283226013184,False

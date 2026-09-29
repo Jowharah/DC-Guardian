@@ -1,0 +1,28 @@
+{
+  "mapping_version": "1.0",
+  "mapping_type": "SYNTHETIC_SCENARIO_MAPPING",
+
+  "description": "Controlled mapping of predictive-maintenance hard-drive assessments to synthetic DC-Guardian server assets for Phase 2 cross-domain scenario evaluation.",
+
+  "data_center_id": "DC-01",
+
+  "scenario_targets": {
+    "ZONE_A_SERVER_STORAGE": {
+      "server_id": "SRV-A1-01",
+      "rack_id": "RACK-A1",
+      "zone_id": "ZONE-A"
+    },
+
+    "ZONE_B_CRITICAL_STORAGE": {
+      "server_id": "SRV-B1-01",
+      "rack_id": "RACK-B1",
+      "zone_id": "ZONE-B"
+    },
+
+    "ZONE_B_APPLICATION_STORAGE": {
+      "server_id": "SRV-B1-02",
+      "rack_id": "RACK-B1",
+      "zone_id": "ZONE-B"
+    }
+  }
+}

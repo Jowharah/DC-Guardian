@@ -1,0 +1,31 @@
+{
+    "threshold": 0.0857589915394783,
+    "model_features": [
+        "failed_login_count",
+        "invalid_user_count",
+        "unique_users",
+        "failure_ratio",
+        "root_attempt_ratio",
+        "disconnect_count",
+        "no_identification_count"
+    ],
+    "count_features": [
+        "failed_login_count",
+        "invalid_user_count",
+        "unique_users",
+        "disconnect_count",
+        "no_identification_count"
+    ],
+    "preprocessing": "log1p_counts_plus_robust_scaler",
+    "threshold_method": "99th_percentile_validation_reference",
+    "architecture": [
+        7,
+        6,
+        3,
+        6,
+        7
+    ],
+    "random_state": 42,
+    "batch_size": 32,
+    "learning_rate": 0.001
+}

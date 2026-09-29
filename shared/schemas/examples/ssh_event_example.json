@@ -1,0 +1,92 @@
+{
+  "event_id": "EVT-SSH-000001",
+  "schema_version": "1.0",
+  "timestamp": "2000-12-17T02:25:00Z",
+
+  "window": {
+    "start": "2000-12-17T02:25:00Z",
+    "end": "2000-12-17T02:30:00Z"
+  },
+
+  "domain": "CYBERSECURITY",
+  "event_type": "SSH_BEHAVIOR_ASSESSMENT",
+
+  "source": {
+    "component": "ssh_detector",
+    "component_version": "1.0",
+    "model_name": "SSH_HYBRID_V1"
+  },
+
+  "entities": {
+    "person_id": null,
+    "source_ip": "1.164.122.177",
+    "asset_id": null,
+    "server_id": null,
+    "camera_id": null,
+    "sensor_id": null,
+    "equipment_id": null
+  },
+
+  "location": {
+    "data_center_id": null,
+    "zone_id": null,
+    "rack_id": null,
+    "access_point_id": null
+  },
+
+  "assessment": {
+    "state": "HIGH_CONFIDENCE_ANOMALY",
+    "confidence": "MEDIUM",
+    "score": null,
+    "anomaly_detected": true
+  },
+
+  "evidence": {
+    "detector_votes": 2,
+    "detector_combination": "RULE+AE",
+
+    "explicit_security_signal": false,
+    "security_signals": [],
+
+    "rule": {
+      "prediction": "ANOMALOUS",
+      "score": 1,
+      "triggered_rules": [
+        "ROOT_TARGETING"
+      ]
+    },
+
+    "isolation_forest": {
+      "prediction": "NORMAL",
+      "anomalous": false
+    },
+
+    "autoencoder": {
+      "prediction": "ANOMALOUS",
+      "anomalous": true
+    },
+
+    "behavior": {
+      "failed_login_count": 6,
+      "invalid_user_count": 0,
+      "unique_users": 1,
+      "failure_ratio": 1.0,
+      "root_attempt_ratio": 1.0,
+      "breakin_warning_count": 0,
+      "disconnect_count": 0,
+      "no_identification_count": 0,
+      "successful_login_count": 0,
+      "success_after_failures": 0
+    }
+  },
+
+  "provenance": {
+    "source_type": "PUBLIC_DATASET",
+    "dataset_name": "Loghub OpenSSH",
+    "mapping_type": "NONE",
+    "original_timestamp": null,
+    "scenario_id": null,
+    "original_event_id": null,
+    "synthetic_mapping": false
+  }
+}
