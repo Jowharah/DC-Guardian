@@ -2320,38 +2320,51 @@ def ingest_face_event(
         }
 
 
-        session.run(
-            event_query,
-            **parameters
-        ).consume()
-
-
         # ====================================================
-        # Event -> Camera
+        # Atomic Event + Camera persistence
+        #
+        # Keep the event write and OBSERVED_BY relationship in
+        # one managed write transaction. If either statement
+        # fails, Neo4j rolls back the complete write unit.
         # ====================================================
 
-        session.run(
-            """
-            MATCH (event:Event {
-                event_id: $event_id
-            })
+        def persist_ppe_observation(
+            tx,
+        ):
 
-            MATCH (camera:Camera {
-                camera_id: $camera_id
-            })
+            tx.run(
+                event_query,
+                **parameters
+            ).consume()
 
-            MERGE
-                (event)-[:OBSERVED_BY]->(camera)
-            """,
 
-            event_id=
-                event[
-                    "event_id"
-                ],
+            tx.run(
+                """
+                MATCH (event:Event {
+                    event_id: $event_id
+                })
 
-            camera_id=
-                camera_id,
-        ).consume()
+                MATCH (camera:Camera {
+                    camera_id: $camera_id
+                })
+
+                MERGE
+                    (event)-[:OBSERVED_BY]->(camera)
+                """,
+
+                event_id=
+                    event[
+                        "event_id"
+                    ],
+
+                camera_id=
+                    camera_id,
+            ).consume()
+
+
+        session.execute_write(
+            persist_ppe_observation
+        )
 
 
         # ====================================================
