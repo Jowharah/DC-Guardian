@@ -15,6 +15,32 @@ from ingest_event import (
 )
 
 
+
+# ============================================================
+# Allowed infrastructure identifiers for dynamic Cypher
+# ============================================================
+#
+# Cypher parameters cannot represent labels/property names.
+# Keep the only dynamic identifiers behind this closed mapping
+# so arbitrary input can never become query syntax.
+# ============================================================
+
+INFRASTRUCTURE_BY_SCOPE = {
+    "SERVER": (
+        "Server",
+        "server_id",
+    ),
+    "RACK": (
+        "Rack",
+        "rack_id",
+    ),
+    "ZONE": (
+        "Zone",
+        "zone_id",
+    ),
+}
+
+
 # ============================================================
 # Correlation ID
 # ============================================================
@@ -243,11 +269,7 @@ def persist_correlation(
     )
 
 
-    if scope not in {
-        "SERVER",
-        "RACK",
-        "ZONE",
-    }:
+    if scope not in INFRASTRUCTURE_BY_SCOPE:
 
         raise ValueError(
             f"Unsupported correlation scope: "
@@ -333,35 +355,12 @@ def persist_correlation(
         # Verify shared infrastructure exists
         # ====================================================
 
-        if scope == "SERVER":
-
-            infrastructure_label = (
-                "Server"
-            )
-
-            id_property = (
-                "server_id"
-            )
-
-        elif scope == "RACK":
-
-            infrastructure_label = (
-                "Rack"
-            )
-
-            id_property = (
-                "rack_id"
-            )
-
-        else:
-
-            infrastructure_label = (
-                "Zone"
-            )
-
-            id_property = (
-                "zone_id"
-            )
+        (
+            infrastructure_label,
+            id_property,
+        ) = INFRASTRUCTURE_BY_SCOPE[
+            scope
+        ]
 
 
         infrastructure_query = f"""
