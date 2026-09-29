@@ -149,12 +149,6 @@ The final training population contains:
 
 | Class | Rows |
 |---|---:|
-| Positive | 7? |
-
-> Note: The Random Forest training population contains 10,676 positive rows and 533,800 sampled negative rows.
-
-Therefore:
-
 | Class | Rows |
 |---|---:|
 | Positive | 10,676 |
