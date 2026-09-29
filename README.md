@@ -59,7 +59,18 @@ Implemented integration currently includes:
 - Deterministic pairwise and three-domain correlation
 - Deterministic/idempotent correlation persistence
 
-### Regression baseline
+### Runtime and regression verification
+
+The verified integrated runtime uses Python 3.12 and the repository-level
+`requirements.txt`. After installing dependencies, verify that the public/frozen
+Phase 1 runtime stacks initialize:
+
+```powershell
+python verify_runtime.py
+```
+
+The smoke test checks Predictive Maintenance, SSH, PPE, and the Face ML stack.
+It deliberately does not require the private Face enrollment embedding artifact.
 
 Run the Phase 2 contract suite from the repository root:
 
