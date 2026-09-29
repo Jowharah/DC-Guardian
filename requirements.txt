@@ -11,6 +11,7 @@ scikit-learn==1.9.1
 joblib==1.6.0
 
 tensorflow==2.21.0
+tf-keras==2.21.0
 deepface==0.0.101
 
 torch
