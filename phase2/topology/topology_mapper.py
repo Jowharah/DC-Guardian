@@ -213,19 +213,9 @@ def map_maintenance_event_to_scenario(
     # Scenario identity/time
     # ========================================================
 
-    if (
-        not isinstance(
-            scenario_id,
-            str,
-        )
-        or
-        not scenario_id.strip()
-    ):
-
-        raise ValueError(
-            "scenario_id must be "
-            "a non-empty string."
-        )
+    scenario_id = validate_scenario_id(
+        scenario_id
+    )
 
 
     scenario_timestamp = (
@@ -1316,19 +1306,9 @@ def map_environmental_event_to_scenario(
         )
 
 
-    if (
-        not isinstance(
-            scenario_id,
-            str,
-        )
-        or
-        not scenario_id.strip()
-    ):
-
-        raise ValueError(
-            "scenario_id must be "
-            "a non-empty string."
-        )
+    scenario_id = validate_scenario_id(
+        scenario_id
+    )
 
 
     scenario_timestamp = (
@@ -1614,19 +1594,9 @@ def map_face_event_to_scenario(
     # Scenario identity
     # ========================================================
 
-    if (
-        not isinstance(
-            scenario_id,
-            str,
-        )
-        or
-        not scenario_id.strip()
-    ):
-
-        raise ValueError(
-            "scenario_id must be "
-            "a non-empty string."
-        )
+    scenario_id = validate_scenario_id(
+        scenario_id
+    )
 
 
     scenario_timestamp = (
@@ -1981,19 +1951,9 @@ def map_ppe_event_to_scenario(
     # Scenario identity
     # ========================================================
 
-    if (
-        not isinstance(
-            scenario_id,
-            str,
-        )
-        or
-        not scenario_id.strip()
-    ):
-
-        raise ValueError(
-            "scenario_id must be "
-            "a non-empty string."
-        )
+    scenario_id = validate_scenario_id(
+        scenario_id
+    )
 
 
     scenario_timestamp = (
@@ -2384,6 +2344,58 @@ def resolve_ssh_target(
 
 
 # ============================================================
+# Scenario identifier validation
+# ============================================================
+
+MAX_SCENARIO_ID_LENGTH = 128
+
+
+def validate_scenario_id(
+    value
+):
+    """
+    Validate a scenario identifier before it is used to build
+    mapped event/correlation identifiers.
+    """
+
+    if (
+        not isinstance(
+            value,
+            str,
+        )
+        or not value.strip()
+    ):
+
+        raise ValueError(
+            "scenario_id must be a non-empty string."
+        )
+
+
+    if len(value) > MAX_SCENARIO_ID_LENGTH:
+
+        raise ValueError(
+            "scenario_id exceeds the maximum "
+            f"length of {MAX_SCENARIO_ID_LENGTH} characters."
+        )
+
+
+    if any(
+        character.isspace()
+        or ord(character) < 33
+        or ord(character) > 126
+        for character in value
+    ):
+
+        raise ValueError(
+            "scenario_id must contain printable ASCII "
+            "characters without whitespace."
+        )
+
+
+    return value
+
+
+# ============================================================
 # Scenario timestamp validation
 # ============================================================
 
@@ -2514,19 +2526,9 @@ def map_ssh_event_to_scenario(
     # Scenario ID
     # --------------------------------------------------------
 
-    if (
-        not isinstance(
-            scenario_id,
-            str
-        )
-        or
-        not scenario_id.strip()
-    ):
-
-        raise ValueError(
-            "scenario_id must be "
-            "a non-empty string."
-        )
+    scenario_id = validate_scenario_id(
+        scenario_id
+    )
 
 
     # --------------------------------------------------------
