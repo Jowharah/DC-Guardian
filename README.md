@@ -105,6 +105,18 @@ DC-Guardian/
 `-- .gitattributes
 ```
 
+## Component Documentation
+
+Detailed Phase 1 documentation is available in each component directory:
+
+- `phase1/face_recognition/README.md`
+- `phase1/ppe_detection/README.md`
+- `phase1/predictive_maintenance/README.md`
+- `phase1/ssh_anomaly/README.md`
+- `phase1/environmental_monitoring/README.md`
+
+The repository-level `requirements.txt` lists the direct Python dependencies for the integrated project. It is intentionally not a full `pip freeze` snapshot; exact environment locking will be finalized after dependency compatibility is verified across the integrated runtime.
+
 ## Key Shared Contracts
 
 - `shared/schemas/event_schema.json` - common event representation used before graph ingestion and correlation.
