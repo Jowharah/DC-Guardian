@@ -72,7 +72,6 @@ A typical project layout is:
 ssh_anomaly/
 |
 |-- README.md
-|-- requirements.txt
 |
 |-- data/
 |   |-- raw/
@@ -160,12 +159,7 @@ Install the main dependencies:
 .\.venv\Scripts\python.exe -m pip install numpy pandas scikit-learn matplotlib tensorflow joblib
 ```
 
-For reproducibility, save the exact installed package versions after the
-environment is working:
-
-``` powershell
-.\.venv\Scripts\python.exe -m pip freeze > requirements.txt
-```
+For integrated DC-GUARDIAN setup, use the repository-level `requirements.txt` as the canonical direct-dependency manifest. Exact environment locking should also be maintained at repository level rather than creating a component-specific freeze file.
 
 ------------------------------------------------------------------------
 
