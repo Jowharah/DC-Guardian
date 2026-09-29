@@ -1,0 +1,18 @@
+# DC-GUARDIAN direct Python dependencies
+#
+# This file lists project-level direct dependencies rather than a full
+# pip-freeze snapshot. Exact environment locking can be added after the
+# integration environment is finalized.
+
+numpy
+pandas
+scikit-learn
+joblib
+tensorflow
+torch
+ultralytics
+deepface
+neo4j
+jsonschema
+python-dotenv
+matplotlib
