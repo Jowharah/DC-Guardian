@@ -21,6 +21,8 @@ from functools import lru_cache
 import joblib
 import pandas as pd
 
+from shared.model_integrity import verify_sha256
+
 from phase1.predictive_maintenance.src.config import (
     BASE_SMART_FEATURES,
     FAILURE_HORIZON_DAYS,
@@ -43,6 +45,12 @@ MODEL_NAME = (
     "DC_Guardian_Temporal_RF_v2"
 )
 
+# Git LFS object SHA-256 for the frozen RF artifact.
+MODEL_SHA256 = (
+    "40a66de944f76ee5fe5853bfc9fca20d9"
+    "cd011cc1781c75ef7e9904bb1e7e88a"
+)
+
 ASSESSMENT_NORMAL = "NORMAL"
 
 ASSESSMENT_AT_RISK = "AT_RISK"
@@ -60,6 +68,13 @@ def load_model():
             f"Maintenance model not found: "
             f"{MODEL_FILE}"
         )
+
+    # joblib uses pickle-compatible deserialization. Verify the
+    # frozen repository artifact before loading trusted model bytes.
+    verify_sha256(
+        MODEL_FILE,
+        MODEL_SHA256,
+    )
 
     return joblib.load(
         MODEL_FILE
