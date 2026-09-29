@@ -1405,33 +1405,25 @@ def ingest_environmental_event(
             # Create/reuse drive asset and hosting relation
             # ------------------------------------------------
 
-            session.run(
-                """
-                MATCH (server:Server {
-                    server_id: $server_id
-                })
+            asset_prepare_query = """
+            MATCH (server:Server {
+                server_id: $server_id
+            })
 
-                MERGE (asset:Asset {
-                    asset_id: $asset_id
-                })
+            MERGE (asset:Asset {
+                asset_id: $asset_id
+            })
 
-                SET
-                    asset.asset_type =
-                        "HARD_DRIVE",
+            SET
+                asset.asset_type =
+                    "HARD_DRIVE",
 
-                    asset.serial_number =
-                        $asset_id
+                asset.serial_number =
+                    $asset_id
 
-                MERGE
-                    (asset)-[:HOSTED_BY]->(server)
-                """,
-
-                server_id=
-                    server_id,
-
-                asset_id=
-                    target_id,
-            ).consume()
+            MERGE
+                (asset)-[:HOSTED_BY]->(server)
+            """
 
 
             target_query = """
@@ -1563,32 +1555,48 @@ def ingest_environmental_event(
         }
 
 
-        session.run(
-            event_query,
-            **parameters
-        ).consume()
-
-
         # ====================================================
-        # Event -> target
+        # Atomic environmental persistence
         #
-        # IMPORTANT:
-        # target_query is a separate Cypher execution.
-        # Therefore both event_id and target_id must be
-        # supplied explicitly.
+        # For hard-drive telemetry, asset creation/hosting is
+        # part of the same transaction as Event + TARGETS.
         # ====================================================
 
-        session.run(
-            target_query,
+        def persist_environmental_observation(
+            tx,
+        ):
 
-            event_id=
-                event[
-                    "event_id"
-                ],
+            if target_kind == "ASSET":
 
-            target_id=
-                target_id,
-        ).consume()
+                tx.run(
+                    asset_prepare_query,
+                    server_id=
+                        server_id,
+                    asset_id=
+                        target_id,
+                ).consume()
+
+
+            tx.run(
+                event_query,
+                **parameters
+            ).consume()
+
+
+            tx.run(
+                target_query,
+                event_id=
+                    event[
+                        "event_id"
+                    ],
+                target_id=
+                    target_id,
+            ).consume()
+
+
+        session.execute_write(
+            persist_environmental_observation
+        )
 
 
         # ====================================================
