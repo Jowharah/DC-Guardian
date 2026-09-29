@@ -11,7 +11,8 @@ import tensorflow as tf
 # Paths
 # ============================================================
 
-SSH_ROOT = Path(__file__).resolve().parents[1]\nMODEL_DIR = SSH_ROOT / "models"
+SSH_ROOT = Path(__file__).resolve().parents[1]
+MODEL_DIR = SSH_ROOT / "models"
 
 IF_MODEL_FILE = (
     MODEL_DIR / "isolation_forest.joblib"
