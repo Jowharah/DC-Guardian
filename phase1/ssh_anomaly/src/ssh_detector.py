@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
+from shared.model_integrity import verify_sha256
+
 
 # ============================================================
 # Paths
@@ -33,6 +35,38 @@ AE_SCALER_FILE = (
 AE_CONFIG_FILE = (
     MODEL_DIR / "autoencoder_log_config.json"
 )
+
+
+# ============================================================
+# Frozen artifact integrity
+# ============================================================
+#
+# joblib uses pickle-compatible deserialization. Keras model
+# files are also executable model artifacts. Verify every
+# frozen artifact before loading/deserializing it.
+# ============================================================
+
+ARTIFACT_SHA256 = {
+    IF_MODEL_FILE:
+        "91215800c9cb7828ec9e42dc6edd2446"
+        "3eb967d03c4b1813cb44c9731f5c0ec9",
+
+    IF_SCALER_FILE:
+        "a4605e3df5c8dac74accdcf7fb0e5159"
+        "875890d376b39bc8461df2046331812d",
+
+    AE_MODEL_FILE:
+        "29856de98e5eaed7e6d1e49f6767e483"
+        "51302d8e521f642cfdd61d0a87880cc5",
+
+    AE_SCALER_FILE:
+        "96110d5bd70f53e02ca083215e763311"
+        "9fd3305c315dbe121906daefd194e82e",
+
+    AE_CONFIG_FILE:
+        "ff210d210167833edcf18eb6da462917"
+        "c88f1f529805b767d81d15d85620ba1e",
+}
 
 
 # ============================================================
@@ -104,6 +138,21 @@ class SSHAnomalyDetector:
                 + ", ".join(
                     missing_files
                 )
+            )
+
+
+        # ----------------------------------------------------
+        # Verify frozen artifacts before any deserialization
+        # ----------------------------------------------------
+
+        for (
+            artifact_path,
+            expected_sha256,
+        ) in ARTIFACT_SHA256.items():
+
+            verify_sha256(
+                artifact_path,
+                expected_sha256,
             )
 
 
