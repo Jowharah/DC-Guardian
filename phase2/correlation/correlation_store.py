@@ -132,6 +132,52 @@ def validate_correlation(
         )
 
 
+    scenario_id = correlation[
+        "scenario_id"
+    ]
+
+    shared_entity_id = correlation[
+        "shared_entity_id"
+    ]
+
+    scope = correlation[
+        "scope"
+    ]
+
+
+    if (
+        not isinstance(
+            scenario_id,
+            str,
+        )
+        or not scenario_id.strip()
+    ):
+
+        raise ValueError(
+            "scenario_id must be a non-empty string."
+        )
+
+
+    if (
+        not isinstance(
+            shared_entity_id,
+            str,
+        )
+        or not shared_entity_id.strip()
+    ):
+
+        raise ValueError(
+            "shared_entity_id must be a non-empty string."
+        )
+
+
+    if scope not in INFRASTRUCTURE_BY_SCOPE:
+
+        raise ValueError(
+            f"Unsupported correlation scope: {scope}"
+        )
+
+
     events = correlation[
         "events"
     ]
