@@ -115,32 +115,100 @@ Synthetic mappings are evaluation constructs. They are not presented as observat
 
 ## Model Evaluation Notes
 
+The Phase 1 components solve different tasks and were evaluated with different protocols. Their metrics should not be compared directly as if they came from one benchmark.
+
 ### Face Recognition
 
-The Face Recognition results are controlled proof-of-concept results from a small curated dataset. They should not be generalized as production biometric accuracy. The frozen Phase 1 configuration uses ArcFace embeddings, RetinaFace detection, cosine distance, and a validation-selected recognition threshold.
+The frozen Face Recognition baseline uses ArcFace embeddings, RetinaFace detection, cosine distance, and a validation-selected recognition threshold of `0.50`.
+
+The locked controlled final test contained 15 images: 6 known-person images and 9 unknown-person images.
+
+| Measure | Locked-test result |
+|---|---:|
+| Known identifications | 6 / 6 |
+| Known identification rate | 100% |
+| Unknown rejections | 9 / 9 |
+| Unknown rejection rate | 100% |
+| False acceptances | 0 |
+| False rejections | 0 |
+| Misidentifications | 0 |
+| Mean latency | 2741 ms/image |
+| Median latency | 2455 ms/image |
+
+The threshold and enrollment set were not changed during the final test. These are controlled proof-of-concept results from a small curated dataset and must not be generalized as production biometric accuracy.
 
 ### PPE Detection
 
 The frozen PPE-v1 detector uses YOLOv8n trained on SH17. The locked final test contains 810 images.
 
-Overall locked-test metrics:
-
-| Metric | Result |
+| Metric | Locked-test result |
 |---|---:|
 | Precision | 0.6889 |
 | Recall | 0.5241 |
 | mAP@0.5 | 0.5447 |
 | mAP@0.5:0.95 | 0.3363 |
 
+For the two classes required by the project compliance policy:
+
+| Required class | Precision | Recall | mAP@0.5 | mAP@0.5:0.95 |
+|---|---:|---:|---:|---:|
+| Helmet | 0.7321 | 0.6026 | 0.6761 | 0.4557 |
+| Safety vest | 0.6213 | 0.4490 | 0.3719 | 0.2195 |
+
 The project-defined baseline compliance policy requires `helmet` and `safety-vest`. A `NON_COMPLIANT` result means required PPE was not detected for at least one detected person; it does **not** prove physical absence.
 
 ### Predictive Maintenance
 
-The selected Phase 1 model is Temporal Random Forest v2. Development uses chronological train/validation/final-test separation and a seven-day forward failure horizon. See `phase1/predictive_maintenance/README.md` for the detailed evaluation methodology and frozen-model artifacts.
+The selected baseline is `DC_Guardian_Temporal_RF_v2`, evaluated once on the untouched 2026 Q1 holdout after model and operating-threshold selection were frozen. The task predicts explicit hard-drive failure within the next seven days.
+
+The final holdout contains 17,064,047 drive-day rows, including 4,285 positive rows and 667 failed drives.
+
+| Metric | 2026 Q1 final holdout |
+|---|---:|
+| PR-AUC | 0.03347 |
+| ROC-AUC | 0.87234 |
+| PR lift | 133.30x |
+| Precision | 0.03382 |
+| Row recall | 0.33722 |
+| Drive-level recall | 0.48426 |
+| Alerts / 1,000 drive-days | 2.504 |
+| Median first-warning lead time | 7 days |
+| Mean first-warning lead time | 5.45 days |
+| Failed drives detected | 323 / 667 |
+
+The positive prevalence is approximately 0.025%, so accuracy alone is not an informative primary measure for this task. The model was not refit on the final test and the operating threshold was not selected on the final test.
 
 ### SSH Anomaly Detection
 
-SSH Detector v1 operates on source-IP / five-minute behavioral windows and preserves different evidence strengths rather than treating every anomaly as a confirmed attack. See `phase1/ssh_anomaly/README.md` for the detector architecture, evaluation methodology, and frozen artifacts.
+SSH Detector v1 combines rules, Isolation Forest, Autoencoder evidence, and explicit OpenSSH security signals. Its locked controlled final evaluation contains 280 scenarios/windows: 120 normal and 160 attack cases.
+
+The detector intentionally preserves different evidence strengths instead of treating every anomaly signal as a confirmed attack.
+
+| Detector / policy | Precision | Recall | F1 | Specificity |
+|---|---:|---:|---:|---:|
+| Rule baseline | 1.000 | 0.588 | 0.740 | 1.000 |
+| Isolation Forest | 0.333 | 0.125 | 0.182 | 0.667 |
+| Autoencoder | 0.795 | 0.875 | 0.833 | 0.700 |
+| Hybrid consensus | 1.000 | 0.713 | 0.832 | 1.000 |
+| Operational detector | 0.678 | 1.000 | 0.808 | 0.367 |
+
+The operational detector obtains full recall on the controlled final set by preserving explicit security signals and broader anomaly evidence, at the cost of more false positives. The stricter hybrid-consensus state provides higher-confidence model evidence with zero false positives on this controlled set. These controlled scenario metrics are not presented as real-world SSH attack prevalence or production detection accuracy.
+
+External honeypot data is used as separate behavioral validation rather than as training data for the frozen detector.
+
+### Environmental Monitoring
+
+Environmental Monitoring is **not a learned ML model** in the current baseline. It is a deterministic monitoring component that converts configured environmental or hardware-telemetry conditions into structured assessments.
+
+Accordingly, DC-GUARDIAN does not report artificial precision, recall, or accuracy values for this component. Validation instead checks deterministic behavior and source contracts, including:
+
+- configured threshold/condition handling,
+- dedicated environmental-sensor observations,
+- hardware-origin telemetry,
+- source/provenance preservation, and
+- compatibility with the Phase 2 common-event and graph contracts.
+
+Production environmental thresholds should ultimately be aligned with the selected operational sensor and equipment specifications.
 
 ## Data and Privacy
 
