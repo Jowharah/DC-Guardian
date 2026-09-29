@@ -1,18 +1,22 @@
-# DC-GUARDIAN direct Python dependencies
+# DC-GUARDIAN verified integrated runtime dependencies
 #
-# This file lists project-level direct dependencies rather than a full
-# pip-freeze snapshot. Exact environment locking can be added after the
-# integration environment is finalized.
+# Versions below reflect the known-good Windows/Python 3.12 integration
+# environment validated during the cleanup/code-quality-security baseline.
+# PyTorch is intentionally not pinned to the local CUDA build here because
+# CUDA-specific wheels depend on the installation platform/index.
 
-numpy
-pandas
-scikit-learn
-joblib
-tensorflow
+numpy==2.5.3
+pandas==3.0.6
+scikit-learn==1.9.1
+joblib==1.6.0
+
+tensorflow==2.21.0
+deepface==0.0.101
+
 torch
-ultralytics
-deepface
-neo4j
-jsonschema
-python-dotenv
-matplotlib
+ultralytics==8.4.163
+
+neo4j==6.3.1
+jsonschema==4.26.0
+python-dotenv==1.2.3
+matplotlib==3.11.2
