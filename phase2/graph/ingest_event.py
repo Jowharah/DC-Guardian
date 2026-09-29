@@ -2328,7 +2328,7 @@ def ingest_face_event(
         # fails, Neo4j rolls back the complete write unit.
         # ====================================================
 
-        def persist_ppe_observation(
+        def persist_face_observation(
             tx,
         ):
 
@@ -2363,7 +2363,7 @@ def ingest_face_event(
 
 
         session.execute_write(
-            persist_ppe_observation
+            persist_face_observation
         )
 
 
@@ -3335,38 +3335,47 @@ def ingest_ppe_event(
         }
 
 
-        session.run(
-            event_query,
-            **parameters
-        ).consume()
-
-
         # ====================================================
-        # Event -> Camera
+        # Atomic Event + Camera persistence
         # ====================================================
 
-        session.run(
-            """
-            MATCH (event:Event {
-                event_id: $event_id
-            })
+        def persist_ppe_observation(
+            tx,
+        ):
 
-            MATCH (camera:Camera {
-                camera_id: $camera_id
-            })
+            tx.run(
+                event_query,
+                **parameters
+            ).consume()
 
-            MERGE
-                (event)-[:OBSERVED_BY]->(camera)
-            """,
 
-            event_id=
-                event[
-                    "event_id"
-                ],
+            tx.run(
+                """
+                MATCH (event:Event {
+                    event_id: $event_id
+                })
 
-            camera_id=
-                camera_id,
-        ).consume()
+                MATCH (camera:Camera {
+                    camera_id: $camera_id
+                })
+
+                MERGE
+                    (event)-[:OBSERVED_BY]->(camera)
+                """,
+
+                event_id=
+                    event[
+                        "event_id"
+                    ],
+
+                camera_id=
+                    camera_id,
+            ).consume()
+
+
+        session.execute_write(
+            persist_ppe_observation
+        )
 
 
         # ====================================================
