@@ -1,7 +1,10 @@
-path: C:\Users\Aljawharah\Documents\DC-Guardian\phase1\ppe_detection\data\raw\SH17
-train: C:\Users\Aljawharah\Documents\DC-Guardian\phase1\ppe_detection\results\final_test\locked_test_images.txt
-val: C:\Users\Aljawharah\Documents\DC-Guardian\phase1\ppe_detection\results\final_test\locked_test_images.txt
-test: C:\Users\Aljawharah\Documents\DC-Guardian\phase1\ppe_detection\results\final_test\locked_test_images.txt
+# Portable locked-test dataset template.
+# Paths are resolved relative to this file/repository when recreating the local
+# evaluation environment. Raw SH17 data is intentionally not committed.
+path: ../../../data/raw/SH17
+train: locked_test_images.txt
+val: locked_test_images.txt
+test: locked_test_images.txt
 nc: 17
 names:
 - person
