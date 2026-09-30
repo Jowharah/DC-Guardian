@@ -1,0 +1,98 @@
+{
+  "manifest_version": "1.0",
+  "purpose": "Approved-source registry for the DC-GUARDIAN Phase 3.1 operational RAG foundation.",
+  "approval_policy": "Only entries with approval_status=APPROVED may enter the active retrieval index.",
+  "sources": [
+    {
+      "document_id": "NIST-SP-800-61R3",
+      "title": "Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile",
+      "domain": "CYBERSECURITY",
+      "version": "Rev. 3",
+      "source": "NIST",
+      "publication_date": "2025-04",
+      "approval_status": "APPROVED",
+      "source_type": "AUTHORITATIVE_GUIDANCE",
+      "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final",
+      "local_file": null
+    },
+    {
+      "document_id": "CISA-IR-VR-PLAYBOOKS",
+      "title": "Cybersecurity Incident & Vulnerability Response Playbooks",
+      "domain": "CYBERSECURITY",
+      "version": "current-publication",
+      "source": "CISA",
+      "approval_status": "APPROVED",
+      "source_type": "AUTHORITATIVE_GUIDANCE",
+      "url": "https://www.cisa.gov/sites/default/files/publications/Cybersecurity_Incident_Vulnerability_Response_Playbooks_508C.pdf",
+      "local_file": null
+    },
+    {
+      "document_id": "NIST-SP-800-53R5-PHYSICAL",
+      "title": "Security and Privacy Controls for Information Systems and Organizations - Physical and Environmental Protection controls",
+      "domain": "PHYSICAL_SECURITY",
+      "version": "Rev. 5",
+      "source": "NIST",
+      "approval_status": "APPROVED",
+      "source_type": "AUTHORITATIVE_GUIDANCE",
+      "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+      "local_file": null,
+      "sections": [
+        "PE-2 Physical Access Authorizations",
+        "PE-3 Physical Access Control",
+        "PE-6 Monitoring Physical Access"
+      ]
+    },
+    {
+      "document_id": "OSHA-1910-132",
+      "title": "29 CFR 1910.132 - Personal Protective Equipment: General Requirements",
+      "domain": "SAFETY",
+      "version": "current-eCFR",
+      "source": "OSHA",
+      "approval_status": "APPROVED",
+      "source_type": "REGULATORY_GUIDANCE",
+      "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.132",
+      "local_file": null
+    },
+    {
+      "document_id": "OSHA-1910-135",
+      "title": "29 CFR 1910.135 - Head Protection",
+      "domain": "SAFETY",
+      "version": "current-eCFR",
+      "source": "OSHA",
+      "approval_status": "APPROVED",
+      "source_type": "REGULATORY_GUIDANCE",
+      "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.135",
+      "local_file": null
+    },
+    {
+      "document_id": "DOE-FEMP-DC-DESIGN-2024",
+      "title": "Best Practices Guide for Energy-Efficient Data Center Design",
+      "domain": "ENVIRONMENTAL",
+      "version": "2024",
+      "source": "U.S. Department of Energy FEMP",
+      "publication_date": "2024-07-26",
+      "approval_status": "APPROVED",
+      "source_type": "AUTHORITATIVE_GUIDANCE",
+      "url": "https://www.energy.gov/cmei/femp/articles/best-practices-guide-energy-efficient-data-center-design",
+      "local_file": null,
+      "topics": [
+        "IT environmental conditions",
+        "air management",
+        "cooling",
+        "electrical systems",
+        "metrics"
+      ]
+    },
+    {
+      "document_id": "DCG-SHARED-POLICY-V1",
+      "title": "DC-GUARDIAN Shared Operational Policy",
+      "domain": "SHARED_POLICY",
+      "version": "draft",
+      "source": "DC-GUARDIAN project",
+      "approval_status": "PLANNED",
+      "source_type": "PROJECT_POLICY",
+      "url": null,
+      "local_file": null
+    }
+  ]
+}
