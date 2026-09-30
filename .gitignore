@@ -159,7 +159,7 @@ phase1/ssh_anomaly/data/external/
 # phase1/ssh_anomaly/models/
 
 # ============================================================
-# PHASE 2 - INTELLIGENT REASONING & INTEGRATION
+# PHASE 2 - EVIDENCE INTEGRATION & DETERMINISTIC CORRELATION
 # ============================================================
 
 # Python caches
@@ -178,18 +178,22 @@ phase2/**/*.log
 phase2/results/
 phase2/outputs/
 
-# Future local RAG/vector-store artifacts
-phase2/rag/vector_store/
-phase2/rag/chroma_db/
-phase2/rag/faiss_index/
-phase2/rag/cache/
+# ============================================================
+# PHASE 3 - GROUNDED REASONING & RESPONSE
+# ============================================================
 
-# Future downloaded/generated embeddings
-phase2/rag/**/*.npy
-phase2/rag/**/*.npz
+# Local RAG/vector-store artifacts
+phase3/rag/vector_store/
+phase3/rag/chroma_db/
+phase3/rag/faiss_index/
+phase3/rag/cache/
+
+# Downloaded/generated embeddings
+phase3/rag/**/*.npy
+phase3/rag/**/*.npz
 
 # Local LLM/model downloads if added later
-phase2/models/
+phase3/models/
 
 
 # ============================================================
