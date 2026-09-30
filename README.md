@@ -1,15 +1,17 @@
 # DC-GUARDIAN
 
-DC-GUARDIAN is a research prototype for multi-domain data-center monitoring and incident reasoning. The project combines independently developed Phase 1 detectors with a Phase 2 integration layer built around a common event schema, a controlled synthetic data-center topology, Neo4j, and deterministic cross-domain correlation.
+DC-GUARDIAN is a research prototype for multi-domain data-center monitoring and incident reasoning. The architecture is organized into three stages: Phase 1 generates domain evidence, Phase 2 integrates and deterministically correlates that evidence using a common event schema, controlled synthetic topology, and Neo4j, and Phase 3 will add grounded reasoning and response.
 
-> **Current baseline:** Phase 1 model baselines are frozen for integration. Phase 2 currently passes **24/24 integration contracts**, including Face Recognition and PPE cross-domain integration. RAG, agent reasoning, severity/decision rules, and the final incident-output layer are the next major workstreams.
+> **Current baseline:** Phase 1 model baselines are frozen for integration. Phase 2 is validated at **24/24 integration contracts**, including Face Recognition and PPE cross-domain integration. The clean Python 3.12 integrated runtime also passes the **4/4 runtime smoke test**. Phase 3 - Grounded Reasoning & Response - is the next major development stage.
 
 ## Architecture
 
 ```text
-Phase 1 domain models
+PHASE 1 - EVIDENCE GENERATION
+Domain detectors / monitoring components
         |
         v
+PHASE 2 - EVIDENCE INTEGRATION & DETERMINISTIC CORRELATION
 Common Event Schema
         |
         v
@@ -24,13 +26,21 @@ Deterministic cross-domain correlation
         v
 Persistent Correlation objects
         |
-        +--> Operational RAG          (planned)
-        +--> Agent reasoning          (planned)
-        +--> Severity/decision rules  (planned)
-        +--> Incident/dashboard       (planned)
+        v
+PHASE 3 - GROUNDED REASONING & RESPONSE
+Operational RAG
+        |
+        v
+Grounded agent reasoning
+        |
+        v
+Severity / decision rules
+        |
+        v
+Incident / dashboard output
 ```
 
-The current design deliberately performs graph and rule-based correlation before future LLM reasoning. Source-model assessments and provenance are preserved rather than silently rewritten by later layers.
+Phase 2 deliberately establishes evidence relationships using graph and explicit deterministic rules before any future LLM reasoning. Source-model assessments and provenance are preserved rather than silently rewritten by later layers. Phase 3 will consume structured event/correlation context; RAG will retrieve approved operational knowledge and will not decide or revise whether source events correlate.
 
 ## Phase 1 Components
 
@@ -126,7 +136,7 @@ Detailed Phase 1 documentation is available in each component directory:
 - `phase1/ssh_anomaly/README.md`
 - `phase1/environmental_monitoring/README.md`
 
-The repository-level `requirements.txt` lists the direct Python dependencies for the integrated project. It is intentionally not a full `pip freeze` snapshot; exact environment locking will be finalized after dependency compatibility is verified across the integrated runtime.
+The repository-level `requirements.txt` records the verified direct dependencies for the integrated Python 3.12 runtime. A clean `.venv-dc-guardian` installation has been validated with the 4/4 runtime smoke test and the 24/24 Phase 2 contract suite. The file is intentionally a curated direct-dependency manifest rather than a complete `pip freeze` snapshot.
 
 ## Key Shared Contracts
 
@@ -265,13 +275,13 @@ Local credentials belong in `.env`, which is excluded from Git. A sanitized `.en
 
 ## Current Development Roadmap
 
-1. Repository cleanup and reproducibility hardening
-2. Operational knowledge manifest and approved-source definition
-3. RAG ingestion, chunking, metadata, retrieval, and retrieval evaluation
-4. Grounded agent interfaces over graph + retrieved evidence
-5. Deterministic severity and decision rules
-6. Broader controlled scenario evaluation
-7. Final incident object and dashboard integration
+1. Phase 1 evidence generation - COMPLETED / frozen integration baseline
+2. Phase 2 evidence integration and deterministic correlation - COMPLETED / 24/24 baseline
+3. Phase 3.1 operational knowledge manifest and approved-source definition - NEXT
+4. Phase 3.1 RAG ingestion, chunking, metadata, retrieval, and retrieval evaluation
+5. Phase 3.2 grounded agent interfaces over graph + retrieved evidence
+6. Phase 3.3 deterministic severity and decision rules
+7. Phase 3.4 incident object, response output, and dashboard integration
 
 ## Research Scope
 
