@@ -793,12 +793,11 @@ select a new threshold inside runtime inference.
 
 ## Phase 2 Handover
 
-SSH Detector v1 is ready to hand over as an independently callable Phase
-1 component.
+SSH Detector v1 is an independently callable Phase 1 evidence-generation component.
 
-The downstream DC-Guardian layer should consume the structured
-assessment rather than only a Boolean anomaly flag. Important fields
-include:
+Phase 2 consumes the structured SSH assessment and is responsible for normalization into the Common Event Schema, controlled topology mapping, Neo4j persistence, and deterministic cross-domain correlation. Infrastructure-specific fields such as `zone_id`, `rack_id`, `server_id`, and `asset_id` are therefore added downstream rather than hard-coded into SSH Detector v1.
+
+Important Phase 1 fields handed to Phase 2 include:
 
 ``` text
 event_type
@@ -818,13 +817,7 @@ autoencoder
 evidence
 ```
 
-Phase 2 can then map this output to the shared event schema, simulated
-data-center topology, Knowledge Graph, operational RAG, Agentic AI,
-correlation/risk reasoning, decision engine, and dashboard.
-
-Infrastructure-specific fields such as `zone_id`, `rack_id`,
-`server_id`, `asset_id`, and final severity policy should be added
-during Phase 2 rather than hard-coded into SSH Detector v1.
+The validated Phase 2 baseline passes 24/24 integration contracts. Phase 3 will consume structured event/correlation context for operational RAG, grounded agent reasoning, deterministic severity/decision rules, and incident-response output. The SSH detector itself does not perform those downstream responsibilities.
 
 ------------------------------------------------------------------------
 
@@ -848,10 +841,12 @@ Completed for SSH Detector v1:
 -   [x] Structured Phase 2 output contract
 -   [x] README / run instructions
 
-Still a shared/team activity:
+Shared integration status:
 
--   [ ] Four-model integration test
--   [ ] Peer review
+-   [x] Integrated into the validated Phase 2 common-event/topology/graph/correlation baseline
+-   [x] Phase 2 consolidated regression suite passes 24/24
+-   [x] Frozen SSH runtime/artifact integrity verified in the integrated runtime
+-   [ ] Additional model optimization or revision requires a separate Phase 1 model-revision cycle
 
 ------------------------------------------------------------------------
 
