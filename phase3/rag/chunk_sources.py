@@ -46,44 +46,66 @@ def scope_records(document_id: str, records: list[dict]) -> tuple[list[dict], st
         raise ValueError(f"Unsupported retrieval scope mode: {scope['mode']}")
 
     controls = scope["controls"]
-    starts = {}
-    for index, record in enumerate(records):
-        upper = record["text"].upper()
-        for control in controls:
-            pattern = rf"(?m)^\s*{re.escape(control)}(?:\s|\.|:)"
-            if control not in starts and re.search(pattern, upper):
-                starts[control] = index
+    selected = []
 
-    missing = [control for control in controls if control not in starts]
-    if missing:
-        raise RuntimeError(
-            f"Could not locate complete control ranges for {document_id}: {missing}"
-        )
+    # Preserve page provenance while extracting only the requested control
+    # text. A control may span pages; extraction stops at the next PE control
+    # heading so unrelated intervening controls are not indexed.
+    full_text_parts = []
+    offsets = []
+    cursor = 0
+    for record in records:
+        text = record["text"]
+        full_text_parts.append(text)
+        offsets.append((cursor, cursor + len(text), record))
+        cursor += len(text) + 2
+    full_text = "\n\n".join(full_text_parts)
 
-    selected_indexes = set()
-    control_heading = re.compile(r"(?m)^\s*PE-(\d+)(?:\s|\.|:)")
+    heading = re.compile(r"(?m)^\s*PE-(\d+)\s+[A-Z]")
+    headings = list(heading.finditer(full_text))
+
     for control in controls:
-        start_index = starts[control]
-        target_number = int(control.split("-")[1])
-        end_index = len(records)
-
-        for index in range(start_index + 1, len(records)):
-            matches = control_heading.findall(records[index]["text"].upper())
-            if any(int(number) > target_number for number in matches):
-                end_index = index
-                break
-
-        selected_indexes.update(range(start_index, end_index))
-
-    selected = [
-        record for index, record in enumerate(records)
-        if index in selected_indexes
-    ]
-    if not selected:
-        raise RuntimeError(
-            f"Retrieval scope selected no records for {document_id}."
+        number = int(control.split("-")[1])
+        start_match = next(
+            (match for match in headings if int(match.group(1)) == number),
+            None,
         )
-    return selected, "EXPLICIT_CONTROL_RANGES"
+        if start_match is None:
+            raise RuntimeError(
+                f"Could not locate complete control text for {document_id}: {control}"
+            )
+
+        next_match = next(
+            (match for match in headings if match.start() > start_match.start()),
+            None,
+        )
+        end_pos = next_match.start() if next_match else len(full_text)
+        control_text = full_text[start_match.start():end_pos].strip()
+
+        pages = []
+        record_ids = []
+        first_meta = None
+        for begin, end, record in offsets:
+            if end <= start_match.start() or begin >= end_pos:
+                continue
+            if first_meta is None:
+                first_meta = record
+            if record.get("page") is not None:
+                pages.append(record["page"])
+            record_ids.append(record["record_id"])
+
+        if first_meta is None or not control_text:
+            raise RuntimeError(f"Empty scoped control: {control}")
+
+        synthetic = dict(first_meta)
+        synthetic["record_id"] = f"{document_id}:scope:{control}"
+        synthetic["text"] = control_text
+        synthetic["page"] = min(pages) if pages else None
+        synthetic["scope_pages"] = sorted(set(pages))
+        synthetic["scope_source_record_ids"] = list(dict.fromkeys(record_ids))
+        selected.append(synthetic)
+
+    return selected, "EXACT_CONTROL_TEXT"
 
 
 def split_long_paragraph(text: str, limit: int) -> list[str]:
@@ -104,6 +126,8 @@ def make_chunks(document_id: str, records: list[dict], scope_mode: str) -> list[
                     "text": piece,
                     "page": record.get("page"),
                     "record_id": record["record_id"],
+                    "scope_pages": record.get("scope_pages"),
+                    "scope_source_record_ids": record.get("scope_source_record_ids"),
                     "meta": record,
                 })
 
@@ -123,11 +147,22 @@ def make_chunks(document_id: str, records: list[dict], scope_mode: str) -> list[
 
         meta = current[0]["meta"]
         pages = sorted({
-            item["page"] for item in current
-            if item["page"] is not None
+            page
+            for item in current
+            for page in (
+                item["scope_pages"]
+                if item.get("scope_pages")
+                else ([item["page"]] if item["page"] is not None else [])
+            )
         })
         source_records = list(dict.fromkeys(
-            item["record_id"] for item in current
+            source_id
+            for item in current
+            for source_id in (
+                item["scope_source_record_ids"]
+                if item.get("scope_source_record_ids")
+                else [item["record_id"]]
+            )
         ))
         index = len(chunks)
         digest = hashlib.sha256(
