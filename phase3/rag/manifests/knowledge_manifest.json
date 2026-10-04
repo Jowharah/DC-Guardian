@@ -51,7 +51,7 @@
       "url": "https://www.cisa.gov/sites/default/files/publications/Cybersecurity_Incident_Vulnerability_Response_Playbooks_508C.pdf",
       "local_file": null,
       "sha256": null,
-      "download_url": "https://www.cisa.gov/sites/default/files/publications/Cybersecurity_Incident_Vulnerability_Response_Playbooks_508C.pdf"
+      "download_url": "https://www.cisa.gov/sites/default/files/publications/Cybersecurity_Incident_Vulnerability_Response_Playbooks_508C_0.pdf"
     },
     {
       "document_id": "NIST-SP-800-40R4",
@@ -117,7 +117,7 @@
       "url": "https://www.cisa.gov/sites/default/files/2025-02/Facility%20Access%20Control%20-%20An%20Interagency%20Security%20Committee%20Best%20Practice-02-20.pdf",
       "local_file": null,
       "sha256": null,
-      "download_url": "https://www.cisa.gov/sites/default/files/2025-02/Facility%20Access%20Control%20-%20An%20Interagency%20Security%20Committee%20Best%20Practice-02-20.pdf"
+      "download_url": "https://www.cisa.gov/sites/default/files/2022-11/Facility%20Access%20Control%20-%20An%20Interagency%20Security%20Committee%20Best%20Practice.pdf"
     },
     {
       "document_id": "OSHA-1910-132",
@@ -137,7 +137,10 @@
       "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.132",
       "local_file": null,
       "sha256": null,
-      "download_url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.132"
+      "download_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-132.pdf",
+      "snapshot_authority": "U.S. Government Publishing Office (GovInfo)",
+      "snapshot_version": "2025 annual CFR edition (Title 29, Vol. 5)",
+      "notes": "Reference URL remains OSHA; ingest snapshot uses the official GPO annual CFR edition to avoid scripted-access restrictions on OSHA web pages."
     },
     {
       "document_id": "OSHA-1910-135",
@@ -157,7 +160,10 @@
       "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.135",
       "local_file": null,
       "sha256": null,
-      "download_url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.135"
+      "download_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-135.pdf",
+      "snapshot_authority": "U.S. Government Publishing Office (GovInfo)",
+      "snapshot_version": "2025 annual CFR edition (Title 29, Vol. 5)",
+      "notes": "Reference URL remains OSHA; ingest snapshot uses the official GPO annual CFR edition to avoid scripted-access restrictions on OSHA web pages."
     },
     {
       "document_id": "OSHA-1910-137",
@@ -177,7 +183,10 @@
       "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.137",
       "local_file": null,
       "sha256": null,
-      "download_url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.137"
+      "download_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-137.pdf",
+      "snapshot_authority": "U.S. Government Publishing Office (GovInfo)",
+      "snapshot_version": "2025 annual CFR edition (Title 29, Vol. 5)",
+      "notes": "Reference URL remains OSHA; ingest snapshot uses the official GPO annual CFR edition to avoid scripted-access restrictions on OSHA web pages."
     },
     {
       "document_id": "OSHA-1910-147",
@@ -197,7 +206,10 @@
       "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147",
       "local_file": null,
       "sha256": null,
-      "download_url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147"
+      "download_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-147.pdf",
+      "snapshot_authority": "U.S. Government Publishing Office (GovInfo)",
+      "snapshot_version": "2025 annual CFR edition (Title 29, Vol. 5)",
+      "notes": "Reference URL remains OSHA; ingest snapshot uses the official GPO annual CFR edition to avoid scripted-access restrictions on OSHA web pages."
     },
     {
       "document_id": "OSHA-1910-38",
@@ -218,7 +230,10 @@
       "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.38",
       "local_file": null,
       "sha256": null,
-      "download_url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.38"
+      "download_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-38.pdf",
+      "snapshot_authority": "U.S. Government Publishing Office (GovInfo)",
+      "snapshot_version": "2025 annual CFR edition (Title 29, Vol. 5)",
+      "notes": "Reference URL remains OSHA; ingest snapshot uses the official GPO annual CFR edition to avoid scripted-access restrictions on OSHA web pages."
     },
     {
       "document_id": "DOE-FEMP-OM-BEST-PRACTICES",
