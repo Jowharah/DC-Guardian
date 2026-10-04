@@ -42,21 +42,48 @@ def scope_records(document_id: str, records: list[dict]) -> tuple[list[dict], st
     if not scope:
         return records, "FULL_DOCUMENT"
 
-    if scope["mode"] != "text_markers":
+    if scope["mode"] != "control_ranges":
         raise ValueError(f"Unsupported retrieval scope mode: {scope['mode']}")
 
-    markers = [m.upper() for m in scope["markers"]]
-    selected = []
-    for record in records:
+    controls = scope["controls"]
+    starts = {}
+    for index, record in enumerate(records):
         upper = record["text"].upper()
-        if any(marker in upper for marker in markers):
-            selected.append(record)
+        for control in controls:
+            pattern = rf"(?m)^\s*{re.escape(control)}(?:\s|\.|:)"
+            if control not in starts and re.search(pattern, upper):
+                starts[control] = index
 
+    missing = [control for control in controls if control not in starts]
+    if missing:
+        raise RuntimeError(
+            f"Could not locate complete control ranges for {document_id}: {missing}"
+        )
+
+    selected_indexes = set()
+    control_heading = re.compile(r"(?m)^\s*PE-(\d+)(?:\s|\.|:)")
+    for control in controls:
+        start_index = starts[control]
+        target_number = int(control.split("-")[1])
+        end_index = len(records)
+
+        for index in range(start_index + 1, len(records)):
+            matches = control_heading.findall(records[index]["text"].upper())
+            if any(int(number) > target_number for number in matches):
+                end_index = index
+                break
+
+        selected_indexes.update(range(start_index, end_index))
+
+    selected = [
+        record for index, record in enumerate(records)
+        if index in selected_indexes
+    ]
     if not selected:
         raise RuntimeError(
             f"Retrieval scope selected no records for {document_id}."
         )
-    return selected, "EXPLICIT_TEXT_MARKERS"
+    return selected, "EXPLICIT_CONTROL_RANGES"
 
 
 def split_long_paragraph(text: str, limit: int) -> list[str]:
@@ -131,12 +158,17 @@ def make_chunks(document_id: str, records: list[dict], scope_mode: str) -> list[
         overlap = []
         overlap_words = 0
         for item in reversed(current):
+            item_words = len(item["text"].split())
+            if overlap and overlap_words + item_words > OVERLAP_WORDS:
+                break
+            if item_words > OVERLAP_WORDS:
+                break
             overlap.insert(0, item)
-            overlap_words += len(item["text"].split())
+            overlap_words += item_words
             if overlap_words >= OVERLAP_WORDS:
                 break
         current = overlap
-        current_words = sum(len(x["text"].split()) for x in current)
+        current_words = overlap_words
 
     for unit in units:
         words = len(unit["text"].split())
@@ -154,7 +186,7 @@ def make_chunks(document_id: str, records: list[dict], scope_mode: str) -> list[
         tail = chunks.pop()
         prev = chunks[-1]
         combined = prev["text"] + "\n\n" + tail["text"]
-        if len(combined.split()) <= MAX_CHUNK_WORDS + OVERLAP_WORDS:
+        if len(combined.split()) <= MAX_CHUNK_WORDS:
             prev["text"] = combined
             prev["word_count"] = len(combined.split())
             prev["pages"] = sorted(set(prev["pages"] + tail["pages"]))
