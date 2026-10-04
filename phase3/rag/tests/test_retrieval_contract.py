@@ -41,8 +41,8 @@ def main() -> None:
         if not row["source_sha256"] or not row["index_id"]:
             raise AssertionError("Provenance contract failed.")
 
-    if any(row["ranking_policy"] != "diverse" for row in rows):
-        raise AssertionError("Default diverse-ranking contract failed.")
+    if any(row["ranking_policy"] != "controlled" for row in rows):
+        raise AssertionError("Default controlled-ranking contract failed.")
 
     if retrieve_knowledge(
         "head protection",
