@@ -39,6 +39,7 @@ ALLOWED_HOSTS = {
     "www.cisa.gov",
     "www.energy.gov",
     "www.osha.gov",
+    "www.govinfo.gov",
 }
 
 MAX_SOURCE_BYTES = 30 * 1024 * 1024
