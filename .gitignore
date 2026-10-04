@@ -197,6 +197,9 @@ phase3/rag/knowledge_base/clean/
 # Generated RAG chunks (rebuild with chunk_sources.py)
 phase3/rag/knowledge_base/chunks/
 
+# Generated retrieval evaluation report (rebuild with evaluate_retrieval.py)
+phase3/rag/evaluation/retrieval_evaluation_report.json
+
 # Local RAG/vector-store artifacts
 phase3/rag/vector_store/
 phase3/rag/chroma_db/
