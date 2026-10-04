@@ -188,6 +188,9 @@ phase3/rag/knowledge_base/originals/
 # Generated parsed knowledge records (rebuild with parse_sources.py)
 phase3/rag/knowledge_base/parsed/
 
+# Generated parsing-quality report (rebuild with audit_parsing.py)
+phase3/rag/evaluation/parsing_quality_report.json
+
 # Local RAG/vector-store artifacts
 phase3/rag/vector_store/
 phase3/rag/chroma_db/
