@@ -67,9 +67,13 @@ def retrieve_knowledge(
     if not eligible:
         return []
 
+    # Retrieval is intentionally offline after the model has been
+    # downloaded during index construction. This avoids network dependence
+    # and prevents Hugging Face certificate/availability issues at runtime.
     model = SentenceTransformer(
         LOCAL_EMBEDDING_MODEL,
         revision=LOCAL_EMBEDDING_REVISION,
+        local_files_only=True,
     )
     query_vector = model.encode(
         [query.strip()],
