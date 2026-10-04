@@ -108,7 +108,9 @@ def repair_known_encoding_artifacts(
     if document_id != "DOE-FEMP-OM-BEST-PRACTICES":
         return text, 0
 
-    artifact = "\u00ef\u00bf\u00bd"
+    # pypdf emits U+FFFD for the reviewed separator/bullet glyphs in
+    # this specific DOE source.
+    artifact = "\ufffd"
     count = text.count(artifact)
     return text.replace(artifact, "\n"), count
 
