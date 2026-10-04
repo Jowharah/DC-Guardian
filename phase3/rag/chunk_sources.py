@@ -7,7 +7,7 @@ import json
 import re
 from pathlib import Path
 
-from config import (
+from phase3.rag.config import (
     MAX_CHUNK_WORDS,
     MIN_CHUNK_WORDS,
     OVERLAP_WORDS,
