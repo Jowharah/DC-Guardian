@@ -55,8 +55,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--ranking",
-        choices=["raw", "diverse"],
-        default="diverse",
+        choices=["raw", "diverse", "controlled"],
+        default="controlled",
     )
     args = parser.parse_args()
 
