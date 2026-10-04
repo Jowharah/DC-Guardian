@@ -63,8 +63,15 @@ def main():
                     raise AssertionError(
                         f"NIST retrieval scope missing {control}."
                     )
-            if any(row["retrieval_scope"] != "EXPLICIT_CONTROL_RANGES" for row in rows):
-                raise AssertionError("NIST chunks do not record control-range scope.")
+            if any(row["retrieval_scope"] != "EXACT_CONTROL_TEXT" for row in rows):
+                raise AssertionError("NIST chunks do not record exact-control scope.")
+            # Selected corpus must not leak the immediately intervening PE-4/PE-5
+            # controls when v1 scope is PE-2, PE-3, and PE-6.
+            for excluded in ("PE-4 PHYSICAL ACCESS CONTROL FOR TRANSMISSION", "PE-5 ACCESS CONTROL FOR OUTPUT DEVICES"):
+                if excluded in combined:
+                    raise AssertionError(
+                        f"NIST scoped corpus leaked excluded control: {excluded}"
+                    )
 
         print(f"PASS: {document_id} ({len(rows)} chunks)")
 
