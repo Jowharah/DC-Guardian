@@ -37,11 +37,14 @@ def retrieve_knowledge(
     *,
     domains: list[str] | None = None,
     top_k: int = 5,
+    ranking: str = "diverse",
 ) -> list[dict]:
     if not isinstance(query, str) or not query.strip():
         raise ValueError("query must be a non-empty string.")
     if not isinstance(top_k, int) or top_k < 1 or top_k > 50:
         raise ValueError("top_k must be an integer from 1 to 50.")
+    if ranking not in {"raw", "diverse"}:
+        raise ValueError("ranking must be 'raw' or 'diverse'.")
 
     requested_domains = None
     if domains is not None:
@@ -83,7 +86,29 @@ def retrieve_knowledge(
 
     eligible_array = np.asarray(eligible, dtype=np.int64)
     scores = vectors[eligible_array] @ query_vector
-    order = np.argsort(-scores)[:top_k]
+    raw_order = list(np.argsort(-scores))
+
+    if ranking == "raw":
+        order = raw_order[:top_k]
+    else:
+        # Diversity policy v2: take the strongest chunk from each document
+        # first, then fill remaining slots by raw similarity. This changes
+        # ranking only; embeddings, scores, chunks, and filtering are unchanged.
+        first_per_document = []
+        deferred = []
+        seen_documents = set()
+        for position in raw_order:
+            row_index = int(eligible_array[position])
+            document_id = metadata[row_index]["document_id"]
+            if document_id not in seen_documents:
+                first_per_document.append(position)
+                seen_documents.add(document_id)
+            else:
+                deferred.append(position)
+
+        order = first_per_document[:top_k]
+        if len(order) < top_k:
+            order.extend(deferred[: top_k - len(order)])
 
     results = []
     for rank, position in enumerate(order, start=1):
@@ -106,6 +131,7 @@ def retrieve_knowledge(
             "source_sha256": item["source_sha256"],
             "index_id": build["index_id"],
             "embedding_model": build["embedding_model"],
+            "ranking_policy": ranking,
         })
 
     return results
@@ -118,6 +144,11 @@ if __name__ == "__main__":
     parser.add_argument("query")
     parser.add_argument("--domain", action="append", dest="domains")
     parser.add_argument("--top-k", type=int, default=5)
+    parser.add_argument(
+        "--ranking",
+        choices=["raw", "diverse"],
+        default="diverse",
+    )
     args = parser.parse_args()
 
     print(json.dumps(
@@ -125,6 +156,7 @@ if __name__ == "__main__":
             args.query,
             domains=args.domains,
             top_k=args.top_k,
+            ranking=args.ranking,
         ),
         indent=2,
         ensure_ascii=False,
