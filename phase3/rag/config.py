@@ -27,3 +27,8 @@ RETRIEVAL_SCOPE = {
 LOCAL_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 LOCAL_EMBEDDING_REVISION = "main"
 LOCAL_EMBEDDING_BATCH_SIZE = 32
+
+
+# Calibrated on evaluation/abstention_calibration_cases.json v1.0 only.
+# Do not retune from the frozen 18-case retrieval evaluation.
+ABSTENTION_THRESHOLD = 0.5922
