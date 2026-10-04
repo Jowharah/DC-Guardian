@@ -6,7 +6,7 @@ REQUIRED_KEYS = {
     "assessment",
     "supported_findings",
     "recommended_considerations",
-    "evidence_sufficient",
+    "grounding_status",
     "citations",
     "limitations",
 }
@@ -25,7 +25,10 @@ SCHEMA = {
             "type": "array",
             "items": {"type": "string"},
         },
-        "evidence_sufficient": {"type": "boolean"},
+        "grounding_status": {
+            "type": "string",
+            "enum": ["SUPPORTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT"],
+        },
         "citations": {
             "type": "array",
             "items": {
@@ -67,8 +70,12 @@ def validate_grounded_assessment(
     ):
         if not isinstance(assessment[key], list):
             raise ValueError(f"{key} must be a list.")
-    if not isinstance(assessment["evidence_sufficient"], bool):
-        raise ValueError("evidence_sufficient must be boolean.")
+    if assessment["grounding_status"] not in {
+        "SUPPORTED",
+        "PARTIALLY_SUPPORTED",
+        "INSUFFICIENT",
+    }:
+        raise ValueError("Invalid grounding_status.")
 
     allowed = {
         (item["chunk_id"], item["document_id"])
@@ -84,12 +91,20 @@ def validate_grounded_assessment(
                 f"{pair}"
             )
 
-    if assessment["evidence_sufficient"] and not assessment["citations"]:
+    if assessment["grounding_status"] in {
+        "SUPPORTED",
+        "PARTIALLY_SUPPORTED",
+    } and not assessment["citations"]:
         raise ValueError(
-            "A sufficient-evidence assessment must cite retrieved evidence."
+            "Supported or partially supported assessments must cite retrieved evidence."
         )
 
-    if not retrieved_evidence and assessment["evidence_sufficient"]:
+    if not retrieved_evidence and assessment["grounding_status"] != "INSUFFICIENT":
         raise ValueError(
-            "Evidence cannot be sufficient when no approved evidence exists."
+            "Grounding must be INSUFFICIENT when no approved evidence exists."
+        )
+
+    if assessment["grounding_status"] == "INSUFFICIENT" and not assessment["limitations"]:
+        raise ValueError(
+            "INSUFFICIENT assessments must state at least one limitation."
         )
