@@ -15,6 +15,7 @@ REQUIRED = {
     "rank","score","chunk_id","document_id","title","primary_domain",
     "applicable_domains","authority_type","publisher","version","pages",
     "text","source_url","source_sha256","index_id","embedding_model",
+    "ranking_policy",
 }
 
 
@@ -40,8 +41,8 @@ def main() -> None:
         if not row["source_sha256"] or not row["index_id"]:
             raise AssertionError("Provenance contract failed.")
 
-    if rows != sorted(rows, key=lambda x: x["score"], reverse=True):
-        raise AssertionError("Results are not score-ranked.")
+    if any(row["ranking_policy"] != "diverse" for row in rows):
+        raise AssertionError("Default diverse-ranking contract failed.")
 
     if retrieve_knowledge(
         "head protection",
