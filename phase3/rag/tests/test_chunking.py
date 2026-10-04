@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import sys
 
 RAG_ROOT = Path(__file__).resolve().parents[1]
 LOCK_FILE = RAG_ROOT / "manifests" / "source_lock.json"
 CHUNK_DIR = RAG_ROOT / "knowledge_base" / "chunks"
+sys.path.insert(0, str(RAG_ROOT))
+from config import MAX_CHUNK_WORDS  # noqa: E402
 
 REQUIRED = {
     "chunk_id","chunk_index","document_id","title","primary_domain",
@@ -48,6 +51,21 @@ def main():
                 raise AssertionError(f"Invalid chunk text/count: {row['chunk_id']}")
             if not row["source_sha256"]:
                 raise AssertionError(f"Missing source hash: {row['chunk_id']}")
+            if row["word_count"] > MAX_CHUNK_WORDS:
+                raise AssertionError(
+                    f"Chunk exceeds configured maximum: {row['chunk_id']} "
+                    f"({row['word_count']} > {MAX_CHUNK_WORDS})"
+                )
+        if document_id == "NIST-SP-800-53R5-PE":
+            combined = "\n".join(row["text"].upper() for row in rows)
+            for control in ("PE-2", "PE-3", "PE-6"):
+                if control not in combined:
+                    raise AssertionError(
+                        f"NIST retrieval scope missing {control}."
+                    )
+            if any(row["retrieval_scope"] != "EXPLICIT_CONTROL_RANGES" for row in rows):
+                raise AssertionError("NIST chunks do not record control-range scope.")
+
         print(f"PASS: {document_id} ({len(rows)} chunks)")
 
     print()
