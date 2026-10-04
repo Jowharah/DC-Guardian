@@ -8,7 +8,11 @@ from pathlib import Path
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from config import LOCAL_EMBEDDING_MODEL, LOCAL_EMBEDDING_REVISION
+from config import (
+    ABSTENTION_THRESHOLD,
+    LOCAL_EMBEDDING_MODEL,
+    LOCAL_EMBEDDING_REVISION,
+)
 
 
 RAG_ROOT = Path(__file__).resolve().parent
@@ -38,6 +42,7 @@ def retrieve_knowledge(
     domains: list[str] | None = None,
     top_k: int = 5,
     ranking: str = "controlled",
+    abstain: bool = False,
 ) -> list[dict]:
     if not isinstance(query, str) or not query.strip():
         raise ValueError("query must be a non-empty string.")
@@ -137,6 +142,11 @@ def retrieve_knowledge(
                 if len(order) >= top_k:
                     break
 
+    if abstain:
+        best_score = float(scores[raw_order[0]]) if raw_order else 0.0
+        if best_score < ABSTENTION_THRESHOLD:
+            return []
+
     results = []
     for rank, position in enumerate(order, start=1):
         row_index = int(eligible_array[position])
@@ -172,6 +182,11 @@ if __name__ == "__main__":
     parser.add_argument("--domain", action="append", dest="domains")
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument(
+        "--abstain",
+        action="store_true",
+        help="Return no evidence when calibrated support threshold is not met.",
+    )
+    parser.add_argument(
         "--ranking",
         choices=["raw", "diverse", "controlled"],
         default="controlled",
@@ -184,6 +199,7 @@ if __name__ == "__main__":
             domains=args.domains,
             top_k=args.top_k,
             ranking=args.ranking,
+            abstain=args.abstain,
         ),
         indent=2,
         ensure_ascii=False,
