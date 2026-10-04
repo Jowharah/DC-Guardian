@@ -35,6 +35,7 @@ LOCK_FILE = RAG_ROOT / "manifests" / "source_lock.json"
 
 ALLOWED_HOSTS = {
     "csrc.nist.gov",
+    "nvlpubs.nist.gov",
     "www.cisa.gov",
     "www.energy.gov",
     "www.osha.gov",
@@ -169,7 +170,7 @@ def main() -> None:
 
     for source in eligible:
         document_id = source["document_id"]
-        url = source.get("url")
+        url = source.get("download_url") or source.get("url")
 
         if not url:
             failures.append((document_id, "Missing source URL"))
