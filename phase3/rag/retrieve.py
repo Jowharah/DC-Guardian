@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from config import (
+from phase3.rag.config import (
     ABSTENTION_THRESHOLD,
     LOCAL_EMBEDDING_MODEL,
     LOCAL_EMBEDDING_REVISION,
