@@ -37,14 +37,16 @@ def retrieve_knowledge(
     *,
     domains: list[str] | None = None,
     top_k: int = 5,
-    ranking: str = "diverse",
+    ranking: str = "controlled",
 ) -> list[dict]:
     if not isinstance(query, str) or not query.strip():
         raise ValueError("query must be a non-empty string.")
     if not isinstance(top_k, int) or top_k < 1 or top_k > 50:
         raise ValueError("top_k must be an integer from 1 to 50.")
-    if ranking not in {"raw", "diverse"}:
-        raise ValueError("ranking must be 'raw' or 'diverse'.")
+    if ranking not in {"raw", "diverse", "controlled"}:
+        raise ValueError(
+            "ranking must be 'raw', 'diverse', or 'controlled'."
+        )
 
     requested_domains = None
     if domains is not None:
@@ -90,7 +92,7 @@ def retrieve_knowledge(
 
     if ranking == "raw":
         order = raw_order[:top_k]
-    else:
+    elif ranking == "diverse":
         # Diversity policy v2: take the strongest chunk from each document
         # first, then fill remaining slots by raw similarity. This changes
         # ranking only; embeddings, scores, chunks, and filtering are unchanged.
@@ -109,6 +111,31 @@ def retrieve_knowledge(
         order = first_per_document[:top_k]
         if len(order) < top_k:
             order.extend(deferred[: top_k - len(order)])
+    else:
+        # Controlled diversity v3. Preserve raw relevance ordering but cap
+        # duplicate chunks from one document. This is a policy parameter,
+        # not a similarity-score threshold and does not alter embeddings.
+        MAX_CHUNKS_PER_DOCUMENT = 2
+        order = []
+        per_document = {}
+        deferred = []
+        for position in raw_order:
+            row_index = int(eligible_array[position])
+            document_id = metadata[row_index]["document_id"]
+            count = per_document.get(document_id, 0)
+            if count < MAX_CHUNKS_PER_DOCUMENT:
+                order.append(position)
+                per_document[document_id] = count + 1
+            else:
+                deferred.append(position)
+            if len(order) >= top_k:
+                break
+
+        if len(order) < top_k:
+            for position in deferred:
+                order.append(position)
+                if len(order) >= top_k:
+                    break
 
     results = []
     for rank, position in enumerate(order, start=1):
@@ -146,8 +173,8 @@ if __name__ == "__main__":
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument(
         "--ranking",
-        choices=["raw", "diverse"],
-        default="diverse",
+        choices=["raw", "diverse", "controlled"],
+        default="controlled",
     )
     args = parser.parse_args()
 
