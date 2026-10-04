@@ -185,6 +185,9 @@ phase2/outputs/
 # Downloaded third-party knowledge snapshots (rebuild with fetch_sources.py)
 phase3/rag/knowledge_base/originals/
 
+# Generated parsed knowledge records (rebuild with parse_sources.py)
+phase3/rag/knowledge_base/parsed/
+
 # Local RAG/vector-store artifacts
 phase3/rag/vector_store/
 phase3/rag/chroma_db/
