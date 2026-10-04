@@ -33,12 +33,49 @@ class ValidFakeProvider:
             "recommended_considerations": [
                 "Verify the observed person's current authorization."
             ],
-            "evidence_sufficient": True,
+            "grounding_status": "SUPPORTED",
             "citations": [{
                 "chunk_id": "TEST:chunk:1",
                 "document_id": "TEST-DOC",
             }],
             "limitations": [],
+        }
+
+
+
+
+class PartialFakeProvider:
+    def reason(self, payload):
+        return {
+            "assessment": "Authorization concern is supported, but entry outcome is unknown.",
+            "supported_findings": [
+                "The supplied evidence supports an authorization concern."
+            ],
+            "recommended_considerations": [
+                "Verify whether physical entry was attempted or granted."
+            ],
+            "grounding_status": "PARTIALLY_SUPPORTED",
+            "citations": [{
+                "chunk_id": "TEST:chunk:1",
+                "document_id": "TEST-DOC",
+            }],
+            "limitations": [
+                "The supplied incident evidence does not establish whether entry occurred."
+            ],
+        }
+
+
+class InsufficientFakeProvider:
+    def reason(self, payload):
+        return {
+            "assessment": "The requested conclusion is not supported.",
+            "supported_findings": [],
+            "recommended_considerations": [],
+            "grounding_status": "INSUFFICIENT",
+            "citations": [],
+            "limitations": [
+                "No approved retrieved evidence supports the requested conclusion."
+            ],
         }
 
 
@@ -48,7 +85,7 @@ class HallucinatedCitationProvider:
             "assessment": "Unsupported.",
             "supported_findings": [],
             "recommended_considerations": [],
-            "evidence_sufficient": True,
+            "grounding_status": "SUPPORTED",
             "citations": [{
                 "chunk_id": "INVENTED",
                 "document_id": "INVENTED-DOC",
@@ -64,9 +101,29 @@ def main():
         retrieved_evidence=EVIDENCE,
         task="Assess the access concern.",
     )
-    if not result["evidence_sufficient"]:
+    if result["grounding_status"] != "SUPPORTED":
         raise AssertionError("Valid grounded result was rejected.")
     print("PASS: Valid grounded assessment.")
+
+    partial = grounded_reason(
+        provider=PartialFakeProvider(),
+        incident_evidence={"authorization": "UNAUTHORIZED"},
+        retrieved_evidence=EVIDENCE,
+        task="Assess the access concern.",
+    )
+    if partial["grounding_status"] != "PARTIALLY_SUPPORTED":
+        raise AssertionError("Partial grounding status failed.")
+    print("PASS: Partially supported assessment.")
+
+    insufficient = grounded_reason(
+        provider=InsufficientFakeProvider(),
+        incident_evidence={"authorization": "UNKNOWN"},
+        retrieved_evidence=[],
+        task="Determine unsupported internal policy.",
+    )
+    if insufficient["grounding_status"] != "INSUFFICIENT":
+        raise AssertionError("Insufficient grounding status failed.")
+    print("PASS: Insufficient assessment.")
 
     try:
         grounded_reason(
