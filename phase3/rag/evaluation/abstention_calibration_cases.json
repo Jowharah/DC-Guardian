@@ -1,0 +1,109 @@
+{
+  "calibration_version": "1.0",
+  "purpose": "Development-only set for calibrating evidence-sufficiency/abstention. This set is separate from the frozen 18-case retrieval evaluation.",
+  "policy": "Do not add frozen evaluation queries or tune labels using frozen evaluation outcomes.",
+  "cases": [
+    {
+      "case_id": "CAL-001",
+      "query": "What guidance covers reviewing physical access logs and monitoring suspicious facility access?",
+      "domains": [
+        "PHYSICAL_SECURITY"
+      ],
+      "supported": true
+    },
+    {
+      "case_id": "CAL-002",
+      "query": "What approved guidance applies to lockout and hazardous energy during equipment servicing?",
+      "domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "supported": true
+    },
+    {
+      "case_id": "CAL-003",
+      "query": "What guidance covers data-center cooling airflow and environmental operating conditions?",
+      "domains": [
+        "ENVIRONMENTAL"
+      ],
+      "supported": true
+    },
+    {
+      "case_id": "CAL-004",
+      "query": "What guidance addresses cybersecurity incident response and containment?",
+      "domains": [
+        "CYBERSECURITY"
+      ],
+      "supported": true
+    },
+    {
+      "case_id": "CAL-005",
+      "query": "What guidance distinguishes predictive and preventive maintenance approaches?",
+      "domains": [
+        "MAINTENANCE"
+      ],
+      "supported": true
+    },
+    {
+      "case_id": "CAL-006",
+      "query": "What PPE guidance covers protective helmets where head hazards exist?",
+      "domains": [
+        "SAFETY"
+      ],
+      "supported": true
+    },
+    {
+      "case_id": "CAL-007",
+      "query": "What is DC-GUARDIAN's approved maximum autonomous shutdown duration?",
+      "domains": [
+        "SHARED_POLICY"
+      ],
+      "supported": false
+    },
+    {
+      "case_id": "CAL-008",
+      "query": "Which DC-GUARDIAN policy specifies the exact SMS phone number for emergency escalation?",
+      "domains": [
+        "SHARED_POLICY"
+      ],
+      "supported": false
+    },
+    {
+      "case_id": "CAL-009",
+      "query": "What is the approved DC-GUARDIAN monetary threshold for automatically replacing a failed drive?",
+      "domains": [
+        "MAINTENANCE",
+        "SHARED_POLICY"
+      ],
+      "supported": false
+    },
+    {
+      "case_id": "CAL-010",
+      "query": "Which approved policy allows the AI agent to unlock a restricted data-center door automatically?",
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "SHARED_POLICY"
+      ],
+      "supported": false
+    },
+    {
+      "case_id": "CAL-011",
+      "query": "What is DC-GUARDIAN's approved employee disciplinary penalty for PPE noncompliance?",
+      "domains": [
+        "SAFETY",
+        "SHARED_POLICY"
+      ],
+      "supported": false
+    },
+    {
+      "case_id": "CAL-012",
+      "query": "What exact internal ticket queue must receive a correlated SSH and physical-access incident?",
+      "domains": [
+        "CYBERSECURITY",
+        "PHYSICAL_SECURITY",
+        "SHARED_POLICY"
+      ],
+      "supported": false
+    }
+  ]
+}

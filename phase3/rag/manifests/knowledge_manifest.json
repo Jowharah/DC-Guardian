@@ -1,0 +1,380 @@
+{
+  "manifest_version": "2.0",
+  "phase": "3.1",
+  "purpose": "Approved and candidate source registry for the DC-GUARDIAN operational RAG foundation.",
+  "active_index_policy": "Only sources with approval_status=APPROVED and retrieval_status=ACTIVE may enter the active retrieval index.",
+  "provenance_policy": "Every indexed chunk must retain document identity, authority, version/date, source URL or local source reference, and index-build provenance.",
+  "domain_model": [
+    "CYBERSECURITY",
+    "PHYSICAL_SECURITY",
+    "SAFETY",
+    "MAINTENANCE",
+    "ENVIRONMENTAL",
+    "SHARED_POLICY"
+  ],
+  "sources": [
+    {
+      "document_id": "NIST-SP-800-61R3",
+      "title": "Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile",
+      "primary_domain": "CYBERSECURITY",
+      "applicable_domains": [
+        "CYBERSECURITY",
+        "SHARED_POLICY"
+      ],
+      "authority_type": "GOVERNMENT_GUIDANCE",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "NIST",
+      "version": "Rev. 3",
+      "publication_date": "2025-04",
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final",
+      "local_file": null,
+      "sha256": null,
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-61r3.pdf"
+    },
+    {
+      "document_id": "CISA-IR-VR-PLAYBOOKS",
+      "title": "Cybersecurity Incident & Vulnerability Response Playbooks",
+      "primary_domain": "CYBERSECURITY",
+      "applicable_domains": [
+        "CYBERSECURITY",
+        "SHARED_POLICY"
+      ],
+      "authority_type": "GOVERNMENT_PLAYBOOK",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "CISA",
+      "version": "public playbooks",
+      "publication_date": null,
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://www.cisa.gov/sites/default/files/publications/Cybersecurity_Incident_Vulnerability_Response_Playbooks_508C.pdf",
+      "local_file": null,
+      "sha256": null,
+      "download_url": "https://www.cisa.gov/sites/default/files/publications/Cybersecurity_Incident_Vulnerability_Response_Playbooks_508C_0.pdf"
+    },
+    {
+      "document_id": "NIST-SP-800-40R4",
+      "title": "Guide to Enterprise Patch Management Planning: Preventive Maintenance for Technology",
+      "primary_domain": "CYBERSECURITY",
+      "applicable_domains": [
+        "CYBERSECURITY",
+        "MAINTENANCE"
+      ],
+      "authority_type": "GOVERNMENT_GUIDANCE",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "NIST",
+      "version": "Rev. 4",
+      "publication_date": "2022-04",
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://csrc.nist.gov/pubs/sp/800/40/r4/final",
+      "local_file": null,
+      "sha256": null,
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-40r4.pdf"
+    },
+    {
+      "document_id": "NIST-SP-800-53R5-PE",
+      "title": "Security and Privacy Controls for Information Systems and Organizations - Physical and Environmental Protection family",
+      "primary_domain": "PHYSICAL_SECURITY",
+      "applicable_domains": [
+        "PHYSICAL_SECURITY",
+        "ENVIRONMENTAL",
+        "SHARED_POLICY"
+      ],
+      "authority_type": "GOVERNMENT_STANDARD_GUIDANCE",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "NIST",
+      "version": "Rev. 5",
+      "publication_date": null,
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+      "local_file": null,
+      "sha256": null,
+      "relevant_sections": [
+        "PE-2 Physical Access Authorizations",
+        "PE-3 Physical Access Control",
+        "PE-6 Monitoring Physical Access"
+      ],
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf"
+    },
+    {
+      "document_id": "CISA-ISC-FAC-2020",
+      "title": "Facility Access Control: An Interagency Security Committee Best Practice",
+      "primary_domain": "PHYSICAL_SECURITY",
+      "applicable_domains": [
+        "PHYSICAL_SECURITY",
+        "SHARED_POLICY"
+      ],
+      "authority_type": "GOVERNMENT_BEST_PRACTICE",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "CISA / Interagency Security Committee",
+      "version": "2020 Edition",
+      "publication_date": "2020",
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://www.cisa.gov/sites/default/files/2025-02/Facility%20Access%20Control%20-%20An%20Interagency%20Security%20Committee%20Best%20Practice-02-20.pdf",
+      "local_file": null,
+      "sha256": null,
+      "download_url": "https://www.cisa.gov/sites/default/files/2022-11/Facility%20Access%20Control%20-%20An%20Interagency%20Security%20Committee%20Best%20Practice.pdf"
+    },
+    {
+      "document_id": "OSHA-1910-132",
+      "title": "29 CFR 1910.132 - Personal Protective Equipment: General Requirements",
+      "primary_domain": "SAFETY",
+      "applicable_domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "authority_type": "REGULATION",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "OSHA",
+      "version": "current eCFR",
+      "publication_date": null,
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.132",
+      "local_file": null,
+      "sha256": null,
+      "download_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-132.pdf",
+      "snapshot_authority": "U.S. Government Publishing Office (GovInfo)",
+      "snapshot_version": "2025 annual CFR edition (Title 29, Vol. 5)",
+      "notes": "Reference URL remains OSHA; ingest snapshot uses the official GPO annual CFR edition to avoid scripted-access restrictions on OSHA web pages."
+    },
+    {
+      "document_id": "OSHA-1910-135",
+      "title": "29 CFR 1910.135 - Head Protection",
+      "primary_domain": "SAFETY",
+      "applicable_domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "authority_type": "REGULATION",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "OSHA",
+      "version": "current eCFR",
+      "publication_date": null,
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.135",
+      "local_file": null,
+      "sha256": null,
+      "download_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-135.pdf",
+      "snapshot_authority": "U.S. Government Publishing Office (GovInfo)",
+      "snapshot_version": "2025 annual CFR edition (Title 29, Vol. 5)",
+      "notes": "Reference URL remains OSHA; ingest snapshot uses the official GPO annual CFR edition to avoid scripted-access restrictions on OSHA web pages."
+    },
+    {
+      "document_id": "OSHA-1910-137",
+      "title": "29 CFR 1910.137 - Electrical Protective Equipment",
+      "primary_domain": "SAFETY",
+      "applicable_domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "authority_type": "REGULATION",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "OSHA",
+      "version": "current eCFR",
+      "publication_date": null,
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.137",
+      "local_file": null,
+      "sha256": null,
+      "download_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-137.pdf",
+      "snapshot_authority": "U.S. Government Publishing Office (GovInfo)",
+      "snapshot_version": "2025 annual CFR edition (Title 29, Vol. 5)",
+      "notes": "Reference URL remains OSHA; ingest snapshot uses the official GPO annual CFR edition to avoid scripted-access restrictions on OSHA web pages."
+    },
+    {
+      "document_id": "OSHA-1910-147",
+      "title": "29 CFR 1910.147 - The Control of Hazardous Energy (Lockout/Tagout)",
+      "primary_domain": "SAFETY",
+      "applicable_domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "authority_type": "REGULATION",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "OSHA",
+      "version": "current eCFR",
+      "publication_date": null,
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147",
+      "local_file": null,
+      "sha256": null,
+      "download_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-147.pdf",
+      "snapshot_authority": "U.S. Government Publishing Office (GovInfo)",
+      "snapshot_version": "2025 annual CFR edition (Title 29, Vol. 5)",
+      "notes": "Reference URL remains OSHA; ingest snapshot uses the official GPO annual CFR edition to avoid scripted-access restrictions on OSHA web pages."
+    },
+    {
+      "document_id": "OSHA-1910-38",
+      "title": "29 CFR 1910.38 - Emergency Action Plans",
+      "primary_domain": "SHARED_POLICY",
+      "applicable_domains": [
+        "SAFETY",
+        "PHYSICAL_SECURITY",
+        "SHARED_POLICY"
+      ],
+      "authority_type": "REGULATION",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "OSHA",
+      "version": "current eCFR",
+      "publication_date": null,
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.38",
+      "local_file": null,
+      "sha256": null,
+      "download_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-38.pdf",
+      "snapshot_authority": "U.S. Government Publishing Office (GovInfo)",
+      "snapshot_version": "2025 annual CFR edition (Title 29, Vol. 5)",
+      "notes": "Reference URL remains OSHA; ingest snapshot uses the official GPO annual CFR edition to avoid scripted-access restrictions on OSHA web pages."
+    },
+    {
+      "document_id": "DOE-FEMP-OM-BEST-PRACTICES",
+      "title": "Operations and Maintenance Best Practices: A Guide to Achieving Operational Efficiency",
+      "primary_domain": "MAINTENANCE",
+      "applicable_domains": [
+        "MAINTENANCE",
+        "ENVIRONMENTAL"
+      ],
+      "authority_type": "GOVERNMENT_GUIDANCE",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "U.S. Department of Energy FEMP",
+      "version": "public guide",
+      "publication_date": "2010-08-09",
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://www.energy.gov/cmei/femp/articles/operations-and-maintenance-best-practices-guide-achieving-operational-efficiency",
+      "local_file": null,
+      "sha256": null,
+      "download_url": "https://www.energy.gov/sites/default/files/2020/04/f74/omguide_complete_w-eo-disclaimer.pdf"
+    },
+    {
+      "document_id": "DOE-FEMP-OM-APPROACHES",
+      "title": "Operations and Maintenance Challenges and Solutions",
+      "primary_domain": "MAINTENANCE",
+      "applicable_domains": [
+        "MAINTENANCE",
+        "ENVIRONMENTAL"
+      ],
+      "authority_type": "GOVERNMENT_BEST_PRACTICE",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "U.S. Department of Energy FEMP",
+      "version": "current web guidance",
+      "publication_date": null,
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://www.energy.gov/cmei/femp/operations-and-maintenance-challenges-and-solutions",
+      "local_file": null,
+      "sha256": null,
+      "topics": [
+        "reactive maintenance",
+        "preventive maintenance",
+        "predictive maintenance",
+        "reliability-centered maintenance"
+      ],
+      "download_url": "https://www.energy.gov/cmei/femp/operations-and-maintenance-challenges-and-solutions"
+    },
+    {
+      "document_id": "DOE-FEMP-DC-DESIGN-2024",
+      "title": "Best Practices Guide for Energy-Efficient Data Center Design",
+      "primary_domain": "ENVIRONMENTAL",
+      "applicable_domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "authority_type": "GOVERNMENT_GUIDANCE",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "U.S. Department of Energy FEMP",
+      "version": "2024",
+      "publication_date": "2024-07-26",
+      "approval_status": "APPROVED",
+      "retrieval_status": "ACTIVE",
+      "url": "https://www.energy.gov/cmei/femp/articles/best-practices-guide-energy-efficient-data-center-design",
+      "local_file": null,
+      "sha256": null,
+      "topics": [
+        "IT environmental conditions",
+        "air management",
+        "cooling",
+        "electrical systems",
+        "metrics"
+      ],
+      "download_url": "https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf"
+    },
+    {
+      "document_id": "DOE-FEMP-FACILITY-OM",
+      "title": "Operations and Maintenance in Federal Facilities",
+      "primary_domain": "MAINTENANCE",
+      "applicable_domains": [
+        "MAINTENANCE",
+        "ENVIRONMENTAL",
+        "SHARED_POLICY"
+      ],
+      "authority_type": "GOVERNMENT_RESOURCE_HUB",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "U.S. Department of Energy FEMP",
+      "version": "current web resource",
+      "publication_date": null,
+      "approval_status": "CANDIDATE",
+      "retrieval_status": "INACTIVE",
+      "url": "https://www.energy.gov/cmei/femp/operations-and-maintenance-federal-facilities",
+      "local_file": null,
+      "sha256": null,
+      "notes": "Useful resource hub; keep inactive until a stable ingestible document or selected subresource is approved.",
+      "download_url": "https://www.energy.gov/cmei/femp/operations-and-maintenance-federal-facilities"
+    },
+    {
+      "document_id": "NIST-SP-800-34R1",
+      "title": "Contingency Planning Guide for Federal Information Systems",
+      "primary_domain": "SHARED_POLICY",
+      "applicable_domains": [
+        "CYBERSECURITY",
+        "SHARED_POLICY"
+      ],
+      "authority_type": "GOVERNMENT_GUIDANCE",
+      "source_type": "EXTERNAL_AUTHORITATIVE",
+      "publisher": "NIST",
+      "version": "Rev. 1",
+      "publication_date": null,
+      "approval_status": "CANDIDATE",
+      "retrieval_status": "INACTIVE",
+      "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final",
+      "local_file": null,
+      "sha256": null,
+      "notes": "Candidate resilience/contingency source; approve only after confirming current applicability for the intended RAG use.",
+      "download_url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final"
+    },
+    {
+      "document_id": "DCG-SHARED-POLICY-V1",
+      "title": "DC-GUARDIAN Operational Response Policy v1",
+      "primary_domain": "SHARED_POLICY",
+      "applicable_domains": [
+        "CYBERSECURITY",
+        "PHYSICAL_SECURITY",
+        "SAFETY",
+        "MAINTENANCE",
+        "ENVIRONMENTAL",
+        "SHARED_POLICY"
+      ],
+      "authority_type": "PROJECT_POLICY",
+      "source_type": "DC_GUARDIAN_INTERNAL",
+      "publisher": "DC-GUARDIAN project",
+      "version": "draft",
+      "publication_date": null,
+      "approval_status": "PLANNED",
+      "retrieval_status": "INACTIVE",
+      "url": null,
+      "local_file": null,
+      "sha256": null,
+      "notes": "To define escalation, evidence handling, human review, source citation, and limits on autonomous action. It must not misrepresent project policy as external regulation.",
+      "download_url": null
+    }
+  ]
+}

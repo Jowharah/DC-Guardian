@@ -21,3 +21,10 @@ neo4j==6.3.1
 jsonschema==4.26.0
 python-dotenv==1.2.3
 matplotlib==3.11.2
+
+# Phase 3 RAG source parsing
+pypdf==6.1.1
+beautifulsoup4==4.15.0
+
+# Phase 3 local embedding baseline
+sentence-transformers==5.1.1

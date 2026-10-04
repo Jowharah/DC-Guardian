@@ -182,6 +182,24 @@ phase2/outputs/
 # PHASE 3 - GROUNDED REASONING & RESPONSE
 # ============================================================
 
+# Downloaded third-party knowledge snapshots (rebuild with fetch_sources.py)
+phase3/rag/knowledge_base/originals/
+
+# Generated parsed knowledge records (rebuild with parse_sources.py)
+phase3/rag/knowledge_base/parsed/
+
+# Generated parsing-quality report (rebuild with audit_parsing.py)
+phase3/rag/evaluation/parsing_quality_report.json
+
+# Generated preprocessed knowledge records (rebuild with preprocess_sources.py)
+phase3/rag/knowledge_base/clean/
+
+# Generated RAG chunks (rebuild with chunk_sources.py)
+phase3/rag/knowledge_base/chunks/
+
+# Generated retrieval evaluation report (rebuild with evaluate_retrieval.py)
+phase3/rag/evaluation/retrieval_evaluation_report.json
+
 # Local RAG/vector-store artifacts
 phase3/rag/vector_store/
 phase3/rag/chroma_db/
@@ -243,3 +261,5 @@ phase1/ppe_detection/results/final_test/ultralytics_eval/val_batch*_pred.jpg
 
 # Old/duplicate maintenance notebook
 phase1/predictive_maintenance/notebooks/DC_Guardian_Predictive_Maintenance_Backblaze (1).ipynb
+# Generated RAG abstention calibration report
+phase3/rag/evaluation/abstention_calibration_report.json

@@ -1,0 +1,138 @@
+{
+  "lock_version": "1.0",
+  "generated_utc": "2026-10-04T15:25:35.855834+00:00",
+  "sources": [
+    {
+      "document_id": "CISA-IR-VR-PLAYBOOKS",
+      "local_file": "knowledge_base/originals/CISA-IR-VR-PLAYBOOKS.pdf",
+      "requested_url": "https://www.cisa.gov/sites/default/files/publications/Cybersecurity_Incident_Vulnerability_Response_Playbooks_508C_0.pdf",
+      "final_url": "https://www.cisa.gov/sites/default/files/publications/Cybersecurity_Incident_Vulnerability_Response_Playbooks_508C_0.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 1159167,
+      "sha256": "ba8ab05388a8a81ec2bafce79dd377d9d7454ef00aef4dcbe2f3de20d46c25cb",
+      "fetched_utc": "2026-10-04T15:25:07.838140+00:00",
+      "acquisition_method": "MANUAL_OFFICIAL_DOWNLOAD"
+    },
+    {
+      "document_id": "CISA-ISC-FAC-2020",
+      "local_file": "knowledge_base/originals/CISA-ISC-FAC-2020.pdf",
+      "requested_url": "https://www.cisa.gov/sites/default/files/2022-11/Facility%20Access%20Control%20-%20An%20Interagency%20Security%20Committee%20Best%20Practice.pdf",
+      "final_url": "https://www.cisa.gov/sites/default/files/2022-11/Facility%20Access%20Control%20-%20An%20Interagency%20Security%20Committee%20Best%20Practice.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 2103694,
+      "sha256": "fc3993179baf2a5ffd26add0af721d00634ae954c60df44752ad66eccf5bc130",
+      "fetched_utc": "2026-10-04T15:25:19.726007+00:00",
+      "acquisition_method": "MANUAL_OFFICIAL_DOWNLOAD"
+    },
+    {
+      "document_id": "DOE-FEMP-DC-DESIGN-2024",
+      "local_file": "knowledge_base/originals/DOE-FEMP-DC-DESIGN-2024.pdf",
+      "requested_url": "https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf",
+      "final_url": "https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 1428000,
+      "sha256": "f4db5c015154933482e84f1946dcafc297d8ad526db90d2985df35232d8ab0c2",
+      "fetched_utc": "2026-10-04T15:16:04.500761+00:00"
+    },
+    {
+      "document_id": "DOE-FEMP-OM-APPROACHES",
+      "local_file": "knowledge_base/originals/DOE-FEMP-OM-APPROACHES.html",
+      "requested_url": "https://www.energy.gov/cmei/femp/operations-and-maintenance-challenges-and-solutions",
+      "final_url": "https://www.energy.gov/cmei/femp/operations-and-maintenance-challenges-and-solutions",
+      "content_type": "text/html",
+      "size_bytes": 148058,
+      "sha256": "e8634eb6dfc831b52983d3bf3b768afefa3032a07da2346a3f9536eee4a3fef9",
+      "fetched_utc": "2026-10-04T15:16:03.785121+00:00"
+    },
+    {
+      "document_id": "DOE-FEMP-OM-BEST-PRACTICES",
+      "local_file": "knowledge_base/originals/DOE-FEMP-OM-BEST-PRACTICES.pdf",
+      "requested_url": "https://www.energy.gov/sites/default/files/2020/04/f74/omguide_complete_w-eo-disclaimer.pdf",
+      "final_url": "https://www.energy.gov/sites/default/files/2020/04/f74/omguide_complete_w-eo-disclaimer.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 8562032,
+      "sha256": "9cf0adbc462c73b7ec20f97b21643ba709c2c7c4571ff6630a2d628d78e3147c",
+      "fetched_utc": "2026-10-04T15:16:03.342953+00:00"
+    },
+    {
+      "document_id": "NIST-SP-800-40R4",
+      "local_file": "knowledge_base/originals/NIST-SP-800-40R4.pdf",
+      "requested_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-40r4.pdf",
+      "final_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-40r4.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 562944,
+      "sha256": "351f4a828d6c0bc8bf98f25ba3f87ec5add0ed8cf8bb4a6e6cb4e7e4a9731833",
+      "fetched_utc": "2026-10-04T15:15:58.998619+00:00"
+    },
+    {
+      "document_id": "NIST-SP-800-53R5-PE",
+      "local_file": "knowledge_base/originals/NIST-SP-800-53R5-PE.pdf",
+      "requested_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf",
+      "final_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 6073678,
+      "sha256": "fc63bcd61715d0181dd8e85998b1e6201ae3515fc6626102101cab1841e11ec6",
+      "fetched_utc": "2026-10-04T15:16:00.871338+00:00"
+    },
+    {
+      "document_id": "NIST-SP-800-61R3",
+      "local_file": "knowledge_base/originals/NIST-SP-800-61R3.pdf",
+      "requested_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-61r3.pdf",
+      "final_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-61r3.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 1040566,
+      "sha256": "e5593d6bb85daecec7e8d9549400c7b3473bcc3f06e469c82218073afa7fba2d",
+      "fetched_utc": "2026-10-04T15:15:57.531692+00:00"
+    },
+    {
+      "document_id": "OSHA-1910-132",
+      "local_file": "knowledge_base/originals/OSHA-1910-132.pdf",
+      "requested_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-132.pdf",
+      "final_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-132.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 199993,
+      "sha256": "c1edd9bd2f3b1c7a7da82ad36a979a02289479544ddeb9ace8b5051d52a73ff4",
+      "fetched_utc": "2026-10-04T15:20:41.844572+00:00"
+    },
+    {
+      "document_id": "OSHA-1910-135",
+      "local_file": "knowledge_base/originals/OSHA-1910-135.pdf",
+      "requested_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-135.pdf",
+      "final_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-135.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 196405,
+      "sha256": "7ee0ee00a0f140e3fe195d5a0f031cdbc092a939d7af1fb65980dd99c5b189b5",
+      "fetched_utc": "2026-10-04T15:20:42.786145+00:00"
+    },
+    {
+      "document_id": "OSHA-1910-137",
+      "local_file": "knowledge_base/originals/OSHA-1910-137.pdf",
+      "requested_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-137.pdf",
+      "final_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-137.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 244192,
+      "sha256": "45d1b71358a6fba2af0900c979a80222eb411bf8bb3c486f6a1f9d1eb52b6b9c",
+      "fetched_utc": "2026-10-04T15:20:43.763536+00:00"
+    },
+    {
+      "document_id": "OSHA-1910-147",
+      "local_file": "knowledge_base/originals/OSHA-1910-147.pdf",
+      "requested_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-147.pdf",
+      "final_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-147.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 244567,
+      "sha256": "0f2c12ce02900338f4a9c71e0b71035dafd7f4897f967978d523407e394f85ba",
+      "fetched_utc": "2026-10-04T15:20:44.606254+00:00"
+    },
+    {
+      "document_id": "OSHA-1910-38",
+      "local_file": "knowledge_base/originals/OSHA-1910-38.pdf",
+      "requested_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-38.pdf",
+      "final_url": "https://www.govinfo.gov/content/pkg/CFR-2025-title29-vol5/pdf/CFR-2025-title29-vol5-sec1910-38.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 200434,
+      "sha256": "7e2d2c5b79ab7e1e561c43ac79944d345cbe825b44a19fb77cac65d2dfe35c42",
+      "fetched_utc": "2026-10-04T15:20:45.436884+00:00"
+    }
+  ]
+}

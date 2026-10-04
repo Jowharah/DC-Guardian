@@ -1,0 +1,234 @@
+{
+  "evaluation_version": "2.0",
+  "status": "FROZEN_BEFORE_RETRIEVAL_TUNING",
+  "freeze_rule": "Do not change expected sources merely because an embedding model, chunking strategy, vector store, or top_k performs poorly. Changes require documented evaluation-version revision.",
+  "cases": [
+    {
+      "case_id": "RAG-EVAL-001",
+      "query": "What approved incident-response guidance is relevant to a high-confidence SSH security anomaly?",
+      "domains": [
+        "CYBERSECURITY"
+      ],
+      "expected_document_ids": [
+        "NIST-SP-800-61R3",
+        "CISA-IR-VR-PLAYBOOKS"
+      ],
+      "case_type": "positive"
+    },
+    {
+      "case_id": "RAG-EVAL-002",
+      "query": "What guidance is relevant when a data-center zone reports high temperature and cooling conditions need review?",
+      "domains": [
+        "ENVIRONMENTAL"
+      ],
+      "expected_document_ids": [
+        "DOE-FEMP-DC-DESIGN-2024"
+      ],
+      "case_type": "positive"
+    },
+    {
+      "case_id": "RAG-EVAL-003",
+      "query": "What guidance applies when a recognized person is not authorized for the observed physical zone?",
+      "domains": [
+        "PHYSICAL_SECURITY"
+      ],
+      "expected_document_ids": [
+        "NIST-SP-800-53R5-PE",
+        "CISA-ISC-FAC-2020"
+      ],
+      "case_type": "positive"
+    },
+    {
+      "case_id": "RAG-EVAL-004",
+      "query": "What PPE guidance is relevant when required head protection is not detected?",
+      "domains": [
+        "SAFETY"
+      ],
+      "expected_document_ids": [
+        "OSHA-1910-132",
+        "OSHA-1910-135"
+      ],
+      "case_type": "positive"
+    },
+    {
+      "case_id": "RAG-EVAL-005",
+      "query": "What operational guidance is relevant to elevated equipment failure risk where predictive maintenance has raised an alert?",
+      "domains": [
+        "MAINTENANCE"
+      ],
+      "expected_document_ids": [
+        "DOE-FEMP-OM-BEST-PRACTICES",
+        "DOE-FEMP-OM-APPROACHES"
+      ],
+      "case_type": "positive"
+    },
+    {
+      "case_id": "RAG-EVAL-006",
+      "query": "What guidance is relevant to correlated high temperature and elevated equipment failure risk?",
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "expected_document_ids": [
+        "DOE-FEMP-DC-DESIGN-2024",
+        "DOE-FEMP-OM-BEST-PRACTICES",
+        "DOE-FEMP-OM-APPROACHES"
+      ],
+      "case_type": "cross_domain"
+    },
+    {
+      "case_id": "RAG-EVAL-007",
+      "query": "What safety controls are relevant before servicing equipment that could unexpectedly energize or release stored energy?",
+      "domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "expected_document_ids": [
+        "OSHA-1910-147"
+      ],
+      "case_type": "cross_domain"
+    },
+    {
+      "case_id": "RAG-EVAL-008",
+      "query": "What protective-equipment guidance is relevant to electrical maintenance hazards?",
+      "domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "expected_document_ids": [
+        "OSHA-1910-137",
+        "OSHA-1910-132"
+      ],
+      "case_type": "cross_domain"
+    },
+    {
+      "case_id": "RAG-EVAL-009",
+      "query": "What guidance should be consulted for enterprise patching as preventive maintenance for computing technology?",
+      "domains": [
+        "CYBERSECURITY",
+        "MAINTENANCE"
+      ],
+      "expected_document_ids": [
+        "NIST-SP-800-40R4"
+      ],
+      "case_type": "cross_domain"
+    },
+    {
+      "case_id": "RAG-EVAL-010",
+      "query": "What guidance addresses monitoring physical access to a protected facility or zone?",
+      "domains": [
+        "PHYSICAL_SECURITY"
+      ],
+      "expected_document_ids": [
+        "NIST-SP-800-53R5-PE",
+        "CISA-ISC-FAC-2020"
+      ],
+      "case_type": "positive"
+    },
+    {
+      "case_id": "RAG-EVAL-011",
+      "query": "What should an emergency action plan cover for reporting emergencies, evacuation, accountability, and employee roles?",
+      "domains": [
+        "SHARED_POLICY",
+        "SAFETY"
+      ],
+      "expected_document_ids": [
+        "OSHA-1910-38"
+      ],
+      "case_type": "positive"
+    },
+    {
+      "case_id": "RAG-EVAL-012",
+      "query": "Return only cybersecurity guidance for an SSH anomaly.",
+      "domains": [
+        "CYBERSECURITY"
+      ],
+      "expected_document_ids": [
+        "NIST-SP-800-61R3",
+        "CISA-IR-VR-PLAYBOOKS"
+      ],
+      "excluded_domains": [
+        "SAFETY",
+        "PHYSICAL_SECURITY",
+        "ENVIRONMENTAL"
+      ],
+      "case_type": "filter_negative"
+    },
+    {
+      "case_id": "RAG-EVAL-013",
+      "query": "Return only safety guidance about missing head protection.",
+      "domains": [
+        "SAFETY"
+      ],
+      "expected_document_ids": [
+        "OSHA-1910-132",
+        "OSHA-1910-135"
+      ],
+      "excluded_domains": [
+        "CYBERSECURITY",
+        "PHYSICAL_SECURITY",
+        "ENVIRONMENTAL"
+      ],
+      "case_type": "filter_negative"
+    },
+    {
+      "case_id": "RAG-EVAL-014",
+      "query": "What guidance distinguishes reactive, preventive, predictive, and reliability-centered maintenance approaches?",
+      "domains": [
+        "MAINTENANCE"
+      ],
+      "expected_document_ids": [
+        "DOE-FEMP-OM-APPROACHES"
+      ],
+      "case_type": "disambiguation"
+    },
+    {
+      "case_id": "RAG-EVAL-015",
+      "query": "What guidance is relevant to data-center airflow, cooling, and environmental operating conditions?",
+      "domains": [
+        "ENVIRONMENTAL"
+      ],
+      "expected_document_ids": [
+        "DOE-FEMP-DC-DESIGN-2024"
+      ],
+      "case_type": "disambiguation"
+    },
+    {
+      "case_id": "RAG-EVAL-016",
+      "query": "Which approved source defines DC-GUARDIAN's own autonomous-action limits and human-review policy?",
+      "domains": [
+        "SHARED_POLICY"
+      ],
+      "expected_document_ids": [],
+      "case_type": "negative_no_approved_source",
+      "notes": "DCG-SHARED-POLICY-V1 is PLANNED/INACTIVE and must not be retrieved as approved knowledge."
+    },
+    {
+      "case_id": "RAG-EVAL-017",
+      "query": "What physical access guidance covers employee and visitor entry, screening, and authentication into nonpublic space?",
+      "domains": [
+        "PHYSICAL_SECURITY"
+      ],
+      "expected_document_ids": [
+        "CISA-ISC-FAC-2020"
+      ],
+      "case_type": "disambiguation"
+    },
+    {
+      "case_id": "RAG-EVAL-018",
+      "query": "What approved guidance should be used for a routine hard-drive predictive-maintenance alert with no electrical or hazardous-energy servicing context?",
+      "domains": [
+        "MAINTENANCE"
+      ],
+      "expected_document_ids": [
+        "DOE-FEMP-OM-BEST-PRACTICES",
+        "DOE-FEMP-OM-APPROACHES"
+      ],
+      "excluded_document_ids": [
+        "OSHA-1910-147",
+        "OSHA-1910-137"
+      ],
+      "case_type": "negative_context"
+    }
+  ]
+}
