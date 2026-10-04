@@ -194,6 +194,9 @@ phase3/rag/evaluation/parsing_quality_report.json
 # Generated preprocessed knowledge records (rebuild with preprocess_sources.py)
 phase3/rag/knowledge_base/clean/
 
+# Generated RAG chunks (rebuild with chunk_sources.py)
+phase3/rag/knowledge_base/chunks/
+
 # Local RAG/vector-store artifacts
 phase3/rag/vector_store/
 phase3/rag/chroma_db/
