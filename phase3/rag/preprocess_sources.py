@@ -94,6 +94,25 @@ def dehyphenate_linebreaks(text: str) -> tuple[str, int]:
     return pattern.subn("", text)
 
 
+def repair_known_encoding_artifacts(
+    text: str,
+    document_id: str,
+) -> tuple[str, int]:
+    """
+    Repair only the reviewed DOE O&M extraction mojibake.
+
+    The sequence below represents a separator/bullet boundary in this
+    specific source. Preserve the boundary as a newline rather than
+    deleting it.
+    """
+    if document_id != "DOE-FEMP-OM-BEST-PRACTICES":
+        return text, 0
+
+    artifact = "\u00ef\u00bf\u00bd"
+    count = text.count(artifact)
+    return text.replace(artifact, "\n"), count
+
+
 def normalize_whitespace(text: str) -> str:
     text = text.replace("\x00", " ")
     text = re.sub(r"[ \t]+", " ", text)
@@ -143,8 +162,13 @@ def main() -> None:
                     record["text"], repeated
                 )
                 text, dehyphenated = dehyphenate_linebreaks(text)
+                text, encoding_repairs = repair_known_encoding_artifacts(
+                    text,
+                    document_id,
+                )
                 text = normalize_whitespace(text)
 
+                encoding_repairs_total += encoding_repairs
                 replacement_total += text.count("\ufffd")
                 if "\ufffd" in text and len(replacement_samples) < 20:
                     replacement_samples.extend(
