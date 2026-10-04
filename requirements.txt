@@ -28,3 +28,6 @@ beautifulsoup4==4.15.0
 
 # Phase 3 local embedding baseline
 sentence-transformers==5.1.1
+
+# Phase 3.2 grounded reasoning provider
+openai==2.3.0
