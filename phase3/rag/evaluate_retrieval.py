@@ -51,6 +51,15 @@ def percentile(values: list[float], q: float) -> float:
 
 
 def main() -> None:
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--ranking",
+        choices=["raw", "diverse"],
+        default="diverse",
+    )
+    args = parser.parse_args()
+
     spec = load_json(CASES_FILE)
     cases = spec["cases"]
 
@@ -67,6 +76,7 @@ def main() -> None:
             case["query"],
             domains=case.get("domains"),
             top_k=max(K_VALUES),
+            ranking=args.ranking,
         )
         latency_ms = (time.perf_counter() - started) * 1000
         latencies_ms.append(latency_ms)
@@ -180,6 +190,7 @@ def main() -> None:
 
     aggregate = {
         "evaluation_version": spec["evaluation_version"],
+        "ranking_policy": args.ranking,
         "case_count": len(cases),
         "k_values": list(K_VALUES),
         "metrics": {},
@@ -232,7 +243,10 @@ def main() -> None:
 
     print()
     print("=" * 60)
-    print("DC-GUARDIAN RAG RETRIEVAL BASELINE")
+    print(
+        "DC-GUARDIAN RAG RETRIEVAL BASELINE "
+        f"({args.ranking.upper()} RANKING)"
+    )
     print("=" * 60)
     for name, value in aggregate["metrics"].items():
         print(f"{name:16} {value:.4f}")
