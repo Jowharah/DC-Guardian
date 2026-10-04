@@ -6,9 +6,10 @@ import sys
 from pathlib import Path
 
 RAG_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(RAG_ROOT))
+ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT))
 
-from retrieve import retrieve_knowledge  # noqa: E402
+from phase3.rag.retrieve import retrieve_knowledge  # noqa: E402
 
 
 REQUIRED = {
