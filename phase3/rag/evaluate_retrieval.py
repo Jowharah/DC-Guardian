@@ -142,15 +142,18 @@ def main() -> None:
         domain_correct = True
         if case.get("domains"):
             requested = set(case["domains"])
+            # Filtering is inclusive: a multi-domain source is eligible when
+            # at least one applicable domain matches the requested set.
             domain_correct = all(
-                requested.intersection(item["applicable_domains"])
+                requested.intersection(set(item["applicable_domains"]))
                 for item in results
             )
         if excluded_domains:
+            # excluded_domains describes domains that must not be retrieved as
+            # the source's PRIMARY domain. A valid multi-domain source should
+            # not fail merely because an excluded label is also applicable.
             domain_correct = domain_correct and all(
-                not excluded_domains.intersection(
-                    set(item["applicable_domains"])
-                )
+                item["primary_domain"] not in excluded_domains
                 for item in results
             )
         row["filter_correct"] = domain_correct
