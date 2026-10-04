@@ -115,6 +115,24 @@ def repair_known_encoding_artifacts(
     return text.replace(artifact, "\n"), count
 
 
+def repair_common_mojibake(text: str) -> tuple[str, int]:
+    """Repair reviewed UTF-8 punctuation mojibake without semantic rewriting."""
+    replacements = {
+        "\u00e2\u20ac\u2122": "'",
+        "\u00e2\u20ac\u0153": '"',
+        "\u00e2\u20ac\u009d": '"',
+        "\u00e2\u20ac\u201c": "-",
+        "\u00e2\u20ac\u201d": "-",
+    }
+    repairs = 0
+    for artifact, replacement in replacements.items():
+        count = text.count(artifact)
+        if count:
+            text = text.replace(artifact, replacement)
+            repairs += count
+    return text, repairs
+
+
 def normalize_whitespace(text: str) -> str:
     text = text.replace("\x00", " ")
     text = re.sub(r"[ \t]+", " ", text)
@@ -158,6 +176,7 @@ def main() -> None:
             replacement_total = 0
             replacement_samples = []
             encoding_repairs_total = 0
+            mojibake_repairs_total = 0
 
             for record in records:
                 text, removed = remove_repeated_lines(
@@ -168,9 +187,11 @@ def main() -> None:
                     text,
                     document_id,
                 )
+                text, mojibake_repairs = repair_common_mojibake(text)
                 text = normalize_whitespace(text)
 
                 encoding_repairs_total += encoding_repairs
+                mojibake_repairs_total += mojibake_repairs
                 replacement_total += text.count("\ufffd")
                 if "\ufffd" in text and len(replacement_samples) < 20:
                     replacement_samples.extend(
@@ -186,6 +207,7 @@ def main() -> None:
                     "repeated_lines_removed": removed,
                     "linebreak_hyphens_joined": dehyphenated,
                     "known_encoding_artifacts_repaired": encoding_repairs,
+                    "common_mojibake_repairs": mojibake_repairs,
                     "semantic_rewrite": False,
                 }
                 cleaned_records.append(output)
@@ -226,6 +248,7 @@ def main() -> None:
                 f"headers/footers_removed={removed_total} "
                 f"dehyphenated={dehyphenated_total} "
                 f"encoding_repairs={encoding_repairs_total} "
+                f"mojibake_repairs={mojibake_repairs_total} "
                 f"replacement_chars={replacement_total}"
             )
         except Exception as error:
