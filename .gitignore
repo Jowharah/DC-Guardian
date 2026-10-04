@@ -261,3 +261,5 @@ phase1/ppe_detection/results/final_test/ultralytics_eval/val_batch*_pred.jpg
 
 # Old/duplicate maintenance notebook
 phase1/predictive_maintenance/notebooks/DC_Guardian_Predictive_Maintenance_Backblaze (1).ipynb
+# Generated RAG abstention calibration report
+phase3/rag/evaluation/abstention_calibration_report.json
