@@ -136,6 +136,7 @@ def main() -> None:
             dehyphenated_total = 0
             replacement_total = 0
             replacement_samples = []
+            encoding_repairs_total = 0
 
             for record in records:
                 text, removed = remove_repeated_lines(
@@ -158,6 +159,7 @@ def main() -> None:
                 output["preprocessing"] = {
                     "repeated_lines_removed": removed,
                     "linebreak_hyphens_joined": dehyphenated,
+                    "known_encoding_artifacts_repaired": encoding_repairs,
                     "semantic_rewrite": False,
                 }
                 cleaned_records.append(output)
@@ -197,6 +199,7 @@ def main() -> None:
                 f"records={len(cleaned_records)} "
                 f"headers/footers_removed={removed_total} "
                 f"dehyphenated={dehyphenated_total} "
+                f"encoding_repairs={encoding_repairs_total} "
                 f"replacement_chars={replacement_total}"
             )
         except Exception as error:
