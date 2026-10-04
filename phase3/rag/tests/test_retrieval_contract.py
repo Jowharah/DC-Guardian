@@ -19,6 +19,8 @@ REQUIRED = {
 
 
 def main() -> None:
+    # The retrieval path must work from the already cached embedding model;
+    # it must not require Hugging Face network access after index creation.
     rows = retrieve_knowledge(
         "physical access authorization and monitoring",
         domains=["PHYSICAL_SECURITY"],
