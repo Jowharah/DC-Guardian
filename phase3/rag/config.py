@@ -20,3 +20,10 @@ RETRIEVAL_SCOPE = {
         ),
     },
 }
+
+
+# Local embedding baseline v1. Model ID and revision are persisted in the
+# index-build manifest. Retrieval uses normalized embeddings + cosine score.
+LOCAL_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+LOCAL_EMBEDDING_REVISION = "main"
+LOCAL_EMBEDDING_BATCH_SIZE = 32
