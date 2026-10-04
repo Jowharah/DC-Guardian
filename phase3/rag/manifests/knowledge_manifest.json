@@ -30,7 +30,8 @@
       "retrieval_status": "ACTIVE",
       "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final",
       "local_file": null,
-      "sha256": null
+      "sha256": null,
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-61r3.pdf"
     },
     {
       "document_id": "CISA-IR-VR-PLAYBOOKS",
@@ -49,7 +50,8 @@
       "retrieval_status": "ACTIVE",
       "url": "https://www.cisa.gov/sites/default/files/publications/Cybersecurity_Incident_Vulnerability_Response_Playbooks_508C.pdf",
       "local_file": null,
-      "sha256": null
+      "sha256": null,
+      "download_url": "https://www.cisa.gov/sites/default/files/publications/Cybersecurity_Incident_Vulnerability_Response_Playbooks_508C.pdf"
     },
     {
       "document_id": "NIST-SP-800-40R4",
@@ -68,7 +70,8 @@
       "retrieval_status": "ACTIVE",
       "url": "https://csrc.nist.gov/pubs/sp/800/40/r4/final",
       "local_file": null,
-      "sha256": null
+      "sha256": null,
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-40r4.pdf"
     },
     {
       "document_id": "NIST-SP-800-53R5-PE",
@@ -93,7 +96,8 @@
         "PE-2 Physical Access Authorizations",
         "PE-3 Physical Access Control",
         "PE-6 Monitoring Physical Access"
-      ]
+      ],
+      "download_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf"
     },
     {
       "document_id": "CISA-ISC-FAC-2020",
@@ -112,7 +116,8 @@
       "retrieval_status": "ACTIVE",
       "url": "https://www.cisa.gov/sites/default/files/2025-02/Facility%20Access%20Control%20-%20An%20Interagency%20Security%20Committee%20Best%20Practice-02-20.pdf",
       "local_file": null,
-      "sha256": null
+      "sha256": null,
+      "download_url": "https://www.cisa.gov/sites/default/files/2025-02/Facility%20Access%20Control%20-%20An%20Interagency%20Security%20Committee%20Best%20Practice-02-20.pdf"
     },
     {
       "document_id": "OSHA-1910-132",
@@ -131,7 +136,8 @@
       "retrieval_status": "ACTIVE",
       "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.132",
       "local_file": null,
-      "sha256": null
+      "sha256": null,
+      "download_url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.132"
     },
     {
       "document_id": "OSHA-1910-135",
@@ -150,7 +156,8 @@
       "retrieval_status": "ACTIVE",
       "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.135",
       "local_file": null,
-      "sha256": null
+      "sha256": null,
+      "download_url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.135"
     },
     {
       "document_id": "OSHA-1910-137",
@@ -169,7 +176,8 @@
       "retrieval_status": "ACTIVE",
       "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.137",
       "local_file": null,
-      "sha256": null
+      "sha256": null,
+      "download_url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.137"
     },
     {
       "document_id": "OSHA-1910-147",
@@ -188,7 +196,8 @@
       "retrieval_status": "ACTIVE",
       "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147",
       "local_file": null,
-      "sha256": null
+      "sha256": null,
+      "download_url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.147"
     },
     {
       "document_id": "OSHA-1910-38",
@@ -208,7 +217,8 @@
       "retrieval_status": "ACTIVE",
       "url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.38",
       "local_file": null,
-      "sha256": null
+      "sha256": null,
+      "download_url": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.38"
     },
     {
       "document_id": "DOE-FEMP-OM-BEST-PRACTICES",
@@ -227,7 +237,8 @@
       "retrieval_status": "ACTIVE",
       "url": "https://www.energy.gov/cmei/femp/articles/operations-and-maintenance-best-practices-guide-achieving-operational-efficiency",
       "local_file": null,
-      "sha256": null
+      "sha256": null,
+      "download_url": "https://www.energy.gov/sites/default/files/2020/04/f74/omguide_complete_w-eo-disclaimer.pdf"
     },
     {
       "document_id": "DOE-FEMP-OM-APPROACHES",
@@ -252,7 +263,8 @@
         "preventive maintenance",
         "predictive maintenance",
         "reliability-centered maintenance"
-      ]
+      ],
+      "download_url": "https://www.energy.gov/cmei/femp/operations-and-maintenance-challenges-and-solutions"
     },
     {
       "document_id": "DOE-FEMP-DC-DESIGN-2024",
@@ -278,7 +290,8 @@
         "cooling",
         "electrical systems",
         "metrics"
-      ]
+      ],
+      "download_url": "https://www.energy.gov/sites/default/files/2024-07/best-practice-guide-data-center-design.pdf"
     },
     {
       "document_id": "DOE-FEMP-FACILITY-OM",
@@ -299,7 +312,8 @@
       "url": "https://www.energy.gov/cmei/femp/operations-and-maintenance-federal-facilities",
       "local_file": null,
       "sha256": null,
-      "notes": "Useful resource hub; keep inactive until a stable ingestible document or selected subresource is approved."
+      "notes": "Useful resource hub; keep inactive until a stable ingestible document or selected subresource is approved.",
+      "download_url": "https://www.energy.gov/cmei/femp/operations-and-maintenance-federal-facilities"
     },
     {
       "document_id": "NIST-SP-800-34R1",
@@ -319,7 +333,8 @@
       "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final",
       "local_file": null,
       "sha256": null,
-      "notes": "Candidate resilience/contingency source; approve only after confirming current applicability for the intended RAG use."
+      "notes": "Candidate resilience/contingency source; approve only after confirming current applicability for the intended RAG use.",
+      "download_url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final"
     },
     {
       "document_id": "DCG-SHARED-POLICY-V1",
@@ -343,7 +358,8 @@
       "url": null,
       "local_file": null,
       "sha256": null,
-      "notes": "To define escalation, evidence handling, human review, source citation, and limits on autonomous action. It must not misrepresent project policy as external regulation."
+      "notes": "To define escalation, evidence handling, human review, source citation, and limits on autonomous action. It must not misrepresent project policy as external regulation.",
+      "download_url": null
     }
   ]
 }
