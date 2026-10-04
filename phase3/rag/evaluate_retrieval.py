@@ -54,6 +54,11 @@ def main() -> None:
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "--abstain",
+        action="store_true",
+        help="Apply the frozen calibrated evidence-sufficiency threshold.",
+    )
+    parser.add_argument(
         "--ranking",
         choices=["raw", "diverse", "controlled"],
         default="controlled",
@@ -77,6 +82,7 @@ def main() -> None:
             domains=case.get("domains"),
             top_k=max(K_VALUES),
             ranking=args.ranking,
+            abstain=args.abstain,
         )
         latency_ms = (time.perf_counter() - started) * 1000
         latencies_ms.append(latency_ms)
@@ -194,6 +200,7 @@ def main() -> None:
     aggregate = {
         "evaluation_version": spec["evaluation_version"],
         "ranking_policy": args.ranking,
+        "abstention_enabled": args.abstain,
         "case_count": len(cases),
         "k_values": list(K_VALUES),
         "metrics": {},
@@ -248,7 +255,8 @@ def main() -> None:
     print("=" * 60)
     print(
         "DC-GUARDIAN RAG RETRIEVAL BASELINE "
-        f"({args.ranking.upper()} RANKING)"
+        f"({args.ranking.upper()} RANKING"
+        f"{' + ABSTENTION' if args.abstain else ''})"
     )
     print("=" * 60)
     for name, value in aggregate["metrics"].items():
