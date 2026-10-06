@@ -65,6 +65,8 @@ def run_check(label: str, script: Path) -> bool:
         [sys.executable, str(script)],
         cwd=ROOT,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         env=env,
