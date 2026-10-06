@@ -17,7 +17,7 @@ Correlation is deterministic and topology-based.
 No ML or LLM reasoning is performed here.
 """
 
-from correlation_rules import (
+from phase2.correlation.correlation_rules import (
     ABNORMAL_STATES,
     CORRELATION_SCOPE_RACK,
     CORRELATION_SCOPE_SERVER,
