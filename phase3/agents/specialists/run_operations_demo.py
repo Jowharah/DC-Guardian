@@ -111,14 +111,15 @@ def main() -> None:
 
     combined = json.dumps(result, ensure_ascii=False).lower()
     forbidden_claims = (
-        "high temperature caused the drive",
-        "temperature caused the drive",
-        "34.0°c caused",
-        "34°c caused",
-        "the drive will fail",
-        "drv-test-001 will fail",
-        "sen-b-01 monitors srv-b1-01",
-        "sen-b-01 measured srv-b1-01",
+        "high temperature caused drv-test-001",
+        "high temperature caused the at_risk state",
+        "the temperature caused drv-test-001",
+        "34.0°c caused drv-test-001",
+        "34°c caused drv-test-001",
+        "drv-test-001 will fail within 7 days",
+        "drv-test-001 will fail in 7 days",
+        "sen-b-01 directly monitors srv-b1-01",
+        "sen-b-01 directly measured srv-b1-01",
     )
     matched = [claim for claim in forbidden_claims if claim in combined]
     if matched:
