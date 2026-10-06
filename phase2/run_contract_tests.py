@@ -10,6 +10,7 @@ used for every child test.
 """
 
 from pathlib import Path
+import os
 import subprocess
 import sys
 import time
@@ -296,9 +297,18 @@ def run_contract(
     start = time.perf_counter()
 
 
+    env = os.environ.copy()
+    existing_pythonpath = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (
+        str(PROJECT_ROOT)
+        if not existing_pythonpath
+        else str(PROJECT_ROOT) + os.pathsep + existing_pythonpath
+    )
+
     result = subprocess.run(
         command,
         cwd=PROJECT_ROOT,
+        env=env,
     )
 
 
