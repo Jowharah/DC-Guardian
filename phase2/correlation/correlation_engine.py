@@ -29,7 +29,7 @@ from phase2.correlation.correlation_rules import (
     SUPPORTED_DOMAINS,
 )
 
-from ingest_event import (
+from phase2.graph.ingest_event import (
     NEO4J_DATABASE,
 )
 
