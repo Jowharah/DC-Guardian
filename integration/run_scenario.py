@@ -63,7 +63,21 @@ def main() -> None:
         "Grounding status: "
         + data["response"]["assessment"]["grounding_status"]
     )
-    print("Decision: PENDING_DETERMINISTIC_DECISION_RULES")
+    decision = data["decision"]
+    print(
+        "Decision: "
+        f"{decision['incident_status']} | "
+        f"severity={decision['severity']} | "
+        f"mode={decision['response_mode']}"
+    )
+    print(
+        "Escalation required: "
+        + str(decision["escalation_required"])
+    )
+    print(
+        "Autonomous action allowed: "
+        + str(decision["autonomous_action_allowed"])
+    )
     print("=" * 60)
 
 
