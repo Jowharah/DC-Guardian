@@ -105,15 +105,22 @@ def main() -> None:
         "srv-b1-01 is compromised",
         "server was compromised",
         "server is compromised",
-        "confirmed attack",
-        "successful compromise",
-        "attacker gained access",
-        "attacker obtained access",
+        "this was a confirmed attack",
+        "the incident was a confirmed attack",
+        "the incident is a confirmed attack",
+        "a successful compromise occurred",
+        "the compromise was successful",
+        "attacker gained access to srv-b1-01",
+        "attacker obtained access to srv-b1-01",
     )
-    if any(claim in combined for claim in forbidden_claims):
+    matched_claims = [
+        claim for claim in forbidden_claims if claim in combined
+    ]
+    if matched_claims:
         raise RuntimeError(
             "FAILED CYBER EVIDENCE BOUNDARY: specialist converted anomaly "
-            "evidence into an unsupported confirmed attack/compromise claim."
+            "evidence into an unsupported confirmed attack/compromise claim: "
+            + ", ".join(matched_claims)
         )
 
     print()
