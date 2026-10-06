@@ -10,6 +10,12 @@ from integration.runners.real_environmental_maintenance_reasoning import (
 from integration.runners.real_environmental_maintenance_response import (
     run_real_environmental_maintenance_response,
 )
+from integration.runners.real_cyber_environmental_maintenance_reasoning import (
+    run_real_cyber_environmental_maintenance_reasoning,
+)
+from integration.runners.real_cyber_environmental_maintenance_response import (
+    run_real_cyber_environmental_maintenance_response,
+)
 
 
 SCENARIOS = {
@@ -22,6 +28,11 @@ SCENARIOS = {
         "description": "Controlled high-temperature + drive AT_RISK evidence.",
         "reasoning_runner": run_real_environmental_maintenance_reasoning,
         "response_runner": run_real_environmental_maintenance_response,
+    },
+    "cyber_environmental_maintenance": {
+        "description": "Controlled SSH anomaly + environmental + maintenance evidence.",
+        "reasoning_runner": run_real_cyber_environmental_maintenance_reasoning,
+        "response_runner": run_real_cyber_environmental_maintenance_response,
     },
 }
 
