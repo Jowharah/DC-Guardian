@@ -4,6 +4,12 @@ from __future__ import annotations
 
 from integration.runners.real_ppe_face_reasoning import run_real_ppe_face_reasoning
 from integration.runners.real_ppe_face_response import run_real_ppe_face_response
+from integration.runners.real_environmental_maintenance_reasoning import (
+    run_real_environmental_maintenance_reasoning,
+)
+from integration.runners.real_environmental_maintenance_response import (
+    run_real_environmental_maintenance_response,
+)
 
 
 SCENARIOS = {
@@ -11,6 +17,11 @@ SCENARIOS = {
         "description": "Controlled PPE non-compliance + unauthorized Face evidence.",
         "reasoning_runner": run_real_ppe_face_reasoning,
         "response_runner": run_real_ppe_face_response,
+    },
+    "environmental_maintenance": {
+        "description": "Controlled high-temperature + drive AT_RISK evidence.",
+        "reasoning_runner": run_real_environmental_maintenance_reasoning,
+        "response_runner": run_real_environmental_maintenance_response,
     },
 }
 
