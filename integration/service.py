@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from integration.scenario_registry import get_scenario
 from integration.schemas.pipeline_result import PipelineResult
+from integration.decision.rules import decide
 
 
 def run_integrated_scenario(
@@ -17,7 +18,7 @@ def run_integrated_scenario(
     reasoning = config["reasoning_runner"](scenario_id=resolved_id)
     response = config["response_runner"](reasoning)
 
-    return PipelineResult(
+    partial = PipelineResult(
         scenario_id=resolved_id,
         evidence={
             "layer": "EVIDENCE",
@@ -38,12 +39,12 @@ def run_integrated_scenario(
             "layer": "RESPONSE",
             **response,
         },
-        decision={
-            "status": "PENDING_DETERMINISTIC_DECISION_RULES",
-        },
+        decision={},
         provenance={
             "scenario_name": scenario_name,
             "scenario_type": "CONTROLLED_SYNTHETIC_SCENARIO",
             "pipeline": "INTEGRATED_APPLICATION_SERVICE",
         },
     )
+    partial.decision = decide(partial.to_dict())
+    return partial
