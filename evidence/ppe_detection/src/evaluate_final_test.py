@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 PPE Detection - Locked Final Evaluation
 
 Runs the frozen PPE-v1 YOLOv8n detector exactly once against
