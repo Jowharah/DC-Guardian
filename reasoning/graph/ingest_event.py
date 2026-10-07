@@ -2517,7 +2517,7 @@ def ingest_face_event(
         # ====================================================
         # Persist graph-derived authorization context
         #
-        # This is Phase 2 context, not a Phase 1 model output.
+        # This is Reasoning layer context, not a Evidence layer model output.
         # ====================================================
 
         session.run(
