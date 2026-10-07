@@ -1670,7 +1670,7 @@ def map_face_event_to_scenario(
     # ========================================================
     # Observation topology
     #
-    # Preserve person_id exactly as supplied by Phase 1.
+    # Preserve person_id exactly as supplied by Evidence layer.
     # ========================================================
 
     mapped_event[
@@ -1908,7 +1908,7 @@ def map_ppe_event_to_scenario(
     # ========================================================
     # Identity boundary
     #
-    # PPE Phase 1 does not identify employees.
+    # PPE Evidence layer does not identify employees.
     # ========================================================
 
     entities = common_event.get(
