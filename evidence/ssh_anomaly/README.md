@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains the Phase 1 SSH anomaly-detection component of
+This repository contains the Evidence layer SSH anomaly-detection component of
 **DC-Guardian**.
 
 SSH Detector v1 processes OpenSSH server logs and produces structured
@@ -14,9 +14,9 @@ behavioral security assessments. The final v1 detector combines:
 -   explicit OpenSSH security signals.
 
 The component operates on **source-IP / 5-minute behavioral windows**.
-Phase 1 ends with a frozen, independently callable inference pipeline.
+Evidence layer ends with a frozen, independently callable inference pipeline.
 Cross-domain correlation, Neo4j, RAG, Agentic AI, topology reasoning,
-and dashboard integration belong to Phase 2.
+and dashboard integration belong to Reasoning layer.
 
 ## Final v1 Architecture
 
@@ -440,7 +440,7 @@ signal.
 
 ## End-to-End Runtime Pipeline
 
-The primary Phase 2-facing wrapper is:
+The primary Reasoning layer-facing wrapper is:
 
 ``` text
 src/ssh_pipeline.py
@@ -791,13 +791,13 @@ select a new threshold inside runtime inference.
 
 ------------------------------------------------------------------------
 
-## Phase 2 Handover
+## Reasoning layer Handover
 
-SSH Detector v1 is an independently callable Phase 1 evidence-generation component.
+SSH Detector v1 is an independently callable Evidence layer evidence-generation component.
 
-Phase 2 consumes the structured SSH assessment and is responsible for normalization into the Common Event Schema, controlled topology mapping, Neo4j persistence, and deterministic cross-domain correlation. Infrastructure-specific fields such as `zone_id`, `rack_id`, `server_id`, and `asset_id` are therefore added downstream rather than hard-coded into SSH Detector v1.
+Reasoning layer consumes the structured SSH assessment and is responsible for normalization into the Common Event Schema, controlled topology mapping, Neo4j persistence, and deterministic cross-domain correlation. Infrastructure-specific fields such as `zone_id`, `rack_id`, `server_id`, and `asset_id` are therefore added downstream rather than hard-coded into SSH Detector v1.
 
-Important Phase 1 fields handed to Phase 2 include:
+Important Evidence layer fields handed to Reasoning layer include:
 
 ``` text
 event_type
@@ -817,11 +817,11 @@ autoencoder
 evidence
 ```
 
-The validated Phase 2 baseline passes 24/24 integration contracts. Phase 3 will consume structured event/correlation context for operational RAG, grounded agent reasoning, deterministic severity/decision rules, and incident-response output. The SSH detector itself does not perform those downstream responsibilities.
+The validated Reasoning layer baseline passes 24/24 integration contracts. Response layer will consume structured event/correlation context for operational RAG, grounded agent reasoning, deterministic severity/decision rules, and incident-response output. The SSH detector itself does not perform those downstream responsibilities.
 
 ------------------------------------------------------------------------
 
-## Phase 1 SSH Status
+## Evidence layer SSH Status
 
 Completed for SSH Detector v1:
 
@@ -838,15 +838,15 @@ Completed for SSH Detector v1:
 -   [x] Metrics recorded
 -   [x] External behavioral validation
 -   [x] End-to-end raw-log inference pipeline
--   [x] Structured Phase 2 output contract
+-   [x] Structured Reasoning layer output contract
 -   [x] README / run instructions
 
 Shared integration status:
 
--   [x] Integrated into the validated Phase 2 common-event/topology/graph/correlation baseline
--   [x] Phase 2 consolidated regression suite passes 24/24
+-   [x] Integrated into the validated Reasoning layer common-event/topology/graph/correlation baseline
+-   [x] Reasoning layer consolidated regression suite passes 24/24
 -   [x] Frozen SSH runtime/artifact integrity verified in the integrated runtime
--   [ ] Additional model optimization or revision requires a separate Phase 1 model-revision cycle
+-   [ ] Additional model optimization or revision requires a separate Evidence layer model-revision cycle
 
 ------------------------------------------------------------------------
 
