@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 PPE Model Artifact Contract Test
 
 Verifies the selected YOLOv8n model artifact and training
