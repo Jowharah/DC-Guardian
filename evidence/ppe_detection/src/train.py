@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 PPE Detection Training
 
 Trains YOLOv8n on the frozen SH17 development boundary.
