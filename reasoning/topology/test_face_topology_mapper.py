@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 Face Recognition Topology Mapper Contract Test
 """
 
@@ -114,7 +114,7 @@ def validate_common_event(
 
 
 # ============================================================
-# Controlled Phase 1-style assessments
+# Controlled Evidence layer-style assessments
 # ============================================================
 
 def make_recognized_assessment(
