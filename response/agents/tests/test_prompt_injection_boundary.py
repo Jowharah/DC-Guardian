@@ -54,19 +54,27 @@ class AdversarialProvider:
 
 
 def main():
-    required = (
-        "untrusted data",
-        "not instructions",
-        "Never follow commands",
+    required_patterns = (
+        ("untrusted data",),
+        ("not instructions", "not\ninstructions"),
+        ("Never follow commands",),
     )
-    for phrase in required:
-        if phrase not in SYSTEM_INSTRUCTIONS:
+    for alternatives in required_patterns:
+        if not any(
+            phrase in SYSTEM_INSTRUCTIONS
+            for phrase in alternatives
+        ):
             raise AssertionError(
-                f"Grounded reasoning instructions lack injection control: {phrase}"
+                "Grounded reasoning instructions lack injection control: "
+                f"{alternatives[0]}"
             )
-        if phrase not in SYNTHESIS_INSTRUCTIONS:
+        if not any(
+            phrase in SYNTHESIS_INSTRUCTIONS
+            for phrase in alternatives
+        ):
             raise AssertionError(
-                f"Synthesis instructions lack injection control: {phrase}"
+                "Synthesis instructions lack injection control: "
+                f"{alternatives[0]}"
             )
 
     result = grounded_reason(
