@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 GRU Training Normalization
 
 Computes robust normalization statistics using TRAINING
