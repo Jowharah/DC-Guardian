@@ -6,6 +6,9 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
+from shared.model_integrity import verify_sha256
+from evidence.ssh_anomaly.src.ssh_detector import ARTIFACT_SHA256
+
 
 # ============================================================
 # Paths
@@ -126,6 +129,15 @@ def load_isolation_forest():
         "============================================"
     )
 
+    verify_sha256(
+        IF_MODEL_FILE,
+        ARTIFACT_SHA256[IF_MODEL_FILE],
+    )
+    verify_sha256(
+        IF_SCALER_FILE,
+        ARTIFACT_SHA256[IF_SCALER_FILE],
+    )
+
     model = joblib.load(
         IF_MODEL_FILE
     )
@@ -210,6 +222,15 @@ def load_autoencoder():
     )
     print(
         "============================================"
+    )
+
+    verify_sha256(
+        AE_MODEL_FILE,
+        ARTIFACT_SHA256[AE_MODEL_FILE],
+    )
+    verify_sha256(
+        AE_SCALER_FILE,
+        ARTIFACT_SHA256[AE_SCALER_FILE],
     )
 
     model = tf.keras.models.load_model(
