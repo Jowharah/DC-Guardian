@@ -2,7 +2,7 @@
 
 ## Purpose
 
-DC-GUARDIAN Environmental Monitoring is a **deterministic monitoring component**, not a learned ML model. It converts configured environmental and hardware-telemetry conditions into structured assessments for Phase 2.
+DC-GUARDIAN Environmental Monitoring is a **deterministic monitoring component**, not a learned ML model. It converts configured environmental and hardware-telemetry conditions into structured assessments for Reasoning layer.
 
 ## Component design
 
@@ -24,7 +24,7 @@ Validation instead checks:
 - dedicated sensor handling,
 - hardware telemetry handling,
 - source and provenance preservation, and
-- compatibility with the Phase 2 common-event contract.
+- compatibility with the Reasoning layer common-event contract.
 
 ## Source structure
 
@@ -41,7 +41,7 @@ tests/
   test_environmental_sources.py
 ```
 
-## Phase 2 contract
+## Reasoning layer contract
 
 Environmental evidence is normalized as the `ENVIRONMENTAL` domain. The graph supports dedicated sensors as well as hardware-derived sources without falsely assigning a dedicated sensor to a server merely to enable correlation.
 
