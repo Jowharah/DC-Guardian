@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Face Recognition Matcher
 
 Loads the frozen enrollment embeddings and performs
