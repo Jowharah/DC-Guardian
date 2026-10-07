@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Predictive Maintenance GRU Training
 
 Experimental GRU challenger to the frozen Temporal RF v2.
