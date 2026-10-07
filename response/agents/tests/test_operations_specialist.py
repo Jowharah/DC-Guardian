@@ -1,4 +1,4 @@
-﻿"""Local contracts for the Phase 3.3 Operations specialist."""
+﻿"""Local contracts for the Specialist Agents Operations specialist."""
 
 from __future__ import annotations
 
@@ -113,7 +113,7 @@ def main():
     print("PASS: Unsupported specialist domains rejected.")
 
     print("=" * 60)
-    print("DC-GUARDIAN PHASE 3.3 OPERATIONS SPECIALIST CONTRACT PASSED")
+    print("DC-GUARDIAN SPECIALIST AGENTS OPERATIONS SPECIALIST CONTRACT PASSED")
     print("=" * 60)
 
 
