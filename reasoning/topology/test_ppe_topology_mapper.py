@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 PPE Topology Mapper Contract Test
 """
 
@@ -51,7 +51,7 @@ from topology_mapper import (
 
 
 # ============================================================
-# Controlled Phase 1 PPE assessment
+# Controlled Evidence layer PPE assessment
 # ============================================================
 
 assessment = {
@@ -195,7 +195,7 @@ common_event = adapt_ppe_assessment(
     assessment,
 
     dataset_name=
-        "DC-Guardian Phase 2 Controlled Contract Test",
+        "DC-Guardian Reasoning Controlled Contract Test",
 
     source_type=
         "CONTROLLED_TEST",
