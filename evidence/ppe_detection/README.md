@@ -2,7 +2,7 @@
 
 ## Purpose
 
-DC-GUARDIAN PPE-v1 provides person-level safety evidence for Phase 2. The frozen baseline uses YOLOv8n trained on SH17 and a project-defined compliance policy.
+DC-GUARDIAN PPE-v1 provides person-level safety evidence for Reasoning layer. The frozen baseline uses YOLOv8n trained on SH17 and a project-defined compliance policy.
 
 ## Frozen baseline
 
@@ -41,14 +41,14 @@ Required-class results:
 | Helmet | 0.7321 | 0.6026 | 0.6761 | 0.4557 |
 | Safety vest | 0.6213 | 0.4490 | 0.3719 | 0.2195 |
 
-The safety-vest result is retained transparently as part of the frozen Phase 1 baseline and is a future robustness/optimization target.
+The safety-vest result is retained transparently as part of the frozen Evidence layer baseline and is a future robustness/optimization target.
 
 ## Runtime flow
 
 ```text
 image -> YOLOv8n detections -> person/PPE association
       -> frozen PPE policy -> COMPLIANT / NON_COMPLIANT / NO_PERSON
-      -> Phase 2 adapter
+      -> Reasoning layer adapter
 ```
 
 ## Repository artifacts
@@ -71,9 +71,9 @@ src/
 
 Raw SH17 data and generated training checkpoints are intentionally excluded from Git.
 
-## Phase 2 contract
+## Reasoning layer contract
 
-Phase 2 preserves the PPE assessment, maps the observation into the controlled topology, persists it in Neo4j, and supports deterministic PPE + Face correlation and persistence.
+Reasoning layer preserves the PPE assessment, maps the observation into the controlled topology, persists it in Neo4j, and supports deterministic PPE + Face correlation and persistence.
 
 ## Limitations
 
