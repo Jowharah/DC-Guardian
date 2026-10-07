@@ -57,7 +57,7 @@ OPERATIONS = SpecialistFinding(
     supported_findings=(
         "The maintenance model reports elevated seven-day failure risk.",
         "A dedicated ZONE-B sensor reports HIGH_TEMPERATURE.",
-        "Phase 2 establishes shared ZONE-B context only.",
+        "The Reasoning layer establishes shared ZONE-B context only.",
     ),
     recommended_considerations=(
         "Review drive-health and environmental evidence together while preserving separate provenance.",
@@ -85,7 +85,7 @@ def main() -> None:
         findings=[CYBER, OPERATIONS],
         task=(
             "Produce a unified cross-domain assessment for validated Cybersecurity "
-            "and Operations findings that Phase 2 has already related within the "
+            "and Operations findings that the Reasoning layer has already related within the "
             "controlled incident context. Identify supported coordinated-review "
             "considerations without inventing compromise, causation, or root cause."
         ),
