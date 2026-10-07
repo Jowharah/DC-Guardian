@@ -1,9 +1,9 @@
 """
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 Deterministic Cross-Domain Correlation Rules
 
 This module defines the frozen vocabulary used by the
-deterministic Phase 2 correlation engine.
+deterministic Reasoning layer correlation engine.
 
 Environmental states are reserved for future integration.
 """
