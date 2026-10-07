@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Optimized GRU Full-Q4 Inference
 
 Scores the complete GRU-eligible Q4 population using
