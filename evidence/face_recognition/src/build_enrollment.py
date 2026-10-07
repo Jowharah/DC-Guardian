@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Face Recognition Enrollment Builder
 
 Builds the authorized employee embedding database from the
