@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Freeze Face Recognition Configuration
 
 Freezes the validation-derived operating threshold before
