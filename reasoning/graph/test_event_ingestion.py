@@ -203,7 +203,7 @@ if __name__ == "__main__":
 
     # ========================================================
     # Step 1:
-    # Phase 1 -> common event
+    # Evidence layer -> common event
     # ========================================================
 
     normalized_event = (
