@@ -1,8 +1,8 @@
 ﻿"""
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 Consolidated Contract Test Runner
 
-Runs Phase 2 contracts in dependency order and stops
+Runs Reasoning contracts in dependency order and stops
 immediately on the first failure.
 
 The same Python interpreter used to launch this script is
@@ -373,7 +373,7 @@ def main():
     print_separator()
 
     print(
-        "DC-GUARDIAN PHASE 2 CONTRACT SUITE"
+        "DC-GUARDIAN REASONING CONTRACT SUITE"
     )
 
     print_separator()
@@ -481,7 +481,7 @@ def main():
             print_separator()
 
             print(
-                "PHASE 2 CONTRACT SUITE FAILED"
+                "REASONING CONTRACT SUITE FAILED"
             )
 
             print_separator()
@@ -508,7 +508,7 @@ def main():
             print()
             print(
                 "Fix the failing contract before "
-                "continuing to later Phase 2 layers."
+                "continuing to later Reasoning layers."
             )
 
 
@@ -532,7 +532,7 @@ def main():
     print_separator()
 
     print(
-        "PHASE 2 CONTRACT TIMINGS"
+        "REASONING CONTRACT TIMINGS"
     )
 
     print_separator()
@@ -566,7 +566,7 @@ def main():
     print_separator()
 
     print(
-        f"PHASE 2 CONTRACTS PASSED: "
+        f"REASONING CONTRACTS PASSED: "
         f"{passed}/{total}"
     )
 
@@ -633,7 +633,7 @@ def main():
     print_separator()
 
     print(
-        "DC-GUARDIAN PHASE 2 "
+        "DC-GUARDIAN REASONING "
         "FOUNDATION + FACE + PPE "
         "CROSS-DOMAIN INTEGRATION PASSED"
     )
