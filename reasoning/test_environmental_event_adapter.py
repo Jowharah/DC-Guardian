@@ -393,7 +393,7 @@ print(
     "\n============================================"
 )
 print(
-    "ENVIRONMENTAL PHASE 2 ADAPTER "
+    "ENVIRONMENTAL REASONING LAYER ADAPTER "
     "CONTRACT PASSED"
 )
 print(
