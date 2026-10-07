@@ -166,7 +166,7 @@ if __name__ == "__main__":
         "\n============================================"
     )
     print(
-        "PHASE 2 EVENT CONTRACT TEST PASSED"
+        "REASONING EVENT CONTRACT TEST PASSED"
     )
     print(
         "============================================"
