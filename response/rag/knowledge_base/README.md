@@ -1,6 +1,6 @@
 ﻿# DC-GUARDIAN RAG Knowledge Base
 
-This directory holds local source snapshots used by the Phase 3.1 retrieval
+This directory holds local source snapshots used by the Response RAG retrieval
 pipeline.
 
 ## Source policy
