@@ -114,7 +114,7 @@ def main():
         raise AssertionError("Physical/Safety specialist accepted CYBERSECURITY.")
 
     print("=" * 60)
-    print("DC-GUARDIAN PHASE 3.3 PHYSICAL/SAFETY SPECIALIST CONTRACT PASSED")
+    print("DC-GUARDIAN SPECIALIST AGENTS PHYSICAL/SAFETY SPECIALIST CONTRACT PASSED")
     print("=" * 60)
 
 
