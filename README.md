@@ -40,7 +40,7 @@ Severity / decision rules
 Incident / dashboard output
 ```
 
-Phase 2 deliberately establishes evidence relationships using graph and explicit deterministic rules before any future LLM reasoning. Source-model assessments and provenance are preserved rather than silently rewritten by later layers. Phase 3 will consume structured event/correlation context; RAG will retrieve approved operational knowledge and will not decide or revise whether source events correlate.
+The Reasoning layer deliberately establishes evidence relationships using graph and explicit deterministic rules before any future LLM reasoning. Source-model assessments and provenance are preserved rather than silently rewritten by later layers. The Response layer consumes structured event/correlation context; RAG will retrieve approved operational knowledge and will not decide or revise whether source events correlate.
 
 ## Evidence Components
 
@@ -275,13 +275,12 @@ Local credentials belong in `.env`, which is excluded from Git. A sanitized `.en
 
 ## Current Development Roadmap
 
-1. Phase 1 evidence generation - COMPLETED / frozen integration baseline
-2. Phase 2 evidence integration and deterministic correlation - COMPLETED / 24/24 baseline
-3. Phase 3.1 operational knowledge manifest and approved-source definition - NEXT
-4. Phase 3.1 RAG ingestion, chunking, metadata, retrieval, and retrieval evaluation
-5. Phase 3.2 grounded agent interfaces over graph + retrieved evidence
-6. Phase 3.3 deterministic severity and decision rules
-7. Phase 3.4 incident object, response output, and dashboard integration
+1. Evidence generation - COMPLETED / frozen integration baseline
+2. Reasoning integration and deterministic correlation - COMPLETED / validated baseline
+3. Response RAG and governed knowledge - IMPLEMENTED / VERIFIED
+4. Grounded specialist reasoning and cross-domain synthesis - IMPLEMENTED / VERIFIED
+5. Deterministic Decision rules - IMPLEMENTED / VERIFIED
+6. Presentation/dashboard integration - NEXT
 
 ## Research Scope
 
