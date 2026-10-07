@@ -1,20 +1,20 @@
-"""Multi-specialist Response runner for Cyber + Environmental + Maintenance."""
+﻿"""Multi-specialist Response runner for Cyber + Environmental + Maintenance."""
 
 from __future__ import annotations
 
-from phase3.agents.providers.openai_provider import OpenAIResponsesProvider
-from phase3.agents.providers.openai_synthesis_provider import OpenAICrossDomainSynthesisProvider
-from phase3.agents.schemas.specialist_finding import (
+from response.agents.providers.openai_provider import OpenAIResponsesProvider
+from response.agents.providers.openai_synthesis_provider import OpenAICrossDomainSynthesisProvider
+from response.agents.schemas.specialist_finding import (
     EvidenceBoundaryClaims,
     to_specialist_finding,
 )
-from phase3.agents.specialists.base import SpecialistRequest
-from phase3.agents.specialists.cybersecurity import CybersecuritySpecialist
-from phase3.agents.specialists.operations import OperationsSpecialist
-from phase3.agents.routing.specialist_router import route_specialists
-from phase3.agents.synthesis.cross_domain import cross_domain_synthesize
-from phase3.rag.knowledge_eligibility import evaluate_knowledge_eligibility
-from phase3.rag.retrieve import retrieve_knowledge
+from response.agents.specialists.base import SpecialistRequest
+from response.agents.specialists.cybersecurity import CybersecuritySpecialist
+from response.agents.specialists.operations import OperationsSpecialist
+from response.agents.routing.specialist_router import route_specialists
+from response.agents.synthesis.cross_domain import cross_domain_synthesize
+from response.rag.knowledge_eligibility import evaluate_knowledge_eligibility
+from response.rag.retrieve import retrieve_knowledge
 
 
 def _retrieve(query, domains):
@@ -98,3 +98,4 @@ def run_real_cyber_environmental_maintenance_response(reasoning_result: dict) ->
         "assessment":synthesis,
         "boundary_claims":synthesis["boundary_claims"],
     }
+

@@ -1,10 +1,10 @@
-"""Reusable application service for DC-GUARDIAN integrated scenarios."""
+﻿"""Reusable application service for DC-GUARDIAN integrated scenarios."""
 
 from __future__ import annotations
 
 from integration.scenario_registry import get_scenario
 from integration.schemas.pipeline_result import PipelineResult
-from integration.decision.rules import decide
+from decision.rules import decide
 
 
 def run_integrated_scenario(
@@ -48,3 +48,4 @@ def run_integrated_scenario(
     )
     partial.decision = decide(partial.to_dict())
     return partial
+

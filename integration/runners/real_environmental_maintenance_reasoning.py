@@ -1,17 +1,17 @@
-"""Real Environmental + Maintenance Reasoning vertical slice."""
+﻿"""Real Environmental + Maintenance Reasoning vertical slice."""
 
 from __future__ import annotations
 
-from phase2.adapters.environmental_event_adapter import adapt_environmental_assessment
-from phase2.adapters.maintenance_event_adapter import adapt_maintenance_assessment
-from phase2.correlation.correlation_engine import find_cross_domain_correlations
-from phase2.graph.ingest_event import (
+from reasoning.adapters.environmental_event_adapter import adapt_environmental_assessment
+from reasoning.adapters.maintenance_event_adapter import adapt_maintenance_assessment
+from reasoning.correlation.correlation_engine import find_cross_domain_correlations
+from reasoning.graph.ingest_event import (
     NEO4J_DATABASE,
     create_driver,
     ingest_environmental_event,
     ingest_maintenance_event,
 )
-from phase2.topology.topology_mapper import (
+from reasoning.topology.topology_mapper import (
     map_environmental_event_to_scenario,
     map_maintenance_event_to_scenario,
 )
@@ -135,3 +135,4 @@ def run_real_environmental_maintenance_reasoning(*, scenario_id: str) -> dict:
         }
     finally:
         driver.close()
+

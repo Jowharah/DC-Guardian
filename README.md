@@ -1,4 +1,4 @@
-# DC-GUARDIAN
+﻿# DC-GUARDIAN
 
 DC-GUARDIAN is a research prototype for multi-domain data-center monitoring and incident reasoning. The architecture is organized into three stages: Phase 1 generates domain evidence, Phase 2 integrates and deterministically correlates that evidence using a common event schema, controlled synthetic topology, and Neo4j, and Phase 3 will add grounded reasoning and response.
 
@@ -85,7 +85,7 @@ It deliberately does not require the private Face enrollment embedding artifact.
 Run the Phase 2 contract suite from the repository root:
 
 ```powershell
-python phase2\run_contract_tests.py
+python reasoning\run_contract_tests.py
 ```
 
 Neo4j must be running for graph and correlation contracts.
@@ -102,14 +102,14 @@ A cleanup or refactor that changes executable Phase 2 code should not be accepte
 
 ```text
 DC-Guardian/
-|-- phase1/
+|-- evidence/
 |   |-- environmental_monitoring/
 |   |-- face_recognition/
 |   |-- ppe_detection/
 |   |-- predictive_maintenance/
 |   `-- ssh_anomaly/
 |
-|-- phase2/
+|-- reasoning/
 |   |-- adapters/
 |   |-- correlation/
 |   |-- graph/
@@ -130,11 +130,11 @@ DC-Guardian/
 
 Detailed Phase 1 documentation is available in each component directory:
 
-- `phase1/face_recognition/README.md`
-- `phase1/ppe_detection/README.md`
-- `phase1/predictive_maintenance/README.md`
-- `phase1/ssh_anomaly/README.md`
-- `phase1/environmental_monitoring/README.md`
+- `evidence/face_recognition/README.md`
+- `evidence/ppe_detection/README.md`
+- `evidence/predictive_maintenance/README.md`
+- `evidence/ssh_anomaly/README.md`
+- `evidence/environmental_monitoring/README.md`
 
 The repository-level `requirements.txt` records the verified direct dependencies for the integrated Python 3.12 runtime. A clean `.venv-dc-guardian` installation has been validated with the 4/4 runtime smoke test and the 24/24 Phase 2 contract suite. The file is intentionally a curated direct-dependency manifest rather than a complete `pip freeze` snapshot.
 
@@ -264,7 +264,7 @@ Do not commit biometric source data, enrollment embeddings, credentials, or priv
 The frozen Temporal Random Forest artifact is stored with Git LFS:
 
 ```text
-phase1/predictive_maintenance/models/rf/temporal_rf_v2.joblib
+evidence/predictive_maintenance/models/rf/temporal_rf_v2.joblib
 ```
 
 After cloning, ensure Git LFS is installed before relying on that artifact.
@@ -286,3 +286,5 @@ Local credentials belong in `.env`, which is excluded from Git. A sanitized `.en
 ## Research Scope
 
 DC-GUARDIAN is currently a controlled research prototype. Cross-domain scenarios use synthetic topology placement and controlled timing where required because no synchronized real-world dataset spans all project domains. Model and correlation results should therefore be interpreted within their documented evaluation settings rather than as production data-center performance claims.
+
+

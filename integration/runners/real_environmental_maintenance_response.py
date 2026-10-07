@@ -1,13 +1,13 @@
-"""Real Response runner for Environmental + Maintenance."""
+﻿"""Real Response runner for Environmental + Maintenance."""
 
 from __future__ import annotations
 
-from phase3.agents.providers.openai_provider import OpenAIResponsesProvider
-from phase3.agents.routing.specialist_router import route_specialists
-from phase3.agents.specialists.base import SpecialistRequest
-from phase3.agents.specialists.operations import OperationsSpecialist
-from phase3.rag.knowledge_eligibility import evaluate_knowledge_eligibility
-from phase3.rag.retrieve import retrieve_knowledge
+from response.agents.providers.openai_provider import OpenAIResponsesProvider
+from response.agents.routing.specialist_router import route_specialists
+from response.agents.specialists.base import SpecialistRequest
+from response.agents.specialists.operations import OperationsSpecialist
+from response.rag.knowledge_eligibility import evaluate_knowledge_eligibility
+from response.rag.retrieve import retrieve_knowledge
 
 
 QUERY = (
@@ -65,3 +65,4 @@ def run_real_environmental_maintenance_response(reasoning_result: dict) -> dict:
             "root_cause_established": False,
         },
     }
+

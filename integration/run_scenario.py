@@ -1,4 +1,4 @@
-"""CLI for the reusable DC-GUARDIAN integration backend."""
+﻿"""CLI for the reusable DC-GUARDIAN integration backend."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ def main() -> None:
 
     print("=" * 60)
     print("DC-GUARDIAN INTEGRATED SCENARIO")
-    print("EVIDENCE -> REASONING -> RESPONSE")
+    print("EVIDENCE -> REASONING -> RESPONSE -> DECISION")
     print("=" * 60)
     print(f"Scenario: {args.scenario}")
     print(f"Scenario ID: {result.scenario_id}")
@@ -83,3 +83,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

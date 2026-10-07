@@ -1,7 +1,7 @@
-"""DC-GUARDIAN integration connection verifier.
+﻿"""DC-GUARDIAN integration connection verifier.
 
 Validates that the implemented architectural layers connect using the project
-names EVIDENCE -> REASONING -> RESPONSE. This verifier intentionally uses
+names EVIDENCE -> REASONING -> RESPONSE -> DECISION. This verifier intentionally uses
 controlled structured evidence rather than retraining/loading every Evidence
 model. Heavy runtime/model smoke testing remains a separate concern.
 """
@@ -18,38 +18,41 @@ ROOT = Path(__file__).resolve().parent
 CHECKS = {
     "EVIDENCE": [],
     "REASONING": [
-        ("Reasoning regression contracts", ROOT / "phase2" / "run_contract_tests.py"),
+        ("Reasoning regression contracts", ROOT / "reasoning" / "run_contract_tests.py"),
     ],
     "RESPONSE": [
-        ("Response RAG foundation", ROOT / "phase3" / "rag" / "verify_phase3_rag.py"),
+        ("Response RAG foundation", ROOT / "response" / "rag" / "verify_response_rag.py"),
         (
             "Grounded reasoning contract",
-            ROOT / "phase3" / "agents" / "tests" / "test_grounded_reasoning_contract.py",
+            ROOT / "response" / "agents" / "tests" / "test_grounded_reasoning_contract.py",
         ),
         (
             "Specialist router contract",
-            ROOT / "phase3" / "agents" / "tests" / "test_specialist_router.py",
+            ROOT / "response" / "agents" / "tests" / "test_specialist_router.py",
         ),
         (
             "Physical/Safety specialist contract",
-            ROOT / "phase3" / "agents" / "tests" / "test_physical_safety_specialist.py",
+            ROOT / "response" / "agents" / "tests" / "test_physical_safety_specialist.py",
         ),
         (
             "Cybersecurity specialist contract",
-            ROOT / "phase3" / "agents" / "tests" / "test_cybersecurity_specialist.py",
+            ROOT / "response" / "agents" / "tests" / "test_cybersecurity_specialist.py",
         ),
         (
             "Operations specialist contract",
-            ROOT / "phase3" / "agents" / "tests" / "test_operations_specialist.py",
+            ROOT / "response" / "agents" / "tests" / "test_operations_specialist.py",
         ),
         (
             "Cross-domain synthesis boundary contract",
-            ROOT / "phase3" / "agents" / "tests" / "test_synthesis_boundaries.py",
+            ROOT / "response" / "agents" / "tests" / "test_synthesis_boundaries.py",
         ),
         (
             "Cross-domain synthesis contract",
-            ROOT / "phase3" / "agents" / "tests" / "test_cross_domain_synthesis.py",
+            ROOT / "response" / "agents" / "tests" / "test_cross_domain_synthesis.py",
         ),
+    ],
+    "DECISION": [
+        ("Deterministic decision contract", ROOT / "integration" / "tests" / "test_decision_rules.py"),
     ],
 }
 
@@ -82,7 +85,7 @@ def run_check(label: str, script: Path) -> bool:
 def main() -> None:
     print("=" * 60)
     print("DC-GUARDIAN END-TO-END CONNECTION VERIFICATION")
-    print("EVIDENCE -> REASONING -> RESPONSE")
+    print("EVIDENCE -> REASONING -> RESPONSE -> DECISION")
     print("=" * 60)
 
     failures = []
@@ -119,9 +122,13 @@ def main() -> None:
         raise SystemExit(1)
 
     print("DC-GUARDIAN END-TO-END CONNECTIONS PASSED")
-    print("EVIDENCE -> REASONING -> RESPONSE")
+    print("EVIDENCE -> REASONING -> RESPONSE -> DECISION")
     print("=" * 60)
 
 
 if __name__ == "__main__":
     main()
+
+
+
+

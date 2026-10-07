@@ -1,4 +1,4 @@
-"""Real Reasoning vertical slice for controlled PPE + Face evidence.
+﻿"""Real Reasoning vertical slice for controlled PPE + Face evidence.
 
 Uses the existing adapters, topology mapping, Neo4j ingestion, authorization
 resolution, and deterministic correlation implementation. Evidence inputs are
@@ -7,19 +7,19 @@ controlled frozen assessment-shaped records; no neural model is loaded here.
 
 from __future__ import annotations
 
-from phase2.adapters.face_event_adapter import adapt_face_assessment
-from phase2.adapters.ppe_event_adapter import adapt_ppe_assessment
-from phase2.correlation.correlation_engine import (
+from reasoning.adapters.face_event_adapter import adapt_face_assessment
+from reasoning.adapters.ppe_event_adapter import adapt_ppe_assessment
+from reasoning.correlation.correlation_engine import (
     find_cross_domain_correlations,
     resolve_event_contexts,
 )
-from phase2.graph.ingest_event import (
+from reasoning.graph.ingest_event import (
     NEO4J_DATABASE,
     create_driver,
     ingest_face_event,
     ingest_ppe_event,
 )
-from phase2.topology.topology_mapper import (
+from reasoning.topology.topology_mapper import (
     map_face_event_to_scenario,
     map_ppe_event_to_scenario,
 )
@@ -171,3 +171,4 @@ def run_real_ppe_face_reasoning(
         }
     finally:
         driver.close()
+

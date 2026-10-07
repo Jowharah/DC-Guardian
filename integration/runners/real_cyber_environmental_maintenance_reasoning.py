@@ -1,20 +1,20 @@
-"""Real Cybersecurity + Environmental + Maintenance Reasoning slice."""
+﻿"""Real Cybersecurity + Environmental + Maintenance Reasoning slice."""
 
 from __future__ import annotations
 
-from phase1.environmental_monitoring.src.sensor_monitor import assess_sensor_reading
-from phase2.adapters.environmental_event_adapter import adapt_environmental_assessment
-from phase2.adapters.maintenance_event_adapter import adapt_maintenance_assessment
-from phase2.adapters.ssh_event_adapter import adapt_ssh_assessment
-from phase2.correlation.correlation_engine import find_multi_domain_correlations
-from phase2.graph.ingest_event import (
+from evidence.environmental_monitoring.src.sensor_monitor import assess_sensor_reading
+from reasoning.adapters.environmental_event_adapter import adapt_environmental_assessment
+from reasoning.adapters.maintenance_event_adapter import adapt_maintenance_assessment
+from reasoning.adapters.ssh_event_adapter import adapt_ssh_assessment
+from reasoning.correlation.correlation_engine import find_multi_domain_correlations
+from reasoning.graph.ingest_event import (
     NEO4J_DATABASE,
     create_driver,
     ingest_environmental_event,
     ingest_maintenance_event,
     ingest_ssh_event,
 )
-from phase2.topology.topology_mapper import (
+from reasoning.topology.topology_mapper import (
     map_environmental_event_to_scenario,
     map_maintenance_event_to_scenario,
     map_ssh_event_to_scenario,
@@ -116,3 +116,5 @@ def run_real_cyber_environmental_maintenance_reasoning(*, scenario_id: str) -> d
         }
     finally:
         driver.close()
+
+

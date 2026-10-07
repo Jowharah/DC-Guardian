@@ -1,4 +1,4 @@
-"""Contract tests for deterministic DC-GUARDIAN Decision Rules v1."""
+﻿"""Contract tests for deterministic DC-GUARDIAN Decision Rules v1."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from integration.decision.rules import decide  # noqa: E402
+from decision.rules import decide  # noqa: E402
 
 
 def case(domains, *, auth=None, grounding="SUPPORTED", boundaries=None):
@@ -68,3 +68,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

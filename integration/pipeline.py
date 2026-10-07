@@ -1,4 +1,4 @@
-"""Integrated DC-GUARDIAN Evidence -> Reasoning -> Response pipeline.
+﻿"""Integrated DC-GUARDIAN Evidence -> Reasoning -> Response pipeline.
 
 Initial v1 wires the controlled PPE + Face scenario through explicit layer
 interfaces. The Evidence and Reasoning hooks are injectable so the contract can
@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from integration.schemas.pipeline_result import PipelineResult
-from phase3.agents.routing.specialist_router import route_specialists
+from response.agents.routing.specialist_router import route_specialists
 
 
 EvidenceRunner = Callable[[dict], list[dict]]
@@ -70,3 +70,4 @@ def run_dc_guardian_scenario(
             "identity_boundary": scenario.get("identity_boundary"),
         },
     )
+

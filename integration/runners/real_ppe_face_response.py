@@ -1,13 +1,13 @@
-"""Real Response runner for the PPE + Face vertical slice."""
+﻿"""Real Response runner for the PPE + Face vertical slice."""
 
 from __future__ import annotations
 
-from phase3.agents.providers.openai_provider import OpenAIResponsesProvider
-from phase3.agents.routing.specialist_router import route_specialists
-from phase3.agents.specialists.base import SpecialistRequest
-from phase3.agents.specialists.physical_safety import PhysicalSafetySpecialist
-from phase3.rag.knowledge_eligibility import evaluate_knowledge_eligibility
-from phase3.rag.retrieve import retrieve_knowledge
+from response.agents.providers.openai_provider import OpenAIResponsesProvider
+from response.agents.routing.specialist_router import route_specialists
+from response.agents.specialists.base import SpecialistRequest
+from response.agents.specialists.physical_safety import PhysicalSafetySpecialist
+from response.rag.knowledge_eligibility import evaluate_knowledge_eligibility
+from response.rag.retrieve import retrieve_knowledge
 
 
 QUERY = (
@@ -79,3 +79,4 @@ def run_real_ppe_face_response(reasoning_result: dict) -> dict:
             "identity_link_established": False,
         },
     }
+

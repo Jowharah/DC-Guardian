@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 # DC-GUARDIAN
 # ============================================================
 
@@ -71,13 +71,13 @@ desktop.ini
 # ============================================================
 
 # Backblaze raw datasets
-phase1/predictive_maintenance/data/raw/
+evidence/predictive_maintenance/data/raw/
 
 # Large generated / processed datasets
-phase1/predictive_maintenance/data/processed/**/*.parquet
-phase1/predictive_maintenance/data/processed/**/*.csv
-phase1/predictive_maintenance/data/processed/**/*.npy
-phase1/predictive_maintenance/data/processed/**/*.npz
+evidence/predictive_maintenance/data/processed/**/*.parquet
+evidence/predictive_maintenance/data/processed/**/*.csv
+evidence/predictive_maintenance/data/processed/**/*.npy
+evidence/predictive_maintenance/data/processed/**/*.npz
 
 # Keep JSON evaluation/configuration artifacts.
 # Keep frozen models.
@@ -85,10 +85,10 @@ phase1/predictive_maintenance/data/processed/**/*.npz
 # temporal_rf_v2.joblib is intentionally NOT ignored.
 # It will be stored using Git LFS:
 #
-# phase1/predictive_maintenance/models/rf/temporal_rf_v2.joblib
+# evidence/predictive_maintenance/models/rf/temporal_rf_v2.joblib
 #
 # Keep:
-# phase1/predictive_maintenance/models/gru/gru_v1.pt
+# evidence/predictive_maintenance/models/gru/gru_v1.pt
 
 
 # ============================================================
@@ -96,14 +96,14 @@ phase1/predictive_maintenance/data/processed/**/*.npz
 # ============================================================
 
 # Private biometric image data - NEVER COMMIT
-phase1/face_recognition/data/controlled_faces/
-phase1/face_recognition/data/raw/
+evidence/face_recognition/data/controlled_faces/
+evidence/face_recognition/data/raw/
 
 # Generated/processed biometric data
-phase1/face_recognition/data/processed/
+evidence/face_recognition/data/processed/
 
 # Biometric enrollment embeddings - NEVER COMMIT
-phase1/face_recognition/models/employee_embeddings.npz
+evidence/face_recognition/models/employee_embeddings.npz
 
 # Keep non-sensitive metadata/config/evaluation artifacts such as:
 # enrollment_metadata.json
@@ -117,27 +117,27 @@ phase1/face_recognition/models/employee_embeddings.npz
 # ============================================================
 
 # SH17 raw dataset
-phase1/ppe_detection/data/raw/
+evidence/ppe_detection/data/raw/
 
 # Generated processed dataset
-phase1/ppe_detection/data/processed/
+evidence/ppe_detection/data/processed/
 
 # Compatibility with existing project path if present
-phase1/ppe_detection/processed/raw/
+evidence/ppe_detection/processed/raw/
 
 # Generated training checkpoints
 # The canonical frozen model under models/ is retained.
-phase1/ppe_detection/results/training/**/weights/
+evidence/ppe_detection/results/training/**/weights/
 
 # Smoke-test model is not a final artifact
-phase1/ppe_detection/models/ppe_yolov8n_smoke.pt
+evidence/ppe_detection/models/ppe_yolov8n_smoke.pt
 
 # Keep final frozen model:
-# phase1/ppe_detection/models/ppe_yolov8_best.pt
+# evidence/ppe_detection/models/ppe_yolov8_best.pt
 
 # Keep evaluation/configuration JSON and YAML files.
 # PPE smoke-test training outputs
-phase1/ppe_detection/results/training/ppe_yolov8n_smoke/
+evidence/ppe_detection/results/training/ppe_yolov8n_smoke/
 
 # PPE generated training visualizations
 
@@ -147,71 +147,71 @@ phase1/ppe_detection/results/training/ppe_yolov8n_smoke/
 # ============================================================
 
 # Raw Loghub/OpenSSH data
-phase1/ssh_anomaly/data/raw/
+evidence/ssh_anomaly/data/raw/
 
 # Generated processed data
-phase1/ssh_anomaly/data/processed/
+evidence/ssh_anomaly/data/processed/
 
 # External honeypot / validation datasets
-phase1/ssh_anomaly/data/external/
+evidence/ssh_anomaly/data/external/
 
 # Keep canonical frozen models under:
-# phase1/ssh_anomaly/models/
+# evidence/ssh_anomaly/models/
 
 # ============================================================
 # PHASE 2 - EVIDENCE INTEGRATION & DETERMINISTIC CORRELATION
 # ============================================================
 
 # Python caches
-phase2/**/__pycache__/
-phase2/**/*.py[cod]
+reasoning/**/__pycache__/
+reasoning/**/*.py[cod]
 
 # Local / temporary outputs
-phase2/tmp/
-phase2/temp/
-phase2/.cache/
+reasoning/tmp/
+reasoning/temp/
+reasoning/.cache/
 
 # Generated logs
-phase2/**/*.log
+reasoning/**/*.log
 
 # Local test/runtime output if generated
-phase2/results/
-phase2/outputs/
+reasoning/results/
+reasoning/outputs/
 
 # ============================================================
 # PHASE 3 - GROUNDED REASONING & RESPONSE
 # ============================================================
 
 # Downloaded third-party knowledge snapshots (rebuild with fetch_sources.py)
-phase3/rag/knowledge_base/originals/
+response/rag/knowledge_base/originals/
 
 # Generated parsed knowledge records (rebuild with parse_sources.py)
-phase3/rag/knowledge_base/parsed/
+response/rag/knowledge_base/parsed/
 
 # Generated parsing-quality report (rebuild with audit_parsing.py)
-phase3/rag/evaluation/parsing_quality_report.json
+response/rag/evaluation/parsing_quality_report.json
 
 # Generated preprocessed knowledge records (rebuild with preprocess_sources.py)
-phase3/rag/knowledge_base/clean/
+response/rag/knowledge_base/clean/
 
 # Generated RAG chunks (rebuild with chunk_sources.py)
-phase3/rag/knowledge_base/chunks/
+response/rag/knowledge_base/chunks/
 
 # Generated retrieval evaluation report (rebuild with evaluate_retrieval.py)
-phase3/rag/evaluation/retrieval_evaluation_report.json
+response/rag/evaluation/retrieval_evaluation_report.json
 
 # Local RAG/vector-store artifacts
-phase3/rag/vector_store/
-phase3/rag/chroma_db/
-phase3/rag/faiss_index/
-phase3/rag/cache/
+response/rag/vector_store/
+response/rag/chroma_db/
+response/rag/faiss_index/
+response/rag/cache/
 
 # Downloaded/generated embeddings
-phase3/rag/**/*.npy
-phase3/rag/**/*.npz
+response/rag/**/*.npy
+response/rag/**/*.npz
 
 # Local LLM/model downloads if added later
-phase3/models/
+response/models/
 
 
 # ============================================================
@@ -249,17 +249,20 @@ temp/
 # ============================================================
 
 # PPE smoke-test outputs
-phase1/ppe_detection/results/training/ppe_yolov8n_smoke/
+evidence/ppe_detection/results/training/ppe_yolov8n_smoke/
 
 # PPE full-training generated visualizations
-phase1/ppe_detection/results/training/ppe_yolov8n_full/*.png
-phase1/ppe_detection/results/training/ppe_yolov8n_full/*.jpg
+evidence/ppe_detection/results/training/ppe_yolov8n_full/*.png
+evidence/ppe_detection/results/training/ppe_yolov8n_full/*.jpg
 
 # PPE locked-test batch preview images
-phase1/ppe_detection/results/final_test/ultralytics_eval/val_batch*_labels.jpg
-phase1/ppe_detection/results/final_test/ultralytics_eval/val_batch*_pred.jpg
+evidence/ppe_detection/results/final_test/ultralytics_eval/val_batch*_labels.jpg
+evidence/ppe_detection/results/final_test/ultralytics_eval/val_batch*_pred.jpg
 
 # Old/duplicate maintenance notebook
-phase1/predictive_maintenance/notebooks/DC_Guardian_Predictive_Maintenance_Backblaze (1).ipynb
+evidence/predictive_maintenance/notebooks/DC_Guardian_Predictive_Maintenance_Backblaze (1).ipynb
 # Generated RAG abstention calibration report
-phase3/rag/evaluation/abstention_calibration_report.json
+response/rag/evaluation/abstention_calibration_report.json
+
+
+

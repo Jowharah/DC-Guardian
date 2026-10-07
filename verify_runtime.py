@@ -1,4 +1,4 @@
-"""
+﻿"""
 DC-GUARDIAN integrated runtime smoke test.
 
 This verifies that the public/frozen Phase 1 runtime stacks can initialize
@@ -16,7 +16,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 
 
 def check_maintenance():
-    from phase1.predictive_maintenance.src.maintenance_detector import (
+    from evidence.predictive_maintenance.src.maintenance_detector import (
         load_model,
     )
 
@@ -32,7 +32,7 @@ def check_maintenance():
 
 
 def check_ssh():
-    from phase1.ssh_anomaly.src.ssh_detector import (
+    from evidence.ssh_anomaly.src.ssh_detector import (
         SSHAnomalyDetector,
     )
 
@@ -51,7 +51,7 @@ def check_ppe():
 
     model_path = (
         PROJECT_ROOT
-        / "phase1"
+        / "evidence"
         / "ppe_detection"
         / "models"
         / "ppe_yolov8_best.pt"
@@ -71,7 +71,7 @@ def check_face_stack():
     # Do not initialize FaceRecognitionPipeline here because the private
     # employee_embeddings.npz artifact is intentionally excluded from Git.
     from deepface import DeepFace  # noqa: F401
-    from phase1.face_recognition.src.face_embedding import (
+    from evidence.face_recognition.src.face_embedding import (
         extract_face_embedding,  # noqa: F401
     )
 
@@ -104,3 +104,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
