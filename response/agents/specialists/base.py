@@ -1,4 +1,4 @@
-"""Shared contract for DC-GUARDIAN Phase 3.3 specialist agents."""
+"""Shared contract for DC-GUARDIAN Specialist Agents specialist agents."""
 
 from __future__ import annotations
 
