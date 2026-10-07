@@ -1,4 +1,4 @@
-"""Configuration for DC-GUARDIAN Phase 3.1 retrieval preparation."""
+"""Configuration for DC-GUARDIAN Response RAG retrieval preparation."""
 
 # Word-count bounds are an initial retrieval experiment, not a claim that one
 # chunk size is universally optimal. Evaluation cases remain frozen while
