@@ -1,5 +1,5 @@
 """
-DC-GUARDIAN Phase 3.1 approved-source fetcher.
+DC-GUARDIAN Response approved-source fetcher.
 
 Downloads only APPROVED + ACTIVE external knowledge sources from the
 knowledge manifest into a local originals directory. Downloaded third-party
@@ -21,11 +21,16 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.request import (
+    HTTPRedirectHandler,
+    Request,
+    build_opener,
+)
 
 
 RAG_ROOT = Path(__file__).resolve().parent
@@ -45,6 +50,7 @@ ALLOWED_HOSTS = {
 MAX_SOURCE_BYTES = 30 * 1024 * 1024
 CHUNK_BYTES = 1024 * 1024
 USER_AGENT = "DC-GUARDIAN-RAG/1.0 (+research-prototype)"
+DOCUMENT_ID_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
 
 
 def sha256_file(path: Path) -> str:
@@ -55,13 +61,58 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def validate_document_id(document_id: str) -> None:
+    if (
+        not isinstance(document_id, str)
+        or not DOCUMENT_ID_PATTERN.fullmatch(document_id)
+    ):
+        raise ValueError(f"Invalid document_id: {document_id!r}")
+
+
 def validate_url(url: str) -> None:
     parsed = urlparse(url)
-    if parsed.scheme != "https":
+
+    if parsed.scheme.lower() != "https":
         raise ValueError(f"Only HTTPS sources are allowed: {url}")
-    if parsed.hostname not in ALLOWED_HOSTS:
+
+    if parsed.username is not None or parsed.password is not None:
+        raise ValueError("Embedded URL credentials are not allowed.")
+
+    try:
+        port = parsed.port
+    except ValueError as error:
+        raise ValueError(f"Invalid source URL port: {url}") from error
+
+    if port not in (None, 443):
         raise ValueError(
-            f"Source host is not approved: {parsed.hostname}"
+            f"Only standard HTTPS port 443 is allowed: {url}"
+        )
+
+    hostname = (parsed.hostname or "").lower()
+    if hostname not in ALLOWED_HOSTS:
+        raise ValueError(f"Source host is not approved: {hostname}")
+
+
+class ValidatingRedirectHandler(HTTPRedirectHandler):
+    """Validate each redirect target before urllib follows it."""
+
+    def redirect_request(
+        self,
+        req,
+        fp,
+        code,
+        msg,
+        headers,
+        newurl,
+    ):
+        validate_url(newurl)
+        return super().redirect_request(
+            req,
+            fp,
+            code,
+            msg,
+            headers,
+            newurl,
         )
 
 
@@ -76,7 +127,9 @@ def download_source(url: str, destination: Path) -> dict:
     validate_url(url)
     request = Request(url, headers={"User-Agent": USER_AGENT})
 
-    with urlopen(request, timeout=60) as response:
+    opener = build_opener(ValidatingRedirectHandler())
+
+    with opener.open(request, timeout=60) as response:  # nosec B310
         final_url = response.geturl()
         validate_url(final_url)
 
@@ -172,6 +225,13 @@ def main() -> None:
     for source in eligible:
         document_id = source["document_id"]
         url = source.get("download_url") or source.get("url")
+
+        try:
+            validate_document_id(document_id)
+        except ValueError as error:
+            failures.append((str(document_id), str(error)))
+            print(f"FAIL: {document_id}: {error}")
+            continue
 
         if not url:
             failures.append((document_id, "Missing source URL"))
