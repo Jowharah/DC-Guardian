@@ -1,4 +1,4 @@
-﻿"""Local contracts for the Phase 3.3 Cybersecurity specialist."""
+﻿"""Local contracts for the Specialist Agents Cybersecurity specialist."""
 
 from __future__ import annotations
 
@@ -99,7 +99,7 @@ def main():
         raise AssertionError("Cybersecurity specialist accepted MAINTENANCE.")
 
     print("=" * 60)
-    print("DC-GUARDIAN PHASE 3.3 CYBERSECURITY SPECIALIST CONTRACT PASSED")
+    print("DC-GUARDIAN SPECIALIST AGENTS CYBERSECURITY SPECIALIST CONTRACT PASSED")
     print("=" * 60)
 
 
