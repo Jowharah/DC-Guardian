@@ -256,19 +256,19 @@ The LLM layer produces grounded interpretation and recommendations. Deterministi
 ## 6. Target End-to-End Architecture
 
 ```text
-PHASE 1 â€” EVIDENCE
+EVIDENCE
 Domain detectors/models
         â†“
 Structured events
         â†“
-PHASE 2 â€” REASONING
+REASONING
 Common Event Schema
 Neo4j topology
 Deterministic correlation
         â†“
 Correlation / incident context
         â†“
-PHASE 3 â€” RESPONSE
+RESPONSE
 Knowledge eligibility
 Local governed RAG
 Grounded specialist reasoning
