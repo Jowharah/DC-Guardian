@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 Face + Cybersecurity Correlation Persistence Contract
 
 Prerequisite:
