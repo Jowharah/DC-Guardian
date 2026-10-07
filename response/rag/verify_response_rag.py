@@ -37,7 +37,7 @@ def count_chunks() -> int:
 
 def main() -> None:
     print("=" * 60)
-    print("DC-GUARDIAN PHASE 3.1 RAG VERIFICATION")
+    print("DC-GUARDIAN RESPONSE RAG VERIFICATION")
     print("=" * 60)
 
     failures = []
@@ -97,7 +97,7 @@ def main() -> None:
         print("=" * 60)
         raise SystemExit(1)
 
-    print("DC-GUARDIAN PHASE 3.1 RAG FOUNDATION PASSED")
+    print("DC-GUARDIAN RESPONSE RAG FOUNDATION PASSED")
     print("=" * 60)
 
 
