@@ -326,6 +326,7 @@ def main():
     checkpoint = torch.load(
         GRU_MODEL_FILE,
         map_location=device,
+        weights_only=True,
     )
 
 
