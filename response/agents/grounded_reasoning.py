@@ -1,4 +1,4 @@
-﻿"""Grounded reasoning orchestration for DC-GUARDIAN Phase 3.2."""
+﻿"""Grounded reasoning orchestration for DC-GUARDIAN Grounded Reasoning."""
 
 from __future__ import annotations
 
