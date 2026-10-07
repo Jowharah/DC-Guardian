@@ -11,6 +11,8 @@ IMPORTANT:
 """
 
 import joblib
+
+from shared.model_integrity import verify_sha256
 import numpy as np
 import pandas as pd
 
@@ -24,6 +26,8 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
+
+from evidence.predictive_maintenance.src.maintenance_detector import MODEL_SHA256
 
 from evidence.predictive_maintenance.src.config import (
     FEATURE_DATA_DIR,
@@ -267,6 +271,8 @@ def main():
     # ========================================================
     # Load model + validation data
     # ========================================================
+
+    verify_sha256(MODEL_FILE, MODEL_SHA256)
 
     pipeline = joblib.load(
         MODEL_FILE
