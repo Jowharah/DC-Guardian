@@ -67,7 +67,7 @@ desktop.ini
 
 
 # ============================================================
-# PHASE 1 - PREDICTIVE MAINTENANCE
+# EVIDENCE - PREDICTIVE MAINTENANCE
 # ============================================================
 
 # Backblaze raw datasets
@@ -92,7 +92,7 @@ evidence/predictive_maintenance/data/processed/**/*.npz
 
 
 # ============================================================
-# PHASE 1 - FACE RECOGNITION
+# EVIDENCE - FACE RECOGNITION
 # ============================================================
 
 # Private biometric image data - NEVER COMMIT
@@ -113,7 +113,7 @@ evidence/face_recognition/models/employee_embeddings.npz
 
 
 # ============================================================
-# PHASE 1 - PPE DETECTION
+# EVIDENCE - PPE DETECTION
 # ============================================================
 
 # SH17 raw dataset
@@ -143,7 +143,7 @@ evidence/ppe_detection/results/training/ppe_yolov8n_smoke/
 
 
 # ============================================================
-# PHASE 1 - SSH ANOMALY DETECTION
+# EVIDENCE - SSH ANOMALY DETECTION
 # ============================================================
 
 # Raw Loghub/OpenSSH data
@@ -159,7 +159,7 @@ evidence/ssh_anomaly/data/external/
 # evidence/ssh_anomaly/models/
 
 # ============================================================
-# PHASE 2 - EVIDENCE INTEGRATION & DETERMINISTIC CORRELATION
+# REASONING - EVIDENCE INTEGRATION & DETERMINISTIC CORRELATION
 # ============================================================
 
 # Python caches
@@ -179,7 +179,7 @@ reasoning/results/
 reasoning/outputs/
 
 # ============================================================
-# PHASE 3 - GROUNDED REASONING & RESPONSE
+# RESPONSE - GROUNDED REASONING
 # ============================================================
 
 # Downloaded third-party knowledge snapshots (rebuild with fetch_sources.py)

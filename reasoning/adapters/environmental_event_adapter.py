@@ -54,7 +54,7 @@ def adapt_environmental_assessment(
     event_id=None,
 ):
     """
-    Convert one Phase 1 environmental assessment into
+    Convert one Evidence layer environmental assessment into
     DC-Guardian Common Event Schema v1.0.
 
     No synthetic infrastructure location is introduced here.

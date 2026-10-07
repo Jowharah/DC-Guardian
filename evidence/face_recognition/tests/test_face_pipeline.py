@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Face Recognition Runtime Pipeline Contract Test
 
 Verifies that the frozen runtime pipeline reproduces

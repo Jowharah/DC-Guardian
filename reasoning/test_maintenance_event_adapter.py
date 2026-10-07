@@ -73,7 +73,7 @@ validator = Draft202012Validator(
 
 
 # ============================================================
-# Representative Phase 1 assessment
+# Representative Evidence layer assessment
 # ============================================================
 
 def build_maintenance_assessment(
@@ -199,7 +199,7 @@ print(
 )
 
 print(
-    "MAINTENANCE PHASE 2 ADAPTER TEST"
+    "MAINTENANCE REASONING LAYER ADAPTER TEST"
 )
 
 print(
@@ -232,7 +232,7 @@ for index, test_case in enumerate(
             assessment,
 
             dataset_name=
-                "DC-Guardian Phase 2 "
+                "DC-Guardian Reasoning layer "
                 "Controlled Contract Test",
 
             source_type=
@@ -545,7 +545,7 @@ print(
 )
 
 print(
-    "MAINTENANCE PHASE 2 ADAPTER CONTRACT PASSED"
+    "MAINTENANCE REASONING LAYER ADAPTER CONTRACT PASSED"
 )
 
 print(

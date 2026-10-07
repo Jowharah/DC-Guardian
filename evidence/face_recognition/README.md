@@ -2,7 +2,7 @@
 
 ## Purpose
 
-DC-GUARDIAN Face Recognition v1 provides controlled identity evidence for the physical-security domain. Recognition is **not** treated as authorization; Phase 2 derives authorization from the graph topology.
+DC-GUARDIAN Face Recognition v1 provides controlled identity evidence for the physical-security domain. Recognition is **not** treated as authorization; Reasoning layer derives authorization from the graph topology.
 
 ## Frozen baseline
 
@@ -17,7 +17,7 @@ Runtime flow:
 
 ```text
 image -> RetinaFace -> ArcFace embedding -> frozen enrollment matching
-      -> RECOGNIZED / UNKNOWN -> Phase 2 adapter
+      -> RECOGNIZED / UNKNOWN -> Reasoning layer adapter
 ```
 
 ## Locked final test
@@ -59,9 +59,9 @@ src/
 
 The private controlled face photographs and the enrollment embedding database are intentionally excluded from Git.
 
-## Phase 2 contract
+## Reasoning layer contract
 
-The Phase 1 output preserves recognition evidence only. Phase 2 adds camera/topology context and derives authorization from declared `Person -> AUTHORIZED_FOR -> Zone` relationships.
+The Evidence layer output preserves recognition evidence only. Reasoning layer adds camera/topology context and derives authorization from declared `Person -> AUTHORIZED_FOR -> Zone` relationships.
 
 ## Limitations
 

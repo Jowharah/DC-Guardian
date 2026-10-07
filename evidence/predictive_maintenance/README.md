@@ -2,7 +2,7 @@
 
 ## Overview
 
-The DC-Guardian Predictive Maintenance model is a Phase 1 machine-learning component designed to identify hard drives at elevated risk of explicit failure within the next seven days.
+The DC-Guardian Predictive Maintenance model is a Evidence layer machine-learning component designed to identify hard drives at elevated risk of explicit failure within the next seven days.
 
 The model uses historical SMART telemetry from the Backblaze Hard Drive Dataset and produces a structured drive-health assessment for downstream DC-Guardian components.
 
@@ -461,7 +461,7 @@ This protects the distinction between development validation and final holdout e
 
 ## 15. Phase Boundary
 
-Predictive Maintenance is a Phase 1 detection component.
+Predictive Maintenance is a Evidence layer detection component.
 
 Its responsibility ends at producing a structured drive-health assessment.
 
@@ -476,13 +476,13 @@ Maintenance assessment
       â†“
 â•â•â•â•â•â•â•â• PHASE BOUNDARY â•â•â•â•â•â•â•â•
       â†“
-Phase 2 maintenance adapter
+Reasoning layer maintenance adapter
       â†“
 Common Event Schema
       â†“
 DC-Guardian correlation / topology
 ```
 
-Phase 2 should not depend on Random Forest implementation details, SMART feature engineering internals, Backblaze-specific files, or GRU experimentation.
+Reasoning layer should not depend on Random Forest implementation details, SMART feature engineering internals, Backblaze-specific files, or GRU experimentation.
 
 The stable interface is the structured assessment returned by `maintenance_detector.py`.

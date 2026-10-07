@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 GRU Full-Q4 Evaluation
 
 Evaluates the frozen GRU v1 probabilities on the complete

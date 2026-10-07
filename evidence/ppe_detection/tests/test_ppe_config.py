@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Final PPE Configuration Contract Test
 
 Verifies the complete frozen PPE-v1 runtime configuration:

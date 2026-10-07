@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 PPE Safety + Physical-Security Correlation Contract
 
 Positive:

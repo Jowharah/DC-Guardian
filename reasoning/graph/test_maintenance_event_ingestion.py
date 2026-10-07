@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
 
     # ========================================================
-    # Phase 1 -> Common Event
+    # Evidence layer -> Common Event
     # ========================================================
 
     normalized = adapt_maintenance_assessment(

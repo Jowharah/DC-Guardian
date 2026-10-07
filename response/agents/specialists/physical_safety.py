@@ -1,4 +1,4 @@
-﻿"""Physical/Safety specialist for Phase 3.3."""
+﻿"""Physical/Safety specialist for Specialist Agents."""
 
 from __future__ import annotations
 

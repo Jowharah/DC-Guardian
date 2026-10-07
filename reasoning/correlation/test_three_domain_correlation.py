@@ -30,7 +30,7 @@ for directory in [
 
 
 # ============================================================
-# Phase 1
+# Evidence layer
 # ============================================================
 
 from evidence.environmental_monitoring.src.sensor_monitor import (
@@ -39,7 +39,7 @@ from evidence.environmental_monitoring.src.sensor_monitor import (
 
 
 # ============================================================
-# Phase 2 adapters
+# Reasoning layer adapters
 # ============================================================
 
 from ssh_event_adapter import (

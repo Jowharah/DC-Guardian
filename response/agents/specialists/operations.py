@@ -1,4 +1,4 @@
-﻿"""Operations specialist for DC-GUARDIAN Phase 3.3."""
+﻿"""Operations specialist for DC-GUARDIAN Specialist Agents."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ class OperationsSpecialist(SpecialistAgent):
             "an exact failure date. Environmental abnormality such as HIGH_TEMPERATURE "
             "is an observed/derived operating-condition state; it does not by itself "
             "prove hardware damage or root cause. Shared server/rack/zone context and "
-            "Phase 2 correlation establish operational relevance, not causation. "
+            "Reasoning-layer correlation establish operational relevance, not causation. "
             "Do not claim that temperature caused a drive failure, that a drive will "
             "certainly fail, or that correlated evidence proves root cause unless "
             "explicit causal evidence is supplied. Do not decide correlation, final "

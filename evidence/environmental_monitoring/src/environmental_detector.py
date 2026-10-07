@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Environmental Monitoring Detector
 
 Creates a common environmental assessment from measurements
@@ -374,7 +374,7 @@ def assess_environmental_condition(
 
 
     # ========================================================
-    # Common Phase 1 environmental contract
+    # Common Evidence layer environmental contract
     # ========================================================
 
     return {

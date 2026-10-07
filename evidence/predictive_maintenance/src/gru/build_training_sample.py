@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 GRU Training Endpoint Sampling
 
 Creates the frozen GRU development training sample.

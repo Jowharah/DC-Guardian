@@ -1,4 +1,4 @@
-﻿"""Structured local retrieval API for DC-GUARDIAN Phase 3.1."""
+﻿"""Structured local retrieval API for DC-GUARDIAN Response RAG."""
 
 from __future__ import annotations
 

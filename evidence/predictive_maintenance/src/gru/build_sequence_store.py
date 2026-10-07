@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 GRU Training Sequence Store
 
 Materializes only the sampled TRAIN sequences:

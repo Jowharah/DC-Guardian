@@ -60,7 +60,7 @@ def main() -> None:
         raise RuntimeError("No approved physical-security evidence retrieved.")
 
     print("=" * 60)
-    print("DC-GUARDIAN PHASE 3.2 GROUNDED REASONING DEMO")
+    print("DC-GUARDIAN GROUNDED REASONING GROUNDED REASONING DEMO")
     print("=" * 60)
     print("Incident: SYNTHETIC_RESPONSE_TEST")
     print("Knowledge eligibility: ELIGIBLE")

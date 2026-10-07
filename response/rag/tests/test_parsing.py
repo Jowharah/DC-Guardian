@@ -1,5 +1,5 @@
 ﻿"""
-Contract checks for Phase 3.1 parsed RAG source records.
+Contract checks for Response RAG parsed RAG source records.
 
 Run after parse_sources.py from the repository root:
     python response/rag/tests/test_parsing.py

@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Predictive Maintenance
 
 Fair RF vs GRU comparison on the exact same
@@ -10,6 +10,8 @@ No retraining is performed.
 """
 
 import joblib
+
+from shared.model_integrity import verify_sha256
 import numpy as np
 import pandas as pd
 
@@ -17,6 +19,8 @@ from sklearn.metrics import (
     average_precision_score,
     roc_auc_score,
 )
+
+from evidence.predictive_maintenance.src.maintenance_detector import MODEL_SHA256
 
 from evidence.predictive_maintenance.src.config import (
     FEATURE_DATA_DIR,
@@ -115,6 +119,8 @@ def main():
     # ========================================================
     # Load frozen RF
     # ========================================================
+
+    verify_sha256(RF_MODEL_FILE, MODEL_SHA256)
 
     rf_pipeline = joblib.load(
         RF_MODEL_FILE

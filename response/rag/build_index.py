@@ -1,4 +1,4 @@
-﻿"""Build the DC-GUARDIAN Phase 3.1 local embedding index."""
+﻿"""Build the DC-GUARDIAN Response RAG local embedding index."""
 
 from __future__ import annotations
 

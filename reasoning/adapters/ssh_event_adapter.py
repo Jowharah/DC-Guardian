@@ -65,7 +65,7 @@ def normalize_datetime(value):
 
 def generate_event_id():
     """
-    Generate a unique Phase 2 event identifier.
+    Generate a unique Reasoning layer event identifier.
     """
 
     return (
@@ -91,7 +91,7 @@ def adapt_ssh_assessment(
 
     Infrastructure location fields remain null here.
     Synthetic topology mapping is performed by a separate
-    Phase 2 component.
+    Reasoning layer component.
     """
 
     if not isinstance(

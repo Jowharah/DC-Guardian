@@ -1,10 +1,10 @@
 """
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 Correlation Persistence
 
 Persists deterministic cross-domain correlations into Neo4j.
 
-A Correlation is derived Phase 2 evidence and is deliberately
+A Correlation is derived Reasoning layer evidence and is deliberately
 stored separately from Event nodes.
 """
 

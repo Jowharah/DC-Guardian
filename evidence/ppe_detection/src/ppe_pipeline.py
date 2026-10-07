@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 PPE Compliance Runtime Pipeline
 
 Frozen YOLOv8n detector
@@ -405,7 +405,7 @@ class PPECompliancePipeline:
 
 
         # ----------------------------------------------------
-        # Structured Phase 1 assessment
+        # Structured Evidence layer assessment
         # ----------------------------------------------------
 
         return {

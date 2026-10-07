@@ -78,7 +78,7 @@ def main() -> None:
         raise RuntimeError("No approved Physical/Safety evidence retrieved.")
 
     print("=" * 60)
-    print("DC-GUARDIAN PHASE 3.3 PHYSICAL/SAFETY SPECIALIST DEMO")
+    print("DC-GUARDIAN SPECIALIST AGENTS PHYSICAL/SAFETY SPECIALIST DEMO")
     print("=" * 60)
     print(f"Scenario: {INCIDENT['scenario_id']}")
     print(f"Router:   {routed}")

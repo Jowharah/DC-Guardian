@@ -1,8 +1,8 @@
 ﻿"""
-DC-Guardian Phase 2
+DC-Guardian Reasoning layer
 PPE Event Adapter Contract Test
 
-Validates frozen Phase 1 PPE assessments against the
+Validates frozen Evidence layer PPE assessments against the
 DC-Guardian Common Event Schema v1.0.
 
 Contract goals:
@@ -91,7 +91,7 @@ def make_assessment(
     people,
 ):
     """
-    Build a controlled frozen Phase 1 PPE assessment.
+    Build a controlled frozen Evidence layer PPE assessment.
     """
 
     return {
@@ -387,7 +387,7 @@ print(
     "\n============================================"
 )
 print(
-    "DC-GUARDIAN PPE PHASE 2 ADAPTER TEST"
+    "DC-GUARDIAN PPE REASONING LAYER ADAPTER TEST"
 )
 print(
     "============================================"
@@ -415,14 +415,14 @@ for test_case in test_cases:
 
 
     # --------------------------------------------------------
-    # Phase 1 -> Phase 2
+    # Evidence layer -> Reasoning layer
     # --------------------------------------------------------
 
     common_event = adapt_ppe_assessment(
         evidence_assessment,
 
         dataset_name=
-            "DC-Guardian Phase 2 "
+            "DC-Guardian Reasoning layer "
             "Controlled Contract Test",
 
         source_type=
@@ -983,7 +983,7 @@ for test_case in test_cases:
             "dataset_name"
         ]
         ==
-        "DC-Guardian Phase 2 "
+        "DC-Guardian Reasoning layer "
         "Controlled Contract Test"
     )
 
@@ -1158,7 +1158,7 @@ print(
 )
 
 print(
-    "PASS: Original Phase 1 assessments immutable."
+    "PASS: Original Evidence layer assessments immutable."
 )
 
 
@@ -1166,7 +1166,7 @@ print(
     "\n============================================"
 )
 print(
-    "PPE PHASE 2 ADAPTER CONTRACT PASSED"
+    "PPE REASONING LAYER ADAPTER CONTRACT PASSED"
 )
 print(
     "============================================"

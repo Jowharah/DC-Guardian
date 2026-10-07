@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 2
+DC-Guardian Reasoning layer
 Face Recognition Event Adapter Contract Test
 """
 
@@ -126,7 +126,7 @@ print(
 )
 
 print(
-    "DC-GUARDIAN FACE PHASE 2 ADAPTER TEST"
+    "DC-GUARDIAN FACE REASONING LAYER ADAPTER TEST"
 )
 
 print(
@@ -135,7 +135,7 @@ print(
 
 
 # ============================================================
-# Initialize frozen Phase 1 face pipeline
+# Initialize frozen Evidence layer face pipeline
 # ============================================================
 
 pipeline = FaceRecognitionPipeline()
@@ -148,7 +148,7 @@ assert (
 
 
 print(
-    "PASS: Frozen Phase 1 face pipeline loaded."
+    "PASS: Frozen Evidence layer face pipeline loaded."
 )
 
 
@@ -440,7 +440,7 @@ print(
 )
 
 print(
-    "PASS: Authorization deferred to Phase 2."
+    "PASS: Authorization deferred to Reasoning layer."
 )
 
 print(
@@ -453,7 +453,7 @@ print(
 )
 
 print(
-    "FACE PHASE 2 ADAPTER CONTRACT PASSED"
+    "FACE REASONING LAYER ADAPTER CONTRACT PASSED"
 )
 
 print(

@@ -68,31 +68,25 @@ if __name__ == "__main__":
     # Basic metadata
     # --------------------------------------------------------
 
-    assert (
-        topology[
-            "topology_version"
-        ]
-        == "1.0"
-    )
+    if topology.get("topology_version") != "1.0":
+        raise ValueError(
+            "Unsupported topology_version; expected '1.0'."
+        )
 
-    assert (
-        topology[
-            "topology_type"
-        ]
-        == "SYNTHETIC"
-    )
+    if topology.get("topology_type") != "SYNTHETIC":
+        raise ValueError(
+            "Unsupported topology_type; expected 'SYNTHETIC'."
+        )
 
 
     data_center = topology[
         "data_center"
     ]
 
-    assert (
-        data_center[
-            "data_center_id"
-        ]
-        == "DC-01"
-    )
+    if data_center.get("data_center_id") != "DC-01":
+        raise ValueError(
+            "Unexpected data_center_id; expected 'DC-01'."
+        )
 
 
     zones = data_center[

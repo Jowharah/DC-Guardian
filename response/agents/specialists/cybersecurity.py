@@ -1,4 +1,4 @@
-﻿"""Cybersecurity specialist for DC-GUARDIAN Phase 3.3."""
+﻿"""Cybersecurity specialist for DC-GUARDIAN Specialist Agents."""
 
 from __future__ import annotations
 

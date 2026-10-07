@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 PPE Locked Final-Test Artifact Contract
 
 Verifies that the frozen PPE-v1 detector was evaluated against

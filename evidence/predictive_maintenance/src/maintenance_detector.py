@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Predictive Maintenance Detector
 
 Stable inference boundary for the frozen Temporal Random Forest v2.
@@ -12,7 +12,7 @@ This module:
         -> frozen RF pipeline
         -> structured maintenance assessment
 
-Phase 2 should consume the returned assessment rather than
+Reasoning layer should consume the returned assessment rather than
 interacting with the Random Forest directly.
 """
 
@@ -148,7 +148,7 @@ def assess_drive_health(
     Returns
     -------
     dict
-        Stable Phase 1 maintenance assessment.
+        Stable Evidence layer maintenance assessment.
     """
 
     validate_drive_history(

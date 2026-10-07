@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Face Recognition Runtime Pipeline
 
 Public inference interface for Face Recognition v1.
@@ -259,7 +259,7 @@ class FaceRecognitionPipeline:
             )
 
 
-            # Current Phase 1 contract intentionally does not
+            # Current Evidence layer contract intentionally does not
             # choose one identity from a multi-face image.
 
             result.update(

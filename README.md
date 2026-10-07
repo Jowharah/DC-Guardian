@@ -1,17 +1,17 @@
 ﻿# DC-GUARDIAN
 
-DC-GUARDIAN is a research prototype for multi-domain data-center monitoring and incident reasoning. The architecture is organized into three stages: Phase 1 generates domain evidence, Phase 2 integrates and deterministically correlates that evidence using a common event schema, controlled synthetic topology, and Neo4j, and Phase 3 will add grounded reasoning and response.
+DC-GUARDIAN is a research prototype for multi-domain data-center monitoring, deterministic cross-domain reasoning, grounded response, and governed decision support. The architecture is organized as Evidence -> Reasoning -> Response -> Decision, with Presentation/dashboard development next.
 
-> **Current baseline:** Phase 1 model baselines are frozen for integration. Phase 2 is validated at **24/24 integration contracts**, including Face Recognition and PPE cross-domain integration. The clean Python 3.12 integrated runtime also passes the **4/4 runtime smoke test**. Phase 3 - Grounded Reasoning & Response - is the next major development stage.
+> **Current baseline:** Evidence model and monitoring baselines are frozen for integration. Reasoning, Response, and deterministic Decision contracts are implemented and validated by the integrated pipeline. The clean Python 3.12 runtime also retains the frozen-model smoke verification. Presentation/dashboard development is the next major development stage.
 
 ## Architecture
 
 ```text
-PHASE 1 - EVIDENCE GENERATION
+EVIDENCE
 Domain detectors / monitoring components
         |
         v
-PHASE 2 - EVIDENCE INTEGRATION & DETERMINISTIC CORRELATION
+REASONING
 Common Event Schema
         |
         v
@@ -27,7 +27,7 @@ Deterministic cross-domain correlation
 Persistent Correlation objects
         |
         v
-PHASE 3 - GROUNDED REASONING & RESPONSE
+RESPONSE
 Operational RAG
         |
         v
@@ -40,9 +40,9 @@ Severity / decision rules
 Incident / dashboard output
 ```
 
-Phase 2 deliberately establishes evidence relationships using graph and explicit deterministic rules before any future LLM reasoning. Source-model assessments and provenance are preserved rather than silently rewritten by later layers. Phase 3 will consume structured event/correlation context; RAG will retrieve approved operational knowledge and will not decide or revise whether source events correlate.
+The Reasoning layer deliberately establishes evidence relationships using graph and explicit deterministic rules before any future LLM reasoning. Source-model assessments and provenance are preserved rather than silently rewritten by later layers. The Response layer consumes structured event/correlation context; RAG will retrieve approved operational knowledge and will not decide or revise whether source events correlate.
 
-## Phase 1 Components
+## Evidence Components
 
 | Component | Current baseline | Purpose |
 |---|---|---|
@@ -52,11 +52,11 @@ Phase 2 deliberately establishes evidence relationships using graph and explicit
 | SSH Anomaly Detection | SSH Detector v1 | Rules + Isolation Forest + Autoencoder + explicit OpenSSH security signals |
 | Environmental Monitoring | Deterministic monitoring contract | Environmental sensor and hardware-telemetry assessment |
 
-Phase 1 datasets that are large, private, biometric, or externally sourced are intentionally excluded from Git. Small configuration, evaluation, and reproducibility artifacts are retained where appropriate.
+Evidence-layer datasets that are large, private, biometric, or externally sourced are intentionally excluded from Git. Small configuration, evaluation, and reproducibility artifacts are retained where appropriate.
 
-## Phase 2 Integration
+## Reasoning Integration
 
-Phase 2 normalizes Phase 1 outputs into a shared event contract and maps controlled evaluation events into the synthetic `DC-01` topology.
+The Reasoning layer normalizes Evidence outputs into a shared event contract and maps controlled evaluation events into the synthetic `DC-01` topology.
 
 Implemented integration currently includes:
 
@@ -73,7 +73,7 @@ Implemented integration currently includes:
 
 The verified integrated runtime uses Python 3.12 and the repository-level
 `requirements.txt`. After installing dependencies, verify that the public/frozen
-Phase 1 runtime stacks initialize:
+Evidence runtime stacks initialize:
 
 ```powershell
 python verify_runtime.py
@@ -82,7 +82,7 @@ python verify_runtime.py
 The smoke test checks Predictive Maintenance, SSH, PPE, and the Face ML stack.
 It deliberately does not require the private Face enrollment embedding artifact.
 
-Run the Phase 2 contract suite from the repository root:
+Run the Reasoning contract suite from the repository root:
 
 ```powershell
 python reasoning\run_contract_tests.py
@@ -96,7 +96,7 @@ The current accepted integration baseline is:
 24 / 24 contracts passing
 ```
 
-A cleanup or refactor that changes executable Phase 2 code should not be accepted unless the full contract suite still passes, or the contract suite is intentionally versioned to reflect a documented interface change.
+A cleanup or refactor that changes executable Reasoning code should not be accepted unless the full contract suite still passes, or the contract suite is intentionally versioned to reflect a documented interface change.
 
 ## Repository Structure
 
@@ -128,7 +128,7 @@ DC-Guardian/
 
 ## Component Documentation
 
-Detailed Phase 1 documentation is available in each component directory:
+Detailed Evidence-component documentation is available in each component directory:
 
 - `evidence/face_recognition/README.md`
 - `evidence/ppe_detection/README.md`
@@ -136,7 +136,7 @@ Detailed Phase 1 documentation is available in each component directory:
 - `evidence/ssh_anomaly/README.md`
 - `evidence/environmental_monitoring/README.md`
 
-The repository-level `requirements.txt` records the verified direct dependencies for the integrated Python 3.12 runtime. A clean `.venv-dc-guardian` installation has been validated with the 4/4 runtime smoke test and the 24/24 Phase 2 contract suite. The file is intentionally a curated direct-dependency manifest rather than a complete `pip freeze` snapshot.
+The repository-level `requirements.txt` records the verified direct dependencies for the integrated Python 3.12 runtime. A clean `.venv-dc-guardian` installation has been validated with the 4/4 runtime smoke test and the 24/24 Reasoning contract suite. The file is intentionally a curated direct-dependency manifest rather than a complete `pip freeze` snapshot.
 
 ## Key Shared Contracts
 
@@ -148,7 +148,7 @@ Synthetic mappings are evaluation constructs. They are not presented as observat
 
 ## Model Evaluation Notes
 
-The Phase 1 components solve different tasks and were evaluated with different protocols. Their metrics should not be compared directly as if they came from one benchmark.
+The Evidence components solve different tasks and were evaluated with different protocols. Their metrics should not be compared directly as if they came from one benchmark.
 
 ### Face Recognition
 
@@ -239,7 +239,7 @@ Accordingly, DC-GUARDIAN does not report artificial precision, recall, or accura
 - dedicated environmental-sensor observations,
 - hardware-origin telemetry,
 - source/provenance preservation, and
-- compatibility with the Phase 2 common-event and graph contracts.
+- compatibility with the Reasoning common-event and graph contracts.
 
 Production environmental thresholds should ultimately be aligned with the selected operational sensor and equipment specifications.
 
@@ -275,13 +275,12 @@ Local credentials belong in `.env`, which is excluded from Git. A sanitized `.en
 
 ## Current Development Roadmap
 
-1. Phase 1 evidence generation - COMPLETED / frozen integration baseline
-2. Phase 2 evidence integration and deterministic correlation - COMPLETED / 24/24 baseline
-3. Phase 3.1 operational knowledge manifest and approved-source definition - NEXT
-4. Phase 3.1 RAG ingestion, chunking, metadata, retrieval, and retrieval evaluation
-5. Phase 3.2 grounded agent interfaces over graph + retrieved evidence
-6. Phase 3.3 deterministic severity and decision rules
-7. Phase 3.4 incident object, response output, and dashboard integration
+1. Evidence generation - COMPLETED / frozen integration baseline
+2. Reasoning integration and deterministic correlation - COMPLETED / validated baseline
+3. Response RAG and governed knowledge - IMPLEMENTED / VERIFIED
+4. Grounded specialist reasoning and cross-domain synthesis - IMPLEMENTED / VERIFIED
+5. Deterministic Decision rules - IMPLEMENTED / VERIFIED
+6. Presentation/dashboard integration - NEXT
 
 ## Research Scope
 

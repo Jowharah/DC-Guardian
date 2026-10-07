@@ -1,8 +1,8 @@
 """
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 Face Recognition Event Adapter
 
-Converts the frozen Phase 1 FaceRecognitionPipeline output
+Converts the frozen Evidence-layer FaceRecognitionPipeline output
 into DC-Guardian Common Event Schema v1.0.
 
 Important:
@@ -10,7 +10,7 @@ Important:
 
 This adapter preserves identity evidence only.
 Camera/topology placement and authorization decisions remain
-Phase 2 responsibilities.
+Reasoning-layer responsibilities.
 """
 
 from copy import deepcopy
@@ -112,7 +112,7 @@ def adapt_face_assessment(
     timestamp=None,
 ):
     """
-    Convert one Phase 1 face-recognition result into the
+    Convert one Evidence-layer face-recognition result into the
     DC-Guardian Common Event Schema.
 
     This function does NOT:
@@ -169,7 +169,7 @@ def adapt_face_assessment(
 
 
     # ========================================================
-    # Phase 1 contract
+    # Evidence-layer contract
     # ========================================================
 
     if (
@@ -219,7 +219,7 @@ def adapt_face_assessment(
 
         raise ValueError(
             "Face assessment must come from "
-            "the frozen Phase 1 configuration."
+            "the frozen Evidence-layer configuration."
         )
 
 

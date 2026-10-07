@@ -1,6 +1,6 @@
-"""Deterministic Phase 3.3 specialist routing.
+"""Deterministic Specialist Agents specialist routing.
 
-Routing consumes domains already established by Phase 1/2. It does not ask an
+Routing consumes domains already established by Evidence/Reasoning. It does not ask an
 LLM to rediscover domain membership or decide whether source events correlate.
 """
 

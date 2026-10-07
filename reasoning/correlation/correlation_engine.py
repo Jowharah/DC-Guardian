@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 Cross-Domain Graph Correlation Engine
 
 Provides:

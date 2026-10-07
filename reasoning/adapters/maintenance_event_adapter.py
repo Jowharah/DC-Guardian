@@ -70,7 +70,7 @@ def normalize_datetime(value):
 
 def generate_event_id():
     """
-    Generate a unique Phase 2 maintenance event ID.
+    Generate a unique Reasoning layer maintenance event ID.
     """
 
     return (
@@ -80,7 +80,7 @@ def generate_event_id():
 
 
 # ============================================================
-# Convert Phase 1 maintenance assessment
+# Convert Evidence layer maintenance assessment
 # ============================================================
 
 def adapt_maintenance_assessment(
@@ -95,7 +95,7 @@ def adapt_maintenance_assessment(
     into DC-Guardian Common Event Schema v1.0.
 
     Infrastructure topology is deliberately unresolved here.
-    A separate Phase 2 topology component may later map the
+    A separate Reasoning layer topology component may later map the
     drive to synthetic equipment/server/rack/location entities.
     """
 
@@ -111,7 +111,7 @@ def adapt_maintenance_assessment(
 
 
     # ========================================================
-    # Validate minimum Phase 1 contract
+    # Validate minimum Evidence layer contract
     # ========================================================
 
     required_fields = [
@@ -355,7 +355,7 @@ def adapt_maintenance_assessment(
         # ----------------------------------------------------
         # Domain entities
         #
-        # serial_number is genuine Phase 1 evidence.
+        # serial_number is genuine Evidence layer evidence.
         #
         # It is represented as asset_id at the common-event
         # boundary. Infrastructure topology is not inferred.

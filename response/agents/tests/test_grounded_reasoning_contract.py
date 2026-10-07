@@ -1,4 +1,4 @@
-﻿"""Local contract tests for Phase 3.2 grounded reasoning."""
+﻿"""Local contract tests for Grounded Reasoning grounded reasoning."""
 
 from __future__ import annotations
 
@@ -138,7 +138,7 @@ def main():
         raise AssertionError("Hallucinated citation was accepted.")
 
     print("=" * 60)
-    print("DC-GUARDIAN PHASE 3.2 GROUNDED REASONING CONTRACT PASSED")
+    print("DC-GUARDIAN GROUNDED REASONING GROUNDED REASONING CONTRACT PASSED")
     print("=" * 60)
 
 

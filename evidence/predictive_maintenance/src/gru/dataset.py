@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Predictive Maintenance GRU Dataset
 
 Shared preprocessing for training and validation sequence stores.

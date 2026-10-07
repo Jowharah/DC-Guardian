@@ -217,7 +217,7 @@ print(
 )
 
 print(
-    "PASS: Phase 1 assessment contract complete."
+    "PASS: Evidence layer assessment contract complete."
 )
 
 print(

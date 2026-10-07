@@ -1,8 +1,8 @@
 """
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 PPE Compliance Event Adapter
 
-Converts the frozen Phase 1 PPECompliancePipeline output
+Converts the frozen Evidence-layer PPECompliancePipeline output
 into DC-Guardian Common Event Schema v1.0.
 
 Important:
@@ -10,7 +10,7 @@ Important:
 
 This adapter preserves PPE compliance evidence only.
 Camera/topology placement, employee identity, authorization,
-and cross-domain correlation remain Phase 2 responsibilities.
+and cross-domain correlation remain Reasoning-layer responsibilities.
 """
 
 from copy import deepcopy
@@ -107,7 +107,7 @@ def adapt_ppe_assessment(
     timestamp=None,
 ):
     """
-    Convert one frozen Phase 1 PPE assessment into the
+    Convert one frozen Evidence-layer PPE assessment into the
     DC-Guardian Common Event Schema.
 
     This function does NOT:
@@ -174,12 +174,12 @@ def adapt_ppe_assessment(
 
 
     # ========================================================
-    # Phase 1 contract
+    # Evidence-layer contract
     #
-    # Phase 1 currently emits PHYSICAL_SECURITY because PPE
+    # Evidence-layer currently emits PHYSICAL_SECURITY because PPE
     # originates from camera-based physical observations.
     #
-    # Phase 2 normalizes PPE into the dedicated SAFETY domain.
+    # Reasoning layer normalizes PPE into the dedicated SAFETY domain.
     # ========================================================
 
     if (
@@ -190,7 +190,7 @@ def adapt_ppe_assessment(
     ):
 
         raise ValueError(
-            "Phase 1 PPE assessment domain must be "
+            "Evidence-layer PPE assessment domain must be "
             "PHYSICAL_SECURITY."
         )
 

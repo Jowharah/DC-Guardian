@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Optimized GRU Full-Q4 Inference
 
 Scores the complete GRU-eligible Q4 population using
@@ -326,6 +326,7 @@ def main():
     checkpoint = torch.load(
         GRU_MODEL_FILE,
         map_location=device,
+        weights_only=True,
     )
 
 

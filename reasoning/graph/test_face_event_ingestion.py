@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 2
+DC-Guardian Reasoning
 Face Recognition Neo4j Ingestion Contract
 
 Tests:

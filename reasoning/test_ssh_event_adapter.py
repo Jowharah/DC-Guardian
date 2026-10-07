@@ -231,7 +231,7 @@ def build_ssh_assessment(
 # Test cases
 #
 # 2026 timestamps are used here because these are controlled
-# Phase 2 contract-test scenarios, not original Loghub times.
+# Reasoning layer contract-test scenarios, not original Loghub times.
 # ============================================================
 
 test_cases = [
@@ -475,7 +475,7 @@ for index, test_case in enumerate(
     )
 
     # --------------------------------------------------------
-    # Convert Phase 1 -> Phase 2
+    # Convert Evidence layer -> Reasoning layer
     # --------------------------------------------------------
 
     common_event = (
@@ -483,7 +483,7 @@ for index, test_case in enumerate(
             ssh_assessment,
 
             dataset_name=
-                "DC-Guardian Phase 2 "
+                "DC-Guardian Reasoning layer "
                 "Controlled Contract Test",
 
             source_type=
@@ -801,7 +801,7 @@ print(
 )
 
 print(
-    "SSH PHASE 2 ADAPTER CONTRACT PASSED"
+    "SSH REASONING LAYER ADAPTER CONTRACT PASSED"
 )
 
 print(

@@ -1,5 +1,5 @@
 ﻿"""
-DC-Guardian Phase 1
+DC-Guardian Evidence
 Predictive Maintenance GRU Configuration
 
 Experimental deep-learning challenger to the frozen

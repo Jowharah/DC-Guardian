@@ -1,7 +1,7 @@
 ﻿"""
 DC-GUARDIAN integrated runtime smoke test.
 
-This verifies that the public/frozen Phase 1 runtime stacks can initialize
+This verifies that the public/frozen Evidence layer runtime stacks can initialize
 from the repository environment without running training or requiring private
 Face enrollment images/embeddings.
 

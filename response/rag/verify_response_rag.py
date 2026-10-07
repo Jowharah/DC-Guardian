@@ -1,4 +1,4 @@
-﻿"""Integrated verification for DC-GUARDIAN Phase 3.1 RAG foundation."""
+﻿"""Integrated verification for DC-GUARDIAN Response RAG RAG foundation."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ def count_chunks() -> int:
 
 def main() -> None:
     print("=" * 60)
-    print("DC-GUARDIAN PHASE 3.1 RAG VERIFICATION")
+    print("DC-GUARDIAN RESPONSE RAG VERIFICATION")
     print("=" * 60)
 
     failures = []
@@ -91,13 +91,13 @@ def main() -> None:
     print("=" * 60)
     if failures:
         print(
-            "DC-GUARDIAN PHASE 3.1 RAG FOUNDATION FAILED: "
+            "DC-GUARDIAN RESPONSE RAG RAG FOUNDATION FAILED: "
             + ", ".join(failures)
         )
         print("=" * 60)
         raise SystemExit(1)
 
-    print("DC-GUARDIAN PHASE 3.1 RAG FOUNDATION PASSED")
+    print("DC-GUARDIAN RESPONSE RAG FOUNDATION PASSED")
     print("=" * 60)
 
 

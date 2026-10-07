@@ -47,7 +47,7 @@ INCIDENT = {
         ),
     },
     "evidence_boundary": (
-        "Phase 2 establishes shared ZONE-B context. It does not establish that "
+        "The Reasoning layer establishes shared ZONE-B context. It does not establish that "
         "the high-temperature observation caused the drive-risk assessment."
     ),
 }
@@ -84,7 +84,7 @@ def main() -> None:
         raise RuntimeError("No approved Operations evidence retrieved.")
 
     print("=" * 60)
-    print("DC-GUARDIAN PHASE 3.3 OPERATIONS SPECIALIST DEMO")
+    print("DC-GUARDIAN SPECIALIST AGENTS OPERATIONS SPECIALIST DEMO")
     print("=" * 60)
     print(f"Scenario: {INCIDENT['scenario_id']}")
     print(f"Router:   {routed}")

@@ -1,4 +1,4 @@
-﻿"""Contracts for deterministic Phase 3.3 specialist routing."""
+﻿"""Contracts for deterministic Specialist Agents specialist routing."""
 
 from __future__ import annotations
 
@@ -51,7 +51,7 @@ def main():
         raise AssertionError("Unsupported SHARED_POLICY routing was accepted.")
 
     print("=" * 60)
-    print("DC-GUARDIAN PHASE 3.3 SPECIALIST ROUTER CONTRACT PASSED")
+    print("DC-GUARDIAN SPECIALIST AGENTS SPECIALIST ROUTER CONTRACT PASSED")
     print("=" * 60)
 
 
