@@ -1,25 +1,25 @@
-﻿# DC-GUARDIAN Phase 3 â€” Response Architecture and Validation
+﻿# DC-GUARDIAN — Response Architecture and Validation
 
 **Status:** IN DEVELOPMENT  
 **Architecture:** Evidence â†’ Reasoning â†’ Response
 
-## 1. Three-Phase Architecture
+## 1. Layered Architecture
 
-DC-GUARDIAN is organized around three architectural phases:
+DC-GUARDIAN is organized around Evidence, Reasoning, Response, Decision, and Presentation layers.
 
 | Phase | Name | Core question | Responsibility |
 |---|---|---|---|
-| Phase 1 | **Evidence** | What happened? | Detect domain events and normalize evidence. |
-| Phase 2 | **Reasoning** | What does the evidence mean together? | Deterministically correlate events using common schemas, topology, and explicit rules. |
-| Phase 3 | **Response** | What approved knowledge applies, what can be concluded, and what should be considered next? | Retrieve governed knowledge, perform grounded AI reasoning, and support deterministic response decisions. |
+| Evidence layer | **Evidence** | What happened? | Detect domain events and normalize evidence. |
+| Reasoning layer | **Reasoning** | What does the evidence mean together? | Deterministically correlate events using common schemas, topology, and explicit rules. |
+| Response layer | **Response** | What approved knowledge applies, what can be concluded, and what should be considered next? | Retrieve governed knowledge, perform grounded AI reasoning, and support deterministic response decisions. |
 
-Phase 2 and Phase 3 both involve reasoning, but they have different roles. Phase 2 correlation is deterministic and rule/topology based. Phase 3.2 uses an LLM to interpret supplied incident evidence together with retrieved approved knowledge. The LLM does not replace Phase 2 correlation or final deterministic decision/escalation rules.
+Reasoning and Response both involve reasoning, but they have different roles. Reasoning-layer correlation is deterministic and rule/topology based. Grounded Reasoning uses an LLM to interpret supplied incident evidence together with retrieved approved knowledge. The LLM does not replace Reasoning-layer correlation or final deterministic decision/escalation rules.
 
-## 2. Phase 3 Decomposition
+## 2. Response layer Decomposition
 
 ### 3.1 Knowledge & Retrieval â€” VERIFIED
 
-Phase 3.1 provides the governed knowledge layer used by later reasoning.
+Response RAG provides the governed knowledge layer used by later reasoning.
 
 Pipeline:
 
@@ -132,17 +132,17 @@ Default evidence depth: TOP-3
 Knowledge eligibility:  DETERMINISTIC
 Cosine abstention:      EXPERIMENTAL / NOT DEFAULT
 
-DC-GUARDIAN PHASE 3.1 RAG FOUNDATION PASSED
+DC-GUARDIAN RESPONSE RAG RAG FOUNDATION PASSED
 ```
 
-## 3. Phase 3.2 Grounded AI Reasoning â€” IN DEVELOPMENT
+## 3. Grounded Reasoning Grounded AI Reasoning â€” IN DEVELOPMENT
 
-Phase 3.2 converts Phase 1/2 evidence plus approved retrieved knowledge into a structured grounded assessment.
+Grounded Reasoning converts Evidence and Reasoning context plus approved retrieved knowledge into a structured grounded assessment.
 
 Current flow:
 
 ```text
-Phase 2 correlation / incident evidence
+Reasoning-layer correlation / incident evidence
         +
 Deterministic knowledge eligibility
         â†“
@@ -191,13 +191,13 @@ Final severity, escalation, and automated actions remain responsibilities of det
 
 ### 3.2.3 Local Reasoning Contract
 
-The local Phase 3.2 contract passed:
+The local Grounded Reasoning contract passed:
 
 ```text
 PASS: Valid grounded assessment.
 PASS: Hallucinated citation rejected.
 
-DC-GUARDIAN PHASE 3.2 GROUNDED REASONING CONTRACT PASSED
+DC-GUARDIAN GROUNDED REASONING GROUNDED REASONING CONTRACT PASSED
 ```
 
 This contract uses fake providers and therefore does not require a paid external API call.
@@ -231,7 +231,7 @@ The result also exposed a useful schema refinement: a single Boolean `evidence_s
 - `PARTIALLY_SUPPORTED`
 - `INSUFFICIENT`
 
-## 4. Planned Phase 3.3 â€” Specialist Agent Routing
+## 4. Planned Specialist Agents â€” Specialist Agent Routing
 
 The target architecture includes specialist reasoning responsibilities, but DC-GUARDIAN will not invoke every specialist for every incident.
 
@@ -243,11 +243,11 @@ Initial target roles:
 - Cross-domain synthesis.
 - Supervisor/router.
 
-Routing should use Phase 2 structured domain/correlation information wherever deterministic routing is possible rather than asking an LLM to rediscover known event domains.
+Routing should use Reasoning-layer structured domain/correlation information wherever deterministic routing is possible rather than asking an LLM to rediscover known event domains.
 
 RAG remains a shared capability rather than requiring a separate autonomous RAG agent.
 
-## 5. Planned Phase 3.4 â€” Cross-Domain Response
+## 5. Planned Cross-Domain Response â€” Cross-Domain Response
 
 For genuinely cross-domain incidents, relevant specialists may reason over their own approved evidence and return structured findings. Cross-domain synthesis then combines those findings.
 
@@ -283,22 +283,22 @@ Incident output / dashboard
 
 | Capability | Status |
 |---|---|
-| Phase 3.1 governed corpus | VERIFIED |
-| Phase 3.1 parsing/preprocessing/chunking | VERIFIED |
-| Phase 3.1 local embedding index | VERIFIED |
-| Phase 3.1 retrieval evaluation | VERIFIED |
-| Phase 3.1 deterministic knowledge eligibility | VERIFIED |
-| Phase 3.1 integrated verification | PASSED |
-| Phase 3.2 provider-independent reasoning interface | IMPLEMENTED |
-| Phase 3.2 structured grounding contract | PASSED |
-| Phase 3.2 first live grounded reasoning call | PASSED |
-| Phase 3.2 reasoning evaluation suite | NEXT |
-| Phase 3.3 specialist routing | PLANNED |
-| Phase 3.4 cross-domain response | PLANNED |
+| Response RAG governed corpus | VERIFIED |
+| Response RAG parsing/preprocessing/chunking | VERIFIED |
+| Response RAG local embedding index | VERIFIED |
+| Response RAG retrieval evaluation | VERIFIED |
+| Response RAG deterministic knowledge eligibility | VERIFIED |
+| Response RAG integrated verification | PASSED |
+| Grounded Reasoning provider-independent reasoning interface | IMPLEMENTED |
+| Grounded Reasoning structured grounding contract | PASSED |
+| Grounded Reasoning first live grounded reasoning call | PASSED |
+| Grounded Reasoning reasoning evaluation suite | NEXT |
+| Specialist Agents specialist routing | PLANNED |
+| Cross-Domain Response cross-domain response | PLANNED |
 
-## 8. Phase 3 Completion Criteria
+## 8. Response layer Completion Criteria
 
-Phase 3 should not be considered complete solely because an LLM can produce plausible text. Completion requires evidence that:
+Response layer should not be considered complete solely because an LLM can produce plausible text. Completion requires evidence that:
 
 1. Knowledge sources remain governed, approved, traceable, and reproducible.
 2. Retrieval quality is measured against frozen cases.
@@ -308,7 +308,7 @@ Phase 3 should not be considered complete solely because an LLM can produce plau
 6. Specialist routing is deterministic where domain information is already known.
 7. Cross-domain synthesis operates on structured specialist findings.
 8. Final severity/escalation and operational authority remain governed by explicit deterministic rules.
-9. The end-to-end Phase 3 verification suite passes.
+9. The end-to-end Response layer verification suite passes.
 10. Documentation and reproducibility artifacts are synchronized with the verified implementation.
 
 ---
