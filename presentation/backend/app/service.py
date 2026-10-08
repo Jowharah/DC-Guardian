@@ -1,7 +1,7 @@
 """Allowlisted scenario execution and browser-safe projection."""
 from integration.scenario_registry import SCENARIOS
 from integration.service import run_integrated_scenario
-from presentation.backend.app.schemas import IncidentView, ScenarioInfo
+from presentation.backend.app.schemas import IncidentView, ScenarioInfo, EvidenceEventView
 
 def list_scenarios() -> list[ScenarioInfo]:
     return [ScenarioInfo(name=name, description=SCENARIOS[name]["description"]) for name in sorted(SCENARIOS)]
@@ -14,6 +14,26 @@ def execute_scenario(name: str, *, scenario_id: str | None = None) -> IncidentVi
         raise ValueError("Unsafe decision contract: autonomous action not explicitly disabled")
     events = result.evidence.get("events", [])
     event_ids = [e["event_id"] for e in events if isinstance(e, dict) and isinstance(e.get("event_id"), str)]
+    safe_events = []
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        try:
+            safe_events.append(EvidenceEventView(
+                event_id=event["event_id"],
+                domain=event["domain"],
+                event_type=event["event_type"],
+                timestamp=event["timestamp"],
+                state=event["assessment"]["state"],
+                component=event["source"]["component"],
+                zone_id=event.get("location", {}).get("zone_id"),
+                server_id=event.get("entities", {}).get("server_id"),
+                sensor_id=event.get("entities", {}).get("sensor_id"),
+                camera_id=event.get("entities", {}).get("camera_id"),
+                source_type=event.get("provenance", {}).get("source_type"),
+            ))
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError("Invalid pipeline evidence event contract") from exc
     return IncidentView(
         scenario_id=result.scenario_id,
         scenario_name=name,
@@ -21,5 +41,7 @@ def execute_scenario(name: str, *, scenario_id: str | None = None) -> IncidentVi
         shared_scope=result.reasoning.get("shared_scope"),
         shared_entity=result.reasoning.get("shared_entity"),
         evidence_event_ids=event_ids,
+        evidence_events=safe_events,
+        event_time=min((item.timestamp for item in safe_events), default=None),
         decision=result.decision,
     )
