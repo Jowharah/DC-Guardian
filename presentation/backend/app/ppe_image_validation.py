@@ -45,13 +45,19 @@ async def validate_ppe_image(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     finally:
         await image.close()
+    from evidence.ppe_detection.src.ppe_pipeline import MODEL_FILE, CONFIG_FILE
+    if not MODEL_FILE.is_file() or not CONFIG_FILE.is_file():
+        raise HTTPException(status_code=503, detail="PPE_MODEL_ARTIFACT_MISSING")
+    import torch
+    if not torch.cuda.is_available():
+        raise HTTPException(status_code=503, detail="PPE_CUDA_UNAVAILABLE")
     try:
         import numpy as np
         from evidence.ppe_detection.src.ppe_pipeline import PPECompliancePipeline
         assessment = PPECompliancePipeline().assess(np.asarray(decoded))
     except (FileNotFoundError, RuntimeError) as exc:
         # Never pretend an inference result exists if CUDA or artifacts are absent.
-        raise HTTPException(status_code=503, detail="Frozen PPE runtime unavailable; verify CUDA and model artifacts") from exc
+        raise HTTPException(status_code=503, detail="PPE_RUNTIME_INITIALIZATION_FAILED") from exc
     return {
         "source_type": "OPERATOR_UPLOADED_IMAGE",
         "inference_executed": True,
