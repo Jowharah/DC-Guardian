@@ -42,3 +42,9 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 @media(max-width:650px){.sidebar,.workspace,.agentSidebar{width:100%}.workspace{padding:18px}.feedHead,.feedRow{grid-template-columns:60px 1fr 85px}.feedHead span:nth-child(3),.feedRow>span:nth-child(3){display:none}}
 
 .incidentButton{width:100%;background:transparent;border:0;border-top:1px solid #524184;border-radius:0;color:inherit;text-align:left;font-weight:400;box-shadow:none;transform:none!important}.incidentButton:hover{background:#39254F;filter:none!important}.incidentButton:focus-visible{outline:2px solid #8392CF;outline-offset:-2px}
+
+/* Incident selection and dismissal */
+.incidentButton.selected{background:#39254F;box-shadow:inset 3px 0 #E3B8E0}
+.incidentActions{display:flex;align-items:center;gap:14px}
+.closeIncident{background:transparent;border:1px solid #A794B0;color:#E3B8E0;font-size:12px;padding:7px 11px;box-shadow:none}
+.closeIncident:hover{background:#524184;transform:none!important}
