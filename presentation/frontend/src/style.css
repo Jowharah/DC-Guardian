@@ -40,3 +40,5 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 @media(max-width:1300px){.agentSidebar{width:270px}.workspace{padding:26px 20px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.scenarioGrid{grid-template-columns:1fr}}
 @media(max-width:950px){.shell{flex-wrap:wrap}.sidebar{width:180px}.workspace{width:calc(100% - 180px);flex:auto}.agentSidebar{width:100%;min-height:360px;border-top:1px solid #524184}.agentConversation{min-height:110px}}
 @media(max-width:650px){.sidebar,.workspace,.agentSidebar{width:100%}.workspace{padding:18px}.feedHead,.feedRow{grid-template-columns:60px 1fr 85px}.feedHead span:nth-child(3),.feedRow>span:nth-child(3){display:none}}
+
+.incidentButton{width:100%;background:transparent;border:0;border-top:1px solid #524184;border-radius:0;color:inherit;text-align:left;font-weight:400;box-shadow:none;transform:none!important}.incidentButton:hover{background:#39254F;filter:none!important}.incidentButton:focus-visible{outline:2px solid #8392CF;outline-offset:-2px}
