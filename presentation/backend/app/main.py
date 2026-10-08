@@ -2,6 +2,7 @@
 from fastapi import FastAPI, HTTPException
 from presentation.backend.app.custom_scenarios import CustomScenarioInput, CustomScenarioResult, topology_options, assess_custom_environment
 from presentation.backend.app.schemas import IncidentView, ScenarioInfo
+from presentation.backend.app.incident_store import remember, list_incidents, get_incident
 from presentation.backend.app.service import execute_scenario, list_scenarios
 
 app = FastAPI(title="DC-GUARDIAN Presentation API", version="0.1.0", docs_url=None, redoc_url=None)
@@ -18,7 +19,7 @@ def scenarios() -> list[ScenarioInfo]:
 def run_scenario(name: str) -> IncidentView:
     # Prototype only: no production deployment until authentication/RBAC and audit are implemented.
     try:
-        return execute_scenario(name)
+        return remember(execute_scenario(name))
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
@@ -32,3 +33,14 @@ def custom_environment(payload: CustomScenarioInput) -> CustomScenarioResult:
         return assess_custom_environment(payload)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+@app.get("/api/v1/incidents", response_model=list[IncidentView])
+def incidents() -> list[IncidentView]:
+    return list_incidents()
+
+@app.get("/api/v1/incidents/{scenario_id}", response_model=IncidentView)
+def incident_detail(scenario_id: str) -> IncidentView:
+    incident = get_incident(scenario_id)
+    if incident is None:
+        raise HTTPException(status_code=404, detail="Incident not found in current process")
+    return incident
