@@ -12,6 +12,7 @@ from presentation.backend.app.graph_integrity import check_graph_integrity
 from presentation.backend.app.graph_audit import audit_graph_access
 from presentation.backend.app.authentication import current_principal, authorize
 from presentation.backend.app.authorization import Principal, Permission
+from presentation.backend.app.evidence_details import read_evidence, DOMAIN_PERMISSIONS
 
 app = FastAPI(
     title="DC-GUARDIAN Presentation API", version="0.1.0",
@@ -91,3 +92,21 @@ def incident_graph_integrity(scenario_id: str, principal: Principal = Depends(cu
         return check_graph_integrity(scenario_id, incident.evidence_event_ids)
     except Exception as exc:
         raise HTTPException(status_code=503, detail="Graph integrity service unavailable") from exc
+
+@app.get("/api/v1/incidents/{scenario_id}/evidence/{event_id}")
+def incident_evidence_detail(scenario_id: str, event_id: str, principal: Principal = Depends(current_principal)) -> dict:
+    incident = get_incident(scenario_id)
+    if incident is None:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    authorize(principal, Permission.INCIDENT_READ, incident.shared_entity)
+    matched = next((event for event in incident.evidence_events if event.event_id == event_id), None)
+    if matched is None:
+        raise HTTPException(status_code=404, detail="Evidence event not found in incident")
+    permission = DOMAIN_PERMISSIONS.get(matched.domain)
+    if permission is None:
+        raise HTTPException(status_code=403, detail="Unsupported Evidence domain")
+    authorize(principal, permission, incident.shared_entity)
+    detail = read_evidence(scenario_id, event_id)
+    if detail is None:
+        raise HTTPException(status_code=404, detail="Detailed Evidence unavailable for this snapshot; regenerate controlled scenario")
+    return detail
