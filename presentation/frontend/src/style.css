@@ -11,3 +11,32 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .mode{background:rgba(116,42,121,.13)}
 .severity{font-weight:700}
 @media(prefers-reduced-motion:reduce){button{transition:none}button:not(:disabled):hover{transform:none}}
+
+/* Monitoring / Lab / persistent investigator layout */
+.workspace{min-width:0;flex:1;padding:36px 30px}
+.agentSidebar{width:315px;flex-shrink:0;background:#21142D;border-left:1px solid #524184;display:flex;flex-direction:column;min-height:100vh;padding:24px 18px}
+.agentHeading{display:flex;align-items:center;gap:12px;padding-bottom:20px;border-bottom:1px solid #524184}
+.agentHeading small,.agentContext small{display:block;color:#A794B0;margin-top:5px;font-size:11px}
+.agentAvatar{display:grid;place-items:center;background:#524184;color:#E3B8E0;border-radius:12px;width:40px;height:40px;font-size:24px}
+.agentContext{margin-top:22px;border:1px solid #524184;background:#2B1B3C;padding:14px;border-radius:12px}
+.agentContext b{display:block;margin-top:10px;overflow-wrap:anywhere}
+.agentContext p{font-size:12px;color:#A794B0;overflow-wrap:anywhere}
+.agentConversation{flex:1;padding:24px 0}
+.agentMessage{padding:14px;border-radius:12px 12px 12px 3px;background:#38254D;color:#F4E5F3;line-height:1.6;font-size:13px}
+.agentConversation p{font-size:12px}
+.agentComposer{border-top:1px solid #524184;padding-top:16px;display:grid;gap:10px}
+.agentComposer textarea{background:#24162F;border:1px solid #524184;border-radius:10px;padding:12px;color:#A794B0;resize:vertical;min-height:75px}
+.agentComposer small{color:#A794B0;font-size:11px;line-height:1.4}
+.navButton{display:block;text-align:left;width:100%;background:transparent;border:0;box-shadow:none;padding:13px;border-radius:9px;color:#A794B0}
+.navButton.active{background:#39254F;color:#F4E5F3;border:1px solid #524184}
+.navButton:hover{background:#39254F;transform:none!important}
+.sectionHead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sectionHead select{background:#24162F;color:#E3B8E0;border:1px solid #524184;border-radius:8px;padding:9px}
+.feed{padding:4px 18px}
+.feedHead,.feedRow{display:grid;grid-template-columns:80px minmax(150px,2fr) minmax(100px,1fr) 100px;align-items:center;gap:12px;padding:15px 5px}
+.feedHead{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#A794B0}
+.feedRow{border-top:1px solid #524184;font-size:12px}
+.feedRow b{font-size:13px}.feedRow small{display:block;color:#A794B0;margin-top:5px}
+@media(max-width:1300px){.agentSidebar{width:270px}.workspace{padding:26px 20px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.scenarioGrid{grid-template-columns:1fr}}
+@media(max-width:950px){.shell{flex-wrap:wrap}.sidebar{width:180px}.workspace{width:calc(100% - 180px);flex:auto}.agentSidebar{width:100%;min-height:360px;border-top:1px solid #524184}.agentConversation{min-height:110px}}
+@media(max-width:650px){.sidebar,.workspace,.agentSidebar{width:100%}.workspace{padding:18px}.feedHead,.feedRow{grid-template-columns:60px 1fr 85px}.feedHead span:nth-child(3),.feedRow>span:nth-child(3){display:none}}
