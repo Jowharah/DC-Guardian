@@ -1,23 +1,52 @@
-"""In-memory, process-local snapshots of validated pipeline runs.
+"""Local SQLite persistence for validated, browser-safe synthetic incident summaries.
 
-Controlled test data only. Restart clears this store; it is not a production
-incident repository. No synthetic event feed is represented as live telemetry.
+Prototype only: no authentication, encryption-at-rest, or multi-tenant isolation.
+Raw images, usernames, IP addresses and biometric artifacts are not persisted here.
 """
+from __future__ import annotations
+
+import os
+import sqlite3
+from pathlib import Path
 from threading import RLock
 from presentation.backend.app.schemas import IncidentView
 
+DEFAULT_DB = Path(__file__).resolve().parents[1] / "data" / "incidents.sqlite3"
 _lock = RLock()
-_incidents: dict[str, IncidentView] = {}
+
+def _db_path() -> Path:
+    return Path(os.environ.get("DCG_PRESENTATION_DB", str(DEFAULT_DB)))
+
+def _connect() -> sqlite3.Connection:
+    path = _db_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(path, timeout=10)
+    conn.execute("""CREATE TABLE IF NOT EXISTS incidents (
+        scenario_id TEXT PRIMARY KEY,
+        created_utc TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+        payload TEXT NOT NULL
+    )""")
+    return conn
 
 def remember(incident: IncidentView) -> IncidentView:
-    with _lock:
-        _incidents[incident.scenario_id] = incident
+    with _lock, _connect() as conn:
+        conn.execute(
+            "INSERT INTO incidents (scenario_id,payload) VALUES (?,?) "
+            "ON CONFLICT(scenario_id) DO UPDATE SET payload=excluded.payload",
+            (incident.scenario_id, incident.model_dump_json()),
+        )
     return incident
 
 def list_incidents() -> list[IncidentView]:
-    with _lock:
-        return list(_incidents.values())
+    with _lock, _connect() as conn:
+        rows = conn.execute(
+            "SELECT payload FROM incidents ORDER BY created_utc DESC, rowid DESC LIMIT 200"
+        ).fetchall()
+    return [IncidentView.model_validate_json(row[0]) for row in rows]
 
 def get_incident(scenario_id: str) -> IncidentView | None:
-    with _lock:
-        return _incidents.get(scenario_id)
+    with _lock, _connect() as conn:
+        row = conn.execute(
+            "SELECT payload FROM incidents WHERE scenario_id=?", (scenario_id,)
+        ).fetchone()
+    return IncidentView.model_validate_json(row[0]) if row else None
