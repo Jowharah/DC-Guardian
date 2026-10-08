@@ -14,6 +14,7 @@ from presentation.backend.app.authentication import current_principal, authorize
 from presentation.backend.app.authorization import Principal, Permission
 from presentation.backend.app.evidence_details import read_evidence, DOMAIN_PERMISSIONS
 from presentation.backend.app.ppe_image_validation import router as ppe_image_router
+from presentation.backend.app.face_image_validation import router as face_image_router
 
 app = FastAPI(
     title="DC-GUARDIAN Presentation API", version="0.1.0",
@@ -21,6 +22,7 @@ app = FastAPI(
 )
 
 app.include_router(ppe_image_router)
+app.include_router(face_image_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
