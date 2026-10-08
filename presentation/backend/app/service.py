@@ -2,6 +2,7 @@
 from integration.scenario_registry import SCENARIOS
 from integration.service import run_integrated_scenario
 from presentation.backend.app.schemas import IncidentView, ScenarioInfo, EvidenceEventView, SpecialistAssessmentView, SynthesisView
+from presentation.backend.app.evidence_details import store_evidence
 
 def list_scenarios() -> list[ScenarioInfo]:
     return [ScenarioInfo(name=name, description=SCENARIOS[name]["description"]) for name in sorted(SCENARIOS)]
@@ -57,7 +58,7 @@ def execute_scenario(name: str, *, scenario_id: str | None = None) -> IncidentVi
                 "limitations", "citations"
             )
         })
-    return IncidentView(
+    incident = IncidentView(
         scenario_id=result.scenario_id,
         scenario_name=name,
         domains=result.reasoning.get("domains", []),
@@ -70,3 +71,5 @@ def execute_scenario(name: str, *, scenario_id: str | None = None) -> IncidentVi
         event_time=min((item.timestamp for item in safe_events), default=None),
         decision=result.decision,
     )
+    store_evidence(incident.scenario_id, events)
+    return incident
