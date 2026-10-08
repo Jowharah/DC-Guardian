@@ -16,10 +16,10 @@ def scenarios() -> list[ScenarioInfo]:
     return list_scenarios()
 
 @app.post("/api/v1/scenarios/{name}/run", response_model=IncidentView)
-def run_scenario(name: str) -> IncidentView:
+def run_scenario(name: str, run_id: str | None = None) -> IncidentView:
     # Prototype only: no production deployment until authentication/RBAC and audit are implemented.
     try:
-        return remember(execute_scenario(name))
+        return remember(execute_scenario(name, scenario_id=run_id) if run_id is not None else execute_scenario(name))
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
