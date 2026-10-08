@@ -35,8 +35,7 @@ def current_principal(credentials: HTTPBasicCredentials | None = Depends(securit
     )
     if not valid:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Authentication required",
-                            headers={"WWW-Authenticate": "Basic"})
+                            detail="Invalid or missing operator credentials")
     principal = Principal(user, frozenset({role}), frozenset(z.strip() for z in zones.split(",") if z.strip()))
     if not allowed(principal, Permission.INCIDENT_READ):
         raise HTTPException(status_code=403, detail="Access denied")
