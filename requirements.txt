@@ -22,14 +22,18 @@ jsonschema==4.26.0
 python-dotenv==1.2.3
 matplotlib==3.11.2
 
-# Phase 3 RAG source parsing
+# Response RAG source parsing
 pypdf==6.19.0
 beautifulsoup4==4.15.0
 
-# Phase 3 local embedding baseline
+# Response local embedding baseline
 sentence-transformers==5.7.0
 transformers==5.19.0
 
-# Phase 3.2 grounded reasoning provider
+# Response grounded reasoning provider
 openai==2.3.0
 
+
+# Presentation FastAPI backend (prototype)
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
