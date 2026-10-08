@@ -9,6 +9,7 @@ import os
 import sqlite3
 from pathlib import Path
 from threading import RLock
+from datetime import datetime, timezone
 from presentation.backend.app.schemas import IncidentView
 
 DEFAULT_DB = Path(__file__).resolve().parents[1] / "data" / "incidents.sqlite3"
@@ -29,6 +30,8 @@ def _connect() -> sqlite3.Connection:
     return conn
 
 def remember(incident: IncidentView) -> IncidentView:
+    if incident.received_at is None:
+        incident = incident.model_copy(update={"received_at": datetime.now(timezone.utc)})
     with _lock, _connect() as conn:
         conn.execute(
             "INSERT INTO incidents (scenario_id,payload) VALUES (?,?) "
@@ -40,13 +43,20 @@ def remember(incident: IncidentView) -> IncidentView:
 def list_incidents() -> list[IncidentView]:
     with _lock, _connect() as conn:
         rows = conn.execute(
-            "SELECT payload FROM incidents ORDER BY created_utc DESC, rowid DESC LIMIT 200"
+            "SELECT payload, created_utc FROM incidents ORDER BY created_utc DESC, rowid DESC LIMIT 200"
         ).fetchall()
-    return [IncidentView.model_validate_json(row[0]) for row in rows]
+    return [_restore(row[0], row[1]) for row in rows]
 
 def get_incident(scenario_id: str) -> IncidentView | None:
     with _lock, _connect() as conn:
         row = conn.execute(
-            "SELECT payload FROM incidents WHERE scenario_id=?", (scenario_id,)
+            "SELECT payload, created_utc FROM incidents WHERE scenario_id=?", (scenario_id,)
         ).fetchone()
-    return IncidentView.model_validate_json(row[0]) if row else None
+    return _restore(row[0], row[1]) if row else None
+
+def _restore(payload: str, created_utc: str) -> IncidentView:
+    incident = IncidentView.model_validate_json(payload)
+    if incident.received_at is None:
+        # Legacy records were created before received_at was part of the API contract.
+        incident = incident.model_copy(update={"received_at": datetime.fromisoformat(created_utc.replace("Z", "+00:00"))})
+    return incident
