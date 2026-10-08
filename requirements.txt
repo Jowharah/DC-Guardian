@@ -41,3 +41,6 @@ uvicorn==0.54.0
 # Presentation API contract tests
 pytest>=8,<10
 httpx>=0.27,<1
+
+# Multipart image upload parsing for PPE validation
+python-multipart>=0.0.20,<1
