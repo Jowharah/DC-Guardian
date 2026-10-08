@@ -37,3 +37,7 @@ openai==2.3.0
 # Presentation FastAPI backend (prototype)
 fastapi==0.143.0
 uvicorn==0.54.0
+
+# Presentation API contract tests
+pytest>=8,<10
+httpx>=0.27,<1
