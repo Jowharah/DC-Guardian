@@ -3,12 +3,12 @@ from fastapi.testclient import TestClient
 from presentation.backend.app.main import app
 from presentation.backend.app.schemas import IncidentView
 from presentation.backend.app import main
-from presentation.backend.app.incident_store import _incidents
+from presentation.backend.app.incident_store import get_incident
 
 client = TestClient(app)
 
-def test_pipeline_snapshot_lifecycle(monkeypatch):
-    _incidents.clear()
+def test_pipeline_snapshot_lifecycle(monkeypatch, tmp_path):
+    monkeypatch.setenv('DCG_PRESENTATION_DB', str(tmp_path / 'incidents.sqlite3'))
     assert client.get("/api/v1/incidents").json() == []
     assert client.get("/api/v1/incidents/DCG-TEST-FLOW-01").status_code == 404
     def fake_execute(name):
@@ -43,4 +43,3 @@ def test_pipeline_snapshot_lifecycle(monkeypatch):
     detail=client.get("/api/v1/incidents/DCG-TEST-FLOW-01")
     assert detail.status_code==200
     assert detail.json()==listed[0]
-    _incidents.clear()
