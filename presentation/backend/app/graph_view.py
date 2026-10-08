@@ -1,10 +1,33 @@
 """Read-only, bounded Neo4j neighborhood for stored controlled incidents."""
 from reasoning.graph.ingest_event import create_driver, NEO4J_DATABASE
+from presentation.backend.app.authorization import Principal, Permission, allowed
 
 NODE_KEYS = ("event_id", "zone_id", "rack_id", "server_id", "camera_id", "sensor_id", "asset_id", "equipment_id", "name")
 EVENT_KEYS = ("domain", "state", "timestamp", "event_type")
 
-def graph_for_scenario(scenario_id: str) -> dict:
+def project_node(node, principal: Principal, zone: str) -> dict:
+    node_id = str(node.element_id)
+    labels = sorted(node.labels)
+    node_type = labels[0] if labels else "Node"
+    keys = EVENT_KEYS + NODE_KEYS if "Event" in labels else NODE_KEYS
+    sensitive = None
+    if "Person" in labels:
+        sensitive = Permission.PERSON_DETAIL
+        keys = ("person_id",)
+    elif "SourceIP" in labels:
+        sensitive = Permission.SSH_DETAIL
+        keys = ("address",)
+    if sensitive and not allowed(principal, sensitive, zone):
+        return {"id": node_id, "label": node_type + " (restricted)",
+                "type": node_type, "properties": {}, "restricted": True}
+    properties = {key: node[key] for key in keys
+                  if key in node and isinstance(node[key], (str, int, float, bool))}
+    label = next((str(properties[k]) for k in ("person_id", "address") + NODE_KEYS
+                  if k in properties), node_type)
+    return {"id": node_id, "label": label, "type": node_type,
+            "properties": properties, "restricted": False}
+
+def graph_for_scenario(scenario_id: str, *, principal: Principal, zone: str) -> dict:
     query = """
     MATCH (e:Event {scenario_id: $scenario_id})
     WITH e ORDER BY e.event_id LIMIT 30
@@ -20,20 +43,8 @@ def graph_for_scenario(scenario_id: str) -> dict:
                 for node in (row["e"], row["n"]):
                     if node is None:
                         continue
-                    node_id = str(node.element_id)
-                    labels = sorted(node.labels)
-                    # Never expose person IDs, source IPs, arbitrary model evidence or biometric fields.
-                    keys = EVENT_KEYS + NODE_KEYS if "Event" in labels else NODE_KEYS
-                    if "Person" in labels or "SourceIP" in labels:
-                        properties = {}
-                        label = labels[0]
-                    else:
-                        properties = {key: node[key] for key in keys
-                                      if key in node and isinstance(node[key], (str, int, float, bool))}
-                        label = next((str(properties[k]) for k in NODE_KEYS if k in properties),
-                                     labels[0] if labels else "Node")
-                    nodes[node_id] = {"id": node_id, "label": label,
-                                      "type": labels[0] if labels else "Node", "properties": properties}
+                    projected = project_node(node, principal, zone)
+                    nodes[projected["id"]] = projected
                 relation = row["r"]
                 if relation is not None:
                     rel_id = str(relation.element_id)
