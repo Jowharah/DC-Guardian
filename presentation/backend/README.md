@@ -40,3 +40,18 @@ Do not enable external network binding, deploy publicly, or use real employee
 credentials. Production requires TLS, proper account management, password
 hashing or institutional SSO, secure sessions, rate limits, audit logging,
 and comprehensive API security tests.
+
+## Automatic local .env configuration
+
+FastAPI now reads missing `DCG_LOCAL_*` values from the repository-root
+`.env` file. Process environment variables override `.env` entries.
+
+```dotenv
+DCG_LOCAL_USER=dcg-local-operator
+DCG_LOCAL_PASSWORD=choose_a_unique_local_development_password
+DCG_LOCAL_ROLE=administrator
+DCG_LOCAL_ZONES=ZONE-A,ZONE-B,ZONE-C
+```
+
+Keep `.env` out of Git and use a development-only password. Restart FastAPI
+after changing the file. Never expose the HTTP Basic prototype to a network.
