@@ -48,3 +48,5 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .incidentActions{display:flex;align-items:center;gap:14px}
 .closeIncident{background:transparent;border:1px solid #A794B0;color:#E3B8E0;font-size:12px;padding:7px 11px;box-shadow:none}
 .closeIncident:hover{background:#524184;transform:none!important}
+
+.evidenceList{display:grid;gap:10px}.evidenceItem{border:1px solid #524184;border-radius:10px;background:#2B1B3C;padding:14px;overflow-wrap:anywhere}.evidenceItem small{color:#A794B0}.evidenceItem .incidentTop{gap:12px;flex-wrap:wrap}
