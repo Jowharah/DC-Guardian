@@ -1,9 +1,9 @@
 """Authenticated, local-only face image inference and opt-in retention."""
 from pathlib import Path
 import json
+import logging
 import os
 import subprocess
-import sys
 import tempfile
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, Response
 from presentation.backend.app.authentication import current_principal, authorize
@@ -12,6 +12,7 @@ from presentation.backend.app.ppe_image_validation import MAX_IMAGE_BYTES, valid
 from presentation.backend.app import face_observations
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 @router.post("/api/v1/face/validate-image")
 async def validate_face(image: UploadFile = File(...), retain: bool = Form(False),
@@ -35,16 +36,21 @@ async def validate_face(image: UploadFile = File(...), retain: bool = Form(False
     enrollment = project_root / "evidence/face_recognition/models/employee_embeddings.npz"
     if not enrollment.is_file():
         raise HTTPException(503, "FACE_ENROLLMENT_MISSING")
+    face_python = project_root / ".venv-face" / "Scripts" / "python.exe"
+    if not face_python.is_file():
+        raise HTTPException(503, "FACE_ENVIRONMENT_MISSING")
     with tempfile.TemporaryDirectory(prefix="dcg-face-") as folder:
         path = Path(folder) / "input.png"
         decoded.save(path, format="PNG")
         try:
-            run = subprocess.run([sys.executable, "-m", "presentation.backend.app.face_worker", str(path)],
+            run = subprocess.run([str(face_python), "-m", "presentation.backend.app.face_worker", str(path)],
                                  cwd=str(project_root), capture_output=True, text=True,
                                  timeout=120, check=False, env={**os.environ, "PYTHONPATH": str(project_root)})
         except subprocess.TimeoutExpired as exc:
             raise HTTPException(504, "FACE_INFERENCE_TIMEOUT") from exc
         if run.returncode:
+            # Avoid recording raw stderr: model libraries may print private paths.
+            logger.error("Face inference worker failed (exit code %d)", run.returncode)
             raise HTTPException(503, "FACE_INFERENCE_WORKER_FAILED")
         lines = [x.removeprefix("DCG_FACE_RESULT=") for x in run.stdout.splitlines()
                  if x.startswith("DCG_FACE_RESULT=")]
