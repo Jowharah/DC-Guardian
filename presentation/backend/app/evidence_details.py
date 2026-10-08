@@ -33,6 +33,18 @@ def project_evidence(event: dict) -> dict:
         source = evidence.get(group)
         if isinstance(source, dict):
             details[group] = _select(source, names)
+    if domain == "SAFETY":
+        details["compliance"] = _select(evidence, ("ppe_status", "person_detected", "person_count", "required_ppe", "required_ppe_not_detected_semantics", "policy_version"))
+        details["detector"] = _select(evidence, ("model_family", "architecture", "confidence_threshold", "iou_threshold", "association_method"))
+        people = evidence.get("people")
+        details["people"] = [_select(p, ("person_index", "status", "required_ppe_detected", "required_ppe_not_detected")) for p in people[:20] if isinstance(p, dict)] if isinstance(people, list) else []
+        details["image_available"] = False
+        details["image_note"] = "Controlled assessment: no source image was supplied."
+    if domain == "PHYSICAL_SECURITY":
+        details["recognition"] = _select(evidence, ("recognition_status", "face_detected", "face_count", "distance", "similarity", "threshold", "threshold_source", "detector_backend", "distance_metric", "authorization_evaluated"))
+        details["identity"] = _select(evidence, ("person_id", "nearest_employee_id"))
+        details["image_available"] = False
+        details["image_note"] = "Controlled assessment: no source image was supplied."
     if domain == "MAINTENANCE":
         details["risk"] = _select(evidence, ("failure_probability","operating_threshold","failure_horizon_days","serial_number"))
     if domain == "CYBERSECURITY":
