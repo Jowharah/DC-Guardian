@@ -52,3 +52,18 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .evidenceList{display:grid;gap:10px}.evidenceItem{border:1px solid #524184;border-radius:10px;background:#2B1B3C;padding:14px;overflow-wrap:anywhere}.evidenceItem small{color:#A794B0}.evidenceItem .incidentTop{gap:12px;flex-wrap:wrap}
 
 .graphCanvas{width:100%;height:auto;max-height:460px;background:#160C20;border-radius:12px;border:1px solid #524184}.graphCanvas g[role="button"]{cursor:pointer}.graphCanvas g[role="button"]:focus{outline:none;filter:brightness(1.4)}.evidenceItem dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.evidenceItem dt{font-size:11px;color:#A794B0}.evidenceItem dd{margin:2px 0;overflow-wrap:anywhere}
+
+/* Topology-aware Neo4j graph */
+.graphPanel{padding:18px;overflow:hidden}
+.graphToolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.graphToolbar p{margin:6px 0;font-size:12px}
+.graphControls{display:flex;gap:6px}
+.graphControls button{min-width:36px;background:#39254F;border:1px solid #524184;padding:7px 10px}
+.graphLegend{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 14px}
+.graphLegend span{display:inline-flex;align-items:center;gap:6px;color:#A794B0;font-size:12px}
+.graphLegend i{display:inline-block;width:10px;height:10px;border-radius:50%}
+.graphCanvas{touch-action:none;min-height:310px;max-height:520px}
+.graphNode{cursor:pointer}
+.graphNode:focus-visible{outline:none;filter:brightness(1.35)}
+.graphHint{font-size:12px}
+.graphPlaceholder{border:1px dashed #524184;border-radius:10px;padding:16px;color:#A794B0;font-size:13px}
