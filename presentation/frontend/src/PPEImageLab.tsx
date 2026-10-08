@@ -11,7 +11,7 @@ export default function PPEImageLab(){
  async function run(){
   if(!file)return;setBusy(true);setError("");setResult(null);
   try{setResult(await validatePPEImage(file))}
-  catch(e){const message=e instanceof Error?e.message:"Upload failed";setError(message.includes("503")?"Frozen PPE inference is unavailable on this runtime (CUDA or model artifact required). No prediction was generated.":message)}
+  catch(e){const message=e instanceof Error?e.message:"Upload failed";setError(message.includes("503")?"PPE inference could not run. The backend will report whether CUDA or the frozen model artifacts are unavailable. No prediction was generated.":message)}
   finally{setBusy(false)}
  }
  return <section className="panel ppeLab"><h3>PPE image validation</h3><p className="muted">Upload a licensed test image or approved snapshot. Runs the frozen PPE detector when CUDA is available. This does not create an incident or perform face identification.</p>
