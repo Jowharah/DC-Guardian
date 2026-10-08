@@ -68,7 +68,7 @@ def incident_graph(scenario_id: str, principal: Principal = Depends(current_prin
         raise HTTPException(status_code=404, detail="Incident not found")
     authorize(principal, Permission.GRAPH_READ, incident.shared_entity)
     try:
-        return graph_for_scenario(scenario_id)
+        return graph_for_scenario(scenario_id, principal=principal, zone=incident.shared_entity)
     except Exception as exc:
         # Never expose database errors, credentials or internal connection details.
         raise HTTPException(status_code=503, detail="Graph service unavailable") from exc
