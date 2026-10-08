@@ -75,3 +75,9 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .graphIntegrity .muted{font-size:12px;margin:7px 0}
 .integrityPass{color:#B9E2D0;font-weight:700}
 .integrityIncomplete{color:#F0BD9B;font-weight:700}
+
+/* Accessible severity hierarchy against the amethyst interface */
+.severity{display:inline-flex;align-items:center;justify-content:center;width:max-content;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:800;letter-spacing:.045em;line-height:1.3;white-space:nowrap}
+.severity-high{background:#D83A69;color:#FFFFFF;border:1px solid #FF7F9D;box-shadow:0 0 14px rgba(216,58,105,.28)}
+.severity-medium{background:#F3B65D;color:#24162F;border:1px solid #FFD48D}
+.severity-low{background:#8392CF;color:#160C20;border:1px solid #A8B5E5}
