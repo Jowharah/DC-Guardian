@@ -1,7 +1,7 @@
 """Allowlisted scenario execution and browser-safe projection."""
 from integration.scenario_registry import SCENARIOS
 from integration.service import run_integrated_scenario
-from presentation.backend.app.schemas import IncidentView, ScenarioInfo, EvidenceEventView
+from presentation.backend.app.schemas import IncidentView, ScenarioInfo, EvidenceEventView, SpecialistAssessmentView, SynthesisView
 
 def list_scenarios() -> list[ScenarioInfo]:
     return [ScenarioInfo(name=name, description=SCENARIOS[name]["description"]) for name in sorted(SCENARIOS)]
@@ -34,6 +34,29 @@ def execute_scenario(name: str, *, scenario_id: str | None = None) -> IncidentVi
             ))
         except (KeyError, TypeError, ValueError) as exc:
             raise ValueError("Invalid pipeline evidence event contract") from exc
+    response = result.response
+    routed = response.get("specialists", [])
+    raw_assessments = response.get("specialist_assessments")
+    if raw_assessments is None:
+        raw_assessments = {routed[0]: response["assessment"]} if len(routed) == 1 else {}
+    specialist_views = [
+        SpecialistAssessmentView(specialist_id=key, **{
+            field: assessment[field] for field in (
+                "assessment", "grounding_status", "supported_findings",
+                "recommended_considerations", "limitations", "citations"
+            )
+        })
+        for key, assessment in raw_assessments.items()
+    ]
+    synthesis = None
+    if "synthesis" in response:
+        synthesis = SynthesisView(**{
+            field: response["synthesis"][field] for field in (
+                "assessment", "grounding_status", "contributing_specialists",
+                "supported_cross_domain_findings", "recommended_considerations",
+                "limitations", "citations"
+            )
+        })
     return IncidentView(
         scenario_id=result.scenario_id,
         scenario_name=name,
@@ -42,6 +65,8 @@ def execute_scenario(name: str, *, scenario_id: str | None = None) -> IncidentVi
         shared_entity=result.reasoning.get("shared_entity"),
         evidence_event_ids=event_ids,
         evidence_events=safe_events,
+        specialist_assessments=specialist_views,
+        synthesis=synthesis,
         event_time=min((item.timestamp for item in safe_events), default=None),
         decision=result.decision,
     )
