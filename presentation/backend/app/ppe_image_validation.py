@@ -83,6 +83,8 @@ async def validate_ppe_image(
             assessment = json.loads(lines[0])
         except json.JSONDecodeError as exc:
             raise HTTPException(status_code=503, detail="PPE_WORKER_OUTPUT_INVALID") from exc
+    if not isinstance(assessment, dict) or "overall_status" not in assessment or "detections" not in assessment:
+        raise HTTPException(status_code=503, detail="PPE_WORKER_OUTPUT_INVALID")
     return {
         "source_type": "OPERATOR_UPLOADED_IMAGE",
         "inference_executed": True,
