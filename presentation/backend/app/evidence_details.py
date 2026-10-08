@@ -19,7 +19,7 @@ DETAIL_FIELDS = {
                       "autoencoder": ("prediction","reconstruction_error","threshold")},
     "ENVIRONMENTAL": {"measurements": ("temperature_c","humidity_pct"),
                       "environmental": ("thresholds","high_temperature_threshold_c","low_temperature_threshold_c","high_humidity_threshold_pct","low_humidity_threshold_pct")},
-    "MAINTENANCE": {"maintenance": ("failure_probability","operating_threshold","failure_horizon_days")},
+    "MAINTENANCE": {"smart": ("smart_5_raw","smart_198_raw","smart_194_raw","smart_5_delta_7","smart_198_delta_7","temperature_7obs_mean")},
 }
 
 def _select(mapping: dict, names: tuple[str, ...]) -> dict:
@@ -33,6 +33,8 @@ def project_evidence(event: dict) -> dict:
         source = evidence.get(group)
         if isinstance(source, dict):
             details[group] = _select(source, names)
+    if domain == "MAINTENANCE":
+        details["risk"] = _select(evidence, ("failure_probability","operating_threshold","failure_horizon_days","serial_number"))
     if domain == "CYBERSECURITY":
         details["detector_votes"] = evidence.get("detector_votes")
         details["detector_combination"] = evidence.get("detector_combination")
