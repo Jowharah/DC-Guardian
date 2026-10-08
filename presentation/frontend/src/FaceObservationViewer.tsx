@@ -1,0 +1,7 @@
+import {useEffect,useState} from "react";
+import {getFaceObservation,getFaceImage,type FaceObservationDetail} from "./api";
+export default function FaceObservationViewer({id}:{id:string}){
+ const [detail,setDetail]=useState<FaceObservationDetail|null>(null),[url,setUrl]=useState(""),[error,setError]=useState("");
+ useEffect(()=>{let active=true,objectUrl="";setDetail(null);setUrl("");setError("");Promise.all([getFaceObservation(id),getFaceImage(id)]).then(([d,b])=>{if(!active)return;objectUrl=URL.createObjectURL(b);setUrl(objectUrl);setDetail(d)}).catch(()=>{if(active)setError("Face evidence unavailable or access denied.")});return()=>{active=false;if(objectUrl)URL.revokeObjectURL(objectUrl)}},[id]);
+ return <section className="panel ppeLab"><h3>Stored Face Recognition observation</h3>{error?<p role="alert">{error}</p>:!detail||!url?<p>Loading authorized evidence…</p>:<><p>{detail.zone_id} · {new Date(detail.created_at).toLocaleString()} · {detail.review_status}</p><div className="ppePreview"><img src={url} alt="Authorized stored face validation image"/></div><p><b>{detail.assessment.recognition_status}</b> · Identity: {detail.assessment.person_id} · Similarity: {detail.assessment.similarity?.toFixed(3)??"N/A"} · Distance: {detail.assessment.distance?.toFixed(3)??"N/A"}</p><p className="muted">Identity recognition only. Zone authorization not evaluated. No Decision severity assigned. This image is not linked to a pipeline incident.</p></>}</section>
+}
