@@ -18,3 +18,13 @@ export type GraphNode = {id:string;label:string;type:string;restricted:boolean;p
 export type GraphEdge = {id:string;source:string;target:string;type:string};
 export type IncidentGraph = {scenario_id:string;source:"NEO4J_READ_ONLY";nodes:GraphNode[];edges:GraphEdge[]};
 export const getIncidentGraph=(id:string)=>request<IncidentGraph>(`/api/v1/incidents/${encodeURIComponent(id)}/graph`);
+
+export type GraphIntegrity = {
+ scenario_id:string;
+ status:"PASS"|"INCOMPLETE";
+ expected_event_count:number;
+ observed_event_count:number;
+ missing_event_ids:string[];
+ missing_ssh_source_relationships:string[];
+};
+export const getGraphIntegrity=(id:string)=>request<GraphIntegrity>(`/api/v1/incidents/${encodeURIComponent(id)}/graph-integrity`);
