@@ -7,6 +7,7 @@ from presentation.backend.app.custom_scenarios import (
 from presentation.backend.app.schemas import IncidentView, ScenarioInfo
 from presentation.backend.app.incident_store import remember, list_incidents, get_incident
 from presentation.backend.app.service import execute_scenario, list_scenarios
+from presentation.backend.app.graph_view import graph_for_scenario
 
 app = FastAPI(
     title="DC-GUARDIAN Presentation API", version="0.1.0",
@@ -54,3 +55,13 @@ def incident_detail(scenario_id: str) -> IncidentView:
     if incident is None:
         raise HTTPException(status_code=404, detail="Incident not found in current process")
     return incident
+
+@app.get("/api/v1/incidents/{scenario_id}/graph")
+def incident_graph(scenario_id: str) -> dict:
+    if get_incident(scenario_id) is None:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    try:
+        return graph_for_scenario(scenario_id)
+    except Exception as exc:
+        # Never expose database errors, credentials or internal connection details.
+        raise HTTPException(status_code=503, detail="Graph service unavailable") from exc
