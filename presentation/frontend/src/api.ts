@@ -47,3 +47,19 @@ export async function getPPEImage(id:string):Promise<Blob>{
  if(!response.ok)throw new Error(`Image unavailable (${response.status})`);
  return response.blob();
 }
+
+export type FaceAssessment={recognition_status:"RECOGNIZED"|"UNKNOWN"|"NO_FACE"|"MULTIPLE_FACES";person_id:string;similarity:number|null;distance:number|null;threshold:number;facial_area?:Record<string,number>|null};
+export type FaceObservation={observation_id:string;zone_id:string;created_at:string;recognition_status:string;person_id:string;review_status:string;pipeline_status:string};
+export type FaceObservationDetail=FaceObservation&{assessment:FaceAssessment};
+export type FaceImageResult={assessment:FaceAssessment;observation:FaceObservation|null;image_stored:boolean;authorization_status:string};
+export async function validateFaceImage(file:File,retain=false,zone="ZONE-B"):Promise<FaceImageResult>{
+ const body=new FormData();body.append("image",file);body.append("retain",String(retain));if(retain)body.append("zone_id",zone);
+ return request<FaceImageResult>("/api/v1/face/validate-image",{method:"POST",body});
+}
+export const getFaceObservations=()=>request<FaceObservation[]>("/api/v1/face/observations");
+export const getFaceObservation=(id:string)=>request<FaceObservationDetail>(`/api/v1/face/observations/${encodeURIComponent(id)}`);
+export async function getFaceImage(id:string):Promise<Blob>{
+ const response=await fetch(`/api/v1/face/observations/${encodeURIComponent(id)}/image`,{headers:credentials?{"Authorization":`Basic ${credentials}`}:{}});
+ if(!response.ok)throw new Error(`Face image unavailable (${response.status})`);
+ return response.blob();
+}
