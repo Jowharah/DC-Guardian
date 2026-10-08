@@ -42,7 +42,7 @@ def save_observation(image: Image.Image, assessment: dict, zone: str, owner: str
         created = datetime.now(timezone.utc).isoformat()
         with _connect() as conn:
             conn.execute("INSERT INTO ppe_observations VALUES (?,?,?,?,?)",
-                         (observation_id, zone, created, owner, json.dumps(assessment, allow_nan=False)))
+                         (observation_id, zone, created, owner, json.dumps({**assessment, "_image_size": {"width": image.width, "height": image.height}}, allow_nan=False)))
     except Exception:
         filename.unlink(missing_ok=True)
         raise
@@ -65,8 +65,10 @@ def get_observation(observation_id: str) -> dict | None:
     if row is None:
         return None
     zone, created, assessment = row
+    stored = json.loads(assessment)
+    size = stored.pop("_image_size", None)
     return {"observation_id": observation_id, "zone_id": zone, "created_at": created,
-            "assessment": json.loads(assessment), "pipeline_status": "PPE_ONLY_NOT_INTEGRATED",
+            "image_size": size, "assessment": stored, "pipeline_status": "PPE_ONLY_NOT_INTEGRATED",
             "review_status": "NOT_REVIEWED"}
 
 def image_bytes(observation_id: str, subject: str) -> bytes:
