@@ -4,6 +4,10 @@ No source images are persisted by this endpoint. The endpoint validates decoded
 image bytes before running the unchanged frozen model. CUDA is required by that model.
 """
 from io import BytesIO
+import json
+import os
+import subprocess
+import tempfile
 from pathlib import Path
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from PIL import Image, UnidentifiedImageError
@@ -45,19 +49,40 @@ async def validate_ppe_image(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     finally:
         await image.close()
-    from evidence.ppe_detection.src.ppe_pipeline import MODEL_FILE, CONFIG_FILE
-    if not MODEL_FILE.is_file() or not CONFIG_FILE.is_file():
-        raise HTTPException(status_code=503, detail="PPE_MODEL_ARTIFACT_MISSING")
-    import torch
-    if not torch.cuda.is_available():
-        raise HTTPException(status_code=503, detail="PPE_CUDA_UNAVAILABLE")
-    try:
-        import numpy as np
-        from evidence.ppe_detection.src.ppe_pipeline import PPECompliancePipeline
-        assessment = PPECompliancePipeline().assess(np.asarray(decoded))
-    except (FileNotFoundError, RuntimeError) as exc:
-        # Never pretend an inference result exists if CUDA or artifacts are absent.
-        raise HTTPException(status_code=503, detail="PPE_RUNTIME_INITIALIZATION_FAILED") from exc
+    project_root = Path(__file__).resolve().parents[3]
+    python_executable = project_root / ".venv-ppe" / "Scripts" / "python.exe"
+    worker = Path(__file__).with_name("ppe_worker.py")
+    if not python_executable.is_file():
+        raise HTTPException(status_code=503, detail="PPE_GPU_ENVIRONMENT_MISSING")
+    if not worker.is_file():
+        raise HTTPException(status_code=503, detail="PPE_WORKER_MISSING")
+    # The uploaded image is decoded and rewritten to a controlled temporary PNG.
+    # No client-supplied filename or command is passed to the subprocess.
+    with tempfile.TemporaryDirectory(prefix="dcg-ppe-") as temp_dir:
+        image_path = Path(temp_dir) / "input.png"
+        decoded.save(image_path, format="PNG")
+        try:
+            completed = subprocess.run(
+                [str(python_executable), "-m", "presentation.backend.app.ppe_worker", str(image_path)],
+                cwd=str(project_root),
+                capture_output=True,
+                text=True,
+                timeout=120,
+                check=False,
+                env={**os.environ, "PYTHONPATH": str(project_root)},
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise HTTPException(status_code=504, detail="PPE_INFERENCE_TIMEOUT") from exc
+        if completed.returncode != 0:
+            raise HTTPException(status_code=503, detail="PPE_INFERENCE_WORKER_FAILED")
+        marker = "DCG_PPE_RESULT="
+        lines = [line[len(marker):] for line in completed.stdout.splitlines() if line.startswith(marker)]
+        if len(lines) != 1:
+            raise HTTPException(status_code=503, detail="PPE_WORKER_OUTPUT_INVALID")
+        try:
+            assessment = json.loads(lines[0])
+        except json.JSONDecodeError as exc:
+            raise HTTPException(status_code=503, detail="PPE_WORKER_OUTPUT_INVALID") from exc
     return {
         "source_type": "OPERATOR_UPLOADED_IMAGE",
         "inference_executed": True,
