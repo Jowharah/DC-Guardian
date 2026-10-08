@@ -35,5 +35,5 @@ openai==2.3.0
 
 
 # Presentation FastAPI backend (prototype)
-fastapi>=0.115,<1
-uvicorn>=0.30,<1
+fastapi==0.143.0
+uvicorn==0.54.0
