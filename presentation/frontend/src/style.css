@@ -102,3 +102,21 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .observation-compliant{background:#2F8C68;color:#FFFFFF;border:1px solid #72D6A7}
 .observation-non_compliant{background:#A53F55;color:#FFFFFF;border:1px solid #E78DA0}
 .observation-unknown,.observation-no_person_detected,.observation-inconclusive{background:#524184;color:#F4E5F3;border:1px solid #A794B0}
+
+/* Monitoring feed: keep all columns inside the scrollable panel. */
+.feed{min-width:0;padding:4px 20px 4px 18px;overflow-x:hidden}
+.feedHead,.feedRow{grid-template-columns:minmax(92px,0.9fr) minmax(0,5fr) minmax(85px,1.2fr) minmax(116px,1.15fr);column-gap:16px;min-width:0}
+.feedHead>span,.feedRow>span{min-width:0;overflow-wrap:anywhere}
+.feedRow>span:nth-child(2) b{display:block;overflow-wrap:anywhere;word-break:break-word}
+.feedRow>span:nth-child(2) small{overflow-wrap:anywhere}
+.feedHead>span:last-child,.feedRow>span:last-child{justify-self:start}
+.feedRow .severity{max-width:100%}
+@media(max-width:950px){
+ .feedHead,.feedRow{grid-template-columns:minmax(78px,1fr) minmax(0,3.5fr) minmax(75px,1fr) minmax(105px,1.25fr);column-gap:10px}
+}
+@media(max-width:650px){
+ .feedHead,.feedRow{grid-template-columns:minmax(75px,1fr) minmax(0,3fr) minmax(92px,1.3fr);column-gap:8px}
+ .feedHead>span:nth-child(3),.feedRow>span:nth-child(3){display:none}
+ .feed{padding-right:14px;padding-left:12px}
+ .feedRow .severity{font-size:10px;padding:5px 7px}
+}
