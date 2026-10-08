@@ -32,8 +32,18 @@ export const getGraphIntegrity=(id:string)=>request<GraphIntegrity>(`/api/v1/inc
 export type EvidenceDetail = {event_id:string;domain:string;source_type:string|null;availability:string;details:Record<string,unknown>};
 export const getEvidenceDetail=(scenarioId:string,eventId:string)=>request<EvidenceDetail>(`/api/v1/incidents/${encodeURIComponent(scenarioId)}/evidence/${encodeURIComponent(eventId)}`);
 
-export type PPEImageResult = {source_type:string;inference_executed:boolean;pipeline_status:string;image_stored:boolean;image_size:{width:number;height:number};assessment:{overall_status:string;person_count:number;people:Record<string,unknown>[];detections:{class_name:string;confidence:number;bbox_xyxy:number[]}[]}};
-export async function validatePPEImage(file:File):Promise<PPEImageResult>{
- const body=new FormData();body.append("image",file);
+export type PPEImageResult = {source_type:string;inference_executed:boolean;pipeline_status:string;image_stored:boolean;observation:PPEObservation|null;image_size:{width:number;height:number};assessment:{overall_status:string;person_count:number;people:Record<string,unknown>[];detections:{class_name:string;confidence:number;bbox_xyxy:number[]}[]}};
+export async function validatePPEImage(file:File, retain=false, zone="ZONE-B"):Promise<PPEImageResult>{
+ const body=new FormData();body.append("image",file);body.append("retain",String(retain));if(retain)body.append("zone_id",zone);
  return request<PPEImageResult>("/api/v1/ppe/validate-image",{method:"POST",body});
+}
+
+export type PPEObservation = {observation_id:string;zone_id:string;created_at:string;status:string;person_count:number;review_status:string;pipeline_status:string;detections?:{class_name:string;confidence:number;bbox_xyxy:number[]}[]};
+export type PPEObservationDetail = PPEObservation & {assessment:PPEImageResult["assessment"]};
+export const getPPEObservations=()=>request<PPEObservation[]>("/api/v1/ppe/observations");
+export const getPPEObservation=(id:string)=>request<PPEObservationDetail>(`/api/v1/ppe/observations/${encodeURIComponent(id)}`);
+export async function getPPEImage(id:string):Promise<Blob>{
+ const response=await fetch(`/api/v1/ppe/observations/${encodeURIComponent(id)}/image`,{headers:credentials?{"Authorization":`Basic ${credentials}`}:{}});
+ if(!response.ok)throw new Error(`Image unavailable (${response.status})`);
+ return response.blob();
 }
