@@ -4,3 +4,5 @@ export type Incident = {schema_version:"1.0";scenario_id:string;scenario_name:st
 async function request<T>(url:string,options?:RequestInit):Promise<T>{const response=await fetch(url,{...options,headers:{"Accept":"application/json",...options?.headers}});if(!response.ok)throw new Error(`API request failed (${response.status})`);return response.json() as Promise<T>}
 export const getScenarios=()=>request<Scenario[]>("/api/v1/scenarios");
 export const runScenario=(name:string)=>request<Incident>(`/api/v1/scenarios/${encodeURIComponent(name)}/run`,{method:"POST"});
+
+export const getIncidents=()=>request<Incident[]>("/api/v1/incidents");
