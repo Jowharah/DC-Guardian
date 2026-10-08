@@ -87,3 +87,10 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .evidenceDetail dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .evidenceDetail dt{font-size:11px;color:#A794B0}.evidenceDetail dd{margin:4px 0 0;color:#F4E5F3;overflow-wrap:anywhere}
 @media(max-width:650px){.evidenceDetail dl{grid-template-columns:1fr}}
+
+/* Independently scrollable incident queue */
+.feed{max-height:390px;overflow-y:auto;overscroll-behavior:contain;scrollbar-color:#794F65 #24162F;scrollbar-width:thin}
+.feedHead{position:sticky;top:0;background:#24162F;z-index:2}
+.evidenceDetail dd dl{display:block;padding-left:10px;border-left:2px solid #524184}
+.evidenceDetail dd dl>div{margin:8px 0}
+.evidenceDetail ul{padding-left:20px;margin:5px 0}
