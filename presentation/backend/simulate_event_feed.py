@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import base64
 import time
 from datetime import datetime, timezone
 from urllib.parse import urlencode
@@ -19,7 +21,12 @@ BASE_URL = "http://127.0.0.1:8000/api/v1"
 def run_one(scenario: str) -> dict:
     run_id = f"DCG-{scenario.upper()}-{uuid4().hex[:12].upper()}"
     url = f"{BASE_URL}/scenarios/{scenario}/run?" + urlencode({"run_id": run_id})
-    request = Request(url, method="POST")
+    username = os.environ.get("DCG_LOCAL_USER", "")
+    password = os.environ.get("DCG_LOCAL_PASSWORD", "")
+    if not username or not password:
+        raise RuntimeError("Local scheduler credentials are not configured")
+    token = base64.b64encode(f"{username}:{password}".encode()).decode()
+    request = Request(url, method="POST", headers={"Authorization": f"Basic {token}"})
     with urlopen(request, timeout=120) as response:
         return json.load(response)
 
