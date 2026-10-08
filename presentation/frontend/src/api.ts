@@ -7,3 +7,8 @@ export const getScenarios=()=>request<Scenario[]>("/api/v1/scenarios");
 export const runScenario=(name:string)=>request<Incident>(`/api/v1/scenarios/${encodeURIComponent(name)}/run`,{method:"POST"});
 
 export const getIncidents=()=>request<Incident[]>("/api/v1/incidents");
+
+export type GraphNode = {id:string;label:string;type:string;properties:Record<string,string|number|boolean>};
+export type GraphEdge = {id:string;source:string;target:string;type:string};
+export type IncidentGraph = {scenario_id:string;source:"NEO4J_READ_ONLY";nodes:GraphNode[];edges:GraphEdge[]};
+export const getIncidentGraph=(id:string)=>request<IncidentGraph>(`/api/v1/incidents/${encodeURIComponent(id)}/graph`);
