@@ -43,9 +43,27 @@ async def validate_face(image: UploadFile = File(...), retain: bool = Form(False
         path = Path(folder) / "input.png"
         decoded.save(path, format="PNG")
         try:
-            run = subprocess.run([str(face_python), "-m", "presentation.backend.app.face_worker", str(path)],
-                                 cwd=str(project_root), capture_output=True, text=True,
-                                 timeout=120, check=False, env={**os.environ, "PYTHONPATH": str(project_root)})
+            run = subprocess.run(
+                [
+                    str(face_python),
+                    "-m",
+                    "presentation.backend.app.face_worker",
+                    str(path),
+                ],
+                cwd=str(project_root),
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=120,
+                check=False,
+                env={
+                    **os.environ,
+                    "PYTHONPATH": str(project_root),
+                    "PYTHONIOENCODING": "utf-8",
+                    "PYTHONUTF8": "1",
+                },
+            )
         except subprocess.TimeoutExpired as exc:
             raise HTTPException(504, "FACE_INFERENCE_TIMEOUT") from exc
         if run.returncode:
