@@ -19,6 +19,20 @@ class DecisionView(BaseModel):
     protected_boundaries: dict[str, bool]
     policy_version: str
 
+class EvidenceEventView(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event_id: str
+    domain: str
+    event_type: str
+    timestamp: datetime
+    state: str
+    component: str
+    zone_id: str | None = None
+    server_id: str | None = None
+    sensor_id: str | None = None
+    camera_id: str | None = None
+    source_type: str | None = None
+
 class IncidentView(BaseModel):
     model_config = ConfigDict(extra="forbid")
     schema_version: Literal["1.0"] = "1.0"
@@ -31,4 +45,5 @@ class IncidentView(BaseModel):
     shared_scope: Any = None
     shared_entity: Any = None
     evidence_event_ids: list[str] = Field(default_factory=list)
+    evidence_events: list[EvidenceEventView] = Field(default_factory=list)
     decision: DecisionView
