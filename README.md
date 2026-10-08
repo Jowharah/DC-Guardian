@@ -282,6 +282,12 @@ Local credentials belong in `.env`, which is excluded from Git. A sanitized `.en
 5. Deterministic Decision rules - IMPLEMENTED / VERIFIED
 6. Presentation/dashboard integration - NEXT
 
+## Security Assessment
+
+Before Presentation/dashboard development, DC-GUARDIAN underwent a scoped security assessment covering dependency vulnerabilities, secret scanning, RAG source-fetch controls, model artifact integrity, Cypher query boundaries, prompt-injection controls, and static analysis. The final scoped Bandit scan reported **0 High, 0 Medium, and 5 reviewed Low** findings; `pip-audit` reported **no known vulnerabilities**. The integrated pipeline and frozen Evidence runtime smoke tests passed. These results do **not** constitute a penetration test or production security certification.
+
+See [Pre-Dashboard Security Assessment and Hardening](docs/DC_Guardian_Security_Assessment_and_Hardening.md) for methodology, remediation, exclusions, residual risks, and reproduction commands.
+
 ## Research Scope
 
 DC-GUARDIAN is currently a controlled research prototype. Cross-domain scenarios use synthetic topology placement and controlled timing where required because no synchronized real-world dataset spans all project domains. Model and correlation results should therefore be interpreted within their documented evaluation settings rather than as production data-center performance claims.
