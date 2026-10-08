@@ -120,3 +120,8 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
  .feed{padding-right:14px;padding-left:12px}
  .feedRow .severity{font-size:10px;padding:5px 7px}
 }
+
+/* Face Recognition is identity evidence, never a Decision severity. */
+.face-recognized{background:#2F8C68;color:#fff;border:1px solid #72D6A7}
+.face-unknown{background:#A53F55;color:#fff;border:1px solid #E78DA0}
+.face-no_face,.face-multiple_faces{background:#524184;color:#F4E5F3;border:1px solid #A794B0}
