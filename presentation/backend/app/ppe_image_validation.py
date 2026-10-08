@@ -9,10 +9,11 @@ import os
 import subprocess
 import tempfile
 from pathlib import Path
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, Response
 from PIL import Image, UnidentifiedImageError
 from presentation.backend.app.authentication import current_principal, authorize
 from presentation.backend.app.authorization import Principal, Permission
+from presentation.backend.app.ppe_observations import save_observation, list_observations, get_observation, image_bytes
 
 router = APIRouter()
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
@@ -36,10 +37,16 @@ def validate_image(data: bytes) -> Image.Image:
 @router.post("/api/v1/ppe/validate-image")
 async def validate_ppe_image(
     image: UploadFile = File(...),
+    retain: bool = Form(False),
+    zone_id: str | None = Form(None),
     principal: Principal = Depends(current_principal),
 ) -> dict:
     # Local-only validation: no identity matching and no zone claim.
     authorize(principal, Permission.CAMERA_DETAIL)
+    if retain:
+        if not zone_id:
+            raise HTTPException(status_code=422, detail="Zone required to retain an image")
+        authorize(principal, Permission.CAMERA_DETAIL, zone_id)
     if image.content_type not in {"image/jpeg", "image/png"}:
         raise HTTPException(status_code=415, detail="JPEG or PNG required")
     try:
@@ -85,11 +92,40 @@ async def validate_ppe_image(
             raise HTTPException(status_code=503, detail="PPE_WORKER_OUTPUT_INVALID") from exc
     if not isinstance(assessment, dict) or "overall_status" not in assessment or "detections" not in assessment:
         raise HTTPException(status_code=503, detail="PPE_WORKER_OUTPUT_INVALID")
+    observation = save_observation(decoded, assessment, zone_id, principal.subject) if retain and zone_id else None
     return {
+        "observation": observation,
         "source_type": "OPERATOR_UPLOADED_IMAGE",
         "inference_executed": True,
         "pipeline_status": "PPE_ONLY_NOT_INTEGRATED",
-        "image_stored": False,
+        "image_stored": observation is not None,
         "image_size": {"width": decoded.width, "height": decoded.height},
         "assessment": assessment,
     }
+
+@router.get("/api/v1/ppe/observations")
+def ppe_observation_feed(principal: Principal = Depends(current_principal)) -> list[dict]:
+    authorize(principal, Permission.CAMERA_DETAIL)
+    return list_observations(principal.zones)
+
+@router.get("/api/v1/ppe/observations/{observation_id}")
+def ppe_observation_detail(observation_id: str, principal: Principal = Depends(current_principal)) -> dict:
+    authorize(principal, Permission.CAMERA_DETAIL)
+    observation = get_observation(observation_id)
+    if observation is None:
+        raise HTTPException(status_code=404, detail="Observation not found")
+    authorize(principal, Permission.CAMERA_DETAIL, observation["zone_id"])
+    return observation
+
+@router.get("/api/v1/ppe/observations/{observation_id}/image")
+def ppe_observation_image(observation_id: str, principal: Principal = Depends(current_principal)) -> Response:
+    authorize(principal, Permission.CAMERA_DETAIL)
+    observation = get_observation(observation_id)
+    if observation is None:
+        raise HTTPException(status_code=404, detail="Observation not found")
+    authorize(principal, Permission.CAMERA_DETAIL, observation["zone_id"])
+    try:
+        data = image_bytes(observation_id, principal.subject)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Image artifact unavailable") from exc
+    return Response(data, media_type="image/png", headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
