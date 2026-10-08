@@ -33,6 +33,26 @@ class EvidenceEventView(BaseModel):
     camera_id: str | None = None
     source_type: str | None = None
 
+class SpecialistAssessmentView(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    specialist_id: str
+    assessment: str
+    grounding_status: Literal["SUPPORTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT"]
+    supported_findings: list[str] = Field(default_factory=list)
+    recommended_considerations: list[str] = Field(default_factory=list)
+    limitations: list[str] = Field(default_factory=list)
+    citations: list[dict[str, str]] = Field(default_factory=list)
+
+class SynthesisView(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    assessment: str
+    grounding_status: Literal["SUPPORTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT"]
+    contributing_specialists: list[str] = Field(default_factory=list)
+    supported_cross_domain_findings: list[str] = Field(default_factory=list)
+    recommended_considerations: list[str] = Field(default_factory=list)
+    limitations: list[str] = Field(default_factory=list)
+    citations: list[dict[str, str]] = Field(default_factory=list)
+
 class IncidentView(BaseModel):
     model_config = ConfigDict(extra="forbid")
     schema_version: Literal["1.0"] = "1.0"
@@ -46,4 +66,6 @@ class IncidentView(BaseModel):
     shared_entity: Any = None
     evidence_event_ids: list[str] = Field(default_factory=list)
     evidence_events: list[EvidenceEventView] = Field(default_factory=list)
+    specialist_assessments: list[SpecialistAssessmentView] = Field(default_factory=list)
+    synthesis: SynthesisView | None = None
     decision: DecisionView
