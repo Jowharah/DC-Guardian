@@ -50,3 +50,5 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .closeIncident:hover{background:#524184;transform:none!important}
 
 .evidenceList{display:grid;gap:10px}.evidenceItem{border:1px solid #524184;border-radius:10px;background:#2B1B3C;padding:14px;overflow-wrap:anywhere}.evidenceItem small{color:#A794B0}.evidenceItem .incidentTop{gap:12px;flex-wrap:wrap}
+
+.graphCanvas{width:100%;height:auto;max-height:460px;background:#160C20;border-radius:12px;border:1px solid #524184}.graphCanvas g[role="button"]{cursor:pointer}.graphCanvas g[role="button"]:focus{outline:none;filter:brightness(1.4)}.evidenceItem dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.evidenceItem dt{font-size:11px;color:#A794B0}.evidenceItem dd{margin:2px 0;overflow-wrap:anywhere}
