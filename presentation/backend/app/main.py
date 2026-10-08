@@ -8,6 +8,7 @@ from presentation.backend.app.schemas import IncidentView, ScenarioInfo
 from presentation.backend.app.incident_store import remember, list_incidents, get_incident
 from presentation.backend.app.service import execute_scenario, list_scenarios
 from presentation.backend.app.graph_view import graph_for_scenario
+from presentation.backend.app.graph_integrity import check_graph_integrity
 from presentation.backend.app.graph_audit import audit_graph_access
 from presentation.backend.app.authentication import current_principal, authorize
 from presentation.backend.app.authorization import Principal, Permission
@@ -79,3 +80,14 @@ def incident_graph(scenario_id: str, principal: Principal = Depends(current_prin
 @app.get("/api/v1/auth/me")
 def auth_me(principal: Principal = Depends(current_principal)) -> dict:
     return {"username": principal.subject, "roles": sorted(principal.roles), "zones": sorted(principal.zones)}
+
+@app.get("/api/v1/incidents/{scenario_id}/graph-integrity")
+def incident_graph_integrity(scenario_id: str, principal: Principal = Depends(current_principal)) -> dict:
+    incident = get_incident(scenario_id)
+    if incident is None:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    authorize(principal, Permission.GRAPH_READ, incident.shared_entity)
+    try:
+        return check_graph_integrity(scenario_id, incident.evidence_event_ids)
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Graph integrity service unavailable") from exc
