@@ -8,6 +8,7 @@ from presentation.backend.app.schemas import IncidentView, ScenarioInfo
 from presentation.backend.app.incident_store import remember, list_incidents, get_incident
 from presentation.backend.app.service import execute_scenario, list_scenarios
 from presentation.backend.app.graph_view import graph_for_scenario
+from presentation.backend.app.graph_audit import audit_graph_access
 from presentation.backend.app.authentication import current_principal, authorize
 from presentation.backend.app.authorization import Principal, Permission
 
@@ -68,7 +69,9 @@ def incident_graph(scenario_id: str, principal: Principal = Depends(current_prin
         raise HTTPException(status_code=404, detail="Incident not found")
     authorize(principal, Permission.GRAPH_READ, incident.shared_entity)
     try:
-        return graph_for_scenario(scenario_id, principal=principal, zone=incident.shared_entity)
+        graph = graph_for_scenario(scenario_id, principal=principal, zone=incident.shared_entity)
+        audit_graph_access(principal.subject, scenario_id, incident.shared_entity, graph)
+        return graph
     except Exception as exc:
         # Never expose database errors, credentials or internal connection details.
         raise HTTPException(status_code=503, detail="Graph service unavailable") from exc
