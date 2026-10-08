@@ -1,22 +1,33 @@
 """Local-only HTTP Basic identity adapter for controlled prototype.
 
 No default credentials. The username/password/role/zone values are supplied
-through server environment variables. HTTP Basic is not a production session
+through process environment variables or the local repository .env file. HTTP Basic is not a production session
 system and must not be used over unencrypted network connections.
 """
 import hmac
 import os
+from pathlib import Path
+from dotenv import dotenv_values
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from presentation.backend.app.authorization import Principal, Permission, allowed
 
+PROJECT_ENV = Path(__file__).resolve().parents[3] / ".env"
 security = HTTPBasic(auto_error=False)
 
+def local_setting(name: str) -> str:
+    """Process environment takes precedence; local .env is a fallback."""
+    if name in os.environ:
+        return os.environ[name]
+    if PROJECT_ENV.is_file():
+        return str(dotenv_values(PROJECT_ENV).get(name) or "")
+    return ""
+
 def current_principal(credentials: HTTPBasicCredentials | None = Depends(security)) -> Principal:
-    user = os.environ.get("DCG_LOCAL_USER", "")
-    password = os.environ.get("DCG_LOCAL_PASSWORD", "")
-    role = os.environ.get("DCG_LOCAL_ROLE", "")
-    zones = os.environ.get("DCG_LOCAL_ZONES", "")
+    user = local_setting("DCG_LOCAL_USER")
+    password = local_setting("DCG_LOCAL_PASSWORD")
+    role = local_setting("DCG_LOCAL_ROLE")
+    zones = local_setting("DCG_LOCAL_ZONES")
     valid = (
         bool(user and password and role and zones and credentials)
         and hmac.compare_digest(credentials.username.encode(), user.encode())
