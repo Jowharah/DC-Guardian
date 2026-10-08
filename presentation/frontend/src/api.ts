@@ -39,7 +39,7 @@ export async function validatePPEImage(file:File, retain=false, zone="ZONE-B"):P
 }
 
 export type PPEObservation = {observation_id:string;zone_id:string;created_at:string;status:string;person_count:number;review_status:string;pipeline_status:string;detections?:{class_name:string;confidence:number;bbox_xyxy:number[]}[]};
-export type PPEObservationDetail = PPEObservation & {assessment:PPEImageResult["assessment"]};
+export type PPEObservationDetail = PPEObservation & {assessment:PPEImageResult["assessment"];image_size:{width:number;height:number}};
 export const getPPEObservations=()=>request<PPEObservation[]>("/api/v1/ppe/observations");
 export const getPPEObservation=(id:string)=>request<PPEObservationDetail>(`/api/v1/ppe/observations/${encodeURIComponent(id)}`);
 export async function getPPEImage(id:string):Promise<Blob>{
