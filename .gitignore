@@ -266,3 +266,8 @@ response/rag/evaluation/abstention_calibration_report.json
 
 
 
+
+# Local Presentation prototype incident storage
+presentation/backend/data/
+presentation/frontend/node_modules/
+presentation/frontend/dist/
