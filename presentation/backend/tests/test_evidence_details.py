@@ -56,3 +56,22 @@ def test_evidence_endpoint_enforces_role(monkeypatch,tmp_path):
         assert response.json()["details"]["source_ip"]=="203.0.113.77"
     finally:
         app.dependency_overrides.pop(current_principal,None)
+
+def test_ppe_projection_includes_person_level_findings_without_images():
+    event={"event_id":"EV-PPE","domain":"SAFETY","evidence":{
+        "ppe_status":"NON_COMPLIANT","person_count":1,"required_ppe":["helmet","safety-vest"],
+        "people":[{"person_index":0,"status":"NON_COMPLIANT","required_ppe_detected":["helmet"],"required_ppe_not_detected":["safety-vest"],"private":"hidden"}]}}
+    details=project_evidence(event)["details"]
+    assert details["compliance"]["ppe_status"]=="NON_COMPLIANT"
+    assert details["people"][0]["required_ppe_not_detected"]==["safety-vest"]
+    assert details["image_available"] is False
+    assert "hidden" not in str(details)
+
+def test_face_projection_allowlists_identity():
+    event={"event_id":"EV-FACE","domain":"PHYSICAL_SECURITY","evidence":{
+        "recognition_status":"RECOGNIZED","person_id":"P003","nearest_employee_id":"P003",
+        "similarity":0.75,"secret_embedding":[0.1,0.2]}}
+    details=project_evidence(event)["details"]
+    assert details["identity"]["person_id"]=="P003"
+    assert details["recognition"]["similarity"]==0.75
+    assert "secret_embedding" not in str(details)
