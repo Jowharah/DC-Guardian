@@ -158,6 +158,8 @@ async def scan_once(sources,db,principal):
                         if previous.get("observation_id") and previous.get("graph"):
                             from presentation.backend.app.image_metadata_store import save
                             save(kind,previous["observation_id"],src["zone_id"],metadata,previous["graph"])
+                            from presentation.backend.app.image_source_hashes import save as save_source_hash
+                            save_source_hash(kind,previous["observation_id"],src["zone_id"],hashlib.sha256(data).hexdigest())
                     except (ValueError,TypeError,KeyError,json.JSONDecodeError):
                         LOG.warning("Image metadata backfill unavailable: %s",path.name)
                 counts["skipped"]+=1
