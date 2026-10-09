@@ -1,19 +1,21 @@
 import {useEffect,useState} from "react";
-import {getUnifiedSpecialists,evaluateUnifiedSpecialists,type UnifiedSpecialistResult} from "./api";
+import {getUnifiedSpecialists,evaluateUnifiedSpecialists,getUnifiedSynthesis,type UnifiedSynthesisResult,type UnifiedSpecialistResult} from "./api";
 
 export default function UnifiedSpecialistViewer({id}:{id:string}){
  const [saved,setSaved]=useState<UnifiedSpecialistResult|null>(null);
+ const [synthesis,setSynthesis]=useState<UnifiedSynthesisResult|null>(null);
  const [busy,setBusy]=useState(false);
  const [message,setMessage]=useState("");
  useEffect(()=>{
-   let active=true;setSaved(null);setMessage("");
+   let active=true;setSaved(null);setSynthesis(null);setMessage("");
+   getUnifiedSynthesis(id).then(x=>{if(active)setSynthesis(x)}).catch(()=>{});
    getUnifiedSpecialists(id).then(x=>{if(active)setSaved(x)})
      .catch(()=>{if(active)setMessage("No saved unified specialist assessment. Evaluation is available below.")});
    return()=>{active=false};
  },[id]);
  async function evaluate(){
    setBusy(true);setMessage("");
-   try{setSaved(await evaluateUnifiedSpecialists(id))}
+   try{setSaved(await evaluateUnifiedSpecialists(id));setSynthesis(await getUnifiedSynthesis(id))}
    catch(e){setMessage(e instanceof Error?e.message:"Specialist evaluation unavailable")}
    finally{setBusy(false)}
  }
@@ -32,6 +34,12 @@ export default function UnifiedSpecialistViewer({id}:{id:string}){
        <h4>Approved citations</h4><ul>{a.citations.map((c,i)=><li key={i}>{c.document_id} / {c.chunk_id}</li>)}</ul>
      </div>)}
    </>}
+   {synthesis&&<div className="evidenceItem"><h4>Unified Specialist Synthesis · {synthesis.synthesis.grounding_status}</h4>
+   <p>{synthesis.synthesis.assessment}</p>
+   <h4>Contributing specialists</h4><p>{synthesis.synthesis.contributing_specialists.join(" + ")}</p>
+   <h4>Supported source findings</h4><ul>{synthesis.synthesis.supported_source_findings.map((v,i)=><li key={i}>{v.specialist}: {v.finding}</li>)}</ul>
+   <h4>Contextual links</h4><ul>{synthesis.synthesis.validated_contextual_links.map((v,i)=><li key={i}>{v.type} · {v.source_id}</li>)}</ul>
+   <p className="muted">No verified identity-to-SSH or person-to-PPE attribution. No causal finding or unified severity.</p></div>}
    <p className="muted">Unified Decision: NOT RUN · No validated unified severity rule · Autonomous action disabled.</p>
  </section>;
 }
