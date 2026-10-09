@@ -1,18 +1,18 @@
 import {useEffect,useMemo,useState} from "react";
-import {getIncidentGraph,getOperationalGraph,type IncidentGraph,type GraphNode} from "./api";
+import {getIncidentGraph,getOperationalGraph,getStandaloneGraph,type IncidentGraph,type GraphNode} from "./api";
 
 const palette:Record<string,string>={Event:"#742A79",Camera:"#524184",Person:"#794F65",Server:"#8392CF",Zone:"#A794B0",Sensor:"#6D83B6",Asset:"#7566AB",SourceIP:"#794F65"};
 const width=960,height=560;
 function nodeColor(type:string){return palette[type]??"#524184"}
 function shortName(n:GraphNode){if(n.type==="Event"){const t=String(n.properties.event_type??"");if(t.includes("PPE"))return "PPE Assessment";if(t.includes("FACE"))return "Face Identification";if(t.includes("SSH"))return "SSH Assessment";if(t.includes("ENVIRONMENT"))return "Environmental Event";if(t.includes("STORAGE"))return "Maintenance Event";return "Evidence Event"}if(n.restricted)return n.type==="SourceIP"?"Source IP (restricted)":"Person (restricted)";const v=n.label;return v.length>23?v.slice(0,20)+"…":v}
-export default function GraphViewer({scenarioId,operational=false}:{scenarioId:string;operational?:boolean}){
+export default function GraphViewer({scenarioId,operational=false,standalone}:{scenarioId:string;operational?:boolean;standalone?:"ssh"|"maintenance"|"environment"}){
  const [graph,setGraph]=useState<IncidentGraph|null>(null);
  const [selected,setSelected]=useState<string|null>(null);
  const [error,setError]=useState("");
  const [zoom,setZoom]=useState(1);
  const [offset,setOffset]=useState({x:0,y:0});
  const [drag,setDrag]=useState<{x:number;y:number;ox:number;oy:number}|null>(null);
- useEffect(()=>{let active=true;setGraph(null);setSelected(null);setError("");setZoom(1);setOffset({x:0,y:0});(operational?getOperationalGraph(scenarioId):getIncidentGraph(scenarioId)).then(data=>{if(active)setGraph(data)}).catch((err)=>{if(active)setError(operational?`Operational graph request failed: ${err instanceof Error?err.message:"Unknown error"}. Check the API response and backend logs.`:"Neo4j graph unavailable. Verify database connectivity.")});return()=>{active=false}},[scenarioId,operational]);
+ useEffect(()=>{let active=true;setGraph(null);setSelected(null);setError("");setZoom(1);setOffset({x:0,y:0});(standalone?getStandaloneGraph(standalone,scenarioId):operational?getOperationalGraph(scenarioId):getIncidentGraph(scenarioId)).then(data=>{if(active)setGraph(data)}).catch((err)=>{if(active)setError(operational?`Operational graph request failed: ${err instanceof Error?err.message:"Unknown error"}. Check the API response and backend logs.`:"Neo4j graph unavailable. Verify database connectivity.")});return()=>{active=false}},[scenarioId,operational,standalone]);
  const shown=useMemo(()=>graph?.nodes.slice(0,40)??[],[graph]);
  const positions=useMemo(()=>{
    const m=new Map<string,{x:number;y:number}>();
