@@ -98,3 +98,6 @@ export const runSSHPipeline=(id:string)=>request<SSHPipelineRun>(`/api/v1/ssh/pu
 
 export type SSHGraphIngestion={status:"INGESTED";graph_event_id:string;scenario_id:string;source_ip:string;server_id:string;zone_id:string;original_timestamp:string;correlation_performed:false;response_performed:false;decision_performed:false;decision_severity:null};
 export const ingestSSHGraph=(id:string)=>request<SSHGraphIngestion>(`/api/v1/ssh/published/${encodeURIComponent(id)}/ingest-graph`,{method:"POST"});
+
+export type SSHCorrelationCheck={status:"CORRELATED"|"NO_CORRELATION";correlation_count:number;scenario_id:string;graph_event_id:string;scope:string;note:string};
+export const checkSSHCorrelation=(id:string)=>request<SSHCorrelationCheck>(`/api/v1/ssh/published/${encodeURIComponent(id)}/check-correlation`,{method:"POST"});
