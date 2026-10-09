@@ -137,3 +137,5 @@ export function validateEnvironment(file:File,zone:string,sensor:string,publish:
 
 export type OperationalCorrelation={id:string;zone_id:string;maintenance_event_id:string;environment_event_id:string;maintenance:MaintenanceEvent;environment:EnvironmentalEvent;time_difference_seconds:number;matched_environment_timestamp:string;correlation_type:string;scope:"ZONE";status:"CORRELATION_CANDIDATE";decision:null;decision_severity:null;explanation:string};
 export const getOperationalCorrelations=()=>request<OperationalCorrelation[]>("/api/v1/operations/correlations");
+
+export const getOperationalGraph=(id:string)=>request<IncidentGraph>(`/api/v1/operations/correlations/${encodeURIComponent(id)}/graph`);
