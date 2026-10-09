@@ -12,7 +12,7 @@ export default function GraphViewer({scenarioId,operational=false}:{scenarioId:s
  const [zoom,setZoom]=useState(1);
  const [offset,setOffset]=useState({x:0,y:0});
  const [drag,setDrag]=useState<{x:number;y:number;ox:number;oy:number}|null>(null);
- useEffect(()=>{let active=true;setGraph(null);setSelected(null);setError("");setZoom(1);setOffset({x:0,y:0});(operational?getOperationalGraph(scenarioId):getIncidentGraph(scenarioId)).then(data=>{if(active)setGraph(data)}).catch(()=>{if(active)setError("Neo4j graph unavailable. Verify database connectivity.")});return()=>{active=false}},[scenarioId,operational]);
+ useEffect(()=>{let active=true;setGraph(null);setSelected(null);setError("");setZoom(1);setOffset({x:0,y:0});(operational?getOperationalGraph(scenarioId):getIncidentGraph(scenarioId)).then(data=>{if(active)setGraph(data)}).catch((err)=>{if(active)setError(operational?`Operational graph request failed: ${err instanceof Error?err.message:"Unknown error"}. Check the API response and backend logs.`:"Neo4j graph unavailable. Verify database connectivity.")});return()=>{active=false}},[scenarioId,operational]);
  const shown=useMemo(()=>graph?.nodes.slice(0,40)??[],[graph]);
  const positions=useMemo(()=>{
    const m=new Map<string,{x:number;y:number}>();
