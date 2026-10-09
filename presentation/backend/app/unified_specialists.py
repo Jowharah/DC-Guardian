@@ -43,6 +43,10 @@ def source_evidence(group):
                 raise HTTPException(409, "Face evidence unavailable")
             a = record["assessment"]
             result["face"] = {k: a.get(k) for k in ("recognition_status", "person_id", "similarity")}
+            from presentation.backend.app.face_zone_authorization import assess as assess_zone
+            result["face"]["zone_authorization"] = assess_zone(
+                a.get("person_id") if a.get("recognition_status") == "RECOGNIZED" else "",
+                group["zone_id"])
         elif kind == "ppe":
             record = ppe_observations.get_observation(oid)
             if record is None:
@@ -95,6 +99,10 @@ def run_agents(group, evidence):
             domains=tuple(domains)))
         if assessment.get("grounding_status") not in ("SUPPORTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT"):
             raise HTTPException(503, "Invalid specialist response contract")
+        for field in ("supported_findings", "recommended_considerations", "limitations"):
+            values = assessment.get(field, [])
+            if isinstance(values, list):
+                assessment[field] = [v.strip() for v in values if isinstance(v, str) and v.strip()]
         results[name] = assessment
     return results
 
