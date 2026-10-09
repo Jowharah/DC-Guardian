@@ -11,6 +11,7 @@ from presentation.backend.app.authorization import Principal,Permission
 from presentation.backend.app.image_metadata_store import connect as metadata_connect
 from presentation.backend.app.ssh_publication import connect as ssh_connect
 from presentation.backend.app import face_observations
+from presentation.backend.app.ssh_temporal_context import get_context
 
 router=APIRouter()
 WINDOW_SECONDS=900
@@ -27,11 +28,15 @@ def eligible(face,ssh):
     if face["zone_id"]!=ssh["zone_id"]:return None
     if face.get("provenance")!="OPERATOR_DECLARED_UNVERIFIED":return None
     ft=parse_timestamp(face.get("captured_at"))
-    st=parse_timestamp(ssh.get("original_timestamp"))
+    # Only a separately persisted, explicitly unverified test declaration may
+    # substitute for historical placeholder-year SSH timestamps.
+    declared=ssh.get("controlled_time")
+    controlled=bool(declared and declared.get("provenance")=="OPERATOR_DECLARED_UNVERIFIED_TEST_TIME")
+    st=parse_timestamp(declared["observed_at"] if controlled else ssh.get("original_timestamp"))
     if ft is None or st is None:return None
     # Legacy OpenSSH year reconstruction is not trustworthy for real-time
     # matching; do not substitute ingestion/received time.
-    if ssh.get("timestamp_uncertain") or st.year<2020:return None
+    if not controlled and (ssh.get("timestamp_uncertain") or st.year<2020):return None
     delta=abs((ft-st).total_seconds())
     return delta if delta<=WINDOW_SECONDS else None
 
@@ -61,7 +66,9 @@ def face_ssh_candidates(principal:Principal=Depends(current_principal)):
             if payload.get("evidence_state")=="NO_ANOMALY_EVIDENCE":continue
             # SSH detector timestamps are historical in many sample logs.
             timestamp=payload.get("window_start") or payload.get("observation_timestamp")
+            controlled_time=get_context(sid)
             ssh_context={"zone_id":ssh_zone,"original_timestamp":timestamp,
+                         "controlled_time":controlled_time,
                          "timestamp_uncertain":payload.get("timestamp_uncertain",False)}
             delta=eligible(face_context,ssh_context)
             if delta is None:continue
@@ -70,8 +77,10 @@ def face_ssh_candidates(principal:Principal=Depends(current_principal)):
                 "camera_id":metadata["camera_id"],"server_id":server,
                 "face_capture_time":metadata["captured_at"],
                 "ssh_original_time":timestamp,"time_difference_seconds":delta,
+                "ssh_context_time":controlled_time["observed_at"] if controlled_time else timestamp,
+                "ssh_time_provenance":controlled_time["provenance"] if controlled_time else "SOURCE_LOG_UNVERIFIED",
                 "face_recognition_status":face["assessment"]["recognition_status"],
                 "ssh_evidence_state":payload.get("evidence_state"),
                 "status":"CONTROLLED_CANDIDATE","decision_severity":None,
-                "explanation":"Same declared zone and nearby original timestamps. No identity, source-IP, login, or causal linkage is established."})
+                "explanation":"Controlled zone/time contextual candidate using operator-declared, unverified test time when provided. The original SSH log timestamp is unchanged. No identity, source-IP, login, or causal linkage is established."})
     return sorted(result,key=lambda x:(x["time_difference_seconds"],x["id"]))[:100]
