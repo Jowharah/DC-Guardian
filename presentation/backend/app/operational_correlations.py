@@ -70,7 +70,18 @@ def operational_correlations(principal:Principal=Depends(current_principal)):
     authorize(principal,Permission.INCIDENT_READ)
     authorize(principal,Permission.MAINTENANCE_DETAIL)
     authorize(principal,Permission.ENVIRONMENT_DETAIL)
-    return correlate(maintenance_events(principal),environmental_events(principal))
+    candidates=correlate(maintenance_events(principal),environmental_events(principal))
+    from presentation.backend.app.operational_decision import storage
+    with storage() as conn:
+        rows=conn.execute("SELECT candidate_id,decision_json FROM operational_decisions").fetchall()
+    decisions={candidate_id:__import__("json").loads(payload) for candidate_id,payload in rows}
+    for candidate in candidates:
+        decision=decisions.get(candidate["id"])
+        if decision is not None:
+            candidate["decision"]=decision
+            candidate["decision_severity"]=decision["severity"]
+            candidate["status"]="DECISION_COMPLETE"
+    return candidates
 
 @router.get("/api/v1/operations/correlations/{candidate_id}/graph")
 def operational_graph(candidate_id:str,principal:Principal=Depends(current_principal)):
