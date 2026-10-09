@@ -187,3 +187,15 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .sshFeedStatuses{display:flex;align-items:center;justify-content:flex-start;gap:5px;flex-wrap:wrap;min-width:0}.sshFeedStatuses .severity{max-width:100%;white-space:normal;overflow-wrap:anywhere}
 
 .maintenanceHistory{max-height:340px;overflow:auto;margin:12px 0;border:1px solid #524184;border-radius:10px}.maintenanceHistory table{width:100%;border-collapse:collapse;font-size:12px}.maintenanceHistory th,.maintenanceHistory td{padding:9px 12px;border-bottom:1px solid #524184;text-align:left;white-space:nowrap}.maintenanceHistory th{position:sticky;top:0;background:#30203E;color:#E3B8E0}
+
+/* SMART history uses an explicit responsive grid to prevent blank-looking table cells. */
+.maintenanceHistory{overflow-x:auto;overflow-y:auto;max-height:360px;background:#1D1129}
+.maintenanceHistoryRow{display:grid;grid-template-columns:minmax(110px,1.6fr) repeat(3,minmax(85px,1fr));min-width:435px;align-items:center;border-bottom:1px solid #524184;color:#F4E5F3;font-size:12px}
+.maintenanceHistoryRow>span{display:block;padding:10px 12px;color:#F4E5F3;font-size:12px;font-weight:500;white-space:nowrap}
+.maintenanceHistoryHeader{position:sticky;top:0;background:#39254F;z-index:1}
+.maintenanceHistoryHeader>span{color:#F4E5F3;font-weight:750}
+.maintenanceHistoryRow:nth-child(odd):not(.maintenanceHistoryHeader){background:#24162F}
+.standaloneDetail .sshPipelineStage{min-width:0}
+.standaloneDetail .sshPipelineStage>b{overflow-wrap:anywhere}
+.standaloneDetail .sshPipelineStage>span{justify-self:end;text-align:center}
+.standaloneMeta>div>small:last-child{margin-top:7px;margin-bottom:0}
