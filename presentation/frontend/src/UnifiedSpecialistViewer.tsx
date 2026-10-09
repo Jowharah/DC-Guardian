@@ -27,20 +27,20 @@ export default function UnifiedSpecialistViewer({id}:{id:string}){
    <button disabled={busy} onClick={()=>void evaluate()}>{busy?"Evaluating…":saved?"Re-evaluate Specialists":"Evaluate Specialists"}</button>
    {message&&<p role="status">{message}</p>}
    {saved&&<><p>Evaluated: {new Date(saved.evaluated_at).toLocaleString()}</p>
-     {Object.entries(saved.specialists).map(([name,a])=><div key={name}>
+     {Object.entries(saved.specialists).map(([name,a])=><details key={name} className="evidenceItem"><summary>{name.replaceAll("_"," ").toUpperCase()} · {a.grounding_status} · View full assessment</summary>
        <h4>{name.replaceAll("_"," ").toUpperCase()} · {a.grounding_status}</h4>
        <p>{a.assessment}</p>
        <h4>Supported findings</h4><ul>{a.supported_findings.map((v,i)=><li key={i}>{v}</li>)}</ul>
        <h4>Recommended considerations</h4><ul>{a.recommended_considerations.map((v,i)=><li key={i}>{v}</li>)}</ul>
        <h4>Limitations</h4><ul>{a.limitations.map((v,i)=><li key={i}>{v}</li>)}</ul>
        <h4>Approved citations</h4><ul>{a.citations.map((c,i)=><li key={i}>{c.document_id} / {c.chunk_id}</li>)}</ul>
-     </div>)}
+     </details>)}
    </>}
    {synthesis&&<div className="evidenceItem"><h4>Unified Specialist Synthesis · {synthesis.synthesis.grounding_status}</h4>
    <p>{synthesis.synthesis.assessment}</p>
    <h4>Contributing specialists</h4><p>{synthesis.synthesis.contributing_specialists.join(" + ")}</p>
-   <h4>Supported source findings</h4><ul>{synthesis.synthesis.supported_source_findings.map((v,i)=><li key={i}>{v.specialist}: {v.finding}</li>)}</ul>
-   <h4>Contextual links</h4><ul>{synthesis.synthesis.validated_contextual_links.map((v,i)=><li key={i}>{v.type} · {v.source_id}</li>)}</ul>
+   <details><summary>Supported source findings ({synthesis.synthesis.supported_source_findings.length})</summary><ul>{synthesis.synthesis.supported_source_findings.map((v,i)=><li key={i}>{v.specialist}: {v.finding}</li>)}</ul></details>
+   <details><summary>Contextual source links ({synthesis.synthesis.validated_contextual_links.length})</summary><ul>{synthesis.synthesis.validated_contextual_links.map((v,i)=><li key={i}>{v.type} · {v.source_id}</li>)}</ul></details>
    <p className="muted">No verified identity-to-SSH or person-to-PPE attribution. No causal finding or unified severity.</p></div>}
    {review&&<div className="evidenceItem"><h4>Deterministic Unified Evidence Review</h4>
    <p><b>{review.decision.status.replaceAll("_"," ")}</b> · {review.decision.response_mode.replaceAll("_"," ")} · Severity NOT ASSIGNED</p>
