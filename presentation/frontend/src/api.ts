@@ -91,3 +91,7 @@ export const publishSSH=(preview_id:string,indices:number[])=>request<{published
 
 export type SSHReasoningPreview={status:string;pipeline_stage:string;source_ip:string|null;original_timestamp:string|null;zone_id:string;server_id:string;topology_mapping_performed:boolean;correlation_performed:boolean;response_performed:boolean;decision_performed:boolean};
 export const previewSSHReasoning=(id:string)=>request<SSHReasoningPreview>(`/api/v1/ssh/published/${encodeURIComponent(id)}/reasoning-preview`);
+
+export type SSHPipelineStage={stage:string;status:string;detail:string};
+export type SSHPipelineRun={event_id:string;source_ip:string|null;original_timestamp:string|null;server_id:string;zone_id:string;stages:SSHPipelineStage[];completed_full_pipeline:false;decision_severity:null;note:string};
+export const runSSHPipeline=(id:string)=>request<SSHPipelineRun>(`/api/v1/ssh/published/${encodeURIComponent(id)}/run-pipeline`,{method:"POST"});
