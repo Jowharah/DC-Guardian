@@ -271,3 +271,14 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .reviewRecordFooter{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;border-top:1px solid rgba(155,127,184,.22);padding-top:10px;font-size:12px;color:#bba8cf}
 .reviewRecordFooter time{color:#f1e4fc}
 @media(max-width:650px){.reviewRecord{padding:13px}.reviewRecordTop{align-items:flex-start}.reviewStatus{font-size:9px}}
+
+
+/* Human review entry and history */
+.reviewOpenButton{width:max-content;max-width:100%;font-size:12px;padding:8px 13px;border:1px solid #8765b2;background:rgba(111,70,153,.24);border-radius:8px}
+.reviewFormPanel{display:grid;gap:12px}
+.reviewFormPanel select,.reviewFormPanel textarea{width:100%;box-sizing:border-box;border:1px solid #795b9b;background:#2c1b3b;color:#f6eafa;border-radius:9px;padding:12px;font:inherit}
+.reviewFormPanel select:focus-visible,.reviewFormPanel textarea:focus-visible{outline:2px solid #cda7f3;outline-offset:2px}
+.reviewAck{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5}
+.reviewAck input{margin-top:4px;flex:none}
+.reviewHistory{display:grid;gap:12px;max-height:460px;overflow:auto}
+.reviewHistory code{overflow-wrap:anywhere}
