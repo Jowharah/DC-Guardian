@@ -157,3 +157,6 @@ export const getPhysicalImageGraph=(id:string)=>request<IncidentGraph>(`/api/v1/
 export type PhysicalSpecialistResult={evaluated_at:string;specialist:SpecialistAssessment;evidence_event_ids:string[];decision:null};
 export const getPhysicalSpecialist=(id:string)=>request<PhysicalSpecialistResult>(`/api/v1/physical/image-correlations/${encodeURIComponent(id)}/specialist`);
 export const evaluatePhysicalSpecialist=(id:string)=>request<PhysicalSpecialistResult>(`/api/v1/physical/image-correlations/${encodeURIComponent(id)}/specialist`,{method:"POST"});
+
+export type PhysicalPersonAssociation={candidate_id:string;recognized_person_id:string|null;status:"MATCH_CANDIDATE"|"AMBIGUOUS"|"NO_MATCH"|"NOT_EVALUATED";person_index:number|null;ppe_status:string|null;identity_link_established:false;decision_severity:null;reason:string;face_containment_ratio?:number};
+export const getPhysicalPersonAssociation=(id:string)=>request<PhysicalPersonAssociation>(`/api/v1/physical/image-correlations/${encodeURIComponent(id)}/person-association`);
