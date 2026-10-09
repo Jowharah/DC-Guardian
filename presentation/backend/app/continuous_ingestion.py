@@ -80,6 +80,8 @@ async def dispatch(src,data,filename,principal,metadata=None):
         if metadata:
             from presentation.backend.app.image_evidence_mapping import project_observation
             output["graph"]=project_observation("ppe",observation["observation_id"],result["assessment"],metadata)
+            from presentation.backend.app.image_metadata_store import save
+            save("ppe",observation["observation_id"],src["zone_id"],metadata,output["graph"])
         return output
     if kind=="face":
         from presentation.backend.app.face_image_validation import validate_face
@@ -91,6 +93,8 @@ async def dispatch(src,data,filename,principal,metadata=None):
         if metadata:
             from presentation.backend.app.image_evidence_mapping import project_observation
             output["graph"]=project_observation("face",observation["observation_id"],result["assessment"],metadata)
+            from presentation.backend.app.image_metadata_store import save
+            save("face",observation["observation_id"],src["zone_id"],metadata,output["graph"])
         return output
     if kind=="ssh":
         from presentation.backend.app.ssh_log_validation import process_ssh_log
