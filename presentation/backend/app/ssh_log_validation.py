@@ -29,7 +29,7 @@ async def validate_ssh_log(
         raw = await log.read(MAX_LOG_BYTES + 1)
     finally:
         await log.close()
-    if not raw or len(raw) > MAX_LOG_BYTES or b"\\x00" in raw:
+    if not raw or len(raw) > MAX_LOG_BYTES or bytes([0]) in raw:
         raise HTTPException(422, "OpenSSH text log must be between 1 byte and 1 MiB")
     root = Path(__file__).resolve().parents[3]
     with tempfile.TemporaryDirectory(prefix="dcg-ssh-") as folder:
