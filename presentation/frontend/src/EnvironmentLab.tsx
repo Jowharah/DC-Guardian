@@ -1,4 +1,5 @@
 import {useEffect,useState} from "react";
+import PostPublicationCheck from "./PostPublicationCheck";
 import {getTopologyOptions,validateEnvironment,type EnvironmentalAssessment} from "./api";
 export default function EnvironmentLab(){
  const [zones,setZones]=useState<{zone_id:string;sensors:string[]}[]>([]);
@@ -24,5 +25,5 @@ export default function EnvironmentLab(){
  {error&&<p role="alert" className="error">{error}</p>}
  {result&&<div className="evidenceItem"><h4>Environmental detector results</h4><p>{result.assessments.length} readings · {result.assessments.filter(x=>x.anomaly_detected).length} anomalous · {result.events.length} published</p>
  {result.assessments.map((x,i)=><details key={i}><summary>{x.assessment.replaceAll("_"," ")} · {x.observation_timestamp}</summary><p>Temperature: {x.measurements.temperature_c??"—"} °C · Humidity: {x.measurements.humidity_pct??"—"}%</p>
- {result.events[i]&&<p>Pipeline: {result.events[i].workflow.stages.map(s=>s.stage+" "+s.status).join(" · ")}</p>}</details>)}</div>}</section>;
+ {result.events[i]&&<p>Pipeline: {result.events[i].workflow.stages.map(s=>s.stage+" "+s.status).join(" · ")}</p>}</details>)}</div>}{result?.published&&result.events.length>0&&<PostPublicationCheck kind="environment" ids={result.events.map(e=>e.event_id)}/> }</section>;
 }
