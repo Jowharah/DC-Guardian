@@ -134,3 +134,6 @@ export function validateEnvironment(file:File,zone:string,sensor:string,publish:
  const body=new FormData();body.append("file",file);body.append("zone_id",zone);body.append("sensor_id",sensor);body.append("publish",String(publish));
  return request<{published:boolean;assessments:EnvironmentalAssessment[];events:{event_id:string;assessment:EnvironmentalAssessment;workflow:EnvironmentalEvent["workflow"]}[]}>("/api/v1/environment/validate",{method:"POST",body});
 }
+
+export type OperationalCorrelation={id:string;zone_id:string;maintenance_event_id:string;environment_event_id:string;maintenance:MaintenanceEvent;environment:EnvironmentalEvent;time_difference_seconds:number;matched_environment_timestamp:string;correlation_type:string;scope:"ZONE";status:"CORRELATION_CANDIDATE";decision:null;decision_severity:null;explanation:string};
+export const getOperationalCorrelations=()=>request<OperationalCorrelation[]>("/api/v1/operations/correlations");
