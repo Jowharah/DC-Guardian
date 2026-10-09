@@ -1,11 +1,13 @@
 """Grounded Face + SSH specialist assessment for contextual candidates."""
 import json
 from datetime import datetime,timezone
+import hashlib
+from presentation.backend.app.incident_store import _db_path
 from fastapi import APIRouter,Depends,HTTPException
 from presentation.backend.app.authentication import current_principal,authorize
 from presentation.backend.app.authorization import Principal,Permission
 from presentation.backend.app.face_ssh_correlations import face_ssh_candidates
-from presentation.backend.app.unified_specialists import run_agents,storage
+from presentation.backend.app.unified_specialists import run_agents
 from presentation.backend.app import face_observations
 from presentation.backend.app.face_zone_authorization import assess as assess_zone
 from presentation.backend.app.ssh_publication import connect as ssh_connect
@@ -20,6 +22,28 @@ def candidate(cid,principal):
     for perm in (Permission.PERSON_DETAIL,Permission.SSH_DETAIL):
         authorize(principal,perm,item["zone_id"])
     return item
+
+def store():
+    import sqlite3
+    db=sqlite3.connect(_db_path(),timeout=15)
+    db.execute("""CREATE TABLE IF NOT EXISTS face_ssh_specialist_results(
+        candidate_id TEXT PRIMARY KEY, signature TEXT NOT NULL,
+        response_json TEXT NOT NULL)""")
+    return db
+
+def signature(item):
+    relevant={k:item[k] for k in ("face_observation_id","ssh_event_id","zone_id",
+             "face_capture_time","ssh_context_time","ssh_time_provenance")}
+    return hashlib.sha256(json.dumps(relevant,sort_keys=True).encode()).hexdigest()
+
+@router.get("/api/v1/cyber/face-ssh/candidates/{candidate_id}/specialists")
+def read_saved(candidate_id:str,principal:Principal=Depends(current_principal)):
+    item=candidate(candidate_id,principal)
+    with store() as db:
+        row=db.execute("SELECT signature,response_json FROM face_ssh_specialist_results WHERE candidate_id=?",(candidate_id,)).fetchone()
+    if row is None:raise HTTPException(404,"No saved Face SSH specialist result")
+    if row[0]!=signature(item):raise HTTPException(409,"Correlation context changed; re-evaluate")
+    return json.loads(row[1])
 
 @router.post("/api/v1/cyber/face-ssh/candidates/{candidate_id}/specialists")
 def evaluate(candidate_id:str,principal:Principal=Depends(current_principal)):
@@ -54,8 +78,14 @@ def evaluate(candidate_id:str,principal:Principal=Depends(current_principal)):
         reasons.append("RECOGNIZED_IDENTITY_NOT_AUTHORIZED_FOR_DECLARED_ZONE")
     if any(v["grounding_status"]=="INSUFFICIENT" for v in specialists.values()):
         reasons.append("SPECIALIST_GROUNDING_INSUFFICIENT")
-    return {"candidate_id":candidate_id,"evaluated_at":datetime.now(timezone.utc).isoformat(),
+    result={"candidate_id":candidate_id,"evaluated_at":datetime.now(timezone.utc).isoformat(),
             "specialists":specialists,"authorization":authorization,
             "review":{"status":"EVIDENCE_REVIEW_REQUIRED","response_mode":"HUMAN_REVIEW",
                       "reasons":reasons,"severity":None,"identity_to_ssh_established":False,
                       "physical_presence_verified":False,"autonomous_action_allowed":False}}
+    with store() as db:
+        db.execute("""INSERT INTO face_ssh_specialist_results VALUES (?,?,?)
+            ON CONFLICT(candidate_id) DO UPDATE SET signature=excluded.signature,
+            response_json=excluded.response_json""",
+            (candidate_id,signature(item),json.dumps(result)))
+    return result
