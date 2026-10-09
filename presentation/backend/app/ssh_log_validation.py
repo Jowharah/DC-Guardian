@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from presentation.backend.app.authentication import current_principal, authorize
 from presentation.backend.app.authorization import Principal, Permission
 from presentation.backend.app.custom_scenarios import topology_options
+from presentation.backend.app.ssh_publication import save_preview
 
 router = APIRouter()
 MAX_LOG_BYTES = 1024 * 1024
@@ -54,5 +55,6 @@ async def validate_ssh_log(
             result = json.loads(lines[0])
         except ValueError as exc:
             raise HTTPException(503, "SSH_WORKER_OUTPUT_INVALID") from exc
-    return {**result, "zone_id": zone_id, "server_id": server_id, "retained": False,
+    preview_id = save_preview(principal.subject, zone_id, server_id, result["assessments"])
+    return {**result, "preview_id": preview_id, "zone_id": zone_id, "server_id": server_id, "retained": False,
             "decision_severity": None}
