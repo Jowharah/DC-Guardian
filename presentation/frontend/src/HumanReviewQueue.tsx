@@ -29,13 +29,21 @@ export default function HumanReviewQueue({ppe,face,unified,ssh,operational,openM
  const counts={source:sources.length,candidate:candidates.length,decision:decisions.length};
  return <section className="analyticsPage">
  <div className="stats"><div className="panel"><small>Source review pending</small><strong>{counts.source}</strong></div><div className="panel"><small>Unified candidates</small><strong>{counts.candidate}</strong></div><div className="panel"><small>Decisions requesting review</small><strong>{counts.decision}</strong></div><div className="panel"><small>Human review completions</small><strong>Not tracked</strong></div></div>
- <div className="panel analyticsFilterPanel"><h3>Review queue</h3><p className="muted">Read-only triage from authorized Evidence feeds. These categories describe different workflows, not severity. No reviewer action or audit record is created.</p>
- <label htmlFor="reviewQueueFilter">Queue category</label><select id="reviewQueueFilter" value={filter} onChange={e=>setFilter(e.target.value)}>
- <option value="ALL">All categories</option><option value="AWAITING_SOURCE_REVIEW">Awaiting source review</option>
- <option value="CANDIDATE_ASSESSMENT">Unified correlation candidates</option><option value="DECISION_REVIEW_REQUIRED">Saved Decisions requiring human review</option></select></div>
- <div className="panel analyticsDrilldown"><h3>Review items · {items.length}</h3>
- {items.length===0?<p className="muted">No items returned for this category.</p>:<ul>{items.map(x=><li key={x.kind+":"+x.id} className="reviewQueueItem"><div><b>{x.kind} · {x.zone}</b><p><code>{x.id}</code></p><p className="muted">{x.note}</p></div><div><strong>{x.state.replaceAll("_"," ")}</strong><p className="muted">{x.received?new Date(x.received).toLocaleString():"Receipt unavailable"}</p></div></li>)}</ul>}
- </div>
+ <section className="panel reviewFilterPanel">
+  <div className="analyticsFilterHeader"><div><h3>Review queue</h3><p className="muted">Read-only triage from authorized Evidence feeds. Select a workflow category to inspect its records.</p></div><span className="analyticsFilterMeta">READ-ONLY · HUMAN REVIEW</span></div>
+  <div className="analyticsRangeOptions" role="group" aria-label="Review queue category">
+   {([{value:"ALL",label:"All items"},{value:"AWAITING_SOURCE_REVIEW",label:"Source review"},{value:"CANDIDATE_ASSESSMENT",label:"Unified candidates"},{value:"DECISION_REVIEW_REQUIRED",label:"Decision review"}] as const).map(option=><button type="button" key={option.value} className={filter===option.value?"analyticsRangeOption selected":"analyticsRangeOption"} aria-pressed={filter===option.value} onClick={()=>setFilter(option.value)}>{option.label}</button>)}
+  </div><p className="muted analyticsFilterNote">Categories describe workflow states, not severity. No reviewer action or audit record is created.</p>
+ </section>
+ <section className="panel reviewItemsPanel">
+  <div className="analyticsFilterHeader"><div><h3>Review items <span className="reviewItemCount">{items.length}</span></h3><p className="muted">Most recently received Evidence first</p></div></div>
+  {items.length===0?<p className="muted">No items returned for this category.</p>:<div className="reviewItemList">{items.map(x=><article key={x.kind+":"+x.id} className="reviewRecord">
+   <div className="reviewRecordTop"><div className="reviewRecordTitle"><span className="reviewKind">{x.kind}</span><b>{x.zone}</b></div><span className="reviewStatus">{x.state.replaceAll("_"," ")}</span></div>
+   <code className="reviewRecordId">{x.id}</code>
+   <p className="reviewRecordNote">{x.note}</p>
+   <div className="reviewRecordFooter"><span>Received</span><time dateTime={x.received}>{x.received?new Date(x.received).toLocaleString():"Unavailable"}</time></div>
+  </article>)}</div>}
+ </section>
  <p className="muted">No verified human review completion, escalation, cross-domain severity, or autonomous action is inferred. Candidate membership does not attribute SSH or PPE activity to a recognized person.</p>
  <button type="button" onClick={openMonitoring}>Open Monitoring Center for Evidence investigation</button>
  </section>;
