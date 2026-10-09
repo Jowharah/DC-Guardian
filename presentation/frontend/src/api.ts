@@ -194,3 +194,5 @@ export const getCameraTopology=()=>request<{zone_id:string;cameras:string[]}[]>(
 
 export type FaceSSHSpecialistReview={candidate_id:string;evaluated_at:string;specialists:Record<string,SpecialistAssessment>;authorization:{status:string;source:string;reason:string};review:{status:string;response_mode:string;reasons:string[];severity:null;identity_to_ssh_established:false;physical_presence_verified:false;autonomous_action_allowed:false}};
 export const evaluateFaceSSHSpecialists=(id:string)=>request<FaceSSHSpecialistReview>(`/api/v1/cyber/face-ssh/candidates/${encodeURIComponent(id)}/specialists`,{method:"POST"});
+
+export const getSavedFaceSSHSpecialists=(id:string)=>request<FaceSSHSpecialistReview>(`/api/v1/cyber/face-ssh/candidates/${encodeURIComponent(id)}/specialists`);
