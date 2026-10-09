@@ -139,3 +139,7 @@ export type OperationalCorrelation={id:string;zone_id:string;maintenance_event_i
 export const getOperationalCorrelations=()=>request<OperationalCorrelation[]>("/api/v1/operations/correlations");
 
 export const getOperationalGraph=(id:string)=>request<IncidentGraph>(`/api/v1/operations/correlations/${encodeURIComponent(id)}/graph`);
+
+export type OperationalDecisionResult={candidate_id:string;evaluated_at:string;specialist:SpecialistAssessment;decision:Decision;evidence_event_ids:string[]};
+export const getOperationalDecision=(id:string)=>request<OperationalDecisionResult>(`/api/v1/operations/correlations/${encodeURIComponent(id)}/decision`);
+export const evaluateOperationalDecision=(id:string)=>request<OperationalDecisionResult>(`/api/v1/operations/correlations/${encodeURIComponent(id)}/decision`,{method:"POST"});
