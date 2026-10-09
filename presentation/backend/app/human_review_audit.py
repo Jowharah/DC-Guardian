@@ -61,7 +61,7 @@ def review_record(group_id,payload,principal):
         previous=db.execute("SELECT entry_hash FROM human_review_audit ORDER BY rowid DESC LIMIT 1").fetchone()
         entry["previous_hash"]=previous[0] if previous else "GENESIS"
         entry["entry_hash"]=hashlib.sha256(json.dumps(entry,sort_keys=True,separators=(",",":")).encode()).hexdigest()
-        db.execute("INSERT INTO human_review_audit VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        db.execute("INSERT INTO human_review_audit VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                    tuple(entry[k] for k in ("audit_id","group_id","zone_id","reviewer",
                    "recorded_at","outcome","rationale","evidence_signature",
                    "policy_version","review_status","previous_hash","entry_hash")))
