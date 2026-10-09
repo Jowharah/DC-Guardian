@@ -1,4 +1,5 @@
 import {useEffect,useState} from "react";
+import PostPublicationCheck from "./PostPublicationCheck";
 import {validatePPEImage,type PPEImageResult} from "./api";
 
 export default function PPEImageLab(){
@@ -24,5 +25,5 @@ export default function PPEImageLab(){
   <button type="button" disabled={!file||busy} onClick={()=>void run()}>{busy?"Running frozen model…":"Validate PPE image"}</button>
   {error&&<p role="alert" className="error">{error}</p>}
   {result&&<div className="evidenceItem"><h4>Model assessment: {result.assessment.overall_status}</h4><p>People detected: {result.assessment.person_count} · Detections: {result.assessment.detections?.length??0}</p><p className="muted">{result.image_stored?"Image retained in protected local Evidence storage. Open Monitoring Center to review it.":"Image is shown only in this browser; it was not saved."} This is PPE-only inference, not a complete DC-GUARDIAN incident.</p>{result.assessment.people.map((person,i)=><pre className="ppeJson" key={i}>{JSON.stringify(person,null,2)}</pre>)}</div>}
- </section>;
+ {result?.image_stored&&result.observation&&<PostPublicationCheck kind="ppe" ids={[result.observation.observation_id]}/> }</section>;
 }
