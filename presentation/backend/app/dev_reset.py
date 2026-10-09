@@ -13,7 +13,7 @@ from datetime import datetime,timezone
 from pathlib import Path
 from presentation.backend.app.incident_store import _db_path
 
-TABLES=("incidents","standalone_events","ssh_validation_previews","ssh_published_evidence","ssh_decisions",
+TABLES=("incidents","standalone_events","ssh_validation_previews","ssh_published_evidence","ssh_decisions","ssh_controlled_time_context",
         "maintenance_evidence","environmental_batches","environmental_evidence",
         "ppe_observations","face_observations","ppe_image_access","face_image_access",
         "image_observation_metadata","image_source_hashes",
