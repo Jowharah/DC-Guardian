@@ -121,3 +121,63 @@ def reasoning_preview(event_id: str, principal: Principal = Depends(current_prin
             "topology_mapping_performed":False,
             "correlation_performed":False, "response_performed":False,
             "decision_performed":False}
+
+@router.post("/api/v1/ssh/published/{event_id}/run-pipeline")
+def run_pipeline(event_id: str, principal: Principal = Depends(current_principal)):
+    """Advance genuine SSH evidence through adapter and topology verification.
+
+    Do not run the synthetic three-domain scenario or manufacture other evidence.
+    Response and Decision are explicitly blocked until a compatible pipeline exists.
+    """
+    authorize(principal, Permission.SSH_DETAIL)
+    with connect() as conn:
+        row = conn.execute("SELECT zone_id,server_id,payload FROM ssh_published_evidence WHERE event_id=?",
+                           (event_id,)).fetchone()
+    if row is None:
+        raise HTTPException(404, "Published SSH evidence not found")
+    zone, server, encoded = row
+    authorize(principal, Permission.SSH_DETAIL, zone)
+    authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+    from reasoning.adapters.ssh_event_adapter import adapt_ssh_assessment
+    from reasoning.topology.topology_mapper import load_topology, build_server_index
+    assessment = json.loads(encoded)
+    try:
+        normalized = adapt_ssh_assessment(assessment, dataset_name="Operator uploaded OpenSSH log",
+                                          source_type="CONTROLLED_TEST", event_id=event_id)
+    except (KeyError, TypeError, ValueError) as exc:
+        raise HTTPException(422, "SSH evidence is incompatible with Reasoning adapter; validate and republish") from exc
+    index = build_server_index(load_topology())
+    target = index.get(server)
+    if not target or target["zone_id"] != zone:
+        raise HTTPException(422, "Selected server/zone is absent from controlled topology")
+    # Topology metadata is a controlled operator assignment, not a claim about
+    # the real SSH hostname or source IP's physical location.
+    stages = [
+        {"stage":"EVIDENCE","status":"COMPLETE","detail":"Frozen SSH detector assessment published"},
+        {"stage":"REASONING_ADAPTER","status":"COMPLETE","detail":"Common Event schema adapter succeeded"},
+        {"stage":"TOPOLOGY","status":"COMPLETE","detail":"Selected server and zone verified in controlled topology"},
+    ]
+    from reasoning.graph.ingest_event import create_driver, NEO4J_DATABASE
+    try:
+        driver=create_driver()
+        try:
+            with driver.session(database=NEO4J_DATABASE,default_access_mode="READ") as session:
+                record=session.run("MATCH (s:Server {server_id:$server}) RETURN s.server_id AS id LIMIT 1",
+                                   server=server).single()
+        finally:
+            driver.close()
+        graph_ok=record is not None
+        stages.append({"stage":"NEO4J","status":"COMPLETE" if graph_ok else "UNAVAILABLE",
+                       "detail":"Server node verified read-only" if graph_ok else "Server node not found"})
+    except Exception:
+        graph_ok=False
+        stages.append({"stage":"NEO4J","status":"UNAVAILABLE","detail":"Read-only graph verification unavailable"})
+    stages.extend([
+        {"stage":"CORRELATION","status":"NOT_RUN","detail":"No validated standalone SSH correlation runner"},
+        {"stage":"RESPONSE","status":"NOT_RUN","detail":"No grounded standalone SSH Response contract"},
+        {"stage":"DECISION","status":"NOT_RUN","detail":"No standalone SSH Decision result or severity"},
+    ])
+    return {"event_id":event_id,"source_ip":normalized["entities"]["source_ip"],
+            "original_timestamp":normalized["timestamp"],"server_id":server,"zone_id":zone,
+            "stages":stages,"completed_full_pipeline":False,"decision_severity":None,
+            "note":"Actual model evidence; no synthetic environmental or maintenance events inserted."}
