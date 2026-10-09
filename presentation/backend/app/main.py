@@ -23,6 +23,7 @@ from presentation.backend.app.maintenance_workflow import router as maintenance_
 from presentation.backend.app.environment_workflow import router as environment_router
 from presentation.backend.app.operational_correlations import router as operational_correlation_router
 from presentation.backend.app.operational_decision import router as operational_decision_router
+from presentation.backend.app.standalone_graph import router as standalone_graph_router
 
 app = FastAPI(
     title="DC-GUARDIAN Presentation API", version="0.1.0",
@@ -39,6 +40,7 @@ app.include_router(maintenance_router)
 app.include_router(environment_router)
 app.include_router(operational_correlation_router)
 app.include_router(operational_decision_router)
+app.include_router(standalone_graph_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
