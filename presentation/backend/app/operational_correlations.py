@@ -92,24 +92,32 @@ def operational_graph(candidate_id:str,principal:Principal=Depends(current_princ
         raise HTTPException(409,"No mapped Neo4j Evidence event references")
     nodes={}
     edges={}
+    # Traverse only approved infrastructure relationships, bounded to four hops.
+    # Event -> Asset -> Server -> Rack -> Zone and Event -> Sensor -> Zone.
     query="""MATCH (e:Event) WHERE e.event_id IN $ids
        WITH e ORDER BY e.event_id LIMIT 30
-       OPTIONAL MATCH (e)-[r]-(n)
-       RETURN e,r,n LIMIT 150"""
+       OPTIONAL MATCH p=(e)-[:TARGETS|HOSTED_BY|LOCATED_IN|MONITORS*1..4]-(n)
+       WHERE ALL(node IN nodes(p) WHERE
+           node:Event OR node:Asset OR node:Server OR
+           node:Rack OR node:Zone OR node:Sensor)
+       RETURN p LIMIT 150"""
     try:
         driver=create_driver()
         try:
             with driver.session(database=NEO4J_DATABASE,default_access_mode="READ") as session:
                 for row in session.run(query,ids=ids):
-                    for node in (row["e"],row["n"]):
-                        if node is not None:
-                            projected=project_node(node,principal,zone)
-                            nodes[projected["id"]]=projected
-                    relation=row["r"]
-                    if relation is not None:
+                    path=row["p"]
+                    if path is None:
+                        continue
+                    for node in path.nodes:
+                        projected=project_node(node,principal,zone)
+                        nodes[projected["id"]]=projected
+                    for relation in path.relationships:
                         rid=str(relation.element_id)
-                        edges[rid]={"id":rid,"source":str(relation.start_node.element_id),
-                                    "target":str(relation.end_node.element_id),"type":relation.type}
+                        edges[rid]={"id":rid,
+                                    "source":str(relation.start_node.element_id),
+                                    "target":str(relation.end_node.element_id),
+                                    "type":relation.type}
         finally:
             driver.close()
     except Exception as exc:
