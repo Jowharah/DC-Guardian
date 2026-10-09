@@ -1,4 +1,5 @@
 import {useEffect,useState} from "react";
+import PostPublicationCheck from "./PostPublicationCheck";
 import {getTopologyOptions,validateMaintenance,type MaintenanceValidation} from "./api";
 export default function MaintenanceLab(){
  const [zones,setZones]=useState<{zone_id:string;servers:string[]}[]>([]);
@@ -26,5 +27,5 @@ export default function MaintenanceLab(){
  <p>Drive: {result.assessment.serial_number} · Estimated 7-day failure risk score: {(result.assessment.failure_probability*100).toFixed(2)}% · Threshold: {(result.assessment.operating_threshold*100).toFixed(0)}%</p>
  <p>{result.published?"Published to Monitoring Center":"Preview only"} · {result.history.length} measurements</p>
  {result.workflow&&<details><summary>Pipeline stage results</summary>{result.workflow.stages.map(x=><p key={x.stage}>{x.stage}: {x.status} · {x.detail}</p>)}</details>}
- <p className="muted">Model score is not a calibrated certainty of failure. No raw CSV retained.</p></div>}</section>
+ <p className="muted">Model score is not a calibrated certainty of failure. No raw CSV retained.</p></div>}{result?.published&&<PostPublicationCheck kind="maintenance" ids={[result.event_id]}/> }</section>
 }
