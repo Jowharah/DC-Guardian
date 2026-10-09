@@ -1,4 +1,5 @@
 import {useEffect,useState} from "react";
+import PostPublicationCheck from "./PostPublicationCheck";
 import {getTopologyOptions,processSSHLog,type SSHProcessResult} from "./api";
 export default function SSHLogLab(){
  const [zones,setZones]=useState<{zone_id:string;servers:string[]}[]>([]);
@@ -32,5 +33,5 @@ export default function SSHLogLab(){
  {result.events[i].stages.map((stage,j)=><p key={j}>{stage.stage}: {stage.status}{stage.detail?" · "+stage.detail:""}</p>)}</div>}
  </div></details>)}
  <p className="muted">Original event timestamps remain distinct from receipt time. Correlated events require a validated multi-domain Response/Decision workflow; they are not silently assigned standalone severity.</p>
- </div>}</section>;
+ </div>}{result?.published&&result.events.length>0&&<PostPublicationCheck kind="ssh" ids={result.events.map(e=>e.event_id)}/> }</section>;
 }
