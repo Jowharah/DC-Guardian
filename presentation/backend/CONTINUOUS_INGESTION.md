@@ -60,3 +60,33 @@ Tests:
 ```powershell
 python -m pytest presentation/backend/tests/test_continuous_ingestion.py -q
 ```
+
+## PPE and Face image ingestion (explicit opt-in)
+
+The worker also supports `ppe` and `face` sources, but image retention must
+be explicitly enabled per source. Create private folders outside the repository:
+
+```json
+{"kind":"ppe","directory":"C:/dcg-private/incoming/ppe","zone_id":"ZONE-B","retain_approved_images":true},
+{"kind":"face","directory":"C:/dcg-private/incoming/face","zone_id":"ZONE-B","retain_approved_images":true}
+```
+
+Add these two objects inside the existing `sources` array (not as a separate
+JSON document). Create both folders first. Only place approved test images
+there, and ensure your organization permits biometric enrollment and retention.
+The worker uses the same frozen `.venv-ppe` GPU and `.venv-face` inference
+subprocesses as the existing manual validation endpoints. Accepted image
+extensions: JPG, JPEG and PNG, up to 8 MiB. The existing image validators
+check the decoded format and pixel limits. PPE requires CAMERA_DETAIL;
+Face requires PERSON_DETAIL for the selected zone. Retained images are served
+only by the existing authenticated observation image endpoints.
+
+**Important scope boundary:** This is continuous *observation* ingestion, not
+yet graph correlation or a Decision incident for PPE/Face. A recognized face
+does not establish zone authorization or severity. PPE and Face images are
+not automatically assigned to a physical camera without verified provenance.
+The worker leaves source files in their incoming folders, which must have
+private filesystem ACLs; do not use shared or synced directories. Existing
+SHA-256 checkpoints prevent reprocessing the same unchanged file path after
+successful completion. The worker does not yet provide encrypted-at-rest
+storage, automated retention expiry, or end-to-end artifact auditing.
