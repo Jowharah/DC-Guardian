@@ -166,3 +166,6 @@ export const getPhysicalReview=(id:string)=>request<PhysicalReviewResult>(`/api/
 
 export type FaceSSHCandidate={id:string;zone_id:string;face_observation_id:string;ssh_event_id:string;camera_id:string;server_id:string;face_capture_time:string;ssh_original_time:string;time_difference_seconds:number;face_recognition_status:string;ssh_evidence_state:string;status:"CONTROLLED_CANDIDATE";decision_severity:null;explanation:string};
 export const getFaceSSHCandidates=()=>request<FaceSSHCandidate[]>("/api/v1/cyber/face-ssh/candidates");
+
+export type UnifiedCorrelationGroup={id:string;zone_id:string;domains:string[];evidence:{kind:string;domain:string;observation_id:string}[];edges:{type:string;left:[string,string];right:[string,string];source_id:string;zone_id:string;details:Record<string,string|number>}[];source_candidate_ids:string[];status:"CORRELATION_GROUP_CANDIDATE";decision:null;decision_severity:null;autonomous_action_allowed:false;identity_link_established:false;causal_relationship_established:false;note:string};
+export const getUnifiedCorrelations=()=>request<UnifiedCorrelationGroup[]>("/api/v1/correlations/unified");
