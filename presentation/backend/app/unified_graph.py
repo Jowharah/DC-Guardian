@@ -74,6 +74,29 @@ def unified_graph(group_id:str,principal:Principal=Depends(current_principal)):
                         rid=str(rel.element_id)
                         edges[rid]={"id":rid,"source":str(rel.start_node.element_id),
                                     "target":str(rel.end_node.element_id),"type":rel.type}
+                # Separate verified authorization context; never join Person to
+                # camera, PPE detections, or SSH based on a contextual candidate.
+                from presentation.backend.app import face_observations
+                recognized=set()
+                for ref in group["evidence"]:
+                    if ref["kind"]!="face":continue
+                    record=face_observations.get(ref["observation_id"])
+                    if not record:continue
+                    assessment=record.get("assessment",{})
+                    if assessment.get("recognition_status")=="RECOGNIZED" and assessment.get("person_id"):
+                        recognized.add(assessment["person_id"])
+                if recognized:
+                    auth_query="""MATCH (p:Person)-[r:AUTHORIZED_FOR]->(z:Zone {zone_id:$zone})
+                        WHERE p.person_id IN $people
+                        RETURN p,r,z LIMIT 30"""
+                    for row in session.run(auth_query,zone=group["zone_id"],people=sorted(recognized)):
+                        for node in (row["p"],row["z"]):
+                            projected=project_node(node,principal,group["zone_id"])
+                            nodes[projected["id"]]=projected
+                        rel=row["r"]
+                        rid=str(rel.element_id)
+                        edges[rid]={"id":rid,"source":str(rel.start_node.element_id),
+                                    "target":str(rel.end_node.element_id),"type":rel.type}
         finally:driver.close()
     except Exception as exc:
         raise HTTPException(503,"Neo4j graph unavailable") from exc
