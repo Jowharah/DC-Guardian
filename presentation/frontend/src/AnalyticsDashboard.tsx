@@ -49,9 +49,13 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
  for(const x of sources){const day=new Date(x.time).toLocaleDateString();daily.set(day,(daily.get(day)??0)+1)}
  const timeline=[...daily].sort((a,b)=>Date.parse(a[0])-Date.parse(b[0])).map(([name,value])=>({name,value}));
  return <section className="analyticsPage">
- <div className="panel"><label htmlFor="analyticsRange">Receipt time range</label><select id="analyticsRange" value={range} onChange={e=>setRange(e.target.value)}>
- <option value="24h">Last 24 hours</option><option value="7d">Last 7 days</option><option value="30d">Last 30 days</option><option value="all">All available</option></select>
- <p className="muted">Filters use receipt time, not declared capture time. Authorized feed limits still apply.</p></div>
+ <section className="panel analyticsFilterPanel" aria-label="Analytics time filters">
+  <div className="analyticsFilterHeader"><div><h3>Reporting period</h3><p className="muted">Explore activity using Evidence receipt time.</p></div><span className="analyticsFilterMeta">READ-ONLY · LIVE DATA</span></div>
+  <div className="analyticsRangeOptions" role="group" aria-label="Receipt time range">
+   {([{value:"24h",label:"24 hours"},{value:"7d",label:"7 days"},{value:"30d",label:"30 days"},{value:"all",label:"All available"}] as const).map(option=><button key={option.value} type="button" className={range===option.value?"analyticsRangeOption selected":"analyticsRangeOption"} aria-pressed={range===option.value} onClick={()=>setRange(option.value)}>{option.label}</button>)}
+  </div>
+  <p className="muted analyticsFilterNote">Filters use receipt timestamps, not declared capture times. Authorized feed limits still apply.</p>
+ </section>
  <div className="stats"><div className="panel"><small>Published source Evidence</small><strong>{sourceTotal}</strong></div><div className="panel"><small>Saved severity Decisions</small><strong>{decisions.length}</strong></div><div className="panel"><small>Unified candidates</small><strong>{candidates.length}</strong></div><div className="panel"><small>Observed zones</small><strong>{zones.length}</strong></div></div>
  <div className="analyticsGrid">
  <section className="panel"><h3>Evidence by domain</h3><p className="muted">Published source records; not incidents or Decisions.</p><Donut items={domains}/></section>
