@@ -159,3 +159,16 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .standaloneMeta strong{font-size:13px;overflow-wrap:anywhere}
 .standaloneDescription p{margin:0;line-height:1.6}
 @media(max-width:650px){.eventForm,.standaloneMeta{grid-template-columns:1fr}.eventFormWide{grid-column:auto}}
+
+/* Match Face Validation and Employee Access fields to Standalone Event styling. */
+.labAccordion .ppeLab>label{display:grid;gap:8px;font-size:13px;color:#E3B8E0}
+.labAccordion .ppeLab select,.labAccordion .ppeLab input:not([type="checkbox"]):not([type="file"]){width:100%;min-width:0;padding:11px 12px;border:1px solid #665384;border-radius:9px;background:#160C20;color:#F4E5F3;font:inherit}
+.labAccordion .ppeLab input[type="file"]{display:block;width:100%;min-width:0;padding:12px;border:1px dashed #665384;border-radius:9px;background:#160C20;color:#F4E5F3}
+.labAccordion .ppeLab input[type="file"]::file-selector-button{border:1px solid #8392CF;border-radius:7px;padding:8px 12px;margin-right:12px;background:#39254F;color:#F4E5F3;cursor:pointer}
+.labAccordion .retentionLabel{display:flex!important;align-items:center;gap:10px!important;line-height:1.5}
+.labAccordion .retentionLabel input{accent-color:#8392CF;width:16px;height:16px;flex-shrink:0}
+.accessForm{margin:8px 0 20px}
+.accessForm button{grid-column:1/-1}
+.accessZones{display:flex;gap:8px;flex-wrap:wrap}
+.accessZones button{font-size:12px;padding:8px 11px}
+.labAccordion .ppeLab input:focus-visible,.labAccordion .ppeLab select:focus-visible{outline:2px solid #8392CF;outline-offset:1px}
