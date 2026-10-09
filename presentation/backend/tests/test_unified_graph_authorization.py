@@ -38,10 +38,10 @@ def run_case(monkeypatch,authorized):
         def __exit__(self,*args):return False
         def run(self,query,**params):
             if "OPTIONAL MATCH p=" in query:return [Row(e=face,p=None)]
-            if "MATCH (p:Person)" in query:return [Row(p=person)]
-            if "MATCH (z:Zone" in query:return [Row(z=zone)]
             if "AUTHORIZED_FOR" in query:
                 return [Row(p=person,z=zone,r=Rel(person,zone))] if authorized else []
+            if "MATCH (p:Person)" in query:return [Row(p=person)]
+            if "MATCH (z:Zone" in query:return [Row(z=zone)]
             raise AssertionError(query)
     class Driver:
         def session(self,**kwargs):return Session()
