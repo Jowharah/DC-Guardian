@@ -20,6 +20,7 @@ from presentation.backend.app.standalone_events import router as standalone_even
 from presentation.backend.app.ssh_log_validation import router as ssh_log_router
 from presentation.backend.app.ssh_publication import router as ssh_publication_router
 from presentation.backend.app.maintenance_workflow import router as maintenance_router
+from presentation.backend.app.environment_workflow import router as environment_router
 
 app = FastAPI(
     title="DC-GUARDIAN Presentation API", version="0.1.0",
@@ -33,6 +34,7 @@ app.include_router(standalone_events_router)
 app.include_router(ssh_log_router)
 app.include_router(ssh_publication_router)
 app.include_router(maintenance_router)
+app.include_router(environment_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
