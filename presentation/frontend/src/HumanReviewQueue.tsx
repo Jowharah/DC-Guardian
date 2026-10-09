@@ -1,3 +1,4 @@
+import UnifiedHumanReviewForm from "./UnifiedHumanReviewForm";
 import {useEffect,useState} from "react";
 import {getUnifiedReviewDecision,type UnifiedReviewDecision} from "./api";
 import type {PPEObservation,FaceObservation,UnifiedCorrelationGroup,PublishedSSH,OperationalCorrelation} from "./api";
@@ -6,6 +7,7 @@ type Props={ppe:PPEObservation[];face:FaceObservation[];unified:UnifiedCorrelati
 type QueueItem={id:string;kind:string;zone:string;received:string;state:string;note:string};
 export default function HumanReviewQueue({ppe,face,unified,ssh,operational,openMonitoring}:Props){
  const [filter,setFilter]=useState("ALL");
+ const [selectedGroup,setSelectedGroup]=useState<string|null>(null);
  const [reviews,setReviews]=useState<Record<string,UnifiedReviewDecision>>({});
  const [reviewErrors,setReviewErrors]=useState<Record<string,boolean>>({});
  const groupIds=unified.filter(x=>x.domains.length>=3).map(x=>x.id).sort().join("|");
@@ -63,9 +65,11 @@ export default function HumanReviewQueue({ppe,face,unified,ssh,operational,openM
    <div className="reviewRecordTop"><div className="reviewRecordTitle"><span className="reviewKind">{x.kind}</span><b>{x.zone}</b></div><span className="reviewStatus">{x.state.replaceAll("_"," ")}</span></div>
    <code className="reviewRecordId">{x.id}</code>
    <p className="reviewRecordNote">{x.note}</p>
+   {x.kind==="UNIFIED"&&<button type="button" className="reviewOpenButton" onClick={()=>setSelectedGroup(x.id)}>{selectedGroup===x.id?"Selected for review":"Open review & audit history"}</button>}
    <div className="reviewRecordFooter"><span>Received</span><time dateTime={x.received}>{x.received?new Date(x.received).toLocaleString():"Unavailable"}</time></div>
   </article>)}</div>}
  </section>
+ {selectedGroup&&<UnifiedHumanReviewForm key={selectedGroup} id={selectedGroup} canSubmit={reviews[selectedGroup]?.decision.status==="EVIDENCE_REVIEW_REQUIRED"}/>}
  <p className="muted">No verified human review completion, escalation, cross-domain severity, or autonomous action is inferred. Candidate membership does not attribute SSH or PPE activity to a recognized person.</p>
  <button type="button" onClick={openMonitoring}>Open Monitoring Center for Evidence investigation</button>
  </section>;
