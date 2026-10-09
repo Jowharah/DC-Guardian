@@ -1,15 +1,19 @@
 import {useState} from "react";
-import {runSSHPipeline,ingestSSHGraph,checkSSHCorrelation,type SSHCorrelationCheck,type SSHGraphIngestion,type SSHPipelineRun} from "./api";
+import {runSSHPipeline,ingestSSHGraph,checkSSHCorrelation,getSSHSpecialistResponse,type SSHSpecialistResponse,type SSHCorrelationCheck,type SSHGraphIngestion,type SSHPipelineRun} from "./api";
 export default function SSHReasoningPreview({eventId}:{eventId:string}){
  const [result,setResult]=useState<SSHPipelineRun|null>(null),[error,setError]=useState(""),[busy,setBusy]=useState(false);
  const [ingested,setIngested]=useState<SSHGraphIngestion|null>(null);
  const [correlation,setCorrelation]=useState<SSHCorrelationCheck|null>(null);
+ const [specialist,setSpecialist]=useState<SSHSpecialistResponse|null>(null);
  async function run(){setBusy(true);setError("");try{setResult(await runSSHPipeline(eventId))}catch(e){setError(e instanceof Error?e.message:"Pipeline execution unavailable")}finally{setBusy(false)}}
  async function ingest(){setBusy(true);setError("");try{setIngested(await ingestSSHGraph(eventId))}catch(e){setError(e instanceof Error?e.message:"Graph ingestion unavailable")}finally{setBusy(false)}}
  async function correlate(){setBusy(true);setError("");try{setCorrelation(await checkSSHCorrelation(eventId))}catch(e){setError(e instanceof Error?e.message:"Correlation unavailable")}finally{setBusy(false)}}
+ async function respond(){setBusy(true);setError("");try{setSpecialist(await getSSHSpecialistResponse(eventId))}catch(e){setError(e instanceof Error?e.message:"Specialist unavailable")}finally{setBusy(false)}}
  return <div className="evidenceItem"><button disabled={busy} onClick={()=>void run()}>{busy?"Running checks…":"Run Through Pipeline"}</button>
  <button disabled={busy} onClick={()=>void ingest()}>Ingest SSH Evidence into Neo4j</button>
  <button disabled={busy} onClick={()=>void correlate()}>Check Correlation</button>
+ <button disabled={busy} onClick={()=>void respond()}>Run Cybersecurity Specialist</button>
+ {specialist&&<section className="evidenceItem"><h4>Cybersecurity Specialist · {specialist.grounding_status}</h4><p>{specialist.assessment}</p><h5>Supported findings</h5><ul>{specialist.supported_findings.map((v,i)=><li key={i}>{v}</li>)}</ul><h5>Recommended considerations</h5><ul>{specialist.recommended_considerations.map((v,i)=><li key={i}>{v}</li>)}</ul><h5>Limitations</h5><ul>{specialist.limitations.map((v,i)=><li key={i}>{v}</li>)}</ul><h5>Approved citations</h5><ul>{specialist.citations.map((v,i)=><li key={i}>{v.document_id} · {v.chunk_id}</li>)}</ul><p className="muted">Specialist analysis only. No Decision severity assigned.</p></section>}
  {correlation&&<p role="status">Correlation: {correlation.status.replaceAll("_"," ")} · Matches: {correlation.correlation_count} · {correlation.note}</p>}
  {ingested&&<p role="status">INGESTED · Graph event: {ingested.graph_event_id} · Source IP: {ingested.source_ip}. Correlation, Response and Decision not yet run.</p>}
  {error&&<p role="alert" className="error">{error}</p>}
