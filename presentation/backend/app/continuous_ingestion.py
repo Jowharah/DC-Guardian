@@ -15,12 +15,14 @@ import time
 from io import BytesIO
 from pathlib import Path
 from fastapi import UploadFile
+from starlette.datastructures import Headers
 from presentation.backend.app.authentication import local_setting
 from presentation.backend.app.authorization import Principal,Permission,require
 
 LOG=logging.getLogger("dcg.ingestion")
-KINDS={"ssh":(".log",".txt"),"maintenance":(".csv",),"environment":(".csv",)}
-MAX_SIZE={"ssh":1024*1024,"maintenance":4*1024*1024,"environment":1024*1024}
+KINDS={"ssh":(".log",".txt"),"maintenance":(".csv",),"environment":(".csv",),
+       "ppe":(".jpg",".jpeg",".png"),"face":(".jpg",".jpeg",".png")}
+MAX_SIZE={"ssh":1024*1024,"maintenance":4*1024*1024,"environment":1024*1024,"ppe":8*1024*1024,"face":8*1024*1024}
 
 def load_config(path):
     cfg=json.loads(Path(path).read_text(encoding="utf-8"))
@@ -38,8 +40,14 @@ def load_config(path):
         if topology is None: raise ValueError("Unknown zone")
         field="sensor_id" if kind=="environment" else "server_id"
         choices="sensors" if kind=="environment" else "servers"
-        if src[field] not in topology[choices]: raise ValueError("Invalid topology assignment")
-        sources.append({"kind":kind,"directory":folder,"zone_id":zone,field:src[field]})
+        if kind in ("ppe","face"):
+            if src.get("retain_approved_images") is not True:
+                raise ValueError("Image ingestion requires explicit retain_approved_images=true consent")
+            sources.append({"kind":kind,"directory":folder,"zone_id":zone,
+                            "retain_approved_images":True})
+        else:
+            if src[field] not in topology[choices]: raise ValueError("Invalid topology assignment")
+            sources.append({"kind":kind,"directory":folder,"zone_id":zone,field:src[field]})
     return sources
 
 def operator():
@@ -59,7 +67,25 @@ def state_db(path):
 
 async def dispatch(src,data,filename,principal):
     kind=src["kind"]
-    file=UploadFile(file=BytesIO(data),filename=filename)
+    image_type="image/png" if filename.lower().endswith(".png") else "image/jpeg"
+    headers=Headers({"content-type":image_type}) if kind in ("ppe","face") else Headers()
+    file=UploadFile(file=BytesIO(data),filename=filename,headers=headers)
+    if kind=="ppe":
+        from presentation.backend.app.ppe_image_validation import validate_ppe_image
+        result=await validate_ppe_image(file,True,src["zone_id"],principal)
+        observation=result.get("observation")
+        if not observation or not result.get("image_stored"):
+            raise RuntimeError("PPE image assessment was not retained")
+        return {"events":1,"partial":0,"observation_id":observation["observation_id"],
+                "pipeline_status":result["pipeline_status"]}
+    if kind=="face":
+        from presentation.backend.app.face_image_validation import validate_face
+        result=await validate_face(file,True,src["zone_id"],principal)
+        observation=result.get("observation")
+        if not observation or not result.get("image_stored"):
+            raise RuntimeError("Face image assessment was not retained")
+        return {"events":1,"partial":0,"observation_id":observation["observation_id"],
+                "pipeline_status":result["pipeline_status"]}
     if kind=="ssh":
         from presentation.backend.app.ssh_log_validation import process_ssh_log
         result=await process_ssh_log(file,src["zone_id"],src["server_id"],True,principal)
@@ -78,7 +104,8 @@ async def scan_once(sources,db,principal):
     for src in sources:
         kind=src["kind"]
         perm={"ssh":Permission.SSH_DETAIL,"maintenance":Permission.MAINTENANCE_DETAIL,
-              "environment":Permission.ENVIRONMENT_DETAIL}[kind]
+              "environment":Permission.ENVIRONMENT_DETAIL,
+              "ppe":Permission.CAMERA_DETAIL,"face":Permission.PERSON_DETAIL}[kind]
         require(principal,perm,src["zone_id"])
         require(principal,Permission.SCENARIO_EXECUTE,src["zone_id"])
         for path in sorted(src["directory"].iterdir()):
