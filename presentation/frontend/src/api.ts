@@ -71,3 +71,7 @@ export type EmployeeAccess={person_id:string;role:string;authorized_zones:string
 export const getEmployees=()=>request<EmployeeAccess[]>("/api/v1/access/employees");
 export const registerEmployee=(person_id:string,role:string)=>request<{status:string}>("/api/v1/access/employees",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({person_id,role})});
 export const changeEmployeeAccess=(person_id:string,zone_id:string,action:"GRANT"|"REVOKE")=>request<{status:string}>(`/api/v1/access/employees/${encodeURIComponent(person_id)}/zones`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({zone_id,action})});
+
+export type StandaloneEvent={event_id:string;zone_id:string;received_at:string;domain:string;state:string;title:string;asset_id:string;description:string;record_type:"STANDALONE_EVIDENCE";source_type:"OPERATOR_SYNTHETIC";decision_severity:null};
+export const getStandaloneEvents=()=>request<StandaloneEvent[]>("/api/v1/events/standalone");
+export const createStandaloneEvent=(event:{domain:string;zone_id:string;state:string;title:string;asset_id:string;description:string})=>request<StandaloneEvent>("/api/v1/events/standalone",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(event)});
