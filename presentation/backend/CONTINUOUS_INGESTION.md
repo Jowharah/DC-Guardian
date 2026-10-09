@@ -90,3 +90,30 @@ private filesystem ACLs; do not use shared or synced directories. Existing
 SHA-256 checkpoints prevent reprocessing the same unchanged file path after
 successful completion. The worker does not yet provide encrypted-at-rest
 storage, automated retention expiry, or end-to-end artifact auditing.
+
+## Optional camera/capture-time sidecars (controlled prototype)
+
+For an approved `incoming/ppe/worker.jpg`, place a JSON sidecar named
+`worker.jpg.metadata.json` in the same folder:
+
+```json
+{"camera_id":"CAM-B-01","captured_at":"2026-10-09T08:05:00Z"}
+```
+
+For an approved `incoming/face/employee.jpg`, use
+`employee.jpg.metadata.json` with its **actual** camera and capture time.
+The worker validates camera membership in the declared zone, timezone-aware
+ISO timestamps and non-future capture time. If a valid sidecar is present,
+the worker writes a separate Neo4j Evidence event linked to the declared
+camera. Original image retention and image access remain under the existing
+PPE/Face observation APIs.
+
+**Do not invent capture metadata for real images.** A matching topology
+camera does not authenticate the claimed source: provenance remains
+`OPERATOR_DECLARED_UNVERIFIED`. The new projection is not a validated
+Common Event adapter, correlation result, authorization result, or Decision.
+No physical-security incident is created automatically. If no sidecar exists,
+the existing image-only ingestion behavior is unchanged.
+
+Sidecars are only suitable for approved controlled testing until signed or
+otherwise independently verified camera-source metadata is available.
