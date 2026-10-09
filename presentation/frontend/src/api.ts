@@ -145,3 +145,6 @@ export const getOperationalDecision=(id:string)=>request<OperationalDecisionResu
 export const evaluateOperationalDecision=(id:string)=>request<OperationalDecisionResult>(`/api/v1/operations/correlations/${encodeURIComponent(id)}/decision`,{method:"POST"});
 
 export const getStandaloneGraph=(kind:"ssh"|"maintenance"|"environment",id:string)=>request<IncidentGraph>(`/api/v1/evidence/${kind}/${encodeURIComponent(id)}/graph`);
+
+export type ImageCaptureMetadata={capture_metadata:{camera_id:string;zone_id:string;captured_at:string;provenance:string}|null;graph_projection:{event_id:string;graph_status:string;provenance_status:string;correlation_status:string;decision_status:string}|null};
+export const getImageCaptureMetadata=(kind:"ppe"|"face",id:string)=>request<ImageCaptureMetadata>(`/api/v1/image-observations/${kind}/${encodeURIComponent(id)}/metadata`);
