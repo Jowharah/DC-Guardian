@@ -125,3 +125,7 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .face-recognized{background:#2F8C68;color:#fff;border:1px solid #72D6A7}
 .face-unknown{background:#A53F55;color:#fff;border:1px solid #E78DA0}
 .face-no_face,.face-multiple_faces{background:#524184;color:#F4E5F3;border:1px solid #A794B0}
+
+.face-auth-authorized{background:#2F8C68;color:#fff;border:1px solid #72D6A7}
+.face-auth-unauthorized{background:#A53F55;color:#fff;border:1px solid #E78DA0}
+.face-auth-unknown{background:#524184;color:#F4E5F3;border:1px solid #A794B0}
