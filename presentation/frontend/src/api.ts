@@ -88,3 +88,6 @@ export async function validateSSHLog(file:File,zone:string,server:string):Promis
 export type PublishedSSH=SSHAssessment&{event_id:string;received_at:string;zone_id:string;server_id:string;record_type:"SSH_DETECTOR_EVIDENCE";source_type:string;decision_severity:null};
 export const getPublishedSSH=()=>request<PublishedSSH[]>("/api/v1/ssh/published");
 export const publishSSH=(preview_id:string,indices:number[])=>request<{published_event_ids:string[]}>("/api/v1/ssh/publish",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({preview_id,indices})});
+
+export type SSHReasoningPreview={status:string;pipeline_stage:string;source_ip:string|null;original_timestamp:string|null;zone_id:string;server_id:string;topology_mapping_performed:boolean;correlation_performed:boolean;response_performed:boolean;decision_performed:boolean};
+export const previewSSHReasoning=(id:string)=>request<SSHReasoningPreview>(`/api/v1/ssh/published/${encodeURIComponent(id)}/reasoning-preview`);
