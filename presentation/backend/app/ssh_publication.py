@@ -181,3 +181,29 @@ def run_pipeline(event_id: str, principal: Principal = Depends(current_principal
             "original_timestamp":normalized["timestamp"],"server_id":server,"zone_id":zone,
             "stages":stages,"completed_full_pipeline":False,"decision_severity":None,
             "note":"Actual model evidence; no synthetic environmental or maintenance events inserted."}
+
+@router.post("/api/v1/ssh/published/{event_id}/ingest-graph")
+def ingest_graph(event_id: str, principal: Principal = Depends(current_principal)):
+    """Explicitly persist genuine SSH detector evidence in the controlled graph."""
+    authorize(principal, Permission.SSH_DETAIL)
+    with connect() as conn:
+        row = conn.execute("SELECT zone_id,server_id,payload FROM ssh_published_evidence WHERE event_id=?",
+                           (event_id,)).fetchone()
+    if row is None:
+        raise HTTPException(404, "Published SSH evidence not found")
+    zone, server, encoded = row
+    authorize(principal, Permission.SSH_DETAIL, zone)
+    authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+    from presentation.backend.app.ssh_graph_ingestion import ingest_published_ssh
+    try:
+        ingested = ingest_published_ssh(event_id, json.loads(encoded), server, zone)
+    except ValueError as exc:
+        raise HTTPException(422, "SSH mapping or event contract validation failed") from exc
+    except Exception as exc:
+        raise HTTPException(503, "Neo4j SSH ingestion unavailable") from exc
+    return {"status":"INGESTED","graph_event_id":ingested["event_id"],
+            "scenario_id":ingested["scenario_id"],"source_ip":ingested["source_ip"],
+            "server_id":server,"zone_id":zone,
+            "original_timestamp":ingested["original_timestamp"],
+            "correlation_performed":False,"response_performed":False,
+            "decision_performed":False,"decision_severity":None}
