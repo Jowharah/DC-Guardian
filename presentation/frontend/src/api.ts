@@ -187,3 +187,5 @@ export const checkPublishedCorrelations=(kind:string,observation_ids:string[])=>
 
 export type ControlledSSHTimeResult={event_id:string;observed_at:string;provenance:string;original_detector_timestamp_unchanged:boolean;verified_observation_time:boolean};
 export const declareControlledSSHTime=(eventId:string,observedAt:string)=>request<ControlledSSHTimeResult>(`/api/v1/ssh/published/${encodeURIComponent(eventId)}/controlled-time`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({observed_at:observedAt,acknowledgment:true})});
+
+export const declareImageCapture=(kind:"ppe"|"face",id:string,camera_id:string,captured_at:string)=>request<{observation_id:string;capture_metadata:{camera_id:string;captured_at:string;zone_id:string;provenance:string};graph_projection:{graph_status:string}}>(`/api/v1/images/${kind}/${encodeURIComponent(id)}/capture-declaration`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({camera_id,captured_at,acknowledgment:true})});
