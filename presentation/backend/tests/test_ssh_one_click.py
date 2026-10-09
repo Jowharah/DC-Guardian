@@ -9,7 +9,7 @@ from presentation.backend.app.authorization import Principal
 def test_one_click_processes_detector_assessment(monkeypatch):
     principal=Principal("operator",frozenset({"administrator"}),frozenset({"ZONE-B"}))
     async def fake_validate(log,zone_id,server_id,principal):
-        return {"preview_id":"SSH-PREVIEW-TEST","assessments":[{"source_ip":"192.0.2.1"}],
+        return {"preview_id":"SSH-PREVIEW-0123456789ABCDEF0123456789ABCDEF","assessments":[{"source_ip":"192.0.2.1"}],
                 "parsed_count":1,"assessment_count":1,"security_relevant_count":1}
     monkeypatch.setattr(workflow,"validate_ssh_log",fake_validate)
     monkeypatch.setattr(publication,"publish",lambda payload,principal:{"published_event_ids":["SSH-EVT-TEST"]})
@@ -27,7 +27,7 @@ def test_one_click_processes_detector_assessment(monkeypatch):
 def test_one_click_reports_partial_graph_failure(monkeypatch):
     principal=Principal("operator",frozenset({"administrator"}),frozenset({"ZONE-B"}))
     async def fake_validate(log,zone_id,server_id,principal):
-        return {"preview_id":"SSH-PREVIEW-TEST","assessments":[{}]}
+        return {"preview_id":"SSH-PREVIEW-0123456789ABCDEF0123456789ABCDEF","assessments":[{}]}
     monkeypatch.setattr(workflow,"validate_ssh_log",fake_validate)
     monkeypatch.setattr(publication,"publish",lambda payload,principal:{"published_event_ids":["SSH-EVT-TEST"]})
     def graph_failure(eid,p):
