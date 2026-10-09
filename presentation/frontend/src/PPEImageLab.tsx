@@ -1,4 +1,5 @@
-import ImageCaptureControls,{type CaptureInput,declareImageCapture} from "./ImageCaptureControls";
+import ImageCaptureControls,{type CaptureInput} from "./ImageCaptureControls";
+import {declareImageCapture} from "./api";
 import {useEffect,useState} from "react";
 import PostPublicationCheck from "./PostPublicationCheck";
 import {validatePPEImage,type PPEImageResult} from "./api";
