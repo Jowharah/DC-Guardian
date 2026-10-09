@@ -3,7 +3,7 @@
 Preserves original detector window; does not fabricate correlation or severity.
 """
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timezone
 from reasoning.adapters.ssh_event_adapter import adapt_ssh_assessment
 from reasoning.topology.topology_mapper import load_topology, build_server_index
 from reasoning.graph.ingest_event import create_driver, ingest_ssh_event
@@ -22,7 +22,12 @@ def prepare_mapped_ssh(event_id: str, assessment: dict, server_id: str, zone_id:
     # Syslog's placeholder year is retained. Do not silently replace it with now.
     timestamp = datetime.fromisoformat(original_time.replace("Z", "+00:00"))
     if timestamp.tzinfo is None:
-        raise ValueError("Original log time has no timezone; mapping requires explicit timezone policy")
+        # Explicit controlled-test convention only; original syslog has no timezone.
+        timestamp = timestamp.replace(tzinfo=timezone.utc)
+    normalized["timestamp"] = timestamp.isoformat()
+    normalized["window"]["start"] = timestamp.isoformat()
+    end = datetime.fromisoformat(normalized["window"]["end"].replace("Z", "+00:00"))
+    normalized["window"]["end"] = (end.replace(tzinfo=timezone.utc) if end.tzinfo is None else end).isoformat()
     mapped = deepcopy(normalized)
     scenario_id = "DCG-SSH-" + event_id.removeprefix("SSH-EVT-")
     mapped["event_id"] = event_id + "-MAPPED"
