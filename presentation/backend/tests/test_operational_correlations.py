@@ -19,6 +19,7 @@ def test_same_zone_within_window_correlates():
 
 def test_different_zone_not_correlated():
     m,e=sample(zone="ZONE-A")
+    e["zone_id"]="ZONE-B"
     assert correlate([m],[e])==[]
 
 def test_old_observation_not_correlated():
