@@ -1,4 +1,5 @@
 import {useEffect,useState} from "react";
+import PostPublicationCheck from "./PostPublicationCheck";
 import {validateFaceImage,type FaceImageResult} from "./api";
 export default function FaceImageLab(){
  const [file,setFile]=useState<File|null>(null),[preview,setPreview]=useState("");
@@ -14,5 +15,5 @@ export default function FaceImageLab(){
  </div><button disabled={!file||busy} onClick={()=>void run()}>{busy?"Running frozen face model…":"Validate face image"}</button>
  {error&&<p role="alert" className="error">{error}</p>}
  {result&&<div className="evidenceItem"><h4>{result.assessment.recognition_status}</h4><p>Identity: <b>{result.assessment.person_id}</b> · Similarity: {result.assessment.similarity?.toFixed(3)??"N/A"} · Cosine distance: {result.assessment.distance?.toFixed(3)??"N/A"}</p><p className="muted">Authorization: NOT EVALUATED · {result.image_stored?"Retained for Monitoring Center review.":"Not retained."}</p></div>}
- </section>
+ {result?.image_stored&&result.observation&&<PostPublicationCheck kind="face" ids={[result.observation.observation_id]}/> }</section>
 }
