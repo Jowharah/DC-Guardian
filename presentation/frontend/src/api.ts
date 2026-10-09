@@ -128,7 +128,7 @@ export function processSSHLog(file:File,zone:string,server:string,publish:boolea
 }
 
 export type EnvironmentalAssessment={assessment:string;observation_timestamp:string;measurements:{temperature_c:number|null;humidity_pct:number|null};anomaly_detected:boolean;evidence:{thresholds:Record<string,number>;triggered_conditions:string[]}};
-export type EnvironmentalEvent={event_id:string;received_at:string;zone_id:string;sensor_id:string;assessment:EnvironmentalAssessment;history:{timestamp:string;temperature_c:number|null;humidity_pct:number|null}[];workflow:{stages:{stage:string;status:string;detail?:string}[];correlation:{status:string;scope:string};specialist:SpecialistAssessment|null;decision:null};record_type:"ENVIRONMENTAL_EVIDENCE";decision_severity:null};
+export type EnvironmentalEvent={event_id:string;received_at:string;zone_id:string;sensor_id:string;assessment:EnvironmentalAssessment;history:{timestamp:string;temperature_c:number|null;humidity_pct:number|null}[];workflow:{stages:{stage:string;status:string;detail?:string}[];correlation:{status:string;scope:string};specialist:SpecialistAssessment|null;reading_states?:string[];decision:null};record_type:"ENVIRONMENTAL_EVIDENCE";decision_severity:null};
 export const getEnvironmentalEvents=()=>request<EnvironmentalEvent[]>("/api/v1/environment/events");
 export function validateEnvironment(file:File,zone:string,sensor:string,publish:boolean){
  const body=new FormData();body.append("file",file);body.append("zone_id",zone);body.append("sensor_id",sensor);body.append("publish",String(publish));
