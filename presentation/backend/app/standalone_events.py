@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from typing import Literal
 from presentation.backend.app.incident_store import _db_path
+from presentation.backend.app.custom_scenarios import topology_options
 from presentation.backend.app.authentication import current_principal, authorize
 from presentation.backend.app.authorization import Principal, Permission
 
@@ -58,6 +59,9 @@ def list_events(principal: Principal = Depends(current_principal)):
 @router.post("/api/v1/events/standalone", status_code=201)
 def create_event(payload: SyntheticEventInput, principal: Principal = Depends(current_principal)):
     authorize(principal, Permission.SCENARIO_EXECUTE, payload.zone_id)
+    topology = next((item for item in topology_options() if item["zone_id"] == payload.zone_id), None)
+    if topology is None or payload.asset_id not in topology["servers"] + topology["sensors"]:
+        raise HTTPException(422, "Asset does not belong to selected zone")
     event_id = "DCG-EVT-" + uuid4().hex[:20].upper()
     received_at = datetime.now(timezone.utc).isoformat()
     with _connect() as conn:
