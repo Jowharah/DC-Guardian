@@ -65,7 +65,7 @@ def state_db(path):
        PRIMARY KEY(source,sha256))""")
     return db
 
-async def dispatch(src,data,filename,principal):
+async def dispatch(src,data,filename,principal,metadata=None):
     kind=src["kind"]
     image_type="image/png" if filename.lower().endswith(".png") else "image/jpeg"
     headers=Headers({"content-type":image_type}) if kind in ("ppe","face") else Headers()
@@ -76,16 +76,22 @@ async def dispatch(src,data,filename,principal):
         observation=result.get("observation")
         if not observation or not result.get("image_stored"):
             raise RuntimeError("PPE image assessment was not retained")
-        return {"events":1,"partial":0,"observation_id":observation["observation_id"],
-                "pipeline_status":result["pipeline_status"]}
+        output={"events":1,"partial":0,"observation_id":observation["observation_id"],"pipeline_status":result["pipeline_status"]}
+        if metadata:
+            from presentation.backend.app.image_evidence_mapping import project_observation
+            output["graph"]=project_observation("ppe",observation["observation_id"],result["assessment"],metadata)
+        return output
     if kind=="face":
         from presentation.backend.app.face_image_validation import validate_face
         result=await validate_face(file,True,src["zone_id"],principal)
         observation=result.get("observation")
         if not observation or not result.get("image_stored"):
             raise RuntimeError("Face image assessment was not retained")
-        return {"events":1,"partial":0,"observation_id":observation["observation_id"],
-                "pipeline_status":result["pipeline_status"]}
+        output={"events":1,"partial":0,"observation_id":observation["observation_id"],"pipeline_status":result["pipeline_status"]}
+        if metadata:
+            from presentation.backend.app.image_evidence_mapping import project_observation
+            output["graph"]=project_observation("face",observation["observation_id"],result["assessment"],metadata)
+        return output
     if kind=="ssh":
         from presentation.backend.app.ssh_log_validation import process_ssh_log
         result=await process_ssh_log(file,src["zone_id"],src["server_id"],True,principal)
@@ -118,14 +124,25 @@ async def scan_once(sources,db,principal):
             data=path.read_bytes()
             if len(data)!=stat.st_size or path.stat().st_mtime_ns!=stat.st_mtime_ns:
                 continue
+            metadata=None
+            if kind in ("ppe","face"):
+                sidecar=path.with_suffix(path.suffix+".metadata.json")
+                if sidecar.is_file() and not sidecar.is_symlink() and sidecar.stat().st_size<=4096:
+                    from presentation.backend.app.image_evidence_mapping import validate_metadata
+                    try:
+                        metadata=validate_metadata(json.loads(sidecar.read_text(encoding="utf-8")),src["zone_id"])
+                    except (ValueError,TypeError,json.JSONDecodeError):
+                        counts["failed"]+=1
+                        LOG.warning("Invalid image metadata: %s",path.name)
+                        continue
             key=str(path.resolve())
-            digest=hashlib.sha256(data).hexdigest()
+            digest=hashlib.sha256(data+(json.dumps(metadata,sort_keys=True).encode() if metadata else b'')).hexdigest()
             if db.execute("SELECT 1 FROM ingested_files WHERE source=? AND sha256=? AND status IN ('COMPLETE','PARTIAL')",
                           (key,digest)).fetchone():
                 counts["skipped"]+=1
                 continue
             try:
-                output=await dispatch(src,data,path.name,principal)
+                output=await dispatch(src,data,path.name,principal,metadata)
                 status="PARTIAL" if output["partial"] else "COMPLETE"
                 counts["partial" if status=="PARTIAL" else "processed"]+=1
                 detail=json.dumps(output)
