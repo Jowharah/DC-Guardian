@@ -25,7 +25,29 @@ def connect():
         assessment_index INTEGER NOT NULL, received_at TEXT NOT NULL,
         zone_id TEXT NOT NULL, server_id TEXT NOT NULL, payload TEXT NOT NULL,
         UNIQUE(preview_id,assessment_index))""")
+    conn.execute("""CREATE TABLE IF NOT EXISTS ssh_decisions (
+        event_id TEXT PRIMARY KEY, evaluated_at TEXT NOT NULL,
+        decision_json TEXT NOT NULL, specialist_json TEXT NOT NULL,
+        correlation_json TEXT NOT NULL)""")
     return conn
+
+def save_decision(event_id, decision, specialist, correlation):
+    with connect() as conn:
+        conn.execute("""INSERT INTO ssh_decisions VALUES (?,?,?,?,?)
+            ON CONFLICT(event_id) DO UPDATE SET evaluated_at=excluded.evaluated_at,
+            decision_json=excluded.decision_json,
+            specialist_json=excluded.specialist_json,
+            correlation_json=excluded.correlation_json""",
+            (event_id,datetime.now(timezone.utc).isoformat(),
+             json.dumps(decision),json.dumps(specialist),json.dumps(correlation)))
+
+def load_decision(event_id):
+    with connect() as conn:
+        row=conn.execute("""SELECT evaluated_at,decision_json,specialist_json,correlation_json
+            FROM ssh_decisions WHERE event_id=?""",(event_id,)).fetchone()
+    return None if row is None else {
+        "evaluated_at":row[0], "decision":json.loads(row[1]),
+        "specialist":json.loads(row[2]), "correlation":json.loads(row[3])}
 
 def save_preview(owner, zone, server, assessments):
     preview_id = "SSH-PREVIEW-" + uuid4().hex.upper()
@@ -85,7 +107,7 @@ def published(principal: Principal = Depends(current_principal)):
     with connect() as conn:
         rows=conn.execute("""SELECT event_id,received_at,zone_id,server_id,payload
                              FROM ssh_published_evidence ORDER BY received_at DESC LIMIT 200""").fetchall()
-    return [{**json.loads(payload),"event_id":eid,"received_at":received,
+    return [{**json.loads(payload),"decision_record":load_decision(eid),"event_id":eid,"received_at":received,
              "zone_id":zone,"server_id":server,"record_type":"SSH_DETECTOR_EVIDENCE",
              "source_type":"OPERATOR_UPLOADED_OPENSSH_LOG","decision_severity":None}
             for eid,received,zone,server,payload in rows if zone in principal.zones]
@@ -312,6 +334,7 @@ def standalone_decision(event_id: str, principal: Principal = Depends(current_pr
             raise HTTPException(409,"Correlated evidence requires multi-domain Decision workflow")
         specialist=assess_standalone_ssh(event_id,assessment,zone,server)
         decision=decide_standalone_ssh(assessment,correlation,specialist)
+        save_decision(event_id,decision,specialist,correlation)
     except HTTPException:
         raise
     except ValueError as exc:
@@ -324,3 +347,17 @@ def standalone_decision(event_id: str, principal: Principal = Depends(current_pr
             "record_type":"STANDALONE_SSH_DECISION",
             "incident_linked":False,"decision_source":"DCG-DECISION-v1",
             "note":"SSH-only human-review Decision; no cross-domain incident inferred."}
+
+@router.get("/api/v1/ssh/published/{event_id}/decision")
+def read_standalone_decision(event_id: str, principal: Principal = Depends(current_principal)):
+    authorize(principal, Permission.SSH_DETAIL)
+    with connect() as conn:
+        row=conn.execute("SELECT zone_id FROM ssh_published_evidence WHERE event_id=?",
+                         (event_id,)).fetchone()
+    if row is None:
+        raise HTTPException(404,"Published SSH evidence not found")
+    authorize(principal, Permission.SSH_DETAIL, row[0])
+    result=load_decision(event_id)
+    if result is None:
+        raise HTTPException(404,"No completed Decision for this event")
+    return result
