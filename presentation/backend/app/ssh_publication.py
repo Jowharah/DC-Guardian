@@ -238,3 +238,39 @@ def check_correlation(event_id: str, principal: Principal = Depends(current_prin
         raise
     except Exception as exc:
         raise HTTPException(503,"Correlation service unavailable") from exc
+
+@router.post("/api/v1/ssh/published/{event_id}/specialist-response")
+def specialist_response(event_id: str, principal: Principal = Depends(current_principal)):
+    authorize(principal, Permission.SSH_DETAIL)
+    with connect() as conn:
+        row=conn.execute("SELECT zone_id,server_id,payload FROM ssh_published_evidence WHERE event_id=?",
+                         (event_id,)).fetchone()
+    if row is None:
+        raise HTTPException(404,"Published SSH evidence not found")
+    zone,server,encoded=row
+    authorize(principal, Permission.SSH_DETAIL, zone)
+    authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+    from presentation.backend.app.ssh_graph_ingestion import prepare_mapped_ssh
+    from presentation.backend.app.ssh_response import assess_standalone_ssh
+    assessment=json.loads(encoded)
+    mapped=prepare_mapped_ssh(event_id,assessment,server,zone)
+    from reasoning.graph.ingest_event import create_driver,NEO4J_DATABASE
+    try:
+        driver=create_driver()
+        try:
+            with driver.session(database=NEO4J_DATABASE,default_access_mode="READ") as session:
+                found=session.run("MATCH (e:Event {event_id:$id}) RETURN e.event_id AS id",
+                                  id=mapped["event_id"]).single()
+        finally:
+            driver.close()
+        if found is None:
+            raise HTTPException(409,"Ingest SSH Evidence into Neo4j first")
+        from presentation.backend.app.ssh_correlation import check_ssh_correlations
+        correlation=check_ssh_correlations(mapped["provenance"]["scenario_id"],mapped["event_id"])
+        if correlation["status"]!="NO_CORRELATION":
+            raise HTTPException(409,"Correlated events require validated multi-domain Response workflow")
+        return assess_standalone_ssh(event_id,assessment,zone,server)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(503,"Cybersecurity specialist unavailable") from exc
