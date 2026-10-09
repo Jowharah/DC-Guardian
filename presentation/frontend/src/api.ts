@@ -109,3 +109,13 @@ export type SSHDecisionResult={event_id:string;zone_id:string;server_id:string;s
 export const evaluateSSHDecision=(id:string)=>request<SSHDecisionResult>(`/api/v1/ssh/published/${encodeURIComponent(id)}/decision`,{method:"POST"});
 
 export const getSavedSSHDecision=(id:string)=>request<{evaluated_at:string;decision:SSHDecisionResult["decision"];specialist:SSHSpecialistResponse;correlation:SSHCorrelationCheck}>(`/api/v1/ssh/published/${encodeURIComponent(id)}/decision`);
+
+export type MaintenanceAssessment={domain:"MAINTENANCE";assessment:"NORMAL"|"AT_RISK";serial_number:string;observation_timestamp:string;failure_probability:number;operating_threshold:number;failure_horizon_days:number;model_name:string;evidence:Record<string,number|null>};
+export type MaintenanceWorkflow={stages:{stage:string;status:string;detail:string}[];correlation:{status:string;count:number;scope:string};specialist:{assessment:string;grounding_status:string;supported_findings:string[];recommended_considerations:string[];limitations:string[];citations:{chunk_id:string;document_id:string}[]}|null;decision:null;graph_event_id:string};
+export type MaintenanceEvent={event_id:string;received_at:string;zone_id:string;server_id:string;assessment:MaintenanceAssessment;history:{date:string;[key:string]:string|number}[];workflow:MaintenanceWorkflow;record_type:"MAINTENANCE_EVIDENCE";decision_severity:null};
+export type MaintenanceValidation={event_id:string;assessment:MaintenanceAssessment;history:MaintenanceEvent["history"];workflow:MaintenanceWorkflow|null;published:boolean;zone_id:string;server_id:string;decision_severity:null};
+export const getMaintenanceEvents=()=>request<MaintenanceEvent[]>("/api/v1/maintenance/events");
+export function validateMaintenance(file:File,zone_id:string,server_id:string,publish:boolean){
+ const body=new FormData();body.append("file",file);body.append("zone_id",zone_id);body.append("server_id",server_id);body.append("publish",String(publish));
+ return request<MaintenanceValidation>("/api/v1/maintenance/validate",{method:"POST",body});
+}
