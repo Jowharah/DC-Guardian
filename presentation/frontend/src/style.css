@@ -172,3 +172,5 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .accessZones{display:flex;gap:8px;flex-wrap:wrap}
 .accessZones button{font-size:12px;padding:8px 11px}
 .labAccordion .ppeLab input:focus-visible,.labAccordion .ppeLab select:focus-visible{outline:2px solid #8392CF;outline-offset:1px}
+
+.sshPublishRow{border:1px solid #524184;border-radius:10px;padding:12px;margin:10px 0;background:#1D1129}.sshPublishRow>label{display:flex;align-items:center;gap:9px;font-size:12px;color:#E3B8E0}.sshPublishRow input[type="checkbox"]{accent-color:#8392CF}.sshWindow{margin-top:10px}.sshWindow summary{cursor:pointer;color:#F4E5F3;overflow-wrap:anywhere}.sshWindowBody{padding:10px 4px}.sshWindowBody pre{max-height:250px;overflow:auto}
