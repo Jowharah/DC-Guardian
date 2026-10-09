@@ -85,7 +85,7 @@ export async function validateSSHLog(file:File,zone:string,server:string):Promis
  return request<SSHLogResult>("/api/v1/ssh/validate-log",{method:"POST",body});
 }
 
-export type PublishedSSH=SSHAssessment&{event_id:string;received_at:string;zone_id:string;server_id:string;record_type:"SSH_DETECTOR_EVIDENCE";source_type:string;decision_severity:null};
+export type PublishedSSH=SSHAssessment&{event_id:string;received_at:string;zone_id:string;server_id:string;record_type:"SSH_DETECTOR_EVIDENCE";source_type:string;decision_severity:null;decision_record?:{evaluated_at:string;decision:SSHDecisionResult["decision"];specialist:SSHSpecialistResponse;correlation:SSHCorrelationCheck}|null};
 export const getPublishedSSH=()=>request<PublishedSSH[]>("/api/v1/ssh/published");
 export const publishSSH=(preview_id:string,indices:number[])=>request<{published_event_ids:string[]}>("/api/v1/ssh/publish",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({preview_id,indices})});
 
@@ -107,3 +107,5 @@ export const getSSHSpecialistResponse=(id:string)=>request<SSHSpecialistResponse
 
 export type SSHDecisionResult={event_id:string;zone_id:string;server_id:string;source_ip:string;evidence_state:string;correlation:SSHCorrelationCheck;specialist:SSHSpecialistResponse;decision:{severity:"LOW"|"MEDIUM"|"HIGH";incident_status:string;response_mode:string;autonomous_action_allowed:false;escalation_required:boolean;decision_rules_triggered:string[];policy_version:string};record_type:"STANDALONE_SSH_DECISION";incident_linked:false;decision_source:string;note:string};
 export const evaluateSSHDecision=(id:string)=>request<SSHDecisionResult>(`/api/v1/ssh/published/${encodeURIComponent(id)}/decision`,{method:"POST"});
+
+export const getSavedSSHDecision=(id:string)=>request<{evaluated_at:string;decision:SSHDecisionResult["decision"];specialist:SSHSpecialistResponse;correlation:SSHCorrelationCheck}>(`/api/v1/ssh/published/${encodeURIComponent(id)}/decision`);
