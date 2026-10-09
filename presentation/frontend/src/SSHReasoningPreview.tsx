@@ -1,9 +1,9 @@
 import {useState} from "react";
-import {previewSSHReasoning,type SSHReasoningPreview as Preview} from "./api";
+import {runSSHPipeline,type SSHPipelineRun} from "./api";
 export default function SSHReasoningPreview({eventId}:{eventId:string}){
- const [result,setResult]=useState<Preview|null>(null),[error,setError]=useState(""),[busy,setBusy]=useState(false);
- async function check(){setBusy(true);setError("");try{setResult(await previewSSHReasoning(eventId))}catch(e){setError(e instanceof Error?e.message:"Reasoning adapter validation unavailable")}finally{setBusy(false)}}
- return <div className="evidenceItem"><button disabled={busy} onClick={()=>void check()}>{busy?"Checking…":"Validate Reasoning contract"}</button>
+ const [result,setResult]=useState<SSHPipelineRun|null>(null),[error,setError]=useState(""),[busy,setBusy]=useState(false);
+ async function run(){setBusy(true);setError("");try{setResult(await runSSHPipeline(eventId))}catch(e){setError(e instanceof Error?e.message:"Pipeline execution unavailable")}finally{setBusy(false)}}
+ return <div className="evidenceItem"><button disabled={busy} onClick={()=>void run()}>{busy?"Running checks…":"Run Through Pipeline"}</button>
  {error&&<p role="alert" className="error">{error}</p>}
- {result&&<p className="muted">{result.status} · Original time: {result.original_timestamp??"Unknown"} · Source IP: {result.source_ip??"Unknown"}. Adapter only; topology mapping, correlation, Response and Decision have not run.</p>}</div>
+ {result&&<div><h4>Pipeline execution status</h4>{result.stages.map(stage=><div className="sshPipelineStage" key={stage.stage}><b>{stage.stage.replaceAll("_"," ")}</b><span className={stage.status==="COMPLETE"?"sshStageComplete":"sshStagePending"}>{stage.status}</span><small>{stage.detail}</small></div>)}<p className="muted">{result.note}</p><p className="muted">Full pipeline: NOT COMPLETE · no Decision severity assigned.</p></div>}</div>
 }
