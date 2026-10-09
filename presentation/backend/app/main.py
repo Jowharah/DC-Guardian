@@ -73,6 +73,8 @@ app.include_router(post_publication_router)
 app.include_router(image_capture_router)
 from presentation.backend.app.camera_topology import router as camera_topology_router
 app.include_router(camera_topology_router)
+from presentation.backend.app.face_ssh_specialists import router as face_ssh_specialists_router
+app.include_router(face_ssh_specialists_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
