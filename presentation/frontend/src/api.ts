@@ -153,3 +153,7 @@ export type PhysicalImageCandidate={id:string;zone_id:string;ppe_observation_id:
 export const getPhysicalImageCandidates=()=>request<PhysicalImageCandidate[]>("/api/v1/physical/image-correlations");
 
 export const getPhysicalImageGraph=(id:string)=>request<IncidentGraph>(`/api/v1/physical/image-correlations/${encodeURIComponent(id)}/graph`);
+
+export type PhysicalSpecialistResult={evaluated_at:string;specialist:SpecialistAssessment;evidence_event_ids:string[];decision:null};
+export const getPhysicalSpecialist=(id:string)=>request<PhysicalSpecialistResult>(`/api/v1/physical/image-correlations/${encodeURIComponent(id)}/specialist`);
+export const evaluatePhysicalSpecialist=(id:string)=>request<PhysicalSpecialistResult>(`/api/v1/physical/image-correlations/${encodeURIComponent(id)}/specialist`,{method:"POST"});
