@@ -2,7 +2,7 @@ import {useEffect,useState} from "react";
 import GraphViewer from "./GraphViewer";
 import UnifiedEvidenceExplorer from "./UnifiedEvidenceExplorer";
 import UnifiedSpecialistViewer from "./UnifiedSpecialistViewer";
-import CorrelationTestingPanel from "./CorrelationTestingPanel";
+
 import GraphIntegrityStatus from "./GraphIntegrityStatus";
 import EvidenceDetailViewer from "./EvidenceDetailViewer";
 import PPEImageLab from "./PPEImageLab";
@@ -122,7 +122,7 @@ export default function App(){
 <details className="labAccordion"><summary>Environmental Monitoring · Sensor validation</summary><EnvironmentLab/></details>
 <details className="labAccordion"><summary>Safety · PPE image validation</summary><PPEImageLab/></details>
 <details className="labAccordion"><summary>Physical Security · Face recognition validation</summary><FaceImageLab/></details>
-<section><h2>Correlation Testing</h2><CorrelationTestingPanel openMonitoring={()=>setPage("monitoring")} openUnified={g=>{setSelectedUnified(g);setSelectedFaceSSH(null);setSelectedPhysical(null);setSelectedOperational(null);setPage("monitoring")}}/></section><section><h2>Advanced Testing & Administration</h2><p className="muted">Synthetic fixtures and access administration are separate from real model validation.</p></section>
+<section><h2>Automatic Correlation</h2><p className="muted">After you publish Evidence in any validator above, its correlation result appears directly below that model result. Matching is based on saved Evidence and existing eligibility rules, not upload order.</p><button type="button" onClick={()=>setPage("monitoring")}>Open Monitoring Center</button></section><section><h2>Advanced Testing & Administration</h2><p className="muted">Synthetic fixtures and access administration are separate from real model validation.</p></section>
 <details className="labAccordion"><summary>Employee Access Management</summary><EmployeeAccessManager/></details>
 <details className="labAccordion"><summary>Standalone synthetic evidence event</summary><StandaloneEventLab/></details>
 <details className="labAccordion"><summary>Legacy controlled scenarios · regression fixtures</summary><div className="scenarioGrid">{scenarios.map(s=><details className="panel scenarioAccordion" key={s.name}><summary><b>{s.name.replaceAll("_"," ")}</b><span className="accordionChevron" aria-hidden="true">⌄</span></summary><div className="accordionBody"><p className="muted">{s.description}</p><button disabled={loading} onClick={()=>void investigate(s.name)}>{loading?"Running…":"Run synthetic scenario"}</button></div></details>)}</div>{error&&<p role="alert" className="error">{error}</p>}</details>
