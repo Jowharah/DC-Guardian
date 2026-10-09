@@ -101,3 +101,6 @@ export const ingestSSHGraph=(id:string)=>request<SSHGraphIngestion>(`/api/v1/ssh
 
 export type SSHCorrelationCheck={status:"CORRELATED"|"NO_CORRELATION";correlation_count:number;scenario_id:string;graph_event_id:string;scope:string;note:string};
 export const checkSSHCorrelation=(id:string)=>request<SSHCorrelationCheck>(`/api/v1/ssh/published/${encodeURIComponent(id)}/check-correlation`,{method:"POST"});
+
+export type SSHSpecialistResponse={specialist_id:string;assessment:string;grounding_status:string;supported_findings:string[];recommended_considerations:string[];limitations:string[];citations:{chunk_id:string;document_id:string}[];source:string;decision_severity:null;confirmed_compromise:false};
+export const getSSHSpecialistResponse=(id:string)=>request<SSHSpecialistResponse>(`/api/v1/ssh/published/${encodeURIComponent(id)}/specialist-response`,{method:"POST"});
