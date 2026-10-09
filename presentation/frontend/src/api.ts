@@ -191,3 +191,6 @@ export const declareControlledSSHTime=(eventId:string,observedAt:string)=>reques
 export const declareImageCapture=(kind:"ppe"|"face",id:string,camera_id:string,captured_at:string)=>request<{observation_id:string;capture_metadata:{camera_id:string;captured_at:string;zone_id:string;provenance:string};graph_projection:{graph_status:string}}>(`/api/v1/images/${kind}/${encodeURIComponent(id)}/capture-declaration`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({camera_id,captured_at,acknowledgment:true})});
 
 export const getCameraTopology=()=>request<{zone_id:string;cameras:string[]}[]>("/api/v1/topology/cameras");
+
+export type FaceSSHSpecialistReview={candidate_id:string;evaluated_at:string;specialists:Record<string,SpecialistAssessment>;authorization:{status:string;source:string;reason:string};review:{status:string;response_mode:string;reasons:string[];severity:null;identity_to_ssh_established:false;physical_presence_verified:false;autonomous_action_allowed:false}};
+export const evaluateFaceSSHSpecialists=(id:string)=>request<FaceSSHSpecialistReview>(`/api/v1/cyber/face-ssh/candidates/${encodeURIComponent(id)}/specialists`,{method:"POST"});
