@@ -1,13 +1,15 @@
 import {useEffect,useState} from "react";
-import {getUnifiedSpecialists,evaluateUnifiedSpecialists,getUnifiedSynthesis,type UnifiedSynthesisResult,type UnifiedSpecialistResult} from "./api";
+import {getUnifiedSpecialists,evaluateUnifiedSpecialists,getUnifiedSynthesis,getUnifiedReviewDecision,type UnifiedReviewDecision,type UnifiedSynthesisResult,type UnifiedSpecialistResult} from "./api";
 
 export default function UnifiedSpecialistViewer({id}:{id:string}){
  const [saved,setSaved]=useState<UnifiedSpecialistResult|null>(null);
  const [synthesis,setSynthesis]=useState<UnifiedSynthesisResult|null>(null);
+ const [review,setReview]=useState<UnifiedReviewDecision|null>(null);
  const [busy,setBusy]=useState(false);
  const [message,setMessage]=useState("");
  useEffect(()=>{
-   let active=true;setSaved(null);setSynthesis(null);setMessage("");
+   let active=true;setSaved(null);setSynthesis(null);setReview(null);setMessage("");
+   getUnifiedReviewDecision(id).then(x=>{if(active)setReview(x)}).catch(()=>{});
    getUnifiedSynthesis(id).then(x=>{if(active)setSynthesis(x)}).catch(()=>{});
    getUnifiedSpecialists(id).then(x=>{if(active)setSaved(x)})
      .catch(()=>{if(active)setMessage("No saved unified specialist assessment. Evaluation is available below.")});
@@ -15,7 +17,7 @@ export default function UnifiedSpecialistViewer({id}:{id:string}){
  },[id]);
  async function evaluate(){
    setBusy(true);setMessage("");
-   try{setSaved(await evaluateUnifiedSpecialists(id));setSynthesis(await getUnifiedSynthesis(id))}
+   try{setSaved(await evaluateUnifiedSpecialists(id));setSynthesis(await getUnifiedSynthesis(id));setReview(await getUnifiedReviewDecision(id))}
    catch(e){setMessage(e instanceof Error?e.message:"Specialist evaluation unavailable")}
    finally{setBusy(false)}
  }
@@ -40,6 +42,11 @@ export default function UnifiedSpecialistViewer({id}:{id:string}){
    <h4>Supported source findings</h4><ul>{synthesis.synthesis.supported_source_findings.map((v,i)=><li key={i}>{v.specialist}: {v.finding}</li>)}</ul>
    <h4>Contextual links</h4><ul>{synthesis.synthesis.validated_contextual_links.map((v,i)=><li key={i}>{v.type} · {v.source_id}</li>)}</ul>
    <p className="muted">No verified identity-to-SSH or person-to-PPE attribution. No causal finding or unified severity.</p></div>}
+   {review&&<div className="evidenceItem"><h4>Deterministic Unified Evidence Review</h4>
+   <p><b>{review.decision.status.replaceAll("_"," ")}</b> · {review.decision.response_mode.replaceAll("_"," ")} · Severity NOT ASSIGNED</p>
+   <p>{review.decision.policy_version}</p>
+   <ul>{review.decision.review_reasons.map(reason=><li key={reason}>{reason.replaceAll("_"," ")}</li>)}</ul>
+   <p className="muted">{review.decision.note} Autonomous action disabled.</p></div>}
    <p className="muted">Unified Decision: NOT RUN · No validated unified severity rule · Autonomous action disabled.</p>
  </section>;
 }
