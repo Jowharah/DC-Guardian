@@ -169,3 +169,5 @@ export const getFaceSSHCandidates=()=>request<FaceSSHCandidate[]>("/api/v1/cyber
 
 export type UnifiedCorrelationGroup={id:string;zone_id:string;domains:string[];evidence:{kind:string;domain:string;observation_id:string}[];edges:{type:string;left:[string,string];right:[string,string];source_id:string;zone_id:string;details:Record<string,string|number>}[];source_candidate_ids:string[];status:"CORRELATION_GROUP_CANDIDATE";decision:null;decision_severity:null;autonomous_action_allowed:false;identity_link_established:false;causal_relationship_established:false;note:string};
 export const getUnifiedCorrelations=()=>request<UnifiedCorrelationGroup[]>("/api/v1/correlations/unified");
+
+export const getUnifiedGraph=(id:string)=>request<IncidentGraph>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/graph`);
