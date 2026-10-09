@@ -79,8 +79,12 @@ export const createStandaloneEvent=(event:{domain:string;zone_id:string;state:st
 export const getTopologyOptions=()=>request<{zone_id:string;servers:string[];sensors:string[]}[]>("/api/v1/topology/options");
 
 export type SSHAssessment={source_ip:string|null;window_start:string|null;window_end:string|null;evidence_state:string;detector_votes:number;detector_combination:string;explicit_security_signal:boolean;usernames:string[];evidence:Record<string,unknown>};
-export type SSHLogResult={parsed_count:number;assessment_count:number;security_relevant_count:number;returned_count:number;truncated:boolean;assessments:SSHAssessment[];zone_id:string;server_id:string;retained:false;decision_severity:null};
+export type SSHLogResult={preview_id:string;parsed_count:number;assessment_count:number;security_relevant_count:number;returned_count:number;truncated:boolean;assessments:SSHAssessment[];zone_id:string;server_id:string;retained:false;decision_severity:null};
 export async function validateSSHLog(file:File,zone:string,server:string):Promise<SSHLogResult>{
  const body=new FormData();body.append("log",file);body.append("zone_id",zone);body.append("server_id",server);
  return request<SSHLogResult>("/api/v1/ssh/validate-log",{method:"POST",body});
 }
+
+export type PublishedSSH=SSHAssessment&{event_id:string;received_at:string;zone_id:string;server_id:string;record_type:"SSH_DETECTOR_EVIDENCE";source_type:string;decision_severity:null};
+export const getPublishedSSH=()=>request<PublishedSSH[]>("/api/v1/ssh/published");
+export const publishSSH=(preview_id:string,indices:number[])=>request<{published_event_ids:string[]}>("/api/v1/ssh/publish",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({preview_id,indices})});
