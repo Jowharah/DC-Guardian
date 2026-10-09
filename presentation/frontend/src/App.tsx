@@ -81,7 +81,8 @@ export default function App(){
  const groupedPPE=new Set(physicalPairs.map(x=>x.ppe_observation_id));
  const groupedFace=new Set([...physicalPairs.map(x=>x.face_observation_id),...faceSSHPairs.map(x=>x.face_observation_id)]);
  const groupedSSH=new Set(faceSSHPairs.map(x=>x.ssh_event_id));
- const unifiedSourceIds=new Set(unifiedGroups.filter(g=>g.domains.length>=3).flatMap(g=>g.source_candidate_ids));
+ // Preserve pair investigations until the unified Evidence Explorer exposes all source details.
+ const unifiedSourceIds=new Set<string>();
  const visiblePhysical=physicalPairs.filter(x=>!unifiedSourceIds.has(x.id));
  const visibleFaceSSH=faceSSHPairs.filter(x=>!unifiedSourceIds.has(x.id));
  const visibleOperational=operationalPairs.filter(x=>!unifiedSourceIds.has(x.id));
