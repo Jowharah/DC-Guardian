@@ -75,6 +75,8 @@ from presentation.backend.app.camera_topology import router as camera_topology_r
 app.include_router(camera_topology_router)
 from presentation.backend.app.face_ssh_specialists import router as face_ssh_specialists_router
 app.include_router(face_ssh_specialists_router)
+from presentation.backend.app.human_review_audit import router as human_review_audit_router
+app.include_router(human_review_audit_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
