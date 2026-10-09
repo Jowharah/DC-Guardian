@@ -75,3 +75,5 @@ export const changeEmployeeAccess=(person_id:string,zone_id:string,action:"GRANT
 export type StandaloneEvent={event_id:string;zone_id:string;received_at:string;domain:string;state:string;title:string;asset_id:string;description:string;record_type:"STANDALONE_EVIDENCE";source_type:"OPERATOR_SYNTHETIC";decision_severity:null};
 export const getStandaloneEvents=()=>request<StandaloneEvent[]>("/api/v1/events/standalone");
 export const createStandaloneEvent=(event:{domain:string;zone_id:string;state:string;title:string;asset_id:string;description:string})=>request<StandaloneEvent>("/api/v1/events/standalone",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(event)});
+
+export const getTopologyOptions=()=>request<{zone_id:string;servers:string[];sensors:string[]}[]>("/api/v1/topology/options");
