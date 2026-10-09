@@ -24,13 +24,13 @@ export default function FaceSSHSpecialistViewer({id}:{id:string}){
  {error&&<p role="alert">{error}</p>}
  {result&&<>
  <p>Evaluated: {new Date(result.evaluated_at).toLocaleString()}</p>
- {Object.entries(result.specialists).map(([name,a])=><div key={name}>
+ {Object.entries(result.specialists).map(([name,a])=><details key={name} className="evidenceItem"><summary>{name.replaceAll("_"," ").toUpperCase()} · {a.grounding_status} · View full assessment</summary>
  <h4>{name.replaceAll("_"," ").toUpperCase()} · {a.grounding_status}</h4>
  <p>{a.assessment}</p>
  <h4>Supported findings</h4><ul>{a.supported_findings.filter(Boolean).map((v,i)=><li key={i}>{v}</li>)}</ul>
  <h4>Limitations</h4><ul>{a.limitations.filter(Boolean).map((v,i)=><li key={i}>{v}</li>)}</ul>
  <h4>Approved citations</h4><ul>{a.citations.map((c,i)=><li key={i}>{c.document_id} / {c.chunk_id}</li>)}</ul>
- </div>)}
+ </details>)}
  <h4>Deterministic Evidence Review · {result.review.status.replaceAll("_"," ")}</h4>
  <p>Zone authorization: {result.authorization.status} · {result.authorization.source}</p>
  <ul>{result.review.reasons.map(x=><li key={x}>{x.replaceAll("_"," ")}</li>)}</ul>
