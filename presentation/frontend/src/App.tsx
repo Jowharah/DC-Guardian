@@ -48,6 +48,12 @@ export default function App(){
  const [selectedOperational,setSelectedOperational]=useState<OperationalCorrelation|null>(null);
  useEffect(()=>{getScenarios().then(setScenarios).catch(()=>setError("Presentation API unavailable. Start FastAPI on port 8000."))},[]);
  useEffect(()=>{let active=true;const refresh=()=>{getIncidents().then(items=>{if(active)setFeed(items)}).catch(()=>{});getPPEObservations().then(items=>{if(active)setPpeFeed(items)}).catch(()=>{if(active)setPpeFeed([])});getFaceObservations().then(items=>{if(active)setFaceFeed(items)}).catch(()=>{if(active)setFaceFeed([])});getStandaloneEvents().then(items=>{if(active)setStandaloneFeed(items)}).catch(()=>{if(active)setStandaloneFeed([])});getPublishedSSH().then(items=>{if(active)setSshFeed(items)}).catch(()=>{if(active)setSshFeed([])});getMaintenanceEvents().then(items=>{if(active)setMaintenanceFeed(items)}).catch(()=>{if(active)setMaintenanceFeed([])});getEnvironmentalEvents().then(items=>{if(active)setEnvironmentFeed(items)}).catch(()=>{if(active)setEnvironmentFeed([])});getOperationalCorrelations().then(items=>{if(active)setOperationalPairs(items)}).catch(()=>{if(active)setOperationalPairs([])})};refresh();const timer=setInterval(refresh,5000);return()=>{active=false;clearInterval(timer)}},[]);
+ // Refresh the open investigation when a saved Decision is published.
+ useEffect(()=>{setSelectedOperational(current=>{
+   if(!current)return null;
+   const updated=operationalPairs.find(p=>p.id===current.id);
+   return updated??current;
+ });},[operationalPairs]);
  const pairedMaintenance=new Set(operationalPairs.map(p=>p.maintenance_event_id));
  const pairedEnvironment=new Set(operationalPairs.map(p=>p.environment_event_id));
  // Suppress duplicate presentation only, never delete persisted Evidence.
