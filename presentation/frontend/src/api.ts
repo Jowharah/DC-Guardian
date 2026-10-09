@@ -163,3 +163,6 @@ export const getPhysicalPersonAssociation=(id:string)=>request<PhysicalPersonAss
 
 export type PhysicalReviewResult={candidate_id:string;specialist_evaluated_at:string;decision:{policy_version:string;status:string;severity:null;response_mode:string;autonomous_action_allowed:false;reasons:string[];identity_link_established:false;confirmed_ppe_violation:false;decision_v1_severity_evaluated:false}};
 export const getPhysicalReview=(id:string)=>request<PhysicalReviewResult>(`/api/v1/physical/image-correlations/${encodeURIComponent(id)}/review-decision`);
+
+export type FaceSSHCandidate={id:string;zone_id:string;face_observation_id:string;ssh_event_id:string;camera_id:string;server_id:string;face_capture_time:string;ssh_original_time:string;time_difference_seconds:number;face_recognition_status:string;ssh_evidence_state:string;status:"CONTROLLED_CANDIDATE";decision_severity:null;explanation:string};
+export const getFaceSSHCandidates=()=>request<FaceSSHCandidate[]>("/api/v1/cyber/face-ssh/candidates");
