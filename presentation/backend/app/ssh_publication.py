@@ -89,3 +89,35 @@ def published(principal: Principal = Depends(current_principal)):
              "zone_id":zone,"server_id":server,"record_type":"SSH_DETECTOR_EVIDENCE",
              "source_type":"OPERATOR_UPLOADED_OPENSSH_LOG","decision_severity":None}
             for eid,received,zone,server,payload in rows if zone in principal.zones]
+
+@router.get("/api/v1/ssh/published/{event_id}/reasoning-preview")
+def reasoning_preview(event_id: str, principal: Principal = Depends(current_principal)):
+    """Validate the actual published detector result against the Common Event adapter.
+
+    Read-only: no Neo4j writes, correlation, Response or Decision claims.
+    """
+    authorize(principal, Permission.SSH_DETAIL)
+    with connect() as conn:
+        row = conn.execute("SELECT zone_id,server_id,payload FROM ssh_published_evidence WHERE event_id=?",
+                           (event_id,)).fetchone()
+    if row is None:
+        raise HTTPException(404, "Published SSH evidence not found")
+    zone,server,encoded = row
+    authorize(principal, Permission.SSH_DETAIL, zone)
+    from reasoning.adapters.ssh_event_adapter import adapt_ssh_assessment
+    assessment = json.loads(encoded)
+    try:
+        normalized = adapt_ssh_assessment(
+            assessment, dataset_name="Operator uploaded OpenSSH log",
+            source_type="CONTROLLED_TEST", event_id=event_id)
+    except (KeyError, TypeError, ValueError) as exc:
+        raise HTTPException(422, "Published evidence lacks required Reasoning contract fields; validate and publish again") from exc
+    return {"event_id":event_id, "status":"COMMON_EVENT_VALIDATED",
+            "pipeline_stage":"REASONING_ADAPTER_ONLY",
+            "zone_id":zone, "server_id":server,
+            "original_timestamp":normalized["timestamp"],
+            "source_ip":normalized["entities"]["source_ip"],
+            "evidence_state":normalized["assessment"]["state"],
+            "topology_mapping_performed":False,
+            "correlation_performed":False, "response_performed":False,
+            "decision_performed":False}
