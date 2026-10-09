@@ -51,10 +51,30 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
   ...ssh.filter(x=>valid(x.received_at)&&x.decision_record).map(x=>({id:x.event_id,kind:"SSH standalone",severity:x.decision_record!.decision.severity})),
   ...operational.filter(x=>valid(x.maintenance.received_at)&&x.decision_severity).map(x=>({id:x.id,kind:"Operational correlation",severity:x.decision_severity!}))
  ];
+
+ // These are separate workflow populations, not mutually exclusive incident severities.
+ // A candidate is never interpreted as a completed review or assigned Decision.
+ const pendingObservations=[
+   ...ppe.filter(x=>valid(x.created_at)&&x.review_status==="NOT_REVIEWED").map(x=>({id:x.observation_id,detail:"PPE · "+x.zone_id+" · Awaiting source review"})),
+   ...face.filter(x=>valid(x.created_at)&&x.review_status==="NOT_REVIEWED").map(x=>({id:x.observation_id,detail:"Face · "+x.zone_id+" · Awaiting source review"}))
+ ];
+ const otherObservations=[
+   ...ppe.filter(x=>valid(x.created_at)&&x.review_status!=="NOT_REVIEWED").map(x=>({id:x.observation_id,detail:"PPE · "+x.zone_id+" · "+x.review_status})),
+   ...face.filter(x=>valid(x.created_at)&&x.review_status!=="NOT_REVIEWED").map(x=>({id:x.observation_id,detail:"Face · "+x.zone_id+" · "+x.review_status}))
+ ];
+ const reviewRows={
+   "Awaiting source review":pendingObservations,
+   "Other source review states":otherObservations,
+   "Unified candidates (review not verified)":
+     candidates.map(x=>({id:x.id,detail:x.zone_id+" · Candidate; saved review not checked"})),
+   "Saved severity Decisions":decisionRows.map(x=>({id:x.id,detail:x.kind+" · "+x.severity}))
+ };
+ const reviewCounts=Object.entries(reviewRows).map(([name,rows])=>({name,value:rows.length}));
  const detailRows=selection?.type==="domain"?sources.filter(x=>x.kind===selection.value).map(x=>({id:x.id,detail:x.zone+" · "+new Date(x.time).toLocaleString()})):
  selection?.type==="zone"?sources.filter(x=>x.zone===selection.value).map(x=>({id:x.id,detail:x.kind+" · "+new Date(x.time).toLocaleString()})):
  selection?.type==="severity"?decisionRows.filter(x=>x.severity===selection.value).map(x=>({id:x.id,detail:x.kind+" · "+x.severity})):
- selection?.type==="correlation"?candidates.filter(x=>x.domains.join(" + ")===selection.value).map(x=>({id:x.id,detail:x.zone_id+" · "+x.evidence.length+" Evidence records"})):[];
+ selection?.type==="correlation"?candidates.filter(x=>x.domains.join(" + ")===selection.value).map(x=>({id:x.id,detail:x.zone_id+" · "+x.evidence.length+" Evidence records"})):
+ selection?.type==="review"?(reviewRows[selection.value as keyof typeof reviewRows]??[]):[];
 
  const daily=new Map<string,number>();
  for(const x of sources){const day=new Date(x.time).toLocaleDateString();daily.set(day,(daily.get(day)??0)+1)}
@@ -73,6 +93,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
  <section className="panel"><h3>Saved Decision severity</h3><p className="muted">Only assigned standalone or operational Decision severities. Candidates and provisional reviews excluded.</p><Donut items={severity} onSelect={value=>setSelection({type:"severity",value})}/></section>
  <section className="panel"><h3>Multi-domain correlation candidates</h3><p className="muted">One count per unified group; pairwise links inside groups are not counted as separate incidents.</p>{correlationBars.length?<Bars items={correlationBars} onSelect={value=>setSelection({type:"correlation",value})}/>:<p className="muted">No unified groups available.</p>}</section>
  <section className="panel"><h3>Evidence by zone</h3><p className="muted">Published source Evidence counts by declared zone.</p>{zones.length?<Bars items={zones} onSelect={value=>setSelection({type:"zone",value})}/>:<p className="muted">No source Evidence available.</p>}</section>
+ <section className="panel"><h3>Review & workflow status</h3><p className="muted">Separate counts for source-review states, unverified unified candidates, and saved severity Decisions. Categories can overlap across workflows; no candidate is treated as a completed review.</p><Bars items={reviewCounts} onSelect={value=>setSelection({type:"review",value})}/></section>
  <section className="panel"><h3>Evidence receipt activity</h3><p className="muted">Published Evidence by local receipt date.</p>{timeline.length?<Bars items={timeline}/>:<p className="muted">No Evidence received in this range.</p>}</section>
  </div>
  {selection&&<section className="panel analyticsDrilldown" aria-live="polite"><div className="analyticsFilterHeader"><div><h3>{selection.value}</h3><p className="muted">{selection.type.toUpperCase()} · {detailRows.length} matching authorized records</p></div><button type="button" className="analyticsClear" onClick={()=>setSelection(null)}>Clear selection</button></div>
