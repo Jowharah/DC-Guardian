@@ -175,3 +175,6 @@ export const getUnifiedGraph=(id:string)=>request<IncidentGraph>(`/api/v1/correl
 export type UnifiedSpecialistResult={group_id:string;evaluated_at:string;specialists:Record<string,SpecialistAssessment>;decision:null;decision_severity:null};
 export const getUnifiedSpecialists=(id:string)=>request<UnifiedSpecialistResult>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/specialists`);
 export const evaluateUnifiedSpecialists=(id:string)=>request<UnifiedSpecialistResult>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/specialists`,{method:"POST"});
+
+export type UnifiedSynthesisResult={group_id:string;specialists_evaluated_at:string;synthesis:{grounding_status:string;contributing_specialists:string[];supported_source_findings:{specialist:string;finding:string}[];source_limitations:{specialist:string;limitation:string}[];validated_contextual_links:{type:string;source_id:string}[];assessment:string;decision_status:"NOT_RUN";decision_severity:null;autonomous_action_allowed:false}};
+export const getUnifiedSynthesis=(id:string)=>request<UnifiedSynthesisResult>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/synthesis`);
