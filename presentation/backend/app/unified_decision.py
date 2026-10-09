@@ -14,7 +14,7 @@ router = APIRouter()
 POLICY = "DCG-UNIFIED-EVIDENCE-REVIEW-v1"
 GROUNDING = frozenset({"SUPPORTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT"})
 
-def evaluate(group, specialists):
+def evaluate(group, specialists, authorization=None):
     if not specialists:
         raise ValueError("Saved grounded specialists required")
     if any(a.get("grounding_status") not in GROUNDING for a in specialists.values()):
@@ -28,6 +28,13 @@ def evaluate(group, specialists):
         reasons.append("PPE_EVIDENCE_REQUIRES_SOURCE_REVIEW")
     if "face" in kinds:
         reasons.append("FACE_IDENTITY_CONTEXT_UNVERIFIED")
+        if isinstance(authorization, dict) and authorization.get("recognition_status") == "RECOGNIZED":
+            auth = authorization.get("zone_authorization")
+            if (isinstance(auth, dict)
+                    and auth.get("status") == "UNAUTHORIZED"
+                    and auth.get("source") == "NEO4J_READ_ONLY"
+                    and auth.get("reason") == "GRAPH_RELATIONSHIP_CHECK"):
+                reasons.append("RECOGNIZED_IDENTITY_NOT_AUTHORIZED_FOR_DECLARED_ZONE")
     if any(a["grounding_status"] == "INSUFFICIENT" for a in specialists.values()):
         reasons.append("SPECIALIST_GROUNDING_INSUFFICIENT")
     if "FACE_SSH_CONTEXT" in edges:
@@ -55,7 +62,11 @@ def read_review_decision(group_id: str, principal: Principal = Depends(current_p
     if row[1] != fingerprint(group):
         raise HTTPException(409, "Source correlations changed; re-evaluate specialists")
     try:
-        decision = evaluate(group, json.loads(row[2]))
+        authorization = None
+        if any(ref["kind"] == "face" for ref in group["evidence"]):
+            from presentation.backend.app.unified_specialists import source_evidence
+            authorization = source_evidence(group).get("face")
+        decision = evaluate(group, json.loads(row[2]), authorization)
     except (ValueError, TypeError, KeyError) as exc:
         raise HTTPException(409, "Invalid saved specialist evidence") from exc
     return {"group_id": group_id, "specialists_evaluated_at": row[0], "decision": decision}
