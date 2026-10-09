@@ -32,7 +32,7 @@ export const getGraphIntegrity=(id:string)=>request<GraphIntegrity>(`/api/v1/inc
 export type EvidenceDetail = {event_id:string;domain:string;source_type:string|null;availability:string;details:Record<string,unknown>};
 export const getEvidenceDetail=(scenarioId:string,eventId:string)=>request<EvidenceDetail>(`/api/v1/incidents/${encodeURIComponent(scenarioId)}/evidence/${encodeURIComponent(eventId)}`);
 
-export type PPEImageResult = {source_type:string;inference_executed:boolean;pipeline_status:string;image_stored:boolean;observation:PPEObservation|null;image_size:{width:number;height:number};assessment:{overall_status:string;person_count:number;people:Record<string,unknown>[];detections:{class_name:string;confidence:number;bbox_xyxy:number[]}[]}};
+export type PPEImageResult = {source_type:string;inference_executed:boolean;pipeline_status:string;image_stored:boolean;observation:PPEObservation|null;image_size:{width:number;height:number};assessment:{overall_status:string;person_count:number;people:{person_index:number;status:string;required_ppe_detected:string[];required_ppe_not_detected:string[];required_ppe:string[]}[];detections:{class_name:string;confidence:number;bbox_xyxy:number[]}[]}};
 export async function validatePPEImage(file:File, retain=false, zone="ZONE-B"):Promise<PPEImageResult>{
  const body=new FormData();body.append("image",file);body.append("retain",String(retain));if(retain)body.append("zone_id",zone);
  return request<PPEImageResult>("/api/v1/ppe/validate-image",{method:"POST",body});
