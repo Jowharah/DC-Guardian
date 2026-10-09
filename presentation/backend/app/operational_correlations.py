@@ -50,7 +50,18 @@ def correlate(maintenance,environment):
                   "scope":"ZONE","status":"CORRELATION_CANDIDATE",
                   "decision":None,"decision_severity":None,
                   "explanation":"Independent abnormal maintenance and environmental assessments in the same declared zone within 15 minutes. This does not establish causation, damage, or a Decision severity."})
-    # One-to-one deterministic grouping prevents duplicate feed entries for\n    # overlapping readings. Prefer closest observation-time matches.\n    chosen=[]\n    used_maintenance=set()\n    used_environment=set()\n    for pair in sorted(pairs,key=lambda x:(x["time_difference_seconds"],x["id"])):\n        if pair["maintenance_event_id"] in used_maintenance or pair["environment_event_id"] in used_environment:\n            continue\n        chosen.append(pair)\n        used_maintenance.add(pair["maintenance_event_id"])\n        used_environment.add(pair["environment_event_id"])\n    return chosen
+    # One-to-one deterministic grouping prevents duplicate feed entries for
+    # overlapping readings. Prefer closest observation-time matches.
+    chosen=[]
+    used_maintenance=set()
+    used_environment=set()
+    for pair in sorted(pairs,key=lambda x:(x["time_difference_seconds"],x["id"])):
+        if pair["maintenance_event_id"] in used_maintenance or pair["environment_event_id"] in used_environment:
+            continue
+        chosen.append(pair)
+        used_maintenance.add(pair["maintenance_event_id"])
+        used_environment.add(pair["environment_event_id"])
+    return chosen
 
 @router.get("/api/v1/operations/correlations")
 def operational_correlations(principal:Principal=Depends(current_principal)):
