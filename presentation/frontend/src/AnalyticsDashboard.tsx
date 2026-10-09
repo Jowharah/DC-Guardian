@@ -1,4 +1,5 @@
-import {useState} from "react";
+import {useEffect,useState} from "react";
+import {getUnifiedHumanReviews,type HumanReviewRecord} from "./api";
 import type {Incident,PublishedSSH,PPEObservation,FaceObservation,MaintenanceEvent,EnvironmentalEvent,OperationalCorrelation,UnifiedCorrelationGroup} from "./api";
 type Props={incidents:Incident[];ssh:PublishedSSH[];ppe:PPEObservation[];face:FaceObservation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];operational:OperationalCorrelation[];unified:UnifiedCorrelationGroup[];openMonitoring:()=>void};
 const palette=["#8564c8","#299eaa","#e0a449","#d76e96","#6592dc"];
@@ -18,6 +19,31 @@ function Bars({items,onSelect}:{items:{name:string;value:number}[];onSelect?:(na
 export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,environment,operational,unified,openMonitoring}:Props){
 
  const [range,setRange]=useState("all");
+ const [audit,setAudit]=useState<Record<string,HumanReviewRecord[]>>({});
+ const [auditUnavailable,setAuditUnavailable]=useState<string[]>([]);
+ const groupIds=unified.filter(g=>g.domains.length>=3).map(g=>g.id).sort().join("|");
+ useEffect(()=>{
+   let active=true;
+   const ids=groupIds?groupIds.split("|"):[];
+   const refresh=async()=>{
+     const responses=await Promise.all(ids.map(async id=>{
+       try{return {id,records:(await getUnifiedHumanReviews(id)).records}}
+       catch{return {id,records:null}}
+     }));
+     if(!active)return;
+     const records:Record<string,HumanReviewRecord[]>={};
+     const unavailable:string[]=[];
+     for(const response of responses){
+       if(response.records)records[response.id]=response.records;
+       else unavailable.push(response.id);
+     }
+     setAudit(records);setAuditUnavailable(unavailable);
+   };
+   void refresh();
+   const timer=setInterval(()=>void refresh(),5000);
+   return()=>{active=false;clearInterval(timer)};
+ },[groupIds]);
+
  const [selection,setSelection]=useState<{type:"domain"|"severity"|"zone"|"correlation";value:string}|null>(null);
  const cutoff=range==="all"?-Infinity:Date.now()-({"24h":1,"7d":7,"30d":30}[range]??0)*86400000;
  const valid=(value:string|null|undefined)=>{const t=Date.parse(value??"");return Number.isFinite(t)&&t<=Date.now()&&t>=cutoff};
@@ -62,12 +88,19 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
    ...ppe.filter(x=>valid(x.created_at)&&x.review_status!=="NOT_REVIEWED").map(x=>({id:x.observation_id,detail:"PPE · "+x.zone_id+" · "+x.review_status})),
    ...face.filter(x=>valid(x.created_at)&&x.review_status!=="NOT_REVIEWED").map(x=>({id:x.observation_id,detail:"Face · "+x.zone_id+" · "+x.review_status}))
  ];
+ const latestAudit=(id:string)=>audit[id]?.at(-1);
+ const withOutcome=(outcome:HumanReviewRecord["outcome"])=>candidates.filter(x=>latestAudit(x.id)?.outcome===outcome).map(x=>({
+  id:x.id,detail:x.zone_id+" · "+outcome.replaceAll("_"," ")+" · Human review recorded"
+ }));
  const reviewRows={
-   "Awaiting source review":pendingObservations,
-   "Other source review states":otherObservations,
-   "Unified candidates (review not verified)":
-     candidates.map(x=>({id:x.id,detail:x.zone_id+" · Candidate; saved review not checked"})),
-   "Saved severity Decisions":decisionRows.map(x=>({id:x.id,detail:x.kind+" · "+x.severity}))
+  "Awaiting source review":pendingObservations,
+  "Other source review states":otherObservations,
+  "Unified candidates without recorded human review":candidates.filter(x=>!latestAudit(x.id)&&!auditUnavailable.includes(x.id)).map(x=>({id:x.id,detail:x.zone_id+" · No human review record; deterministic review status not assessed here"})),
+  "Follow-up outstanding":withOutcome("NEEDS_FOLLOW_UP"),
+  "Human review inconclusive":withOutcome("INCONCLUSIVE"),
+  "Human review recorded — no finding":withOutcome("REVIEWED_NO_FINDING"),
+  "Review history unavailable":candidates.filter(x=>auditUnavailable.includes(x.id)).map(x=>({id:x.id,detail:x.zone_id+" · Audit history unavailable"})),
+  "Saved severity Decisions":decisionRows.map(x=>({id:x.id,detail:x.kind+" · "+x.severity}))
  };
  const reviewCounts=Object.entries(reviewRows).map(([name,rows])=>({name,value:rows.length}));
  const detailRows=selection?.type==="domain"?sources.filter(x=>x.kind===selection.value).map(x=>({id:x.id,detail:x.zone+" · "+new Date(x.time).toLocaleString()})):
@@ -93,7 +126,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
  <section className="panel"><h3>Saved Decision severity</h3><p className="muted">Only assigned standalone or operational Decision severities. Candidates and provisional reviews excluded.</p><Donut items={severity} onSelect={value=>setSelection({type:"severity",value})}/></section>
  <section className="panel"><h3>Multi-domain correlation candidates</h3><p className="muted">One count per unified group; pairwise links inside groups are not counted as separate incidents.</p>{correlationBars.length?<Bars items={correlationBars} onSelect={value=>setSelection({type:"correlation",value})}/>:<p className="muted">No unified groups available.</p>}</section>
  <section className="panel"><h3>Evidence by zone</h3><p className="muted">Published source Evidence counts by declared zone.</p>{zones.length?<Bars items={zones} onSelect={value=>setSelection({type:"zone",value})}/>:<p className="muted">No source Evidence available.</p>}</section>
- <section className="panel"><h3>Review & workflow status</h3><p className="muted">Separate counts for source-review states, unverified unified candidates, and saved severity Decisions. Categories can overlap across workflows; no candidate is treated as a completed review.</p><Bars items={reviewCounts} onSelect={value=>setSelection({type:"review",value})}/></section>
+ <section className="panel"><h3>Review & workflow status</h3><p className="muted">Source-review states, recorded human outcomes, and saved severity Decisions are separate workflow populations. Follow-up is not investigation resolution.</p><Bars items={reviewCounts} onSelect={value=>setSelection({type:"review",value})}/></section>
  <section className="panel"><h3>Evidence receipt activity</h3><p className="muted">Published Evidence by local receipt date.</p>{timeline.length?<Bars items={timeline}/>:<p className="muted">No Evidence received in this range.</p>}</section>
  </div>
  {selection&&<section className="panel analyticsDrilldown" aria-live="polite"><div className="analyticsFilterHeader"><div><h3>{selection.value}</h3><p className="muted">{selection.type.toUpperCase()} · {detailRows.length} matching authorized records</p></div><button type="button" className="analyticsClear" onClick={()=>setSelection(null)}>Clear selection</button></div>
