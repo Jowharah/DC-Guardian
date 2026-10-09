@@ -25,6 +25,7 @@ from presentation.backend.app.operational_correlations import router as operatio
 from presentation.backend.app.operational_decision import router as operational_decision_router
 from presentation.backend.app.standalone_graph import router as standalone_graph_router
 from presentation.backend.app.image_metadata_api import router as image_metadata_router
+from presentation.backend.app.physical_image_correlations import router as physical_image_router
 
 app = FastAPI(
     title="DC-GUARDIAN Presentation API", version="0.1.0",
@@ -43,6 +44,7 @@ app.include_router(operational_correlation_router)
 app.include_router(operational_decision_router)
 app.include_router(standalone_graph_router)
 app.include_router(image_metadata_router)
+app.include_router(physical_image_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
