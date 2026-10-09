@@ -54,7 +54,10 @@ export default function CorrelationTestingPanel({openMonitoring,openUnified}:Pro
      <p>{g.evidence.length} Evidence records · {g.edges.length} explicit source links · Candidate only</p>
      <button type="button" onClick={()=>openUnified(g)}>Open unified investigation</button>
    </div>)}
-   {pairCount>0&&<p className="muted">Two-domain investigations are available in Monitoring Center. Groups already included above are not counted twice.</p>}
+   {operational.filter(x=>!combined.has(x.id)).map(x=><div key={x.id} className="evidenceItem"><p><b>Environmental + Maintenance</b> · {x.zone_id} · {x.status.replaceAll("_"," ")}</p><p className="muted">{x.maintenance_event_id} + {x.environment_event_id} · {x.time_difference_seconds} seconds apart</p></div>)}
+   {physical.filter(x=>!combined.has(x.id)).map(x=><div key={x.id} className="evidenceItem"><p><b>PPE + Face</b> · {x.zone_id} · Controlled candidate</p><p className="muted">{x.ppe_observation_id} + {x.face_observation_id}</p></div>)}
+   {faceSSH.filter(x=>!combined.has(x.id)).map(x=><div key={x.id} className="evidenceItem"><p><b>Face + SSH</b> · {x.zone_id} · Contextual candidate</p><p className="muted">{x.face_observation_id} + {x.ssh_event_id} · {x.ssh_time_provenance}</p></div>)}
+   {pairCount>0&&<p className="muted">Open Monitoring Center to investigate two-domain candidates. Contributing pairs already in unified groups are suppressed here.</p>}
    <button type="button" disabled={loading} onClick={()=>void refresh()}>{loading?"Checking…":"Check correlations now"}</button>
    <button type="button" onClick={openMonitoring}>Open Monitoring Center</button>
  </div>;
