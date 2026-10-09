@@ -63,3 +63,6 @@ export async function getFaceImage(id:string):Promise<Blob>{
  if(!response.ok)throw new Error(`Face image unavailable (${response.status})`);
  return response.blob();
 }
+
+export type FaceZoneAuthorization={status:"AUTHORIZED"|"UNAUTHORIZED"|"UNKNOWN";source:string;reason:string};
+export const getFaceAuthorization=(id:string)=>request<FaceZoneAuthorization>(`/api/v1/face/observations/${encodeURIComponent(id)}/authorization`);
