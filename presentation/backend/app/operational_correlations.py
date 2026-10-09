@@ -4,11 +4,13 @@ Candidate correlation only: no synthetic graph links, specialist claims or
 Decision severity are manufactured. Individual Evidence remains persisted.
 """
 from datetime import datetime,timezone
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter,Depends,HTTPException
 from presentation.backend.app.authentication import current_principal,authorize
 from presentation.backend.app.authorization import Principal,Permission
 from presentation.backend.app.maintenance_workflow import list_events as maintenance_events
 from presentation.backend.app.environment_workflow import list_events as environmental_events
+from presentation.backend.app.graph_view import project_node
+from reasoning.graph.ingest_event import create_driver,NEO4J_DATABASE
 
 router=APIRouter()
 WINDOW_SECONDS=15*60
@@ -69,3 +71,48 @@ def operational_correlations(principal:Principal=Depends(current_principal)):
     authorize(principal,Permission.MAINTENANCE_DETAIL)
     authorize(principal,Permission.ENVIRONMENT_DETAIL)
     return correlate(maintenance_events(principal),environmental_events(principal))
+
+@router.get("/api/v1/operations/correlations/{candidate_id}/graph")
+def operational_graph(candidate_id:str,principal:Principal=Depends(current_principal)):
+    authorize(principal,Permission.GRAPH_READ)
+    authorize(principal,Permission.MAINTENANCE_DETAIL)
+    authorize(principal,Permission.ENVIRONMENT_DETAIL)
+    match=next((p for p in correlate(maintenance_events(principal),environmental_events(principal))
+                if p["id"]==candidate_id),None)
+    if match is None:
+        raise HTTPException(404,"Operational correlation candidate not found")
+    zone=match["zone_id"]
+    authorize(principal,Permission.GRAPH_READ,zone)
+    authorize(principal,Permission.MAINTENANCE_DETAIL,zone)
+    authorize(principal,Permission.ENVIRONMENT_DETAIL,zone)
+    maintenance_id=match["maintenance"]["workflow"].get("graph_event_id")
+    env_ids=match["environment"].get("evidence_event_ids",[])
+    ids=([maintenance_id] if maintenance_id else [])+[eid+"-MAPPED" for eid in env_ids if eid.startswith("ENV-EVT-")]
+    if not ids:
+        raise HTTPException(409,"No mapped Neo4j Evidence event references")
+    nodes={}
+    edges={}
+    query="""MATCH (e:Event) WHERE e.event_id IN $ids
+       WITH e ORDER BY e.event_id LIMIT 30
+       OPTIONAL MATCH (e)-[r]-(n)
+       RETURN e,r,n LIMIT 150"""
+    try:
+        driver=create_driver()
+        try:
+            with driver.session(database=NEO4J_DATABASE,default_access_mode="READ") as session:
+                for row in session.run(query,ids=ids):
+                    for node in (row["e"],row["n"]):
+                        if node is not None:
+                            projected=project_node(node,principal,zone)
+                            nodes[projected["id"]]=projected
+                    relation=row["r"]
+                    if relation is not None:
+                        rid=str(relation.element_id)
+                        edges[rid]={"id":rid,"source":str(relation.start_node.element_id),
+                                    "target":str(relation.end_node.element_id),"type":relation.type}
+        finally:
+            driver.close()
+    except Exception as exc:
+        raise HTTPException(503,"Neo4j graph unavailable") from exc
+    return {"scenario_id":candidate_id,"source":"NEO4J_READ_ONLY",
+            "nodes":list(nodes.values()),"edges":list(edges.values())}
