@@ -274,3 +274,53 @@ def specialist_response(event_id: str, principal: Principal = Depends(current_pr
         raise
     except Exception as exc:
         raise HTTPException(503,"Cybersecurity specialist unavailable") from exc
+
+@router.post("/api/v1/ssh/published/{event_id}/decision")
+def standalone_decision(event_id: str, principal: Principal = Depends(current_principal)):
+    """Execute validated SSH-only Reasoning/Response/Decision; no synthetic companions."""
+    authorize(principal, Permission.SSH_DETAIL)
+    with connect() as conn:
+        row=conn.execute("SELECT zone_id,server_id,payload FROM ssh_published_evidence WHERE event_id=?",
+                         (event_id,)).fetchone()
+    if row is None:
+        raise HTTPException(404,"Published SSH evidence not found")
+    zone,server,encoded=row
+    authorize(principal, Permission.SSH_DETAIL, zone)
+    authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+    from presentation.backend.app.ssh_graph_ingestion import prepare_mapped_ssh
+    from presentation.backend.app.ssh_correlation import check_ssh_correlations
+    from presentation.backend.app.ssh_response import assess_standalone_ssh
+    from presentation.backend.app.ssh_decision import decide_standalone_ssh
+    assessment=json.loads(encoded)
+    try:
+        mapped=prepare_mapped_ssh(event_id,assessment,server,zone)
+    except (ValueError,KeyError,TypeError) as exc:
+        raise HTTPException(422,"Invalid SSH Reasoning contract") from exc
+    from reasoning.graph.ingest_event import create_driver,NEO4J_DATABASE
+    try:
+        driver=create_driver()
+        try:
+            with driver.session(database=NEO4J_DATABASE,default_access_mode="READ") as session:
+                found=session.run("MATCH (e:Event {event_id:$id}) RETURN e.event_id AS id",
+                                  id=mapped["event_id"]).single()
+        finally:
+            driver.close()
+        if found is None:
+            raise HTTPException(409,"Ingest SSH Evidence into Neo4j first")
+        correlation=check_ssh_correlations(mapped["provenance"]["scenario_id"],mapped["event_id"])
+        if correlation["status"]!="NO_CORRELATION":
+            raise HTTPException(409,"Correlated evidence requires multi-domain Decision workflow")
+        specialist=assess_standalone_ssh(event_id,assessment,zone,server)
+        decision=decide_standalone_ssh(assessment,correlation,specialist)
+    except HTTPException:
+        raise
+    except ValueError as exc:
+        raise HTTPException(422,"Standalone Decision contract invalid") from exc
+    except Exception as exc:
+        raise HTTPException(503,"Standalone Decision dependencies unavailable") from exc
+    return {"event_id":event_id,"zone_id":zone,"server_id":server,
+            "source_ip":assessment["source_ip"],"evidence_state":assessment["evidence_state"],
+            "correlation":correlation,"specialist":specialist,"decision":decision,
+            "record_type":"STANDALONE_SSH_DECISION",
+            "incident_linked":False,"decision_source":"DCG-DECISION-v1",
+            "note":"SSH-only human-review Decision; no cross-domain incident inferred."}
