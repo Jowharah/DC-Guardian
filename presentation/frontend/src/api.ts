@@ -160,3 +160,6 @@ export const evaluatePhysicalSpecialist=(id:string)=>request<PhysicalSpecialistR
 
 export type PhysicalPersonAssociation={candidate_id:string;recognized_person_id:string|null;status:"MATCH_CANDIDATE"|"AMBIGUOUS"|"NO_MATCH"|"NOT_EVALUATED";person_index:number|null;ppe_status:string|null;identity_link_established:false;decision_severity:null;reason:string;face_containment_ratio?:number};
 export const getPhysicalPersonAssociation=(id:string)=>request<PhysicalPersonAssociation>(`/api/v1/physical/image-correlations/${encodeURIComponent(id)}/person-association`);
+
+export type PhysicalReviewResult={candidate_id:string;specialist_evaluated_at:string;decision:{policy_version:string;status:string;severity:null;response_mode:string;autonomous_action_allowed:false;reasons:string[];identity_link_established:false;confirmed_ppe_violation:false;decision_v1_severity_evaluated:false}};
+export const getPhysicalReview=(id:string)=>request<PhysicalReviewResult>(`/api/v1/physical/image-correlations/${encodeURIComponent(id)}/review-decision`);
