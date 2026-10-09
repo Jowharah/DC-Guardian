@@ -171,3 +171,7 @@ export type UnifiedCorrelationGroup={id:string;zone_id:string;domains:string[];e
 export const getUnifiedCorrelations=()=>request<UnifiedCorrelationGroup[]>("/api/v1/correlations/unified");
 
 export const getUnifiedGraph=(id:string)=>request<IncidentGraph>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/graph`);
+
+export type UnifiedSpecialistResult={group_id:string;evaluated_at:string;specialists:Record<string,SpecialistAssessment>;decision:null;decision_severity:null};
+export const getUnifiedSpecialists=(id:string)=>request<UnifiedSpecialistResult>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/specialists`);
+export const evaluateUnifiedSpecialists=(id:string)=>request<UnifiedSpecialistResult>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/specialists`,{method:"POST"});
