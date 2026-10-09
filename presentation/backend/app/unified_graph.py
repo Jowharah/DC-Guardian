@@ -86,6 +86,18 @@ def unified_graph(group_id:str,principal:Principal=Depends(current_principal)):
                     if assessment.get("recognition_status")=="RECOGNIZED" and assessment.get("person_id"):
                         recognized.add(assessment["person_id"])
                 if recognized:
+                    # Show recognized graph identities even without an authorization
+                    # edge for the declared zone. Do not fabricate an edge.
+                    for row in session.run(
+                        "MATCH (p:Person) WHERE p.person_id IN $people RETURN p LIMIT 30",
+                        people=sorted(recognized)):
+                        projected=project_node(row["p"],principal,group["zone_id"])
+                        nodes[projected["id"]]=projected
+                    for row in session.run(
+                        "MATCH (z:Zone {zone_id:$zone}) RETURN z LIMIT 1",
+                        zone=group["zone_id"]):
+                        projected=project_node(row["z"],principal,group["zone_id"])
+                        nodes[projected["id"]]=projected
                     auth_query="""MATCH (p:Person)-[r:AUTHORIZED_FOR]->(z:Zone {zone_id:$zone})
                         WHERE p.person_id IN $people
                         RETURN p,r,z LIMIT 30"""
