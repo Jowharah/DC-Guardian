@@ -9,11 +9,6 @@ export default function UnifiedHumanReviewForm({id,canSubmit}:{id:string;canSubm
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");
  const [message,setMessage]=useState("");
- useEffect(()=>{
-  let active=true;setRecords([]);setError("");setMessage("");setAck(false);setRationale("");
-  getUnifiedHumanReviews(id).then(r=>{if(active)setRecords(r.records)}).catch(()=>{if(active)setError("Audit history unavailable; review submission disabled until history can be loaded.")});
-  return()=>{active=false};
- },[id]);
  const [historyReady,setHistoryReady]=useState(false);
  useEffect(()=>{let active=true;setHistoryReady(false);getUnifiedHumanReviews(id).then(r=>{if(active){setRecords(r.records);setHistoryReady(true);setError("")}}).catch(()=>{if(active){setHistoryReady(false);setError("Audit history unavailable; submission disabled.")}});return()=>{active=false}},[id]);
  async function submit(){
