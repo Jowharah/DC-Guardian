@@ -10,6 +10,7 @@ from presentation.backend.app.authentication import current_principal, authorize
 from presentation.backend.app.authorization import Principal, Permission
 from presentation.backend.app.ppe_image_validation import MAX_IMAGE_BYTES, validate_image
 from presentation.backend.app import face_observations
+from presentation.backend.app.face_zone_authorization import assess as assess_zone
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -97,6 +98,19 @@ def face_detail(oid: str, principal: Principal = Depends(current_principal)):
         raise HTTPException(404, "Observation not found")
     authorize(principal, Permission.PERSON_DETAIL, item["zone_id"])
     return item
+
+@router.get("/api/v1/face/observations/{oid}/authorization")
+def face_authorization(oid: str, principal: Principal = Depends(current_principal)):
+    authorize(principal, Permission.PERSON_DETAIL)
+    item = face_observations.get(oid)
+    if item is None:
+        raise HTTPException(404, "Observation not found")
+    authorize(principal, Permission.PERSON_DETAIL, item["zone_id"])
+    assessment = item["assessment"]
+    if assessment.get("recognition_status") != "RECOGNIZED":
+        return {"status": "UNKNOWN", "source": "RECOGNITION_ASSESSMENT",
+                "reason": "IDENTITY_NOT_RECOGNIZED"}
+    return assess_zone(assessment.get("person_id"), item["zone_id"])
 
 @router.get("/api/v1/face/observations/{oid}/image")
 def face_image(oid: str, principal: Principal = Depends(current_principal)):
