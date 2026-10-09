@@ -28,6 +28,7 @@ def db():
       event_id TEXT PRIMARY KEY,received_at TEXT NOT NULL,zone_id TEXT NOT NULL,
       sensor_id TEXT NOT NULL,assessment_json TEXT NOT NULL,
       history_json TEXT NOT NULL,workflow_json TEXT NOT NULL)""")
+    con.execute("""CREATE TABLE IF NOT EXISTS environmental_batches(\n      batch_id TEXT PRIMARY KEY,received_at TEXT NOT NULL,zone_id TEXT NOT NULL,\n      sensor_id TEXT NOT NULL,assessment_json TEXT NOT NULL,\n      history_json TEXT NOT NULL,workflow_json TEXT NOT NULL,\n      event_ids_json TEXT NOT NULL)""")
     return con
 
 def map_sensor(event_id,assessment,zone):
@@ -107,12 +108,32 @@ def process_sensor_batch(rows,zone,sensor,publish):
                             "detail":"Approved knowledge or Response provider unavailable"}
         workflow={"stages":stages,"correlation":{"status":"CORRELATED" if correlated else "NO_CORRELATION",
                  "scope":"BATCH_SCENARIO_ONLY"},"specialist":specialist,"decision":None}
-        with db() as conn:
-            conn.execute("INSERT INTO environmental_evidence VALUES (?,?,?,?,?,?,?)",
-                (eid,datetime.now(timezone.utc).isoformat(),zone,sensor,
-                 json.dumps(assessment),json.dumps(rows),json.dumps(workflow)))
         published.append({"event_id":eid,"assessment":assessment,"workflow":workflow})
-    return {"published":True,"assessments":results,"events":published}
+    # Publish one aggregate feed entry for this sensor upload, preserving each
+    # individual assessment and Neo4j event for traceability.
+    abnormal=[x for x in published if x["assessment"]["anomaly_detected"]]
+    primary=(abnormal[-1] if abnormal else published[-1])
+    batch_id="ENV-BATCH-"+uuid4().hex.upper()
+    aggregate={"stages":[{"stage":"EVIDENCE","status":"COMPLETE","detail":f"{len(results)} readings assessed"},
+         {"stage":"REASONING","status":"COMPLETE"},
+         {"stage":"NEO4J","status":"COMPLETE","detail":f"{len(events)} Event nodes ingested"},
+         {"stage":"CORRELATION","status":"COMPLETE",
+          "detail":"CORRELATED" if any(x["workflow"]["correlation"]["status"]=="CORRELATED" for x in published) else "NO_CORRELATION"},
+         {"stage":"RESPONSE","status":"COMPLETE" if any(x["workflow"]["specialist"] for x in published) else "NOT_RUN",
+          "detail":"At least one grounded specialist assessment" if any(x["workflow"]["specialist"] for x in published) else "No completed grounded assessment"},
+         {"stage":"DECISION","status":"NOT_RUN","detail":"No validated standalone environmental severity rule"}],
+        "correlation":{"status":"CORRELATED" if any(x["workflow"]["correlation"]["status"]=="CORRELATED" for x in published) else "NO_CORRELATION",
+                       "scope":"BATCH_SCENARIO_ONLY"},
+        "specialist":next((x["workflow"]["specialist"] for x in reversed(published) if x["workflow"]["specialist"]),None),
+        "decision":None}
+    with db() as conn:
+        conn.execute("INSERT INTO environmental_batches VALUES (?,?,?,?,?,?,?,?)",
+          (batch_id,datetime.now(timezone.utc).isoformat(),zone,sensor,
+           json.dumps(primary["assessment"]),json.dumps(rows),json.dumps(aggregate),
+           json.dumps([x["event_id"] for x in published])))
+    return {"published":True,"assessments":results,
+            "events":[{"event_id":batch_id,"assessment":primary["assessment"],
+                       "workflow":aggregate,"reading_count":len(results)}]}
 
 @router.post("/api/v1/environment/validate")
 async def validate(file:UploadFile=File(...),zone_id:str=Form(...),sensor_id:str=Form(...),
@@ -161,10 +182,32 @@ async def validate(file:UploadFile=File(...),zone_id:str=Form(...),sensor_id:str
 def list_events(principal:Principal=Depends(current_principal)):
     authorize(principal,Permission.INCIDENT_READ)
     with db() as conn:
-        records=conn.execute("""SELECT event_id,received_at,zone_id,sensor_id,
-          assessment_json,history_json,workflow_json FROM environmental_evidence
+        batches=conn.execute("""SELECT batch_id,received_at,zone_id,sensor_id,
+          assessment_json,history_json,workflow_json,event_ids_json FROM environmental_batches
           ORDER BY received_at DESC LIMIT 200""").fetchall()
-    return [{"event_id":eid,"received_at":received,"zone_id":zone,"sensor_id":sensor,
-             "assessment":json.loads(a),"history":json.loads(h),"workflow":json.loads(w),
-             "record_type":"ENVIRONMENTAL_EVIDENCE","decision_severity":None}
-            for eid,received,zone,sensor,a,h,w in records if zone in principal.zones]
+        legacy=conn.execute("""SELECT event_id,received_at,zone_id,sensor_id,
+          assessment_json,history_json,workflow_json FROM environmental_evidence
+          ORDER BY received_at DESC LIMIT 500""").fetchall()
+    result=[]
+    for eid,received,zone,sensor,a,h,w,ids in batches:
+        if zone in principal.zones:
+            result.append({"event_id":eid,"received_at":received,"zone_id":zone,
+              "sensor_id":sensor,"assessment":json.loads(a),"history":json.loads(h),
+              "workflow":json.loads(w),"evidence_event_ids":json.loads(ids),
+              "record_type":"ENVIRONMENTAL_EVIDENCE","decision_severity":None})
+    # Backward compatibility: collapse previously published one-row-per-reading
+    # records by identical upload history, sensor and zone.
+    grouped={}
+    for eid,received,zone,sensor,a,h,w in legacy:
+        if zone not in principal.zones: continue
+        key=(zone,sensor,h)
+        group=grouped.setdefault(key,[])
+        group.append((eid,received,json.loads(a),json.loads(w)))
+    for (zone,sensor,h),items in grouped.items():
+        selected=next((x for x in items if x[2]["anomaly_detected"]),items[0])
+        result.append({"event_id":selected[0],"received_at":items[0][1],
+          "zone_id":zone,"sensor_id":sensor,"assessment":selected[2],
+          "history":json.loads(h),"workflow":selected[3],
+          "evidence_event_ids":[x[0] for x in items],
+          "record_type":"ENVIRONMENTAL_EVIDENCE","decision_severity":None})
+    return sorted(result,key=lambda x:x["received_at"],reverse=True)[:200]
