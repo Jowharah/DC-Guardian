@@ -178,3 +178,6 @@ export const evaluateUnifiedSpecialists=(id:string)=>request<UnifiedSpecialistRe
 
 export type UnifiedSynthesisResult={group_id:string;specialists_evaluated_at:string;synthesis:{grounding_status:string;contributing_specialists:string[];supported_source_findings:{specialist:string;finding:string}[];source_limitations:{specialist:string;limitation:string}[];validated_contextual_links:{type:string;source_id:string}[];assessment:string;decision_status:"NOT_RUN";decision_severity:null;autonomous_action_allowed:false}};
 export const getUnifiedSynthesis=(id:string)=>request<UnifiedSynthesisResult>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/synthesis`);
+
+export type UnifiedReviewDecision={group_id:string;specialists_evaluated_at:string;decision:{policy_version:string;status:string;response_mode:string;review_reasons:string[];severity:null;autonomous_action_allowed:false;note:string}};
+export const getUnifiedReviewDecision=(id:string)=>request<UnifiedReviewDecision>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/review-decision`);
