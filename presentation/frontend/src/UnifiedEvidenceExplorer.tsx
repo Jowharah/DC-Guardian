@@ -1,3 +1,4 @@
+import SSHEvidenceDetails from "./SSHEvidenceDetails";
 import PPEObservationViewer from "./PPEObservationViewer";
 import FaceObservationViewer from "./FaceObservationViewer";
 import type {UnifiedCorrelationGroup,PublishedSSH,MaintenanceEvent,EnvironmentalEvent} from "./api";
@@ -17,13 +18,7 @@ export default function UnifiedEvidenceExplorer({group,ssh,maintenance,environme
  if(ref.kind==="face")return <details key={key}><summary>Face Recognition · {ref.observation_id}</summary><FaceObservationViewer id={ref.observation_id}/></details>;
  if(ref.kind==="ssh"){
  const item=ssh.find(x=>x.event_id===ref.observation_id);
- return <details key={key}><summary>SSH · {ref.observation_id}</summary>{item?<div className="evidenceItem">
- <p>Detector: {item.evidence_state} · Source IP: {item.source_ip??"Unavailable"} · Server: {item.server_id}</p>
- <p>Original window: {item.window_start??"Unavailable"} · Received: {new Date(item.received_at).toLocaleString()}</p>
- <p>Usernames: {item.usernames?.join(", ")||"Unavailable"} · Detector votes: {item.detector_votes}</p>
- <pre className="ppeJson">{JSON.stringify(item.evidence,null,2)}</pre>
- <p>Saved standalone Decision: {item.decision_record?.decision.severity??"NOT RUN"}</p>
- </div>:<p className="muted">SSH source unavailable or not returned by the authorized Evidence API.</p>}</details>
+ return <details key={key}><summary>SSH · {ref.observation_id}</summary>{item?<SSHEvidenceDetails event={item}/>:<p className="muted">SSH source unavailable or not returned by the authorized Evidence API.</p>}</details>
  }
  if(ref.kind==="maintenance"){
  const item=maintenance.find(x=>x.event_id===ref.observation_id);
