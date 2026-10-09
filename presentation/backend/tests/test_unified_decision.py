@@ -30,3 +30,29 @@ def test_no_domains_does_not_assign_severity():
     result=evaluate({"evidence":[],"edges":[]},{"cybersecurity":{"grounding_status":"SUPPORTED"}})
     assert result["status"]=="OBSERVATION_RECORDED"
     assert result["severity"] is None
+
+def test_unauthorized_recognized_person_adds_explicit_reason():
+    result=evaluate(GROUP,{"cybersecurity":{"grounding_status":"SUPPORTED"}},
+                    {"recognition_status":"RECOGNIZED",
+                     "zone_authorization":{"status":"UNAUTHORIZED",
+                        "source":"NEO4J_READ_ONLY","reason":"GRAPH_RELATIONSHIP_CHECK"}})
+    assert "RECOGNIZED_IDENTITY_NOT_AUTHORIZED_FOR_DECLARED_ZONE" in result["review_reasons"]
+    assert result["severity"] is None
+    assert result["identity_to_ssh_established"] is False
+
+def test_authorized_or_unverified_status_does_not_add_reason():
+    for status,source in [("AUTHORIZED","NEO4J_READ_ONLY"),
+                          ("UNAUTHORIZED","OPERATOR_DECLARED"),
+                          ("UNKNOWN","NEO4J_READ_ONLY")]:
+        result=evaluate(GROUP,{"physical_security":{"grounding_status":"SUPPORTED"}},
+                        {"recognition_status":"RECOGNIZED",
+                         "zone_authorization":{"status":status,
+                            "source":source,"reason":"GRAPH_RELATIONSHIP_CHECK"}})
+        assert "RECOGNIZED_IDENTITY_NOT_AUTHORIZED_FOR_DECLARED_ZONE" not in result["review_reasons"]
+
+def test_unrecognized_face_cannot_trigger_unauthorized_reason():
+    result=evaluate(GROUP,{"physical_security":{"grounding_status":"SUPPORTED"}},
+                    {"recognition_status":"UNKNOWN",
+                     "zone_authorization":{"status":"UNAUTHORIZED",
+                         "source":"NEO4J_READ_ONLY","reason":"GRAPH_RELATIONSHIP_CHECK"}})
+    assert "RECOGNIZED_IDENTITY_NOT_AUTHORIZED_FOR_DECLARED_ZONE" not in result["review_reasons"]
