@@ -24,4 +24,5 @@ def test_preview_never_writes_graph():
     result=process_sensor_batch(rows,"ZONE-B","SEN-B-01",False)
     assert result["published"] is False
     assert result["events"]==[]
-    assert result["assessments"][0]["assessment"]=="HIGH_TEMPERATURE"
+    assert result["assessments"][0]["assessment"]=="NORMAL"
+    assert result["assessments"][0]["anomaly_detected"] is False
