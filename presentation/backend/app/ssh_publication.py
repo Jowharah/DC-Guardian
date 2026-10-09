@@ -207,3 +207,34 @@ def ingest_graph(event_id: str, principal: Principal = Depends(current_principal
             "original_timestamp":ingested["original_timestamp"],
             "correlation_performed":False,"response_performed":False,
             "decision_performed":False,"decision_severity":None}
+
+@router.post("/api/v1/ssh/published/{event_id}/check-correlation")
+def check_correlation(event_id: str, principal: Principal = Depends(current_principal)):
+    authorize(principal, Permission.SSH_DETAIL)
+    with connect() as conn:
+        row = conn.execute("SELECT zone_id,server_id,payload FROM ssh_published_evidence WHERE event_id=?",
+                           (event_id,)).fetchone()
+    if row is None:
+        raise HTTPException(404,"Published SSH evidence not found")
+    zone,server,encoded=row
+    authorize(principal, Permission.SSH_DETAIL, zone)
+    authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+    from presentation.backend.app.ssh_graph_ingestion import prepare_mapped_ssh
+    from presentation.backend.app.ssh_correlation import check_ssh_correlations
+    mapped=prepare_mapped_ssh(event_id,json.loads(encoded),server,zone)
+    from reasoning.graph.ingest_event import create_driver,NEO4J_DATABASE
+    try:
+        driver=create_driver()
+        try:
+            with driver.session(database=NEO4J_DATABASE,default_access_mode="READ") as session:
+                record=session.run("MATCH (e:Event {event_id:$id}) RETURN e.event_id AS id LIMIT 1",
+                                   id=mapped["event_id"]).single()
+        finally:
+            driver.close()
+        if record is None:
+            raise HTTPException(409,"Ingest this SSH evidence into Neo4j first")
+        return check_ssh_correlations(mapped["provenance"]["scenario_id"],mapped["event_id"])
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(503,"Correlation service unavailable") from exc
