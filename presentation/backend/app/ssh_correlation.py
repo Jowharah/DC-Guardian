@@ -13,8 +13,7 @@ def check_ssh_correlations(scenario_id: str, graph_event_id: str) -> dict:
             driver, scenario_id=scenario_id, window_minutes=15)
     finally:
         driver.close()
-    matches = [c for c in candidates if graph_event_id in c.get("event_ids", [])
-               or graph_event_id in c.get("evidence_event_ids", [])]
+    matches = [c for c in candidates if any(e.get("event_id") == graph_event_id for e in c.get("events", []))]
     # Correlation engine outputs may differ by rule; never return an unrelated pair.
     return {"status": "CORRELATED" if matches else "NO_CORRELATION",
             "correlation_count": len(matches), "scenario_id": scenario_id,
