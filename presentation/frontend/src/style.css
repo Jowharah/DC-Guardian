@@ -199,3 +199,20 @@ button:focus-visible,a:focus-visible{outline:3px solid #8392CF;outline-offset:3p
 .standaloneDetail .sshPipelineStage>b{overflow-wrap:anywhere}
 .standaloneDetail .sshPipelineStage>span{justify-self:end;text-align:center}
 .standaloneMeta>div>small:last-child{margin-top:7px;margin-bottom:0}
+
+
+/* Read-only Analytics Dashboard */
+.analyticsPage{display:grid;gap:18px}
+.analyticsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.analyticsGrid>.panel{min-width:0}
+.analyticsDonutLayout{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.analyticsDonutLayout svg{width:min(200px,100%);height:auto;flex:0 0 180px}
+.analyticsLegend{flex:1;min-width:180px;display:grid;gap:9px}
+.analyticsLegend>div{display:grid;grid-template-columns:12px minmax(0,1fr) auto;align-items:center;gap:9px;font-size:13px}
+.analyticsLegend>div>span:first-child{width:11px;height:11px;border-radius:3px}
+.analyticsBars{display:grid;gap:15px;margin-top:22px}
+.analyticsBarRow{display:grid;grid-template-columns:minmax(120px,1fr) minmax(70px,2fr) 30px;align-items:center;gap:12px;font-size:12px}
+.analyticsBarRow>span{overflow-wrap:anywhere}
+.analyticsTrack{height:13px;background:rgba(127,127,150,.16);border-radius:8px;overflow:hidden}
+.analyticsTrack>div{height:100%;border-radius:8px;min-width:0}
+@media(max-width:950px){.analyticsGrid{grid-template-columns:1fr}}
