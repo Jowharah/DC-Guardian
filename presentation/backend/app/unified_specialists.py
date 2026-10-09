@@ -62,6 +62,35 @@ def source_evidence(group):
             result["ssh"] = {k: a.get(k) for k in ("evidence_state", "source_ip", "window_start", "detector_votes", "usernames", "evidence")}
     return result
 
+def specialist_task(name, evidence, edges):
+    types = {edge["type"] for edge in edges}
+    context = (
+        "The correlation service has established a controlled contextual "
+        "FACE_SSH_CONTEXT candidate based on declared zone/time. "
+        "Acknowledge this candidate, but do not claim a verified real-world "
+        "association, actor identity, physical presence, or causation. "
+        if "FACE_SSH_CONTEXT" in types else
+        "Describe only the contextual links explicitly supplied; do not infer causation. "
+    )
+    if name == "cybersecurity":
+        return (context +
+                "Analyze the SSH detector results and original timestamp provenance. "
+                "Do not attribute SSH activity to a recognized person. "
+                "Do not claim there is no contextual candidate when one is supplied. "
+                "No severity or autonomous action.")
+    if "face" in evidence and "ppe" not in evidence:
+        return (context +
+                "Analyze only face recognition and independent zone authorization. "
+                "No PPE assessment is part of this investigation: do not discuss "
+                "missing PPE, PPE detectors, or person-to-PPE association. "
+                "Authorization is not proof of physical presence or entry. "
+                "No severity or autonomous action.")
+    return (context +
+            "Analyze only supplied face recognition, zone authorization and/or PPE "
+            "detector outcomes. Do not equate detector absence with physical absence, "
+            "or assert identity-to-PPE linkage without independent evidence. "
+            "No severity or autonomous action.")
+
 def run_agents(group, evidence):
     from response.rag.knowledge_eligibility import evaluate_knowledge_eligibility
     from response.rag.retrieve import retrieve_knowledge
@@ -95,7 +124,7 @@ def run_agents(group, evidence):
                                "causal_relationship_established": False,
                                "time_provenance": "CONTROLLED_CONTEXT_MAY_BE_OPERATOR_DECLARED_UNVERIFIED"},
             retrieved_evidence=knowledge,
-            task="Describe supported source findings and limits only. Do not attribute SSH activity to a recognized person, assert PPE identity linkage, infer causation, or assign severity.",
+            task=specialist_task(name, evidence, group["edges"]),
             domains=tuple(domains)))
         if assessment.get("grounding_status") not in ("SUPPORTED", "PARTIALLY_SUPPORTED", "INSUFFICIENT"):
             raise HTTPException(503, "Invalid specialist response contract")
