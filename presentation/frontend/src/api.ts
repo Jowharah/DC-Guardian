@@ -184,3 +184,6 @@ export const getUnifiedReviewDecision=(id:string)=>request<UnifiedReviewDecision
 
 export type PublishedCorrelationCheck={kind:string;observation_ids:string[];status:"CANDIDATES_FOUND"|"NO_ELIGIBLE_CORRELATION";groups:UnifiedCorrelationGroup[];checked_against:string;note:string};
 export const checkPublishedCorrelations=(kind:string,observation_ids:string[])=>request<PublishedCorrelationCheck>("/api/v1/correlations/check-published",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({kind,observation_ids})});
+
+export type ControlledSSHTimeResult={event_id:string;observed_at:string;provenance:string;original_detector_timestamp_unchanged:boolean;verified_observation_time:boolean};
+export const declareControlledSSHTime=(eventId:string,observedAt:string)=>request<ControlledSSHTimeResult>(`/api/v1/ssh/published/${encodeURIComponent(eventId)}/controlled-time`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({observed_at:observedAt,acknowledgment:true})});
