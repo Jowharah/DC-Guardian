@@ -1,9 +1,9 @@
 """Controlled same-source image pairing, no inferred camera authenticity or Decision."""
 from datetime import datetime,timezone
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter,Depends,HTTPException
 from presentation.backend.app.authentication import current_principal,authorize
 from presentation.backend.app.authorization import Principal,Permission
-from presentation.backend.app.image_source_hashes import pairs,connect as hash_connect
+from presentation.backend.app.image_source_hashes import connect as hash_connect
 from presentation.backend.app.image_metadata_store import get,connect as metadata_connect
 from presentation.backend.app import face_observations,ppe_observations
 
@@ -54,8 +54,13 @@ def image_correlations(principal:Principal=Depends(current_principal)):
                 if not eligible_pair(None,None,pm,fm):continue
                 delta=abs((parse_time(pm["capture_metadata"]["captured_at"])-parse_time(fm["capture_metadata"]["captured_at"])).total_seconds())
                 same_hash=bool(hashes.get(pid) and hashes.get(pid)==hashes.get(fid))
-                candidates.append((0 if same_hash else 1,delta,pid,fid,pm,fm,same_hash))
-        for _,delta,pid,fid,pm,fm,same_hash in sorted(candidates):
+                p_record=ppe_observations.get_observation(pid)
+                f_record=face_observations.get(fid)
+                if not p_record or not f_record:continue
+                receipt_gap=abs((parse_time(p_record["created_at"])-parse_time(f_record["created_at"])).total_seconds())
+                recent=max(parse_time(p_record["created_at"]).timestamp(),parse_time(f_record["created_at"]).timestamp())
+                candidates.append((0 if same_hash else 1,delta,receipt_gap,-recent,pid,fid,pm,fm,same_hash))
+        for _,delta,receipt_gap,_,pid,fid,pm,fm,same_hash in sorted(candidates):
             if pid in used or fid in used:continue
             p=ppe_observations.get_observation(pid)
             f=face_observations.get(fid)
@@ -66,6 +71,8 @@ def image_correlations(principal:Principal=Depends(current_principal)):
               "camera_id":pm["capture_metadata"]["camera_id"],
               "captured_at":pm["capture_metadata"]["captured_at"],
               "time_difference_seconds":delta,
+              "receipt_difference_seconds":receipt_gap,
+              "ppe_received_at":p["created_at"],"face_received_at":f["created_at"],
               "ppe_status":p["assessment"]["overall_status"],
               "face_status":f["assessment"]["recognition_status"],
               "source_match":"IDENTICAL_SOURCE_BYTES" if same_hash else "MATCHING_DECLARED_CAMERA_AND_TIME",
