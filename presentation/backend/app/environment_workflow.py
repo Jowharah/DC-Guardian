@@ -17,7 +17,7 @@ from evidence.environmental_monitoring.src.sensor_monitor import assess_sensor_r
 from reasoning.adapters.environmental_event_adapter import adapt_environmental_assessment
 from reasoning.graph.ingest_event import create_driver,ingest_environmental_event
 from reasoning.correlation.correlation_engine import find_cross_domain_correlations
-from reasoning.topology.topology_mapper import load_topology
+from reasoning.topology.topology_mapper import resolve_environmental_source
 router=APIRouter()
 MAX_BYTES=1024*1024
 
@@ -33,7 +33,11 @@ def db():
 def map_sensor(event_id,assessment,zone):
     event=adapt_environmental_assessment(assessment,dataset_name="Approved operator sensor CSV",
         source_type="CONTROLLED_TEST",event_id=event_id+"-MAPPED")
-    event["location"]["zone_id"]=zone
+    target=resolve_environmental_source(event)
+    if target["zone_id"]!=zone:
+        raise ValueError("Sensor topology zone mismatch")
+    event["location"].update({"zone_id":zone,"data_center_id":target["data_center_id"],"rack_id":target["rack_id"]})
+    event["evidence"]["topology_resolution"]={"mapping_source":target["mapping_source"],"monitors":target["monitors"]}
     event["provenance"].update({"original_event_id":event_id,"synthetic_mapping":True,
         "mapping_type":"SYNTHETIC_SCENARIO","scenario_id":"DCG-ENV-"+event_id.removeprefix("ENV-EVT-")})
     return event
@@ -104,6 +108,8 @@ async def validate(file:UploadFile=File(...),zone_id:str=Form(...),sensor_id:str
             raise ValueError("Invalid or duplicate timestamp")
         for col in ("temperature_c","humidity_pct"):
             frame[col]=pd.to_numeric(frame[col],errors="coerce")
+            if frame[col].notna().any() and not frame[col].dropna().map(lambda x: float("-inf")<x<float("inf")).all():
+                raise ValueError("Measurements must be finite")
         if frame[["temperature_c","humidity_pct"]].isna().all(axis=1).any():
             raise ValueError("Each row requires a measurement")
         rows=[]
