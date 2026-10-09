@@ -125,6 +125,7 @@ def process_sensor_batch(rows,zone,sensor,publish):
         "correlation":{"status":"CORRELATED" if any(x["workflow"]["correlation"]["status"]=="CORRELATED" for x in published) else "NO_CORRELATION",
                        "scope":"BATCH_SCENARIO_ONLY"},
         "specialist":next((x["workflow"]["specialist"] for x in reversed(published) if x["workflow"]["specialist"]),None),
+        "reading_states":[x["assessment"]["assessment"] for x in published],
         "decision":None}
     with db() as conn:
         conn.execute("INSERT INTO environmental_batches VALUES (?,?,?,?,?,?,?,?)",
