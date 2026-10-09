@@ -149,5 +149,7 @@ export const getStandaloneGraph=(kind:"ssh"|"maintenance"|"environment",id:strin
 export type ImageCaptureMetadata={capture_metadata:{camera_id:string;zone_id:string;captured_at:string;provenance:string}|null;graph_projection:{event_id:string;graph_status:string;provenance_status:string;correlation_status:string;decision_status:string}|null};
 export const getImageCaptureMetadata=(kind:"ppe"|"face",id:string)=>request<ImageCaptureMetadata>(`/api/v1/image-observations/${kind}/${encodeURIComponent(id)}/metadata`);
 
-export type PhysicalImageCandidate={id:string;zone_id:string;ppe_observation_id:string;face_observation_id:string;camera_id:string;captured_at:string;ppe_status:string;face_status:string;source_match:string;provenance:string;correlation_status:string;decision_severity:null;explanation:string};
+export type PhysicalImageCandidate={id:string;zone_id:string;ppe_observation_id:string;face_observation_id:string;camera_id:string;captured_at:string;ppe_status:string;face_status:string;source_match:string;provenance:string;time_difference_seconds:number;receipt_difference_seconds:number;ppe_received_at:string;face_received_at:string;correlation_status:string;decision_severity:null;explanation:string};
 export const getPhysicalImageCandidates=()=>request<PhysicalImageCandidate[]>("/api/v1/physical/image-correlations");
+
+export const getPhysicalImageGraph=(id:string)=>request<IncidentGraph>(`/api/v1/physical/image-correlations/${encodeURIComponent(id)}/graph`);
