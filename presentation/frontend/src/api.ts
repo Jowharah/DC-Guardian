@@ -95,3 +95,6 @@ export const previewSSHReasoning=(id:string)=>request<SSHReasoningPreview>(`/api
 export type SSHPipelineStage={stage:string;status:string;detail:string};
 export type SSHPipelineRun={event_id:string;source_ip:string|null;original_timestamp:string|null;server_id:string;zone_id:string;stages:SSHPipelineStage[];completed_full_pipeline:false;decision_severity:null;note:string};
 export const runSSHPipeline=(id:string)=>request<SSHPipelineRun>(`/api/v1/ssh/published/${encodeURIComponent(id)}/run-pipeline`,{method:"POST"});
+
+export type SSHGraphIngestion={status:"INGESTED";graph_event_id:string;scenario_id:string;source_ip:string;server_id:string;zone_id:string;original_timestamp:string;correlation_performed:false;response_performed:false;decision_performed:false;decision_severity:null};
+export const ingestSSHGraph=(id:string)=>request<SSHGraphIngestion>(`/api/v1/ssh/published/${encodeURIComponent(id)}/ingest-graph`,{method:"POST"});
