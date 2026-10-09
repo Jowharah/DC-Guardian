@@ -77,8 +77,36 @@ def process_sensor_batch(rows,zone,sensor,publish):
                  "detail":"Multi-domain workflow required" if correlated else "Standalone environmental Response not yet validated"},
                 {"stage":"DECISION","status":"NOT_RUN",
                  "detail":"No validated standalone environmental severity rule"}]
+        specialist=None
+        if assessment["anomaly_detected"] and not correlated:
+            try:
+                from response.agents.providers.openai_provider import OpenAIResponsesProvider
+                from response.agents.specialists.operations import OperationsSpecialist
+                from response.agents.specialists.base import SpecialistRequest
+                from response.rag.knowledge_eligibility import evaluate_knowledge_eligibility
+                from response.rag.retrieve import retrieve_knowledge
+                if not evaluate_knowledge_eligibility(domains=["ENVIRONMENTAL"])["eligible"]:
+                    raise RuntimeError("No approved environmental knowledge")
+                knowledge=retrieve_knowledge("Approved data center temperature humidity monitoring guidance",
+                    domains=["ENVIRONMENTAL"],top_k=3,ranking="controlled",abstain=False)
+                if not knowledge:
+                    raise RuntimeError("No approved environmental knowledge retrieved")
+                specialist=OperationsSpecialist(OpenAIResponsesProvider()).assess(
+                    SpecialistRequest(incident_evidence={
+                        "event_id":eid,"domains":["ENVIRONMENTAL"],"sensor_id":sensor,
+                        "zone_id":zone,"environmental_assessment":assessment,
+                        "correlation_status":"NO_CORRELATION",
+                        "causal_relationship_established":False,"root_cause_established":False},
+                        retrieved_evidence=knowledge,
+                        task="Assess standalone sensor evidence. Do not infer hardware damage, causation, or severity.",
+                        domains=("ENVIRONMENTAL",)))
+                stages[-2]={"stage":"RESPONSE","status":"COMPLETE",
+                            "detail":"Grounded Operations Specialist"}
+            except Exception:
+                stages[-2]={"stage":"RESPONSE","status":"UNAVAILABLE",
+                            "detail":"Approved knowledge or Response provider unavailable"}
         workflow={"stages":stages,"correlation":{"status":"CORRELATED" if correlated else "NO_CORRELATION",
-                 "scope":"BATCH_SCENARIO_ONLY"},"decision":None}
+                 "scope":"BATCH_SCENARIO_ONLY"},"specialist":specialist,"decision":None}
         with db() as conn:
             conn.execute("INSERT INTO environmental_evidence VALUES (?,?,?,?,?,?,?)",
                 (eid,datetime.now(timezone.utc).isoformat(),zone,sensor,
