@@ -38,7 +38,7 @@ def prepare_mapped_ssh(event_id: str, assessment: dict, server_id: str, zone_id:
         "zone_id": zone_id, "rack_id": target["rack_id"]})
     mapped["provenance"].update({
         "original_event_id": event_id,
-        "original_timestamp": original_time,
+        "original_timestamp": timestamp.isoformat(),
         "synthetic_mapping": True, "mapping_type": "SYNTHETIC_SCENARIO",
         "scenario_id": scenario_id})
     return mapped
