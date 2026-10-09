@@ -47,7 +47,10 @@ def group_edges(edges):
                 if node in members:continue
                 members.add(node);pending.extend(adjacency[node]-members)
             visited.update(members)
-            relevant=[e for e in zone_edges if tuple(e["left"]) in members and tuple(e["right"]) in members]
+            relevant=sorted(
+                (e for e in zone_edges if tuple(e["left"]) in members and tuple(e["right"]) in members),
+                key=lambda e:(e["type"],e["source_id"],tuple(e["left"]),tuple(e["right"]))
+            )
             if len(members)<2:continue
             refs=[{"kind":kind,"domain":DOMAIN[kind],"observation_id":oid} for kind,oid in sorted(members)]
             source_ids=sorted({e["source_id"] for e in relevant})
