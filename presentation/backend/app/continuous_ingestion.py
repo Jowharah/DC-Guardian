@@ -1,4 +1,4 @@
-"""Opt-in local file ingestion for the three existing Evidence workflows.
+"""Opt-in local file ingestion for all five Evidence workflows.
 
 Runs as a separate CLI process, not inside FastAPI. No filesystem watching
 threads are started by importing this module. Source files are never deleted.
@@ -106,7 +106,17 @@ async def dispatch(src,data,filename,principal,metadata=None):
         from presentation.backend.app.ssh_log_validation import process_ssh_log
         result=await process_ssh_log(file,src["zone_id"],src["server_id"],True,principal)
         events=result["events"]
-        return {"events":len(events),"partial":sum(x["status"]=="PARTIAL" for x in events)}
+        partial=sum(x["status"]=="PARTIAL" for x in events)
+        complete=sum(x["status"]=="DECISION_COMPLETE" for x in events)
+        return {"events":len(events),"partial":partial,
+                "parsed_count":result.get("parsed_count",0),
+                "assessment_count":result.get("assessment_count",0),
+                "security_relevant_count":result.get("security_relevant_count",0),
+                "decision_complete_count":complete,
+                "processing_outcome":("PROCESSED_NO_ANOMALY" if not events
+                  else "PARTIAL" if partial
+                  else "DECISION_COMPLETE" if complete==len(events)
+                  else "EVIDENCE_PUBLISHED")}
     if kind=="maintenance":
         from presentation.backend.app.maintenance_workflow import validate
         result=await validate(file,src["zone_id"],src["server_id"],True,principal)
@@ -169,6 +179,11 @@ async def scan_once(sources,db,principal):
                 status="PARTIAL" if output["partial"] else "COMPLETE"
                 counts["partial" if status=="PARTIAL" else "processed"]+=1
                 detail=json.dumps(output)
+                if kind=="ssh":
+                    LOG.info("%s: %s (%s parsed, %s assessments, %s security relevant, %s published, %s decisions)",
+                             path.name,output["processing_outcome"],output["parsed_count"],
+                             output["assessment_count"],output["security_relevant_count"],
+                             output["events"],output["decision_complete_count"])
             except Exception as exc:
                 status="FAILED"
                 counts["failed"]+=1
