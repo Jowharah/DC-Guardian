@@ -119,3 +119,10 @@ export function validateMaintenance(file:File,zone_id:string,server_id:string,pu
  const body=new FormData();body.append("file",file);body.append("zone_id",zone_id);body.append("server_id",server_id);body.append("publish",String(publish));
  return request<MaintenanceValidation>("/api/v1/maintenance/validate",{method:"POST",body});
 }
+
+export type SSHProcessedEvent={event_id:string;assessment_index:number;status:string;graph_event_id?:string;correlation?:SSHCorrelationCheck;decision?:SSHDecisionResult["decision"];specialist?:SSHSpecialistResponse;stages:{stage:string;status:string;detail?:string}[]};
+export type SSHProcessResult=SSHLogResult&{published:boolean;events:SSHProcessedEvent[]};
+export function processSSHLog(file:File,zone:string,server:string,publish:boolean){
+ const body=new FormData();body.append("log",file);body.append("zone_id",zone);body.append("server_id",server);body.append("publish",String(publish));
+ return request<SSHProcessResult>("/api/v1/ssh/process-log",{method:"POST",body});
+}
