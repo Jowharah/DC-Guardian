@@ -1,9 +1,16 @@
-import {useState} from "react";
-import {evaluateFaceSSHSpecialists,type FaceSSHSpecialistReview} from "./api";
+import {useEffect,useState} from "react";
+import {evaluateFaceSSHSpecialists,getSavedFaceSSHSpecialists,type FaceSSHSpecialistReview} from "./api";
 export default function FaceSSHSpecialistViewer({id}:{id:string}){
  const [result,setResult]=useState<FaceSSHSpecialistReview|null>(null);
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");
+ useEffect(()=>{
+   let active=true;
+   setResult(null);setError("");
+   getSavedFaceSSHSpecialists(id).then(value=>{if(active)setResult(value)})
+     .catch(e=>{if(active&&!(e instanceof Error&&e.message.includes("404")))setError("Saved assessment unavailable; re-evaluate if needed.")});
+   return()=>{active=false};
+ },[id]);
  async function run(){
    setBusy(true);setError("");
    try{setResult(await evaluateFaceSSHSpecialists(id))}
@@ -13,7 +20,7 @@ export default function FaceSSHSpecialistViewer({id}:{id:string}){
  return <section className="evidenceItem">
  <h4>Face + Cybersecurity Specialist Analysis</h4>
  <p className="muted">Independent Cybersecurity and Physical Security findings. Camera and test-time declarations are unverified.</p>
- <button type="button" disabled={busy} onClick={()=>void run()}>{busy?"Evaluating…":"Evaluate Specialists and Review"}</button>
+ <button type="button" disabled={busy} onClick={()=>void run()}>{busy?"Evaluating…":result?"Re-evaluate Specialists and Review":"Evaluate Specialists and Review"}</button>
  {error&&<p role="alert">{error}</p>}
  {result&&<>
  <p>Evaluated: {new Date(result.evaluated_at).toLocaleString()}</p>
