@@ -126,3 +126,11 @@ export function processSSHLog(file:File,zone:string,server:string,publish:boolea
  const body=new FormData();body.append("log",file);body.append("zone_id",zone);body.append("server_id",server);body.append("publish",String(publish));
  return request<SSHProcessResult>("/api/v1/ssh/process-log",{method:"POST",body});
 }
+
+export type EnvironmentalAssessment={assessment:string;observation_timestamp:string;measurements:{temperature_c:number|null;humidity_pct:number|null};anomaly_detected:boolean;evidence:{thresholds:Record<string,number>;triggered_conditions:string[]}};
+export type EnvironmentalEvent={event_id:string;received_at:string;zone_id:string;sensor_id:string;assessment:EnvironmentalAssessment;history:{timestamp:string;temperature_c:number|null;humidity_pct:number|null}[];workflow:{stages:{stage:string;status:string;detail?:string}[];correlation:{status:string;scope:string};decision:null};record_type:"ENVIRONMENTAL_EVIDENCE";decision_severity:null};
+export const getEnvironmentalEvents=()=>request<EnvironmentalEvent[]>("/api/v1/environment/events");
+export function validateEnvironment(file:File,zone:string,sensor:string,publish:boolean){
+ const body=new FormData();body.append("file",file);body.append("zone_id",zone);body.append("sensor_id",sensor);body.append("publish",String(publish));
+ return request<{published:boolean;assessments:EnvironmentalAssessment[];events:{event_id:string;assessment:EnvironmentalAssessment;workflow:EnvironmentalEvent["workflow"]}[]}>("/api/v1/environment/validate",{method:"POST",body});
+}
