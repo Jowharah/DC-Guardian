@@ -17,6 +17,7 @@ from presentation.backend.app.ppe_image_validation import router as ppe_image_ro
 from presentation.backend.app.face_image_validation import router as face_image_router
 from presentation.backend.app.employee_access import router as employee_access_router
 from presentation.backend.app.standalone_events import router as standalone_events_router
+from presentation.backend.app.ssh_log_validation import router as ssh_log_router
 
 app = FastAPI(
     title="DC-GUARDIAN Presentation API", version="0.1.0",
@@ -27,6 +28,7 @@ app.include_router(ppe_image_router)
 app.include_router(face_image_router)
 app.include_router(employee_access_router)
 app.include_router(standalone_events_router)
+app.include_router(ssh_log_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
