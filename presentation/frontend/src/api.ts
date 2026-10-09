@@ -66,3 +66,8 @@ export async function getFaceImage(id:string):Promise<Blob>{
 
 export type FaceZoneAuthorization={status:"AUTHORIZED"|"UNAUTHORIZED"|"UNKNOWN";source:string;reason:string};
 export const getFaceAuthorization=(id:string)=>request<FaceZoneAuthorization>(`/api/v1/face/observations/${encodeURIComponent(id)}/authorization`);
+
+export type EmployeeAccess={person_id:string;role:string;authorized_zones:string[]};
+export const getEmployees=()=>request<EmployeeAccess[]>("/api/v1/access/employees");
+export const registerEmployee=(person_id:string,role:string)=>request<{status:string}>("/api/v1/access/employees",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({person_id,role})});
+export const changeEmployeeAccess=(person_id:string,zone_id:string,action:"GRANT"|"REVOKE")=>request<{status:string}>(`/api/v1/access/employees/${encodeURIComponent(person_id)}/zones`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({zone_id,action})});
