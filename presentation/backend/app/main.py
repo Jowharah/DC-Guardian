@@ -36,6 +36,7 @@ from presentation.backend.app.unified_correlations import router as unified_corr
 from presentation.backend.app.unified_graph import router as unified_graph_router
 from presentation.backend.app.unified_specialists import router as unified_specialists_router
 from presentation.backend.app.unified_synthesis import router as unified_synthesis_router
+from presentation.backend.app.unified_decision import router as unified_decision_router
 
 app = FastAPI(
     title="DC-GUARDIAN Presentation API", version="0.1.0",
@@ -65,6 +66,7 @@ app.include_router(unified_correlations_router)
 app.include_router(unified_graph_router)
 app.include_router(unified_specialists_router)
 app.include_router(unified_synthesis_router)
+app.include_router(unified_decision_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
