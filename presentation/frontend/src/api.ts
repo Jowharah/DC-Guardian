@@ -181,3 +181,6 @@ export const getUnifiedSynthesis=(id:string)=>request<UnifiedSynthesisResult>(`/
 
 export type UnifiedReviewDecision={group_id:string;specialists_evaluated_at:string;decision:{policy_version:string;status:string;response_mode:string;review_reasons:string[];severity:null;autonomous_action_allowed:false;note:string}};
 export const getUnifiedReviewDecision=(id:string)=>request<UnifiedReviewDecision>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/review-decision`);
+
+export type PublishedCorrelationCheck={kind:string;observation_ids:string[];status:"CANDIDATES_FOUND"|"NO_ELIGIBLE_CORRELATION";groups:UnifiedCorrelationGroup[];checked_against:string;note:string};
+export const checkPublishedCorrelations=(kind:string,observation_ids:string[])=>request<PublishedCorrelationCheck>("/api/v1/correlations/check-published",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({kind,observation_ids})});
