@@ -143,3 +143,5 @@ export const getOperationalGraph=(id:string)=>request<IncidentGraph>(`/api/v1/op
 export type OperationalDecisionResult={candidate_id:string;evaluated_at:string;specialist:SpecialistAssessment;decision:Decision;evidence_event_ids:string[]};
 export const getOperationalDecision=(id:string)=>request<OperationalDecisionResult>(`/api/v1/operations/correlations/${encodeURIComponent(id)}/decision`);
 export const evaluateOperationalDecision=(id:string)=>request<OperationalDecisionResult>(`/api/v1/operations/correlations/${encodeURIComponent(id)}/decision`,{method:"POST"});
+
+export const getStandaloneGraph=(kind:"ssh"|"maintenance"|"environment",id:string)=>request<IncidentGraph>(`/api/v1/evidence/${kind}/${encodeURIComponent(id)}/graph`);
