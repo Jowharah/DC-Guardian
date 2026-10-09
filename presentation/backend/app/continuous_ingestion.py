@@ -141,8 +141,19 @@ async def scan_once(sources,db,principal):
                         continue
             key=str(path.resolve())
             digest=hashlib.sha256(data+(json.dumps(metadata,sort_keys=True).encode() if metadata else b'')).hexdigest()
-            if db.execute("SELECT 1 FROM ingested_files WHERE source=? AND sha256=? AND status IN ('COMPLETE','PARTIAL')",
-                          (key,digest)).fetchone():
+            prior=db.execute("SELECT detail FROM ingested_files WHERE source=? AND sha256=? AND status IN ('COMPLETE','PARTIAL')",
+                             (key,digest)).fetchone()
+            if prior:
+                # Backfill display metadata for images projected before the
+                # metadata store existed. No new inference or graph writes.
+                if metadata and kind in ("ppe","face"):
+                    try:
+                        previous=json.loads(prior[0])
+                        if previous.get("observation_id") and previous.get("graph"):
+                            from presentation.backend.app.image_metadata_store import save
+                            save(kind,previous["observation_id"],src["zone_id"],metadata,previous["graph"])
+                    except (ValueError,TypeError,KeyError,json.JSONDecodeError):
+                        LOG.warning("Image metadata backfill unavailable: %s",path.name)
                 counts["skipped"]+=1
                 continue
             try:
