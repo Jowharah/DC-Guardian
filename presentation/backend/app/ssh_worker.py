@@ -21,6 +21,12 @@ def main():
             "explicit_security_signal": item.get("explicit_security_signal"),
             "usernames": usernames,
             "evidence": item.get("evidence", {}),
+            "anomaly_detected": item.get("anomaly_detected"),
+            "confidence": item.get("confidence"),
+            "security_signals": item.get("security_signals", []),
+            "rule": item.get("rule", {}),
+            "isolation_forest": item.get("isolation_forest", {}),
+            "autoencoder": item.get("autoencoder", {}),
         })
     print("DCG_SSH_RESULT=" + json.dumps({
         "parsed_count": len(parsed), "assessment_count": len(result["assessments"]),
