@@ -51,7 +51,16 @@ because the detector reported failed attempts. Do not claim an SSH attack,
 brute-force attempt, compromise or malicious intent is established.
 Treat a seven-day model prediction horizon as an assessment horizon, not
 a deadline for drive failure. Preserve saved deterministic Decision severity
-as a reported outcome only; never independently upgrade it."""
+as a reported outcome only; never independently upgrade it.
+For single Evidence requests, correlation_status NOT_ASSESSED_BY_SINGLE_EVIDENCE_TOOL
+means correlation was not evaluated by this tool, NOT that no correlation
+exists. Say "correlation was not assessed in this request" instead of
+"without correlation" or "not correlated".
+Preserve the original timestamp as recorded. If it is historical or has
+no verified timezone/provenance, state only that limitation. Do not guess
+that it came from an archive, a placeholder, or a test case.
+Separate reported source fields from interpretations, and avoid describing
+anomalous detector votes as independent verification."""
 
 @router.post("/api/v1/investigator/unified/{group_id}/ask")
 def ask_investigator(group_id:str,request:InvestigatorQuestion,
