@@ -1,9 +1,9 @@
 import InvestigatorMessage from "./InvestigatorMessage";
 import {useEffect,useState} from "react";
-import {askOperationalInvestigator,askUnifiedInvestigator,getInvestigatorHistory,saveInvestigatorHistory,clearInvestigatorHistory} from "./api";
+import {askSingleEvidenceInvestigator,type InvestigatorSingleKind,askOperationalInvestigator,askUnifiedInvestigator,getInvestigatorHistory,saveInvestigatorHistory,clearInvestigatorHistory} from "./api";
 
 type Message={role:"operator"|"investigator";text:string};
-export default function InvestigatorPanel({groupId,investigationType="unified",workspace,expanded,onToggleExpanded}:{groupId:string|null;investigationType?:"unified"|"operations";workspace:string;expanded:boolean;onToggleExpanded:()=>void}){
+export default function InvestigatorPanel({groupId,investigationType="unified",singleKind,workspace,expanded,onToggleExpanded}:{groupId:string|null;investigationType?:"unified"|"operations"|"single";singleKind?:InvestigatorSingleKind;workspace:string;expanded:boolean;onToggleExpanded:()=>void}){
  const [question,setQuestion]=useState("");
  const [consent,setConsent]=useState(false);
  const [messages,setMessages]=useState<Message[]>([]);
@@ -21,13 +21,13 @@ export default function InvestigatorPanel({groupId,investigationType="unified",w
    setMessages(result.messages.flatMap(item=>[{role:"operator" as const,text:item.question},{role:"investigator" as const,text:item.answer}]));
   }).catch(()=>{if(active)setHistoryNote("Conversation history is disabled or unavailable. Messages will remain in this tab only.")});
   return()=>{active=false};
- },[groupId,investigationType]);
+ },[groupId,investigationType,singleKind]);
  async function send(){
   const value=question.trim();
   if(!groupId||!consent||value.length<3||busy)return;
   setBusy(true);setError("");
   try{
-   const result=investigationType==="operations"?await askOperationalInvestigator(groupId,value):await askUnifiedInvestigator(groupId,value);
+   const result=investigationType==="single"&&singleKind?await askSingleEvidenceInvestigator(singleKind,groupId,value):investigationType==="operations"?await askOperationalInvestigator(groupId,value):await askUnifiedInvestigator(groupId,value);
    setMessages(previous=>[...previous,{role:"operator",text:value},{role:"investigator",text:result.answer}]);
    if(investigationType==="unified"&&saveChats&&historyAvailable&&groupId){
     try{await saveInvestigatorHistory(groupId,value,result.answer)}
@@ -40,7 +40,7 @@ export default function InvestigatorPanel({groupId,investigationType="unified",w
  return <aside className={`agentSidebar ${expanded?"agentSidebarExpanded":""}`} aria-label="AI Investigator">
   <div className="agentHeading"><div className="agentAvatar">✦</div><div className="agentHeadingText"><b>AI Investigator</b><small>OpenAI · read-only · opt-in</small></div><button type="button" className="investigatorExpandButton" onClick={onToggleExpanded} aria-label={expanded?"Collapse AI Investigator":"Expand AI Investigator"} aria-expanded={expanded} title={expanded?"Return to sidebar view":"Expand chat workspace"}><span aria-hidden="true">{expanded?"↘":"⤢"}</span><span>{expanded?"Collapse":"Expand"}</span></button></div>
   <div className="agentContext"><small>WORKSPACE CONTEXT</small><b>{workspace}</b>
-   <p>{groupId?"Selected "+(investigationType==="operations"?"operational correlation":"unified investigation")+": "+groupId:"Open a unified or operational correlation in Monitoring Center to ask Evidence questions."}</p></div>
+   <p>{groupId?"Selected "+(investigationType==="operations"?"operational correlation":investigationType==="single"?"single "+(singleKind??"")+" Evidence":"unified investigation")+": "+groupId:"Select an Evidence event or correlation in Monitoring Center to ask questions."}</p></div>
   <div className="agentConversation" aria-live="polite">
    {messages.length===0?<div className="agentMessage">Ask about existing saved detector assessments, contextual correlations, deterministic review, or recorded human outcomes. No new model inference or Decision is created.</div>:
     messages.map((m,i)=><div key={i} className={`agentMessage investigatorChatBubble ${m.role==="operator"?"investigatorOperatorBubble":"investigatorAssistantBubble"}`}><div className="investigatorSpeaker"><span className="investigatorSpeakerIcon" aria-hidden="true">{m.role==="operator"?"●":"✦"}</span><b>{m.role==="operator"?"You":"AI Investigator"}</b></div>{m.role==="operator"?<p>{m.text}</p>:<InvestigatorMessage text={m.text}/>}</div>)}
