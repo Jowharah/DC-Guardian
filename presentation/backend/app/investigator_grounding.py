@@ -43,7 +43,7 @@ SSH_PATTERNS={
 # Original frozen detector metric keys are valid explicit claim labels.
 # Match only key: number or key = number, on one line.
 for _field,_patterns in SSH_PATTERNS.items():
-    _patterns.append(r"\\b"+re.escape(_field)+r"\\s*[:=]\\s*(\\d+(?:\\.\\d+)?%?)\\b")
+    _patterns.append(r"\b"+re.escape(_field)+r"\s*[:=]\s*(\d+(?:\.\d+)?%?)(?![\d.])")
 SSH_PATTERNS={key:[re.compile(p,re.I) for p in patterns] for key,patterns in SSH_PATTERNS.items()}
 
 def ssh_field_checks(answer:str,assessment:dict)->dict:
