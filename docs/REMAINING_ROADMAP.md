@@ -16,14 +16,14 @@
 | Human Review Queue and saved outcomes | Implemented and locally demonstrated | Multi-review lifecycle policy and investigation resolution contract |
 | Audit hash-chain verification | Implemented; local 11-test and 16-test runs reported | Trusted external checkpoint, backup/recovery and production audit controls |
 | Unified cross-domain severity | **Not implemented by design** | Validate and approve deterministic policy before assigning any severity |
-| AI Investigator | **Pending** | Approved read-only tools, RBAC-aware retrieval, grounded explanations, audit, prompt-injection tests |
+| AI Investigator | **Implemented research prototype; 23 targeted tests passed** | Claim-level grounding, outbound privacy review, tool audit, prompt-injection evaluation, cost limits and production hardening; see [AI Investigator](AI_INVESTIGATOR.md) |
 | Deployment / production security | Pending | Production authentication, TLS, secrets, monitoring, dependency audit, threat modeling, penetration tests |
 
 ## Suggested order
 
 1. Full API authorization and protected artifact-access regression; browser-level end-to-end test.
 2. Review lifecycle, audit integrity external checkpoint design, and failure/recovery handling.
-3. AI Investigator **read-only** Evidence retrieval tools with explicit source citations and authorization.
+3. AI Investigator **claim-level grounding**, source-field citations, privacy review, audit and authorization regression (read-only Evidence tools and source manifests are already implemented).
 4. Dashboard accessibility, live-time synthetic event contracts, and multi-domain demo verification.
 5. Production deployment design and independent security review.
 
