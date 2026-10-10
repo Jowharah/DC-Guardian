@@ -60,6 +60,8 @@ def review_record(group_id,payload,principal):
         raise HTTPException(422,"Review rationale must contain at least 15 characters")
     with connect() as db:
         db.execute("BEGIN IMMEDIATE")
+        if verify_database(db)["status"] != "PASS":
+            raise HTTPException(409,"Audit chain integrity failed; new review blocked")
         previous=db.execute("SELECT entry_hash FROM human_review_audit ORDER BY rowid DESC LIMIT 1").fetchone()
         entry["previous_hash"]=previous[0] if previous else "GENESIS"
         entry["entry_hash"]=hashlib.sha256(json.dumps(entry,sort_keys=True,separators=(",",":")).encode()).hexdigest()
