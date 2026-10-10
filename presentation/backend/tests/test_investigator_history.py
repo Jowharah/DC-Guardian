@@ -44,3 +44,25 @@ def test_same_zone_different_operator_is_private(isolated):
     history.clear_history("G1",colleague)
     assert len(history.get_history("G1",ADMIN)["messages"])==1
     assert history.get_history("G1",colleague)["messages"]==[]
+
+def test_operational_and_single_history_namespaces(isolated,monkeypatch):
+    from presentation.backend.app import operational_decision,investigator_tools
+    monkeypatch.setattr(operational_decision,"get_candidate",lambda identifier,principal:{"id":identifier,"zone_id":"ZONE-A"})
+    monkeypatch.setattr(investigator_tools,"single_evidence_context",lambda kind,identifier,principal:{"kind":kind,"zone_id":"ZONE-A"})
+    entry=history.HistoryEntry(question="Explain Evidence",answer="A saved assessment was reported.")
+    history._other_save("operations","SAME",entry,ADMIN)
+    history._other_save("ssh","SAME",entry,ADMIN)
+    assert len(history._other_history("operations","SAME",ADMIN)["messages"])==1
+    assert len(history._other_history("ssh","SAME",ADMIN)["messages"])==1
+    assert history.get_history("SAME",ADMIN)["messages"]==[]
+    history._other_clear("ssh","SAME",ADMIN)
+    assert history._other_history("ssh","SAME",ADMIN)["messages"]==[]
+    assert len(history._other_history("operations","SAME",ADMIN)["messages"])==1
+
+def test_operational_history_checks_authorization_first(isolated,monkeypatch):
+    from presentation.backend.app import operational_decision
+    def deny(identifier,principal):raise HTTPException(403,"Access denied")
+    monkeypatch.setattr(operational_decision,"get_candidate",deny)
+    with pytest.raises(HTTPException) as exc:
+        history._other_history("operations","OP1",OTHER)
+    assert exc.value.status_code==403
