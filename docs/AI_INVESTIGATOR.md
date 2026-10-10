@@ -76,6 +76,14 @@ npm run build
 
 The browser has demonstrated live OpenAI answers for a unified investigation, a Maintenance/Environmental operational correlation, and individual SSH Evidence; unified history persistence was also demonstrated. Do not infer that every workflow or the latest frontend build has passed solely from those demonstrations.
 
+## Grounding UI and provenance wording — October 2026
+
+New Investigator answers display the backend `grounding_check` below the response: either **Reference check only** or **Unrecognized Evidence IDs**, and explicitly **Claim-level verification: Not performed**. This is intentionally a neutral/limitation indicator, not a green validation badge. Historical saved answers without grounding metadata do not retroactively gain a check.
+
+The model instructions now distinguish single-source `NOT_ASSESSED_BY_SINGLE_EVIDENCE_TOOL` from confirmed absence of correlation. They also prohibit guessing why historical source timestamps exist; timestamp origin and timezone require verified provenance.
+
+**Remaining:** deterministic numeric field-level validation (for example, failed login count and detector votes), claim-to-field citations, and tests with deliberately unsupported model claims. These have not yet been implemented.
+
 ## Outstanding safeguards
 
 1. Claim-level source/field verification and model-grounding/abstention evaluations, including misleading time/correlation statements.
