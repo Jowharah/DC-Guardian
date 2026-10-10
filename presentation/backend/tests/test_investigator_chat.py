@@ -4,6 +4,14 @@ from presentation.backend.app import investigator_chat as chat
 from presentation.backend.app.authorization import Principal
 
 ADMIN=Principal("operator",frozenset({"administrator"}),frozenset({"ZONE-A"}))
+@pytest.fixture(autouse=True)
+def block_external_openai(monkeypatch):
+    """Any unexpected provider call must fail locally, never reach OpenAI."""
+    from openai import OpenAI
+    def forbidden(*args,**kwargs):
+        raise AssertionError("Unexpected live OpenAI call from Investigator test")
+    monkeypatch.setattr(OpenAI,"__init__",forbidden)
+
 CONTEXT={"group_id":"G1","zone_id":"ZONE-A",
  "evidence_refs":[{"kind":"ssh","observation_id":"SSH-1"}],
  "contextual_links":[],"source_assessments":{"ssh":{"evidence_state":"HIGH_CONFIDENCE_ANOMALY"}},
