@@ -59,27 +59,31 @@ def ssh_field_checks(answer:str,assessment:dict)->dict:
         expected=next((d[field] for d in (assessment,top,evidence,nested) if field in d),None)
         found=[]
         for pattern in patterns:
-            for match in pattern.finditer(normalized):
-                # Numeric claims must not span adjacent Markdown lines.
-                if "\\n" in match.group(0) or "\\r" in match.group(0):
-                    continue
-                if any(match.start()<end and match.end()>begin for begin,end in found):
-                    continue
-                found.append(match.span())
-                raw=match.group(1)
-                try:
-                    claimed=float(raw.rstrip("%"))
-                    if raw.endswith("%"):claimed/=100
-                    if isinstance(expected,bool) or expected is None:
+            for line_number,line in enumerate(normalized.splitlines()):
+                for match in pattern.finditer(line):
+                    # Process each line independently so values cannot be
+                    # attached to labels on a following line.
+                    begin,end=match.span()
+                    if any(n==line_number and begin<stop and end>start
+                           for n,start,stop in found):
+                        continue
+                    found.append((line_number,begin,end))
+                    raw=match.group(1)
+                    try:
+                        claimed=float(raw.rstrip("%"))
+                        if raw.endswith("%"):claimed/=100
+                        if isinstance(expected,bool) or expected is None:
+                            status="SOURCE_FIELD_UNAVAILABLE"
+                        else:
+                            actual=float(expected)
+                            status="MATCH" if abs(claimed-actual)<1e-9 else "MISMATCH"
+                    except (TypeError,ValueError,OverflowError):
                         status="SOURCE_FIELD_UNAVAILABLE"
-                    else:
-                        actual=float(expected)
-                        status="MATCH" if abs(claimed-actual)<1e-9 else "MISMATCH"
-                except (TypeError,ValueError,OverflowError):
-                    status="SOURCE_FIELD_UNAVAILABLE"
-                checks.append({"field":field,"claim":match.group(0),
-                               "source_value":expected,"status":status})
+                    checks.append({"field":field,"claim":match.group(0),
+                                   "source_value":expected,"status":status})
+                    if len(found)>=5:break
                 if len(found)>=5:break
+            if len(found)>=5:break
     status=("MISMATCH" if any(c["status"]=="MISMATCH" for c in checks)
             else "PARTIAL_FIELD_CHECK" if checks
             else "NO_RECOGNIZED_CLAIMS")
