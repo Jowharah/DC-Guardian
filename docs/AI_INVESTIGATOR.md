@@ -100,3 +100,7 @@ For individual SSH Evidence questions, `investigator_grounding.ssh_field_checks`
 6. Update source-manifest persistence if historical answers must display their original supporting Evidence references.
 
 The Investigator is an **explanation aid**; DC-GUARDIAN's frozen Evidence, existing correlation contracts, deterministic Decisions, and human oversight remain authoritative.
+
+## SSH numeric coverage refinement — October 2026
+
+The narrow SSH field checker additionally recognizes label-first `Unique Users`, `Breakin Warning Count`, and `Success After Failures` values, and returns a count of matched, mismatched and unavailable source fields. The UI distinguishes numerical field consistency from narrative/causal claim verification and independent source authenticity. These are implementation updates pending local test and browser validation; do not interpret a partial match count as complete verification of the answer.
