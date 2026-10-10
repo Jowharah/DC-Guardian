@@ -40,6 +40,10 @@ SSH_PATTERNS={
  "no_identification_count":[r"\bno\s+identification\s+count\s*[:=]\s*(\d+)\b"],
  "success_after_failures":[r"\bsuccess\s+after\s+failures(?:\s+count)?\s*[:=]\s*(\d+)\b"],
 }
+# Original frozen detector metric keys are valid explicit claim labels.
+# Match only key: number or key = number, on one line.
+for _field,_patterns in SSH_PATTERNS.items():
+    _patterns.append(r"\\b"+re.escape(_field)+r"\\s*[:=]\\s*(\\d+(?:\\.\\d+)?%?)\\b")
 SSH_PATTERNS={key:[re.compile(p,re.I) for p in patterns] for key,patterns in SSH_PATTERNS.items()}
 
 def ssh_field_checks(answer:str,assessment:dict)->dict:
