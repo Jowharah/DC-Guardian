@@ -1,3 +1,4 @@
+import InvestigatorMessage from "./InvestigatorMessage";
 import {useEffect,useState} from "react";
 import {askUnifiedInvestigator} from "./api";
 
@@ -26,7 +27,7 @@ export default function InvestigatorPanel({groupId,workspace}:{groupId:string|nu
    <p>{groupId?"Selected unified investigation: "+groupId:"Open a unified investigation in Monitoring Center to ask Evidence questions."}</p></div>
   <div className="agentConversation" aria-live="polite">
    {messages.length===0?<div className="agentMessage">Ask about existing saved detector assessments, contextual correlations, deterministic review, or recorded human outcomes. No new model inference or Decision is created.</div>:
-    messages.map((m,i)=><div key={i} className="agentMessage"><b>{m.role==="operator"?"You":"Investigator"}</b><p>{m.text}</p></div>)}
+    messages.map((m,i)=><div key={i} className={`agentMessage investigatorChatBubble ${m.role==="operator"?"investigatorOperatorBubble":"investigatorAssistantBubble"}`}><div className="investigatorSpeaker"><span className="investigatorSpeakerIcon" aria-hidden="true">{m.role==="operator"?"●":"✦"}</span><b>{m.role==="operator"?"You":"AI Investigator"}</b></div>{m.role==="operator"?<p>{m.text}</p>:<InvestigatorMessage text={m.text}/>}</div>)}
    {error&&<p role="alert" className="error">{error.includes("INVESTIGATOR_NOT_ENABLED")||error.includes("(503)")?"The Investigator backend is not enabled or the OpenAI provider is unavailable. Ask your administrator to check the server configuration.":error}</p>}
   </div>
   <div className="agentComposer">
