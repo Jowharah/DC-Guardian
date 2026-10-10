@@ -47,7 +47,7 @@ def test_label_first_claims_with_published_evidence_shape():
 **Detector votes:** 2"""
     result=ssh_field_checks(answer,source)
     assert len(result["checks"])==7
-    assert all(c["status"]=="MATCH" for c in result["checks"])
+    assert all(c["status"]=="MATCH" for c in result["checks"]), result["checks"]
 
 def test_label_first_wrong_value_is_mismatch():
     result=ssh_field_checks("**Failed login count:** 8",
