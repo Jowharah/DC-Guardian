@@ -1,6 +1,6 @@
 import InvestigatorMessage from "./InvestigatorMessage";
 import {useEffect,useState} from "react";
-import {askSingleEvidenceInvestigator,type InvestigatorSingleKind,askOperationalInvestigator,askUnifiedInvestigator,getInvestigatorHistory,saveInvestigatorHistory,clearInvestigatorHistory} from "./api";
+import {askSingleEvidenceInvestigator,type InvestigatorSingleKind,askOperationalInvestigator,askUnifiedInvestigator,getScopedInvestigatorHistory,saveScopedInvestigatorHistory,clearScopedInvestigatorHistory} from "./api";
 
 type Message={role:"operator"|"investigator";text:string};
 export default function InvestigatorPanel({groupId,investigationType="unified",singleKind,workspace,expanded,onToggleExpanded}:{groupId:string|null;investigationType?:"unified"|"operations"|"single";singleKind?:InvestigatorSingleKind;workspace:string;expanded:boolean;onToggleExpanded:()=>void}){
@@ -15,7 +15,7 @@ export default function InvestigatorPanel({groupId,investigationType="unified",s
  useEffect(()=>{
   let active=true;
   setMessages([]);setQuestion("");setConsent(false);setSaveChats(false);setHistoryAvailable(false);setHistoryNote("");setError("");
-  if(groupId&&investigationType==="unified")getInvestigatorHistory(groupId).then(result=>{
+  if(groupId)getScopedInvestigatorHistory(investigationType,groupId,singleKind).then(result=>{
    if(!active)return;
    setHistoryAvailable(true);
    setMessages(result.messages.flatMap(item=>[{role:"operator" as const,text:item.question},{role:"investigator" as const,text:item.answer}]));
@@ -29,8 +29,8 @@ export default function InvestigatorPanel({groupId,investigationType="unified",s
   try{
    const result=investigationType==="single"&&singleKind?await askSingleEvidenceInvestigator(singleKind,groupId,value):investigationType==="operations"?await askOperationalInvestigator(groupId,value):await askUnifiedInvestigator(groupId,value);
    setMessages(previous=>[...previous,{role:"operator",text:value},{role:"investigator",text:result.answer}]);
-   if(investigationType==="unified"&&saveChats&&historyAvailable&&groupId){
-    try{await saveInvestigatorHistory(groupId,value,result.answer)}
+   if(saveChats&&historyAvailable&&groupId){
+    try{await saveScopedInvestigatorHistory(investigationType,groupId,value,result.answer,singleKind)}
     catch{setHistoryNote("Answer received, but conversation history could not be saved.")}
    }
    setQuestion("");
@@ -46,9 +46,9 @@ export default function InvestigatorPanel({groupId,investigationType="unified",s
     messages.map((m,i)=><div key={i} className={`agentMessage investigatorChatBubble ${m.role==="operator"?"investigatorOperatorBubble":"investigatorAssistantBubble"}`}><div className="investigatorSpeaker"><span className="investigatorSpeakerIcon" aria-hidden="true">{m.role==="operator"?"●":"✦"}</span><b>{m.role==="operator"?"You":"AI Investigator"}</b></div>{m.role==="operator"?<p>{m.text}</p>:<InvestigatorMessage text={m.text}/>}</div>)}
    {error&&<p role="alert" className="error">{error.includes("INVESTIGATOR_NOT_ENABLED")||error.includes("(503)")?"The Investigator backend is not enabled or the OpenAI provider is unavailable. Ask your administrator to check the server configuration.":error}</p>}
   </div>
-  {groupId&&investigationType==="unified"&&<div className="investigatorHistoryControls">
+  {groupId&&<div className="investigatorHistoryControls">
    <label className="investigatorConsent"><input type="checkbox" checked={saveChats} disabled={!historyAvailable||busy} onChange={e=>setSaveChats(e.target.checked)}/> Save new conversations privately for this investigation (local test storage).</label>
-   <button type="button" disabled={!historyAvailable||busy} onClick={async()=>{if(!groupId||!window.confirm("Delete your saved Investigator conversation for this investigation?"))return;try{await clearInvestigatorHistory(groupId);setMessages([]);setHistoryNote("Saved conversation cleared.")}catch{setHistoryNote("Could not clear saved conversation.")}}}>Clear saved chat</button>
+   <button type="button" disabled={!historyAvailable||busy} onClick={async()=>{if(!groupId||!window.confirm("Delete your saved Investigator conversation for this investigation?"))return;try{await clearScopedInvestigatorHistory(investigationType,groupId,singleKind);setMessages([]);setHistoryNote("Saved conversation cleared.")}catch{setHistoryNote("Could not clear saved conversation.")}}}>Clear saved chat</button>
    {historyNote&&<small role="status">{historyNote}</small>}
   </div>}
   <div className="agentComposer">
