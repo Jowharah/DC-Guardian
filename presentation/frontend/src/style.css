@@ -367,3 +367,12 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .investigatorHistoryControls button{justify-self:start;background:transparent;border:1px solid #705493;border-radius:8px;color:#e9d5fa;padding:7px 11px;font-size:11px}
 .investigatorHistoryControls button:disabled{opacity:.5}
 .investigatorHistoryControls small{color:#c6b1d8;font-size:11px;line-height:1.5}
+
+
+/* Investigator authorized source manifest */
+.investigatorSources{margin-top:14px;padding:11px 12px;border:1px solid #635184;border-radius:9px;background:#2b203a;font-size:11px}
+.investigatorSources summary{cursor:pointer;color:#c8b2ef;font-weight:700}
+.investigatorSources p{color:#c6b8d5;line-height:1.5}
+.investigatorSources ul{padding-left:18px;margin:8px 0;display:grid;gap:7px}
+.investigatorSources li{overflow-wrap:anywhere}
+.investigatorSources code{color:#a9d8ff;overflow-wrap:anywhere}
