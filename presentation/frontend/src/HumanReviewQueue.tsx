@@ -1,3 +1,4 @@
+import AuditIntegrityPanel from "./AuditIntegrityPanel";
 import UnifiedHumanReviewForm from "./UnifiedHumanReviewForm";
 import {useEffect,useState} from "react";
 import {getUnifiedReviewDecision,getUnifiedHumanReviews,type HumanReviewRecord,type UnifiedReviewDecision} from "./api";
@@ -80,6 +81,7 @@ export default function HumanReviewQueue({ppe,face,unified,ssh,operational,openM
   </article>)}</div>}
  </section>
  {selectedGroup&&<UnifiedHumanReviewForm key={selectedGroup} id={selectedGroup} canSubmit={reviews[selectedGroup]?.decision.status==="EVIDENCE_REVIEW_REQUIRED"}/>}
+ <AuditIntegrityPanel/>
  <p className="muted">Recorded human reviews do not establish investigation resolution, cross-domain severity, or autonomous action. Candidate membership does not attribute SSH or PPE activity to a recognized person.</p>
  <button type="button" onClick={openMonitoring}>Open Monitoring Center for Evidence investigation</button>
  </section>;
