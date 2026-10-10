@@ -3,6 +3,8 @@
 **Updated:** 2026-10-10  
 **Scope:** `feature/presentation-dashboard` research prototype; controlled/synthetic demonstration, not production certification.
 
+For the current OpenAI-powered investigation feature, see [AI Investigator](AI_INVESTIGATOR.md) (all five Evidence domains, correlations, conversation history, source manifests, privacy and grounding limitations).
+
 Start with [Project Development History](PROJECT_DEVELOPMENT_HISTORY.md) for what has been implemented, [Validation and Operations](VALIDATION_AND_OPERATIONS.md) for reproducible commands and tested boundaries, and [Remaining Roadmap](REMAINING_ROADMAP.md) for open work.
 
 ## Existing reference documents
