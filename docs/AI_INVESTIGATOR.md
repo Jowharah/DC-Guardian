@@ -121,3 +121,12 @@ DC-GUARDIAN is treated as both a research project and an industrial prototype, s
 - Reference checks split pair/candidate IDs that embed member Evidence IDs, so `DCG-PHYSICAL-PPE-IMG-…-FACE-IMG-…` no longer appears as an unrecognized reference.
 
 **Caveats:** Group IDs are a hash of membership. Groups whose membership grows get a new ID and require specialist re-evaluation; earlier human-review records and Investigator history stay attached to the old ID. Times must be timezone-aware. SSH uses only an operator-declared test time or a trustworthy source time, never receipt time. A pair or group is contextual and never establishes causation, identity, physical presence, or severity.
+
+## Human verdicts on individual Evidence — October 2026
+
+Operators can record a verdict on any single Evidence item in all five domains, from the Human Review Queue or the Monitoring Center detail view: **CONFIRMED**, **OVERRIDDEN** (with a human-verified status, e.g. PPE `COMPLIANT`), or **INCONCLUSIVE**, with a rationale of at least 15 characters (`evidence_review.py`, `/api/v1/evidence-reviews/...`).
+
+- The detector output is never modified. Each verdict snapshots the detector status it reviewed and is appended to its own hash chain (`evidence_review_audit`); `/api/v1/reviews/audit-integrity` now verifies both the unified-review and Evidence-verdict chains.
+- The latest verdict is effective. An override to a non-concerning status (PPE `COMPLIANT`, Face `AUTHORIZED`/`NO_FACE`, SSH `BENIGN`, Maintenance `HEALTHY`, Environment `NORMAL`) removes the event from every correlation pair and unified group; an override to a concerning status makes it eligible under the Reasoning-contract pair rule. Dedicated matchers do not add pairs for human escalations.
+- Domain operators review their own domain in their zones (safety: PPE/Face; security: SSH; operations: Maintenance/Environment); viewers cannot record verdicts.
+- The Investigator receives a verdict summary (verdict, detector status, effective status, time) without the free-text rationale or reviewer identity, and must report both the detector result and the human verdict.

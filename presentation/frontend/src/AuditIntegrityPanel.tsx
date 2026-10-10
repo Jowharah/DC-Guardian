@@ -12,9 +12,10 @@ export default function AuditIntegrityPanel(){
   finally{setLoading(false)}
  }
  return <section className="panel auditIntegrityPanel">
-  <div className="analyticsFilterHeader"><div><h3>Audit integrity verification</h3><p className="muted">Administrator-only · verifies the complete local human-review hash chain.</p></div>
+  <div className="analyticsFilterHeader"><div><h3>Audit integrity verification</h3><p className="muted">Administrator-only · verifies the local unified-review and Evidence-verdict hash chains.</p></div>
    <button type="button" disabled={loading} onClick={()=>void check()}>{loading?"Verifying…":"Verify audit integrity"}</button></div>
-  {result&&<div className="auditIntegrityResult" role="status"><strong className={result.status==="PASS"?"auditPass":"auditFailed"}>{result.status}</strong><span>Records checked: {result.checked}</span>
+  {result&&<div className="auditIntegrityResult" role="status"><strong className={result.status==="PASS"?"auditPass":"auditFailed"}>{result.status}</strong><span>Records checked: {result.unified_chain&&result.evidence_chain?`${result.unified_chain.checked} unified reviews · ${result.evidence_chain.checked} Evidence verdicts`:result.checked}</span>
+   {result.evidence_chain&&result.evidence_chain.status!=="PASS"&&<p>Evidence verdict chain: {result.evidence_chain.reason} at <code>{result.evidence_chain.audit_id}</code></p>}
    {result.audit_id&&<p>First affected record: <code>{result.audit_id}</code></p>}
    {result.reason&&<p>Reason: {result.reason}</p>}
    {result.head_hash&&<details><summary>Chain head hash</summary><code>{result.head_hash}</code></details>}

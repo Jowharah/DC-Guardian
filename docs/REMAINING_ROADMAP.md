@@ -14,6 +14,7 @@
 | RBAC-protected Evidence artifact access | Implemented in part; regression tests passing | Full API/asset access matrix and multi-user integration testing |
 | Analytics and interactive drill-down | Implemented and locally demonstrated | Additional chart and filter regression |
 | Human Review Queue and saved outcomes | Implemented and locally demonstrated | Multi-review lifecycle policy and investigation resolution contract |
+| Human verdicts on individual Evidence (confirm / override / inconclusive) | Implemented; focused tests and copy-database HTTP check | Browser validation; policy for who may override which domain in production; reporting overrides as model false-positive/negative metrics |
 | Audit hash-chain verification | Implemented; local 11-test and 16-test runs reported | Trusted external checkpoint, backup/recovery and production audit controls |
 | Unified cross-domain severity | **Not implemented by design** | Validate and approve deterministic policy before assigning any severity |
 | AI Investigator | **Implemented research prototype; 23 targeted tests passed** | Claim-level grounding, outbound privacy review, tool audit, prompt-injection evaluation, cost limits and production hardening; see [AI Investigator](AI_INVESTIGATOR.md) |

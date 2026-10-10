@@ -208,9 +208,18 @@ export const submitUnifiedHumanReview=(id:string,outcome:HumanReviewRecord["outc
 
 export type AuditIntegrityResult={
  status:"PASS"|"FAILED";checked:number;head_hash?:string;
- reason?:string;audit_id?:string;limitation?:string
+ reason?:string;audit_id?:string;limitation?:string;
+ unified_chain?:{status:"PASS"|"FAILED";checked:number;reason?:string;audit_id?:string};
+ evidence_chain?:{status:"PASS"|"FAILED";checked:number;reason?:string;audit_id?:string}
 };
 export const getAuditIntegrity=()=>request<AuditIntegrityResult>("/api/v1/reviews/audit-integrity");
+export type EvidenceVerdict="CONFIRMED"|"OVERRIDDEN"|"INCONCLUSIVE";
+export type EvidenceReviewRecord={audit_id:string;kind:string;evidence_id:string;zone_id:string;reviewer:string;recorded_at:string;verdict:EvidenceVerdict;corrected_status:string|null;model_status:string|null;rationale:string;previous_hash:string;entry_hash:string};
+export type EvidenceReviewEffective={verdict:EvidenceVerdict;model_status:string|null;effective_status:string|null;abnormal:boolean|null;recorded_at:string;reviewer:string;source:string};
+export type LatestEvidenceReview={kind:InvestigatorSingleKind;evidence_id:string;zone_id:string;verdict:EvidenceVerdict;corrected_status:string|null;model_status:string|null;effective_status:string|null;recorded_at:string;reviewer:string};
+export const getEvidenceReview=(kind:InvestigatorSingleKind,id:string)=>request<{kind:string;evidence_id:string;records:EvidenceReviewRecord[];effective:EvidenceReviewEffective|null;vocabulary:string[]}>(`/api/v1/evidence-reviews/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`);
+export const recordEvidenceReview=(kind:InvestigatorSingleKind,id:string,payload:{verdict:EvidenceVerdict;corrected_status:string|null;rationale:string;acknowledgment:boolean})=>request<EvidenceReviewRecord>(`/api/v1/evidence-reviews/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+export const getLatestEvidenceReviews=()=>request<LatestEvidenceReview[]>("/api/v1/evidence-reviews");
 
 export type InvestigatorAnswer={group_id:string;answer:string;evidence_refs:{kind:string;observation_id:string}[];read_only:true;decision_severity_assigned:false;notice:string;grounding_check?:InvestigatorGroundingCheck;sources?:{kind:string;id:string;role:string}[]};
 export const askUnifiedInvestigator=(groupId:string,question:string)=>request<InvestigatorAnswer>(`/api/v1/investigator/unified/${encodeURIComponent(groupId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});

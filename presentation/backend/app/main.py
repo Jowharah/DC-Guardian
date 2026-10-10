@@ -79,6 +79,8 @@ from presentation.backend.app.human_review_audit import router as human_review_a
 app.include_router(human_review_audit_router)
 from presentation.backend.app.correlation_pairs import router as correlation_pairs_router
 app.include_router(correlation_pairs_router)
+from presentation.backend.app.evidence_review import router as evidence_review_router
+app.include_router(evidence_review_router)
 from presentation.backend.app.investigator_tools import router as investigator_tools_router
 app.include_router(investigator_tools_router)
 from presentation.backend.app.investigator_chat import router as investigator_chat_router

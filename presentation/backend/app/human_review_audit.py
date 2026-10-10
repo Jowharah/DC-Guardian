@@ -17,7 +17,7 @@ from presentation.backend.app.incident_store import _db_path
 from presentation.backend.app.unified_specialists import find_group,fingerprint
 from presentation.backend.app.unified_decision import read_review_decision
 
-from presentation.backend.app.review_integrity import verify_database
+from presentation.backend.app.review_integrity import verify_database,verify_evidence_database
 
 router=APIRouter()
 Outcome=Literal["REVIEWED_NO_FINDING","NEEDS_FOLLOW_UP","INCONCLUSIVE"]
@@ -98,4 +98,9 @@ def audit_integrity(principal:Principal=Depends(current_principal)):
     if "administrator" not in principal.roles:
         raise HTTPException(403,"Administrator required")
     with connect() as db:
-        return verify_database(db)
+        unified=verify_database(db)
+        evidence=verify_evidence_database(db)
+    # Top-level fields keep describing the unified chain for existing clients;
+    # the overall status fails if either chain fails.
+    return {**unified,"status":"PASS" if unified["status"]==evidence["status"]=="PASS" else "FAILED",
+            "unified_chain":unified,"evidence_chain":evidence}

@@ -80,7 +80,9 @@ def member_evidence(kind, oid, zone):
             "thresholds": (a.get("evidence") or {}).get("thresholds")}
     else:
         raise HTTPException(409, "Unknown Evidence domain")
-    return {"observation_id": oid, **result}
+    from presentation.backend.app.evidence_review import summary
+    # Authenticated human verdict beside the frozen output; never replaces it.
+    return {"observation_id": oid, **result, "human_review": summary(kind, oid)}
 
 def source_evidence(group):
     """Saved assessments per domain; a group may hold several events per domain."""

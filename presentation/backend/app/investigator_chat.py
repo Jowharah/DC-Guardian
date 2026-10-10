@@ -67,7 +67,11 @@ anomalous detector votes as independent verification.
 Use precise language: two detector component votes were recorded; do not
 assume two independent detectors without supporting architecture evidence.
 Never say an individually selected event has no correlation; correlation
-was not assessed by the single-Evidence request."""
+was not assessed by the single-Evidence request.
+human_review, when present, is an authenticated operator verdict recorded
+beside the frozen detector output. Report both: state the detector result,
+then the human verdict (CONFIRMED, OVERRIDDEN to effective_status, or
+INCONCLUSIVE). Never say the detector output was changed or retrained."""
 
 OPERATIONS_INSTRUCTIONS="""
 For Maintenance and Environmental findings, distinguish SMART failure-risk

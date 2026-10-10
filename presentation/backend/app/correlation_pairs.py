@@ -130,6 +130,8 @@ def face_state(assessment,zone):
     return status
 
 def abnormal(n):
+    # A human override verdict replaces the detector state for eligibility.
+    if n.get("human_abnormal") is not None:return n["human_abnormal"]
     return n["state"] in ABNORMAL_STATES or n["state"] in ("UNKNOWN_PERSON","UNAUTHORIZED")
 
 def generic_pairs(nodes):
@@ -158,6 +160,10 @@ def generic_edges(principal):
     # Only domains the operator may inspect contribute nodes.
     nodes=[n for kind,load in loaders.items() if allowed(principal,DETAIL[kind])
            for n in load(principal)]
+    from presentation.backend.app.evidence_review import overrides
+    human=overrides()
+    for n in nodes:
+        n["human_abnormal"]=human.get((n["kind"],n["id"]))
     return generic_pairs(nodes)
 
 def specialized_edges(principal):
@@ -188,7 +194,14 @@ def specialized_edges(principal):
     return edges
 
 def all_edges(principal):
-    return specialized_edges(principal)+generic_edges(principal)
+    from presentation.backend.app.evidence_review import overrides
+    human=overrides()
+    # Evidence a human has overridden to a non-concerning status is no longer
+    # a correlation candidate, whichever matcher linked it.
+    cleared={key for key,is_abnormal in human.items() if is_abnormal is False}
+    specialized=[e for e in specialized_edges(principal)
+                 if tuple(e["left"]) not in cleared and tuple(e["right"]) not in cleared]
+    return specialized+generic_edges(principal)
 
 def as_pair(e,severities=None):
     from presentation.backend.app.unified_correlations import DOMAIN

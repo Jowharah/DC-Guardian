@@ -150,8 +150,9 @@ def single_evidence_context(kind:str,evidence_id:str,principal:Principal=Depends
       "environment":("event_id","zone_id","sensor_id","assessment"),
     }[kind]
     selected={key:record[key] for key in allowed if key in record}
+    from presentation.backend.app.evidence_review import summary
     return {"kind":kind,"evidence_id":evidence_id,"zone_id":zone,
-            "source_assessment":selected,
+            "source_assessment":selected,"human_review":summary(kind,evidence_id),
             "correlation_status":"NOT_ASSESSED_BY_SINGLE_EVIDENCE_TOOL",
             "restrictions":{"read_only":True,"identity_link_established":False,
                             "causation_established":False,"autonomous_action_allowed":False},

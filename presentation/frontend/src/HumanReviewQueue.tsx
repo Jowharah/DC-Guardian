@@ -1,14 +1,18 @@
 import AuditIntegrityPanel from "./AuditIntegrityPanel";
 import UnifiedHumanReviewForm from "./UnifiedHumanReviewForm";
+import EvidenceReviewPanel from "./EvidenceReviewPanel";
 import {useEffect,useState} from "react";
-import {getUnifiedReviewDecision,getUnifiedHumanReviews,type HumanReviewRecord,type UnifiedReviewDecision} from "./api";
+import {getUnifiedReviewDecision,getUnifiedHumanReviews,getLatestEvidenceReviews,type HumanReviewRecord,type UnifiedReviewDecision,type LatestEvidenceReview,type InvestigatorSingleKind,type MaintenanceEvent,type EnvironmentalEvent} from "./api";
 import type {PPEObservation,FaceObservation,UnifiedCorrelationGroup,PublishedSSH,OperationalCorrelation} from "./api";
 
-type Props={ppe:PPEObservation[];face:FaceObservation[];unified:UnifiedCorrelationGroup[];ssh:PublishedSSH[];operational:OperationalCorrelation[];openMonitoring:()=>void};
-type QueueItem={id:string;kind:string;zone:string;received:string;state:string;note:string};
-export default function HumanReviewQueue({ppe,face,unified,ssh,operational,openMonitoring}:Props){
+type Props={ppe:PPEObservation[];face:FaceObservation[];unified:UnifiedCorrelationGroup[];ssh:PublishedSSH[];operational:OperationalCorrelation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];openMonitoring:()=>void};
+type QueueItem={id:string;kind:string;zone:string;received:string;state:string;note:string;evidenceKind?:InvestigatorSingleKind};
+export default function HumanReviewQueue({ppe,face,unified,ssh,operational,maintenance,environment,openMonitoring}:Props){
  const [filter,setFilter]=useState("ALL");
  const [selectedGroup,setSelectedGroup]=useState<string|null>(null);
+ const [selectedEvidence,setSelectedEvidence]=useState<{kind:InvestigatorSingleKind;id:string}|null>(null);
+ const [verdicts,setVerdicts]=useState<Record<string,LatestEvidenceReview>>({});
+ useEffect(()=>{let active=true;const refresh=()=>getLatestEvidenceReviews().then(items=>{if(active)setVerdicts(Object.fromEntries(items.map(v=>[v.kind+":"+v.evidence_id,v])))}).catch(()=>{});void refresh();const timer=setInterval(refresh,5000);return()=>{active=false;clearInterval(timer)}},[]);
  const [reviews,setReviews]=useState<Record<string,UnifiedReviewDecision>>({});
  const [reviewErrors,setReviewErrors]=useState<Record<string,boolean>>({});
  const [audit,setAudit]=useState<Record<string,HumanReviewRecord[]>>({});
@@ -39,9 +43,18 @@ export default function HumanReviewQueue({ppe,face,unified,ssh,operational,openM
   const timer=setInterval(()=>void refresh(),5000);
   return()=>{active=false;clearInterval(timer)};
  },[groupIds]);
+ const sourceItem=(evidenceKind:InvestigatorSingleKind,id:string,zone:string,received:string,pending:string):QueueItem=>{
+  const v=verdicts[evidenceKind+":"+id];
+  return {id,kind:evidenceKind.toUpperCase(),zone,received,evidenceKind,
+   state:!v?"AWAITING_SOURCE_REVIEW":v.verdict==="OVERRIDDEN"?"HUMAN_OVERRIDDEN":v.verdict==="CONFIRMED"?"HUMAN_CONFIRMED":"HUMAN_REVIEW_INCONCLUSIVE",
+   note:!v?pending:v.verdict==="OVERRIDDEN"?`Detector: ${(v.model_status??"not reported").replaceAll("_"," ")} · Human override: ${(v.corrected_status??"").replaceAll("_"," ")} by ${v.reviewer}.`:v.verdict==="CONFIRMED"?`Detector result ${(v.model_status??"").replaceAll("_"," ")} confirmed by ${v.reviewer}.`:`Human review inconclusive (${v.reviewer}); detector result still applies.`};
+ };
  const sources:QueueItem[]=[
-  ...ppe.filter(x=>x.review_status==="NOT_REVIEWED").map(x=>({id:x.observation_id,kind:"PPE",zone:x.zone_id,received:x.created_at,state:"AWAITING_SOURCE_REVIEW",note:"Frozen PPE model output; no operator review recorded."})),
-  ...face.filter(x=>x.review_status==="NOT_REVIEWED").map(x=>({id:x.observation_id,kind:"FACE",zone:x.zone_id,received:x.created_at,state:"AWAITING_SOURCE_REVIEW",note:"Recognition and zone authorization are independent; no operator review recorded."}))
+  ...ppe.map(x=>sourceItem("ppe",x.observation_id,x.zone_id,x.created_at,"Frozen PPE model output; no operator verdict recorded.")),
+  ...face.map(x=>sourceItem("face",x.observation_id,x.zone_id,x.created_at,"Recognition and zone authorization are independent; no operator verdict recorded.")),
+  ...ssh.map(x=>sourceItem("ssh",x.event_id,x.zone_id,x.received_at,"SSH detector Evidence; no operator verdict recorded.")),
+  ...maintenance.map(x=>sourceItem("maintenance",x.event_id,x.zone_id,x.received_at,"SMART failure-risk model output; no operator verdict recorded.")),
+  ...environment.map(x=>sourceItem("environment",x.event_id,x.zone_id,x.received_at,"Environmental sensor assessment; no operator verdict recorded."))
  ];
  const receipts=new Map<string,string>([
   ...ppe.map(x=>["ppe:"+x.observation_id,x.created_at] as [string,string]),
@@ -61,13 +74,13 @@ export default function HumanReviewQueue({ppe,face,unified,ssh,operational,openM
  const unique=new Map<string,QueueItem>();
  for(const item of [...sources,...candidates,...decisions])unique.set(item.kind+":"+item.id,item);
  const items=[...unique.values()].filter(x=>filter==="ALL"||x.state===filter).sort((a,b)=>Date.parse(b.received||"1970-01-01")-Date.parse(a.received||"1970-01-01"));
- const counts={source:sources.length,candidate:candidates.filter(x=>x.state==="CANDIDATE_ASSESSMENT").length,unifiedReview:candidates.filter(x=>x.state==="EVIDENCE_REVIEW_REQUIRED").length,decision:decisions.length,recorded:candidates.filter(x=>Boolean(latest(x.id))).length};
+ const counts={source:sources.filter(x=>x.state==="AWAITING_SOURCE_REVIEW").length,candidate:candidates.filter(x=>x.state==="CANDIDATE_ASSESSMENT").length,unifiedReview:candidates.filter(x=>x.state==="EVIDENCE_REVIEW_REQUIRED").length,decision:decisions.length,recorded:candidates.filter(x=>Boolean(latest(x.id))).length};
  return <section className="analyticsPage">
  <div className="stats"><div className="panel"><small>Source review pending</small><strong>{counts.source}</strong></div><div className="panel"><small>Unified review required</small><strong>{counts.unifiedReview}</strong></div><div className="panel"><small>Decisions requesting review</small><strong>{counts.decision}</strong></div><div className="panel"><small>Groups with recorded human review</small><strong>{counts.recorded}</strong></div></div>
  <section className="panel reviewFilterPanel">
   <div className="analyticsFilterHeader"><div><h3>Review queue</h3><p className="muted">Read-only triage from authorized Evidence feeds. Select a workflow category to inspect its records.</p></div><span className="analyticsFilterMeta">READ-ONLY · HUMAN REVIEW</span></div>
   <div className="analyticsRangeOptions" role="group" aria-label="Review queue category">
-   {([{value:"ALL",label:"All items"},{value:"AWAITING_SOURCE_REVIEW",label:"Source review"},{value:"CANDIDATE_ASSESSMENT",label:"Unevaluated candidates"},{value:"EVIDENCE_REVIEW_REQUIRED",label:"Unified review required"},{value:"DECISION_REVIEW_REQUIRED",label:"Decision review"},{value:"FOLLOW_UP_OUTSTANDING",label:"Follow-up outstanding"},{value:"HUMAN_REVIEW_INCONCLUSIVE",label:"Inconclusive"},{value:"HUMAN_REVIEW_RECORDED",label:"Review recorded"}] as const).map(option=><button type="button" key={option.value} className={filter===option.value?"analyticsRangeOption selected":"analyticsRangeOption"} aria-pressed={filter===option.value} onClick={()=>setFilter(option.value)}>{option.label}</button>)}
+   {([{value:"ALL",label:"All items"},{value:"AWAITING_SOURCE_REVIEW",label:"Source review"},{value:"HUMAN_OVERRIDDEN",label:"Human overrides"},{value:"HUMAN_CONFIRMED",label:"Human confirmed"},{value:"CANDIDATE_ASSESSMENT",label:"Unevaluated candidates"},{value:"EVIDENCE_REVIEW_REQUIRED",label:"Unified review required"},{value:"DECISION_REVIEW_REQUIRED",label:"Decision review"},{value:"FOLLOW_UP_OUTSTANDING",label:"Follow-up outstanding"},{value:"HUMAN_REVIEW_INCONCLUSIVE",label:"Inconclusive"},{value:"HUMAN_REVIEW_RECORDED",label:"Review recorded"}] as const).map(option=><button type="button" key={option.value} className={filter===option.value?"analyticsRangeOption selected":"analyticsRangeOption"} aria-pressed={filter===option.value} onClick={()=>setFilter(option.value)}>{option.label}</button>)}
   </div><p className="muted analyticsFilterNote">Categories describe workflow states, not severity. Human review outcomes are recorded separately from source Evidence.</p>
  </section>
  <section className="panel reviewItemsPanel">
@@ -76,10 +89,12 @@ export default function HumanReviewQueue({ppe,face,unified,ssh,operational,openM
    <div className="reviewRecordTop"><div className="reviewRecordTitle"><span className="reviewKind">{x.kind}</span><b>{x.zone}</b></div><span className="reviewStatus">{x.state.replaceAll("_"," ")}</span></div>
    <code className="reviewRecordId">{x.id}</code>
    <p className="reviewRecordNote">{x.note}</p>
-   {x.kind==="UNIFIED"&&<button type="button" className="reviewOpenButton" onClick={()=>setSelectedGroup(x.id)}>{selectedGroup===x.id?"Selected for review":"Open review & audit history"}</button>}
+   {x.kind==="UNIFIED"&&<button type="button" className="reviewOpenButton" onClick={()=>{setSelectedEvidence(null);setSelectedGroup(x.id)}}>{selectedGroup===x.id?"Selected for review":"Open review & audit history"}</button>}
+   {x.evidenceKind&&<button type="button" className="reviewOpenButton" onClick={()=>{setSelectedGroup(null);setSelectedEvidence({kind:x.evidenceKind!,id:x.id})}}>{selectedEvidence?.id===x.id?"Selected for review":"Review Evidence & record verdict"}</button>}
    <div className="reviewRecordFooter"><span>Received</span><time dateTime={x.received}>{x.received?new Date(x.received).toLocaleString():"Unavailable"}</time></div>
   </article>)}</div>}
  </section>
+ {selectedEvidence&&<EvidenceReviewPanel key={selectedEvidence.kind+":"+selectedEvidence.id} kind={selectedEvidence.kind} id={selectedEvidence.id}/>}
  {selectedGroup&&<UnifiedHumanReviewForm key={selectedGroup} id={selectedGroup} canSubmit={reviews[selectedGroup]?.decision.status==="EVIDENCE_REVIEW_REQUIRED"}/>}
  <AuditIntegrityPanel/>
  <p className="muted">Recorded human reviews do not establish investigation resolution, cross-domain severity, or autonomous action. Candidate membership does not attribute SSH or PPE activity to a recognized person.</p>
