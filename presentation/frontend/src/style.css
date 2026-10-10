@@ -292,3 +292,17 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .auditIntegrityResult code{overflow-wrap:anywhere}
 .auditPass{color:#7ee2b2}
 .auditFailed{color:#ff9b9b}
+
+
+/* Scenario Lab administration and regression utility layout */
+.labAdvancedIntro{margin-top:14px}
+.labAdvancedIntro h2{margin-bottom:7px}
+.labAdvancedIntro p{margin:0}
+.labUtilityGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.labUtility{min-width:0}
+.labUtility>summary,.labLegacy>summary{display:flex;align-items:center;gap:12px;cursor:pointer}
+.labUtility>summary span,.labLegacy>summary span{display:flex;flex-direction:column;gap:5px;min-width:0}
+.labUtility>summary b,.labLegacy>summary b{font-size:14px}
+.labUtility>summary small,.labLegacy>summary small{font-size:12px;color:#cbb3df;line-height:1.45}
+.labUtility[open],.labLegacy[open]{grid-column:1/-1}
+@media(max-width:950px){.labUtilityGrid{grid-template-columns:1fr}}
