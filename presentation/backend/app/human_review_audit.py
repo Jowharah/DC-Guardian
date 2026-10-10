@@ -17,6 +17,8 @@ from presentation.backend.app.incident_store import _db_path
 from presentation.backend.app.unified_specialists import find_group,fingerprint
 from presentation.backend.app.unified_decision import read_review_decision
 
+from presentation.backend.app.review_integrity import verify_database
+
 router=APIRouter()
 Outcome=Literal["REVIEWED_NO_FINDING","NEEDS_FOLLOW_UP","INCONCLUSIVE"]
 
@@ -86,3 +88,11 @@ def list_reviews(group_id:str,principal:Principal=Depends(current_principal)):
     return {"group_id":group_id,"zone_id":group["zone_id"],
             "records":[dict(zip(keys,row)) for row in rows],
             "note":"Historical append-only local audit; recorded reviews do not imply current Evidence validity."}
+
+@router.get("/api/v1/reviews/audit-integrity")
+def audit_integrity(principal:Principal=Depends(current_principal)):
+    authorize(principal,Permission.SCENARIO_EXECUTE)
+    if "administrator" not in principal.roles:
+        raise HTTPException(403,"Administrator required")
+    with connect() as db:
+        return verify_database(db)
