@@ -3,7 +3,7 @@ import {useEffect,useState} from "react";
 import {askUnifiedInvestigator} from "./api";
 
 type Message={role:"operator"|"investigator";text:string};
-export default function InvestigatorPanel({groupId,workspace}:{groupId:string|null;workspace:string}){
+export default function InvestigatorPanel({groupId,workspace,expanded,onToggleExpanded}:{groupId:string|null;workspace:string;expanded:boolean;onToggleExpanded:()=>void}){
  const [question,setQuestion]=useState("");
  const [consent,setConsent]=useState(false);
  const [messages,setMessages]=useState<Message[]>([]);
@@ -21,8 +21,8 @@ export default function InvestigatorPanel({groupId,workspace}:{groupId:string|nu
   }catch(e){setError(e instanceof Error?e.message:"Investigator unavailable")}
   finally{setBusy(false)}
  }
- return <aside className="agentSidebar">
-  <div className="agentHeading"><div className="agentAvatar">✦</div><div><b>AI Investigator</b><small>OpenAI · read-only · opt-in</small></div></div>
+ return <aside className={`agentSidebar ${expanded?"agentSidebarExpanded":""}`} aria-label="AI Investigator">
+  <div className="agentHeading"><div className="agentAvatar">✦</div><div className="agentHeadingText"><b>AI Investigator</b><small>OpenAI · read-only · opt-in</small></div><button type="button" className="investigatorExpandButton" onClick={onToggleExpanded} aria-label={expanded?"Collapse AI Investigator":"Expand AI Investigator"} aria-expanded={expanded} title={expanded?"Return to sidebar view":"Expand chat workspace"}><span aria-hidden="true">{expanded?"↘":"⤢"}</span><span>{expanded?"Collapse":"Expand"}</span></button></div>
   <div className="agentContext"><small>WORKSPACE CONTEXT</small><b>{workspace}</b>
    <p>{groupId?"Selected unified investigation: "+groupId:"Open a unified investigation in Monitoring Center to ask Evidence questions."}</p></div>
   <div className="agentConversation" aria-live="polite">
