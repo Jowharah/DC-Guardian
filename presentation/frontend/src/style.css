@@ -342,3 +342,21 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .investigatorHighlightInfo{color:#8ed4ff;font-weight:750}
 .investigatorEvidenceId{font-size:10px;overflow-wrap:anywhere;color:#c8b3f1;background:rgba(139,109,182,.14);padding:1px 3px;border-radius:3px}
 @media(prefers-reduced-motion:reduce){.investigatorChatBubble{transition:none}}
+
+
+/* Expandable AI Investigator workspace, keeping left navigation visible */
+.investigatorExpandButton{margin-left:auto;display:flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid #705493;border-radius:9px;background:#352448;color:#f4e7ff;font-size:12px;white-space:nowrap}
+.investigatorExpandButton:hover{background:#4c3267}
+.investigatorExpandButton:focus-visible{outline:2px solid #d6b1ff;outline-offset:2px}
+.agentHeadingText{min-width:0}
+.investigatorExpandedShell>.workspace{display:none}
+.investigatorExpandedShell>.agentSidebar{width:auto;min-width:0;flex:1;max-width:none;height:100vh;min-height:0;position:sticky;top:0;padding:24px clamp(18px,4vw,60px);overflow:hidden}
+.agentSidebarExpanded .agentHeading,.agentSidebarExpanded .agentContext,.agentSidebarExpanded .agentConversation,.agentSidebarExpanded .agentComposer{width:100%;max-width:1060px;margin-left:auto;margin-right:auto;box-sizing:border-box}
+.agentSidebarExpanded .agentConversation{min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#765598 transparent;padding:18px 8px 18px 0}
+.agentSidebarExpanded .investigatorChatBubble{max-width:850px}
+.agentSidebarExpanded .investigatorOperatorBubble{margin-left:auto}
+.agentSidebarExpanded .investigatorAssistantBubble{margin-right:auto}
+.agentSidebarExpanded .agentComposer textarea{min-height:92px;color:#f4e5f3}
+.agentSidebarExpanded .investigatorFormatted{font-size:14px}
+.agentSidebarExpanded .investigatorSectionHeading{font-size:14px}
+@media(max-width:800px){.investigatorExpandedShell>.sidebar{width:76px;padding:16px 7px}.investigatorExpandedShell .sidebar .brand{font-size:11px;overflow-wrap:anywhere}.investigatorExpandedShell .sidebar .subtle,.investigatorExpandedShell .sidebarBottom{display:none}.investigatorExpandedShell .sidebar nav{margin-top:24px}.investigatorExpandedShell .navButton{font-size:11px;padding:10px 5px}.investigatorExpandedShell>.agentSidebar{padding:16px 12px}}
