@@ -200,3 +200,9 @@ export const getSavedFaceSSHSpecialists=(id:string)=>request<FaceSSHSpecialistRe
 export type HumanReviewRecord={audit_id:string;group_id:string;zone_id:string;reviewer:string;recorded_at:string;outcome:"REVIEWED_NO_FINDING"|"NEEDS_FOLLOW_UP"|"INCONCLUSIVE";rationale:string;evidence_signature:string;policy_version:string;review_status:string;previous_hash:string;entry_hash:string};
 export const getUnifiedHumanReviews=(id:string)=>request<{group_id:string;zone_id:string;records:HumanReviewRecord[];note:string}>(`/api/v1/reviews/unified/${encodeURIComponent(id)}/records`);
 export const submitUnifiedHumanReview=(id:string,outcome:HumanReviewRecord["outcome"],rationale:string)=>request<HumanReviewRecord>(`/api/v1/reviews/unified/${encodeURIComponent(id)}/records`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({outcome,rationale,acknowledgment:true})});
+
+export type AuditIntegrityResult={
+ status:"PASS"|"FAILED";checked:number;head_hash?:string;
+ reason?:string;audit_id?:string;limitation?:string
+};
+export const getAuditIntegrity=()=>request<AuditIntegrityResult>("/api/v1/reviews/audit-integrity");
