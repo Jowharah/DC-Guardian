@@ -33,7 +33,7 @@ export default function UnifiedHumanReviewForm({id,canSubmit}:{id:string;canSubm
   <textarea id="humanReviewRationale" value={rationale} disabled={!canSubmit||!historyReady||busy} maxLength={2000} rows={4} onChange={e=>setRationale(e.target.value)} placeholder="Describe the Evidence reviewed and why you selected this outcome."/>
   <label className="reviewAck"><input type="checkbox" checked={ack} disabled={!canSubmit||!historyReady||busy} onChange={e=>setAck(e.target.checked)}/> I confirm this is my human review of the selected Evidence. The original assessments and Decision remain unchanged.</label>
   <button type="button" disabled={!canSubmit||!historyReady||!ack||rationale.trim().length<15||busy} onClick={()=>void submit()}>{busy?"Saving review…":"Record human review"}</button>
-  {!canSubmit&&<p className="muted">A saved deterministic EVIDENCE_REVIEW_REQUIRED result is needed before submission.</p>}
+  {!canSubmit&&<p className="muted">Recording is disabled until this group has a current specialist evaluation. Run it from the group in Monitoring Center; if the group's links changed since the last run, it must be run again.</p>}
   {error&&<p role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
   <h4>Local audit history · {records.length}</h4>
   {records.length===0?<p className="muted">No recorded human reviews for this group.</p>:<div className="reviewHistory">{records.map(x=><article key={x.audit_id} className="reviewRecord">

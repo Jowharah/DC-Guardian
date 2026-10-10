@@ -390,3 +390,4 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 
 .severity-none{background:#39254F;color:#E3B8E0;border:1px solid #8392CF}
 .decisionReviewNotice{margin:10px 0;padding:10px 12px;border-radius:10px;border:1px solid #524184;background:#21142D}.decisionReviewPending{border-color:#F3B65D}.decisionReviewNotice p{margin:6px 0}
+.humanVerdictBadge{background:#2E2140;color:#E3B8E0;border:1px solid #8392CF;margin-left:4px}.humanVerdictOverride{background:#1F4A3A;color:#D8FFF0;border-color:#59C79A}
