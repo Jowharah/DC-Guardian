@@ -4,6 +4,7 @@ No user-provided tool execution, synthetic fixture creation, or graph mutation.
 """
 import json
 import os
+from presentation.backend.app.authentication import local_setting
 from fastapi import APIRouter,Depends,HTTPException
 from pydantic import BaseModel,Field
 from presentation.backend.app.authentication import current_principal
@@ -31,9 +32,9 @@ def ask_investigator(group_id:str,request:InvestigatorQuestion,
                      principal:Principal=Depends(current_principal)):
     # Authorization and source retrieval must precede the external LLM call.
     context=unified_context(group_id,principal)
-    if os.getenv("DCG_INVESTIGATOR_ENABLED")!="1":
+    if local_setting("DCG_INVESTIGATOR_ENABLED")!="1":
         raise HTTPException(503,"INVESTIGATOR_NOT_ENABLED")
-    if not os.getenv("OPENAI_API_KEY"):
+    if not local_setting("OPENAI_API_KEY"):
         raise HTTPException(503,"OPENAI_API_KEY_NOT_CONFIGURED")
     # Explicit allowlist prevents accidentally transmitting entire records
     # including free-form human rationale and biometric identity data.
@@ -49,9 +50,9 @@ def ask_investigator(group_id:str,request:InvestigatorQuestion,
     }
     try:
         from openai import OpenAI
-        client=OpenAI(timeout=30.0,max_retries=0)
+        client=OpenAI(api_key=local_setting("OPENAI_API_KEY"),timeout=30.0,max_retries=0)
         response=client.responses.create(
-            model=os.getenv("DCG_INVESTIGATOR_MODEL","gpt-4.1-mini"),
+            model=local_setting("DCG_INVESTIGATOR_MODEL") or "gpt-4.1-mini",
             instructions=INSTRUCTIONS,
             input=json.dumps({"question":request.question,"authorized_context":minimal},
                              ensure_ascii=False),
