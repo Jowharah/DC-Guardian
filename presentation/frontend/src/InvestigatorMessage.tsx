@@ -24,6 +24,16 @@ export default function InvestigatorMessage({text}:{text:string}){
  return <div className="investigatorFormatted">{lines.map((raw,i)=>{
   const line=raw.trim();
   if(!line)return null;
+  const markdownHeading=line.match(/^(#{1,4})\s+(.+)$/);
+  if(markdownHeading){
+   const title=markdownHeading[2].replace(/\*\*/g,"").replace(/:\s*$/,"");
+   const rule=domainRules.find(item=>item.pattern.test(title));
+   currentKind=rule?.kind??"general";
+   return <div key={i} className={`investigatorSectionHeading investigatorTone-${currentKind}`}>
+    <span aria-hidden="true">{rule?.icon??"✦"}</span>
+    <strong>{inline(title)}</strong>
+   </div>;
+  }
   const heading=domainRules.find(rule=>rule.pattern.test(line.replace(/\*\*/g,"")));
   if(heading){
    currentKind=heading.kind;
