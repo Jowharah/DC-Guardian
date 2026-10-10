@@ -31,6 +31,7 @@ def test_missing_key_fails_closed(monkeypatch):
     monkeypatch.setattr(chat,"unified_context",lambda group_id,principal:CONTEXT)
     monkeypatch.setenv("DCG_INVESTIGATOR_ENABLED","1")
     monkeypatch.delenv("OPENAI_API_KEY",raising=False)
+    monkeypatch.setattr(chat,"local_setting",lambda name: "" if name=="OPENAI_API_KEY" else "1" if name=="DCG_INVESTIGATOR_ENABLED" else "")
     with pytest.raises(HTTPException) as exc:
         chat.ask_investigator("G1",chat.InvestigatorQuestion(question="Explain this anomaly"),ADMIN)
     assert exc.value.status_code==503
