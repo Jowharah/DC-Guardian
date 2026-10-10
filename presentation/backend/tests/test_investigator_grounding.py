@@ -32,3 +32,28 @@ def test_ssh_field_checks_do_not_verify_unrecognized_prose():
     result=ssh_field_checks("A malicious attack occurred",{"metrics":{"failed_login_count":6}})
     assert result["status"]=="NO_RECOGNIZED_CLAIMS"
     assert result["checks"]==[]
+
+def test_label_first_claims_with_published_evidence_shape():
+    source={"detector_votes":2,"evidence":{
+        "failed_login_count":6,"invalid_user_count":0,"unique_users":1,
+        "failure_ratio":1.0,"root_attempt_ratio":1.0,
+        "successful_login_count":0,"breakin_warning_count":0}}
+    answer="""**Failed login count:** 6
+**Invalid user count:** 0
+**Unique users attempted:** 1
+**Failure ratio:** 1.0 (100%)
+**Root attempt ratio:** 1.0
+**Successful login count:** 0
+**Detector votes:** 2"""
+    result=ssh_field_checks(answer,source)
+    assert len(result["checks"])==7
+    assert all(c["status"]=="MATCH" for c in result["checks"])
+
+def test_label_first_wrong_value_is_mismatch():
+    result=ssh_field_checks("**Failed login count:** 8",
+                            {"evidence":{"failed_login_count":6}})
+    assert result["status"]=="MISMATCH"
+
+def test_missing_source_metric_not_accepted_as_zero():
+    result=ssh_field_checks("**Successful login count:** 0",{"evidence":{}})
+    assert result["checks"][0]["status"]=="SOURCE_FIELD_UNAVAILABLE"
