@@ -47,3 +47,16 @@ def test_out_of_zone_admin_denied(isolated):
         audit.review_record("G1",audit.ReviewInput(outcome="INCONCLUSIVE",
             rationale="Requires further verification.",acknowledgment=True),other)
     assert exc.value.status_code==403
+
+def test_modified_audit_blocks_future_review(isolated):
+    payload=audit.ReviewInput(outcome="INCONCLUSIVE",
+        rationale="Evidence requires operator follow-up.",acknowledgment=True)
+    audit.review_record("G1",payload,ADMIN)
+    with audit.connect() as db:
+        db.execute("UPDATE human_review_audit SET rationale=?",
+                   ("Modified historical rationale",))
+    with pytest.raises(HTTPException) as exc:
+        audit.review_record("G1",payload,ADMIN)
+    assert exc.value.status_code==409
+    with audit.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM human_review_audit").fetchone()[0]==1
