@@ -45,7 +45,7 @@ The individual Evidence component READMEs remain the authoritative detailed mode
 
 - Governed approved-source RAG, local sentence-transformer retrieval, domain-scoped specialist agents, grounding/citation limitations, and specialist synthesis.
 - Standalone SSH and environmental + maintenance supported Decision workflows can assign policy-based severity and human review.
-- Unified multi-domain investigations use `DCG-UNIFIED-EVIDENCE-REVIEW-v1`: provisional review reasons, **no unified severity**, no autonomous action.
+- Unified multi-domain investigations use `DCG-UNIFIED-EVIDENCE-REVIEW-v1`: provisional review reasons, no autonomous action. October 2026: a provisional group severity (`DCG-UNIFIED-SEVERITY-PROVISIONAL-v1`) was added at the operator's request.
 - A recognized person whose independent graph check returns unauthorized for a declared zone can trigger `RECOGNIZED_IDENTITY_NOT_AUTHORIZED_FOR_DECLARED_ZONE`; this does not establish entry, wrongdoing, or SSH attribution.
 - Saved Face + SSH specialist assessments and unified specialist results can be reopened and re-evaluated; historical source assessments are preserved.
 

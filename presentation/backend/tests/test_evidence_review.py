@@ -76,15 +76,17 @@ def test_audit_integrity_reports_both_chains():
     assert result["evidence_chain"]["checked"]==1
     assert result["unified_chain"]["checked"]==0
 
-def test_cleared_evidence_leaves_every_correlation(monkeypatch):
+def test_cleared_evidence_leaves_pairs_but_keeps_group_links(monkeypatch):
     from presentation.backend.app.unified_correlations import edge
     monkeypatch.setattr(pairs,"specialized_edges",lambda p:[
         edge("PHYSICAL_IMAGE",("ppe","PPE-IMG-1"),("face","F1"),"PF1","ZONE-B"),
         edge("FACE_SSH_CONTEXT",("face","F1"),("ssh","S1"),"FS1","ZONE-B")])
-    monkeypatch.setattr(pairs,"generic_edges",lambda p:[])
+    monkeypatch.setattr(pairs,"generic_edges",lambda p,h:[])
     assert len(pairs.all_edges(ADMIN))==2
     verdict()
     assert [e["source_id"] for e in pairs.all_edges(ADMIN)]==["FS1"]
+    # Unified groups keep the cleared member's links so the group survives.
+    assert len(pairs.all_edges(ADMIN,include_cleared=True))==2
 
 def test_human_verdict_controls_generic_eligibility():
     from datetime import datetime,timezone
@@ -92,8 +94,9 @@ def test_human_verdict_controls_generic_eligibility():
     ppe=pairs.node("ppe","P1","ZONE-B","PPE_NON_COMPLIANT",[t],"OPERATOR_DECLARED_UNVERIFIED")
     ssh=pairs.node("ssh","S1","ZONE-B","HIGH_CONFIDENCE_ANOMALY",[t],"X","SRV-1")
     assert len(pairs.generic_pairs([ppe,ssh]))==1
+    # Clearing does not unlink here; all_edges filters cleared pairs.
     ppe["human_abnormal"]=False
-    assert pairs.generic_pairs([ppe,ssh])==[]
+    assert len(pairs.generic_pairs([ppe,ssh]))==1
     # A human can also escalate an event the detector judged normal.
     compliant=pairs.node("ppe","P2","ZONE-B","COMPLIANT",[t],"OPERATOR_DECLARED_UNVERIFIED")
     assert pairs.generic_pairs([compliant,ssh])==[]

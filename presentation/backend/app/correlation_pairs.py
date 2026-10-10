@@ -129,10 +129,14 @@ def face_state(assessment,zone):
             return "UNAUTHORIZED"
     return status
 
-def abnormal(n):
-    # A human override verdict replaces the detector state for eligibility.
-    if n.get("human_abnormal") is not None:return n["human_abnormal"]
+def detector_abnormal(n):
     return n["state"] in ABNORMAL_STATES or n["state"] in ("UNKNOWN_PERSON","UNAUTHORIZED")
+
+def abnormal(n):
+    """Eligibility for linking. A human escalation adds eligibility; a human
+    clearance does not remove links here, so group membership stays stable.
+    Cleared events are filtered from the pair list by all_edges."""
+    return n.get("human_abnormal") is True or detector_abnormal(n)
 
 def generic_pairs(nodes):
     """Reasoning-contract pairs for combinations without a dedicated matcher."""
@@ -154,17 +158,24 @@ def generic_pairs(nodes):
                      "right_time_provenance":b["time_provenance"]}))
     return result
 
-def generic_edges(principal):
+def load_nodes(principal,human):
     loaders={"ssh":ssh_nodes,"maintenance":maintenance_nodes,"environment":environment_nodes,
              "ppe":lambda p:image_nodes("ppe",p),"face":lambda p:image_nodes("face",p)}
     # Only domains the operator may inspect contribute nodes.
     nodes=[n for kind,load in loaders.items() if allowed(principal,DETAIL[kind])
            for n in load(principal)]
-    from presentation.backend.app.evidence_review import overrides
-    human=overrides()
     for n in nodes:
         n["human_abnormal"]=human.get((n["kind"],n["id"]))
-    return generic_pairs(nodes)
+    return nodes
+
+def generic_edges(principal,human):
+    return generic_pairs(load_nodes(principal,human))
+
+def member_states(principal):
+    """Detector state and abnormality per Evidence item, for group severity."""
+    from presentation.backend.app.evidence_review import overrides
+    return {(n["kind"],n["id"]):{"state":n["state"],"detector_abnormal":detector_abnormal(n)}
+            for n in load_nodes(principal,overrides())}
 
 def specialized_edges(principal):
     """Existing matcher output, collected only where the operator holds access."""
@@ -193,15 +204,16 @@ def specialized_edges(principal):
                               details={"time_difference_seconds":c["time_difference_seconds"]}))
     return edges
 
-def all_edges(principal):
+def all_edges(principal,include_cleared=False):
+    """Every correlation link. Unified groups keep human-cleared members
+    (marked) so their identity and review history survive; the pair list
+    drops any pair containing an event a human cleared."""
     from presentation.backend.app.evidence_review import overrides
     human=overrides()
-    # Evidence a human has overridden to a non-concerning status is no longer
-    # a correlation candidate, whichever matcher linked it.
+    edges=specialized_edges(principal)+generic_edges(principal,human)
+    if include_cleared:return edges
     cleared={key for key,is_abnormal in human.items() if is_abnormal is False}
-    specialized=[e for e in specialized_edges(principal)
-                 if tuple(e["left"]) not in cleared and tuple(e["right"]) not in cleared]
-    return specialized+generic_edges(principal)
+    return [e for e in edges if tuple(e["left"]) not in cleared and tuple(e["right"]) not in cleared]
 
 def as_pair(e,severities=None):
     from presentation.backend.app.unified_correlations import DOMAIN

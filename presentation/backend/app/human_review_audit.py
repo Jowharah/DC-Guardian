@@ -47,7 +47,7 @@ def review_record(group_id,payload,principal):
         raise HTTPException(422,"Explicit human review acknowledgment required")
     # Require the existing grounded deterministic disposition before recording.
     decision=read_review_decision(group_id,principal)["decision"]
-    if decision["status"]!="EVIDENCE_REVIEW_REQUIRED":
+    if decision["status"] not in ("EVIDENCE_REVIEW_REQUIRED","REVIEW_REQUIRED"):
         raise HTTPException(409,"No deterministic review requirement for this group")
     entry={"audit_id":"DCG-HR-"+uuid4().hex.upper(),
            "group_id":group_id,"zone_id":group["zone_id"],

@@ -74,7 +74,33 @@ def group_edges(edges,min_members=MIN_GROUP_MEMBERS):
 def collect_existing(principal):
     """Reuse published candidate contracts; never invent eligibility rules."""
     from presentation.backend.app.correlation_pairs import all_edges
-    return all_edges(principal)
+    # Human-cleared members stay in their group, marked; see annotate().
+    return all_edges(principal,include_cleared=True)
+
+def annotate(groups,principal):
+    """Member verdicts, concern flags and provisional severity per group.
+
+    Group ID and fingerprint depend only on membership and links, so verdicts
+    never invalidate saved specialists or review history. A group with fewer
+    than two members left un-cleared is no longer a correlation candidate.
+    """
+    from presentation.backend.app.correlation_pairs import member_states
+    from presentation.backend.app.evidence_review import overrides,summary
+    from presentation.backend.app.unified_severity import members_with_review,group_severity
+    states=member_states(principal)
+    human=overrides()
+    result=[]
+    for group in groups:
+        summaries={(r["kind"],r["observation_id"]):summary(r["kind"],r["observation_id"]) for r in group["evidence"]}
+        members=members_with_review(group,states,human,summaries)
+        if sum(not m["cleared_by_human"] for m in members)<2:continue
+        severity=group_severity(members)
+        result.append({**group,"members":members,
+            "decision_severity":severity["severity"],"severity_policy":severity["policy"],
+            "severity_rules_triggered":severity["rules_triggered"],
+            "active_concern_domains":severity["active_concern_domains"],
+            "severity_provisional":True})
+    return result
 
 @router.get("/api/v1/correlations/unified")
 def unified_correlations(principal:Principal=Depends(current_principal)):
@@ -92,4 +118,4 @@ def unified_correlations(principal:Principal=Depends(current_principal)):
                            Permission.PERSON_DETAIL,Permission.SSH_DETAIL):
             authorize(principal,permission,zone)
         result.append(group)
-    return result
+    return annotate(result,principal)

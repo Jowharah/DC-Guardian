@@ -16,7 +16,7 @@
 | Human Review Queue and saved outcomes | Implemented and locally demonstrated | Multi-review lifecycle policy and investigation resolution contract |
 | Human verdicts on individual Evidence (confirm / override / inconclusive) | Implemented; focused tests and copy-database HTTP check | Browser validation; policy for who may override which domain in production; reporting overrides as model false-positive/negative metrics; Decision re-evaluation for human-escalated events that never had a Decision |
 | Audit hash-chain verification | Implemented; local 11-test and 16-test runs reported | Trusted external checkpoint, backup/recovery and production audit controls |
-| Unified cross-domain severity | **Not implemented by design** | Validate and approve deterministic policy before assigning any severity |
+| Unified cross-domain severity | **Provisional policy implemented** (`DCG-UNIFIED-SEVERITY-PROVISIONAL-v1`: Decision Rules v1 on active-concern member domains) | Validate the policy against labelled multi-domain scenarios and approve it before treating group severity as authoritative |
 | AI Investigator | **Implemented research prototype; 23 targeted tests passed** | Claim-level grounding, outbound privacy review, tool audit, prompt-injection evaluation, cost limits and production hardening; see [AI Investigator](AI_INVESTIGATOR.md) |
 | Deployment / production security | Pending | Production authentication, TLS, secrets, monitoring, dependency audit, threat modeling, penetration tests |
 
@@ -31,7 +31,7 @@
 ## Acceptance rules
 
 - Never reinterpret contextual correlation as verified identity, causation, or physical presence.
-- Never promote provisional unified review to severity without a validated deterministic policy.
+- Group severity stays labelled provisional until `DCG-UNIFIED-SEVERITY-PROVISIONAL-v1` is validated; never derive it from specialist or standalone severity.
 - Do not replace original detector output with agent-generated conclusions.
 - Do not claim human review resolution solely from a recorded follow-up outcome.
 - Treat local test results as revision-specific and rerun after code changes.

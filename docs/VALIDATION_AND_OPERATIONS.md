@@ -99,6 +99,6 @@ The Presentation backend tests isolate all storage in a temporary `DCG_PRESENTAT
 
 - No production-grade session management, independent audit anchoring, or external checkpoint.
 - No verified live camera identity or timestamp attestation for controlled image observations.
-- No validated unified severity policy or autonomous remediation.
+- Unified group severity uses a provisional, not yet validated deterministic policy; no autonomous remediation.
 - AI Investigator chat and tools remain disabled.
 - Full penetration testing, load testing, deployment hardening, and end-to-end multi-user authorization validation remain outstanding.
