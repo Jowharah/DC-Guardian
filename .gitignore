@@ -248,9 +248,6 @@ temp/
 # FINAL REPOSITORY CLEANUP
 # ============================================================
 
-# PPE smoke-test outputs
-evidence/ppe_detection/results/training/ppe_yolov8n_smoke/
-
 # PPE full-training generated visualizations
 evidence/ppe_detection/results/training/ppe_yolov8n_full/*.png
 evidence/ppe_detection/results/training/ppe_yolov8n_full/*.jpg
@@ -271,3 +268,5 @@ response/rag/evaluation/abstention_calibration_report.json
 presentation/backend/data/
 presentation/frontend/node_modules/
 presentation/frontend/dist/
+presentation/frontend/tsconfig.tsbuildinfo
+presentation/frontend/build_errors.txt

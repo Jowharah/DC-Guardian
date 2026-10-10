@@ -26,9 +26,11 @@ def test_scan_deduplicates_completed_file(tmp_path,monkeypatch):
     source={"kind":"ssh","directory":folder,"zone_id":"ZONE-B","server_id":"SRV-B1-01"}
     principal=Principal("operator",frozenset({"administrator"}),frozenset({"ZONE-B"}))
     calls=[]
-    async def fake_dispatch(src,data,name,p):
+    async def fake_dispatch(src,data,name,p,metadata=None):
         calls.append(name)
-        return {"events":1,"partial":0}
+        # Same summary fields the real SSH dispatch returns and scan_once logs.
+        return {"events":1,"partial":0,"processing_outcome":"PUBLISHED","parsed_count":1,
+                "assessment_count":1,"security_relevant_count":1,"decision_complete_count":1}
     monkeypatch.setattr(ingest,"dispatch",fake_dispatch)
     with ingest.state_db(tmp_path/"state.sqlite3") as db:
         first=asyncio.run(ingest.scan_once([source],db,principal))

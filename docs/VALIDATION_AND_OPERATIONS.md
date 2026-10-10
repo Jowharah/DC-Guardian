@@ -91,7 +91,9 @@ Do not infer review completion from a deterministic `EVIDENCE_REVIEW_REQUIRED` r
 
 ## Local Git hygiene
 
-`git status --short` uses `??` for untracked files. Review contents before staging; do not use `git add .` blindly when local private datasets or credentials may exist. Generated logs and `tsconfig.tsbuildinfo` are typically ignored; `package-lock.json` may be worth tracking after reviewing dependency policy. Local `phase1/` contents must be inspected before committing.
+`git status --short` uses `??` for untracked files. Review contents before staging; do not use `git add .` blindly when local private datasets or credentials may exist. `tsconfig.tsbuildinfo` and build logs are ignored; `presentation/frontend/package-lock.json` is tracked for reproducible installs.
+
+The Presentation backend tests isolate all storage in a temporary `DCG_PRESENTATION_DB`. `reasoning/run_contract_tests.py` writes contract data to the configured Neo4j database and removes `SCENARIO-*` Event/Correlation nodes after the suite (set `DCG_KEEP_TEST_GRAPH=1` to keep them for debugging).
 
 ## Known limitations
 

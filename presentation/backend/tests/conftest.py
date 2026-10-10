@@ -8,6 +8,15 @@ from presentation.backend.app.authentication import current_principal
 from presentation.backend.app.authorization import Principal
 
 @pytest.fixture(autouse=True)
+def isolated_presentation_storage(tmp_path, monkeypatch):
+    """No test may write to the operator's real SQLite store or image folders.
+
+    Every store (incidents, Evidence, images, audit, history) derives from
+    DCG_PRESENTATION_DB; tests that set their own path still override this.
+    """
+    monkeypatch.setenv("DCG_PRESENTATION_DB", str(tmp_path / "presentation.sqlite3"))
+
+@pytest.fixture(autouse=True)
 def authorized_legacy_test(request):
     if request.node.path.name not in {
         "test_api_contract.py", "test_custom_scenarios.py", "test_incident_flow.py"

@@ -304,6 +304,9 @@ def run_contract(
         if not existing_pythonpath
         else str(PROJECT_ROOT) + os.pathsep + existing_pythonpath
     )
+    # Libraries such as DeepFace print emoji; without this, redirected output
+    # on Windows falls back to cp1252 and the contract crashes on import.
+    env["PYTHONIOENCODING"] = "utf-8"
 
     result = subprocess.run(
         command,
@@ -644,8 +647,56 @@ def main():
     return 0
 
 
+def remove_test_graph_artifacts():
+    """Delete contract-test Events/Correlations from the shared graph.
+
+    Contracts share the operator's Neo4j database, and *_store contracts reuse
+    nodes left by the preceding contract, so cleanup runs once after the whole
+    suite. Only nodes with the test-only SCENARIO- prefix are removed; topology
+    (Server, Rack, Zone, Person, Camera) and DCG-* dashboard data are untouched.
+    Set DCG_KEEP_TEST_GRAPH=1 to keep them for debugging.
+    """
+
+    if os.environ.get("DCG_KEEP_TEST_GRAPH") == "1":
+        print("Test graph artifacts kept (DCG_KEEP_TEST_GRAPH=1).")
+        return
+
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+    from reasoning.graph.ingest_event import (
+        NEO4J_DATABASE,
+        create_driver,
+    )
+
+    try:
+        driver = create_driver()
+        try:
+            with driver.session(database=NEO4J_DATABASE) as session:
+                deleted = session.run(
+                    """
+                    MATCH (n)
+                    WHERE (n:Event OR n:Correlation)
+                      AND n.scenario_id STARTS WITH 'SCENARIO-'
+                    DETACH DELETE n
+                    RETURN count(n) AS deleted
+                    """
+                ).single()["deleted"]
+        finally:
+            driver.close()
+    except Exception as exc:
+        print(f"WARNING: test graph cleanup failed: {type(exc).__name__}")
+        return
+
+    print(f"Removed {deleted} contract-test graph nodes.")
+
+
 if __name__ == "__main__":
 
+    try:
+        exit_code = main()
+    finally:
+        remove_test_graph_artifacts()
+
     raise SystemExit(
-        main()
+        exit_code
     )

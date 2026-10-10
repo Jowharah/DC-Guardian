@@ -120,10 +120,29 @@ DC-Guardian/
 |   |-- validate_event_schema.py
 |   `-- validate_topology.py
 |
+|-- response/
+|   |-- agents/            # grounded specialists, routing, cross-domain synthesis
+|   `-- rag/               # approved-knowledge retrieval and abstention
+|
+|-- decision/
+|   `-- rules.py           # deterministic Decision rules (DCG-DECISION-v1)
+|
+|-- integration/           # scenario pipeline, runners, service contracts
+|
+|-- presentation/
+|   |-- backend/           # FastAPI: RBAC, Evidence workflows, correlation,
+|   |                      # human review audit, AI Investigator
+|   `-- frontend/          # React/Vite dashboard
+|
 |-- shared/
 |   |-- schemas/
 |   `-- topology/
 |
+|-- docs/                  # architecture, validation, roadmap, Investigator
+|-- verify_runtime.py      # Evidence runtime smoke test
+|-- verify_dc_guardian_pipeline.py
+|-- requirements.txt
+|-- .env.example
 |-- .gitignore
 `-- .gitattributes
 ```
@@ -273,7 +292,7 @@ After cloning, ensure Git LFS is installed before relying on that artifact.
 
 ## Local Configuration
 
-Local credentials belong in `.env`, which is excluded from Git. A sanitized `.env.example` will document the required local configuration without publishing credentials.
+Local credentials belong in `.env`, which is excluded from Git. `.env.example` documents the required local configuration (Neo4j, OpenAI, Investigator flags) without credentials; copy it to `.env` and fill in local values.
 
 ## Current Development Roadmap
 
