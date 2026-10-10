@@ -282,3 +282,13 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .reviewAck input{margin-top:4px;flex:none}
 .reviewHistory{display:grid;gap:12px;max-height:460px;overflow:auto}
 .reviewHistory code{overflow-wrap:anywhere}
+
+
+/* Local audit integrity verification */
+.auditIntegrityPanel{display:grid;gap:15px}
+.auditIntegrityPanel .analyticsFilterHeader button{width:auto;min-width:160px}
+.auditIntegrityResult{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:13px 15px;border:1px solid rgba(158,123,191,.4);border-radius:10px}
+.auditIntegrityResult p,.auditIntegrityResult details{flex-basis:100%;margin:0}
+.auditIntegrityResult code{overflow-wrap:anywhere}
+.auditPass{color:#7ee2b2}
+.auditFailed{color:#ff9b9b}
