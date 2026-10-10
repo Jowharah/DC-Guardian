@@ -44,7 +44,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
    return()=>{active=false;clearInterval(timer)};
  },[groupIds]);
 
- const [selection,setSelection]=useState<{type:"domain"|"severity"|"zone"|"correlation";value:string}|null>(null);
+ const [selection,setSelection]=useState<{type:"domain"|"severity"|"zone"|"correlation"|"review";value:string}|null>(null);
  const cutoff=range==="all"?-Infinity:Date.now()-({"24h":1,"7d":7,"30d":30}[range]??0)*86400000;
  const valid=(value:string|null|undefined)=>{const t=Date.parse(value??"");return Number.isFinite(t)&&t<=Date.now()&&t>=cutoff};
  const sources=[
