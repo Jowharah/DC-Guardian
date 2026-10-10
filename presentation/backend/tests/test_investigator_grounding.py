@@ -57,3 +57,10 @@ def test_label_first_wrong_value_is_mismatch():
 def test_missing_source_metric_not_accepted_as_zero():
     result=ssh_field_checks("**Successful login count:** 0",{"evidence":{}})
     assert result["checks"][0]["status"]=="SOURCE_FIELD_UNAVAILABLE"
+
+def test_number_first_claims_cannot_cross_lines():
+    source={"detector_votes":2,"evidence":{"successful_login_count":0}}
+    answer="Successful login count: 0\nDetector votes: 2"
+    result=ssh_field_checks(answer,source)
+    assert len(result["checks"])==2, result["checks"]
+    assert all(c["status"]=="MATCH" for c in result["checks"]), result["checks"]
