@@ -79,6 +79,7 @@ def record_review(group_id:str,payload:ReviewInput,principal:Principal=Depends(c
 @router.get("/api/v1/reviews/unified/{group_id}/records")
 def list_reviews(group_id:str,principal:Principal=Depends(current_principal)):
     group=find_group(group_id,principal)
+    authorize(principal,Permission.INCIDENT_READ,group["zone_id"])
     with connect() as db:
         rows=db.execute("""SELECT audit_id,group_id,zone_id,reviewer,recorded_at,
            outcome,rationale,evidence_signature,policy_version,review_status,
