@@ -12,7 +12,7 @@ from presentation.backend.app.authentication import current_principal
 from presentation.backend.app.authorization import Principal
 from presentation.backend.app.investigator_tools import unified_context
 from presentation.backend.app.investigator_sources import unified_sources,operational_sources,single_sources
-from presentation.backend.app.investigator_grounding import check_answer_references
+from presentation.backend.app.investigator_grounding import check_answer_references,ssh_field_checks
 
 router=APIRouter()
 logger=logging.getLogger(__name__)
@@ -183,6 +183,6 @@ state from confirmed events, and explicitly state any unsupported conclusions.""
     except Exception as exc:
         logger.warning("Single Evidence Investigator failure: %s",type(exc).__name__)
         raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
-    return {"kind":kind,"evidence_id":evidence_id,"answer":answer,"sources":single_sources(context),"source_validation":"REFERENCES_ONLY_NOT_CLAIM_VERIFIED","grounding_check":check_answer_references(answer,single_sources(context)),
+    return {"kind":kind,"evidence_id":evidence_id,"answer":answer,"sources":single_sources(context),"source_validation":"REFERENCES_ONLY_NOT_CLAIM_VERIFIED","grounding_check":check_answer_references(answer,single_sources(context)),"field_grounding":ssh_field_checks(answer,context["source_assessment"]) if kind=="ssh" else None,
             "read_only":True,"decision_severity_assigned":False,
             "notice":"LLM explanation only; no new correlation, Decision or autonomous action."}
