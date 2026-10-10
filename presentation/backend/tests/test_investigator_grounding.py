@@ -72,3 +72,19 @@ def test_remaining_ssh_label_variants_and_summary():
     assert len(result["checks"])==3, result["checks"]
     assert all(c["status"]=="MATCH" for c in result["checks"]),result["checks"]
     assert result["summary"]=={"matched":3,"mismatched":0,"source_unavailable":0,"recognized":3}
+
+def test_original_ssh_metric_keys_match_frozen_evidence():
+    metrics={"failed_login_count":6,"invalid_user_count":0,"unique_users":1,
+             "failure_ratio":1.0,"root_attempt_ratio":1.0,
+             "breakin_warning_count":0,"disconnect_count":0,
+             "no_identification_count":0,"successful_login_count":0,
+             "success_after_failures":0}
+    answer="\n".join(f"**{key}: {value}**" for key,value in metrics.items())
+    result=ssh_field_checks(answer,{"evidence":metrics})
+    assert len(result["checks"])==10,result["checks"]
+    assert all(c["status"]=="MATCH" for c in result["checks"]),result["checks"]
+    assert result["summary"]["matched"]==10
+
+def test_original_metric_key_mismatch_is_reported():
+    result=ssh_field_checks("failed_login_count: 9",{"evidence":{"failed_login_count":6}})
+    assert result["status"]=="MISMATCH"
