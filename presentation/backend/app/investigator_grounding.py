@@ -54,11 +54,12 @@ def ssh_field_checks(answer:str,assessment:dict)->dict:
     top=assessment.get("metrics")
     top=top if isinstance(top,dict) else {}
     checks=[]
+    normalized=answer.replace("**","").replace("`","")
     for field,patterns in SSH_PATTERNS.items():
         expected=next((d[field] for d in (assessment,top,evidence,nested) if field in d),None)
         found=[]
         for pattern in patterns:
-            for match in pattern.finditer(answer):
+            for match in pattern.finditer(normalized):
                 if any(match.start()<end and match.end()>begin for begin,end in found):
                     continue
                 found.append(match.span())
