@@ -13,7 +13,7 @@ import json
 
 router=APIRouter()
 
-def assess_review(ppe,face,grounding):
+def assess_review(ppe,face,grounding,ppe_verdict=None):
     if grounding not in ("SUPPORTED","PARTIALLY_SUPPORTED","INSUFFICIENT"):
         raise ValueError("Saved grounded specialist assessment required")
     if ppe.get("overall_status") not in ("COMPLIANT","NON_COMPLIANT","NO_PERSON"):
@@ -21,8 +21,12 @@ def assess_review(ppe,face,grounding):
     if face.get("recognition_status") not in ("RECOGNIZED","UNKNOWN","NO_FACE","MULTIPLE_FACES"):
         raise ValueError("Unknown frozen Face status")
     reasons=[]
-    if ppe["overall_status"]=="NON_COMPLIANT":
-        reasons.append("PPE_NON_COMPLIANT_DETECTOR_ASSESSMENT")
+    # A human override replaces the detector PPE status for this disposition;
+    # the frozen detector output itself is unchanged.
+    overridden=bool(ppe_verdict and ppe_verdict.get("source")=="HUMAN_OVERRIDE")
+    ppe_status=ppe_verdict["effective_status"] if overridden else ppe["overall_status"]
+    if ppe_status=="NON_COMPLIANT":
+        reasons.append("PPE_NON_COMPLIANT_HUMAN_VERDICT" if overridden else "PPE_NON_COMPLIANT_DETECTOR_ASSESSMENT")
     if face["recognition_status"]!="RECOGNIZED":
         reasons.append("FACE_RECOGNITION_NOT_ESTABLISHED")
     if grounding=="INSUFFICIENT":
@@ -32,6 +36,7 @@ def assess_review(ppe,face,grounding):
             "severity":None,"response_mode":"HUMAN_REVIEW" if reasons else "NO_ACTION_ASSIGNED",
             "autonomous_action_allowed":False,"reasons":reasons,
             "identity_link_established":False,"confirmed_ppe_violation":False,
+            "ppe_status_used":ppe_status,"ppe_status_source":"HUMAN_OVERRIDE" if overridden else "DETECTOR",
             "decision_v1_severity_evaluated":False}
 
 @router.get("/api/v1/physical/image-correlations/{candidate_id}/review-decision")
@@ -47,7 +52,9 @@ def review_decision(candidate_id:str,principal:Principal=Depends(current_princip
     if not p or not f:
         raise HTTPException(409,"Source observations unavailable")
     try:
-        result=assess_review(p["assessment"],f["assessment"],json.loads(row[1])["grounding_status"])
+        from presentation.backend.app.evidence_review import summary
+        result=assess_review(p["assessment"],f["assessment"],json.loads(row[1])["grounding_status"],
+                             summary("ppe",item["ppe_observation_id"]))
     except (ValueError,KeyError,TypeError) as exc:
         raise HTTPException(409,"Source or specialist contract invalid") from exc
     return {"candidate_id":candidate_id,"specialist_evaluated_at":row[0],"decision":result}

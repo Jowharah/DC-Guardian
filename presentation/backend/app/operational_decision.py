@@ -78,8 +78,11 @@ def read_decision(candidate_id:str,principal:Principal=Depends(current_principal
                          (candidate_id,)).fetchone()
     if row is None:
         raise HTTPException(404,"No completed correlated Decision")
+    from presentation.backend.app.decision_reevaluation import overlay,operational_members
+    candidate=get_candidate(candidate_id,principal)
+    view=overlay("operations",candidate_id,json.loads(row[2]),operational_members(candidate))
     return {"candidate_id":candidate_id,"evaluated_at":row[0],
-            "specialist":json.loads(row[1]),"decision":json.loads(row[2]),
+            "specialist":json.loads(row[1]),**view,
             "evidence_event_ids":json.loads(row[3])}
 
 @router.post("/api/v1/operations/correlations/{candidate_id}/decision")

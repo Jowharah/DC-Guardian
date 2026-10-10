@@ -87,7 +87,7 @@ export async function validateSSHLog(file:File,zone:string,server:string):Promis
  return request<SSHLogResult>("/api/v1/ssh/validate-log",{method:"POST",body});
 }
 
-export type PublishedSSH=SSHAssessment&{event_id:string;received_at:string;zone_id:string;server_id:string;record_type:"SSH_DETECTOR_EVIDENCE";source_type:string;decision_severity:null;decision_record?:{evaluated_at:string;decision:SSHDecisionResult["decision"];specialist:SSHSpecialistResponse;correlation:SSHCorrelationCheck}|null};
+export type PublishedSSH=SSHAssessment&{event_id:string;received_at:string;zone_id:string;server_id:string;record_type:"SSH_DETECTOR_EVIDENCE";source_type:string;decision_severity:null;decision_record?:{evaluated_at:string;decision:SSHDecisionResult["decision"];specialist:SSHSpecialistResponse;correlation:SSHCorrelationCheck;original_decision?:{severity:"LOW"|"MEDIUM"|"HIGH"|null}|null;reevaluation?:DecisionReevaluation|null;input_review?:DecisionInputReview}|null};
 export const getPublishedSSH=()=>request<PublishedSSH[]>("/api/v1/ssh/published");
 export const publishSSH=(preview_id:string,indices:number[])=>request<{published_event_ids:string[]}>("/api/v1/ssh/publish",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({preview_id,indices})});
 
@@ -107,10 +107,10 @@ export const checkSSHCorrelation=(id:string)=>request<SSHCorrelationCheck>(`/api
 export type SSHSpecialistResponse={specialist_id:string;assessment:string;grounding_status:string;supported_findings:string[];recommended_considerations:string[];limitations:string[];citations:{chunk_id:string;document_id:string}[];source:string;decision_severity:null;confirmed_compromise:false};
 export const getSSHSpecialistResponse=(id:string)=>request<SSHSpecialistResponse>(`/api/v1/ssh/published/${encodeURIComponent(id)}/specialist-response`,{method:"POST"});
 
-export type SSHDecisionResult={event_id:string;zone_id:string;server_id:string;source_ip:string;evidence_state:string;correlation:SSHCorrelationCheck;specialist:SSHSpecialistResponse;decision:{severity:"LOW"|"MEDIUM"|"HIGH";incident_status:string;response_mode:string;autonomous_action_allowed:false;escalation_required:boolean;decision_rules_triggered:string[];policy_version:string};record_type:"STANDALONE_SSH_DECISION";incident_linked:false;decision_source:string;note:string};
+export type SSHDecisionResult={event_id:string;zone_id:string;server_id:string;source_ip:string;evidence_state:string;correlation:SSHCorrelationCheck;specialist:SSHSpecialistResponse;decision:{severity:"LOW"|"MEDIUM"|"HIGH"|null;incident_status:string;response_mode:string;autonomous_action_allowed:false;escalation_required:boolean;decision_rules_triggered:string[];policy_version:string};record_type:"STANDALONE_SSH_DECISION";incident_linked:false;decision_source:string;note:string};
 export const evaluateSSHDecision=(id:string)=>request<SSHDecisionResult>(`/api/v1/ssh/published/${encodeURIComponent(id)}/decision`,{method:"POST"});
 
-export const getSavedSSHDecision=(id:string)=>request<{evaluated_at:string;decision:SSHDecisionResult["decision"];specialist:SSHSpecialistResponse;correlation:SSHCorrelationCheck}>(`/api/v1/ssh/published/${encodeURIComponent(id)}/decision`);
+export const getSavedSSHDecision=(id:string)=>request<{evaluated_at:string;decision:SSHDecisionResult["decision"];specialist:SSHSpecialistResponse;correlation:SSHCorrelationCheck;original_decision?:{severity:"LOW"|"MEDIUM"|"HIGH"|null}|null;reevaluation?:DecisionReevaluation|null;input_review?:DecisionInputReview}>(`/api/v1/ssh/published/${encodeURIComponent(id)}/decision`);
 
 export type MaintenanceAssessment={domain:"MAINTENANCE";assessment:"NORMAL"|"AT_RISK";serial_number:string;observation_timestamp:string;failure_probability:number;operating_threshold:number;failure_horizon_days:number;model_name:string;evidence:Record<string,number|null>};
 export type MaintenanceWorkflow={stages:{stage:string;status:string;detail:string}[];correlation:{status:string;count:number;scope:string};specialist:{assessment:string;grounding_status:string;supported_findings:string[];recommended_considerations:string[];limitations:string[];citations:{chunk_id:string;document_id:string}[]}|null;decision:null;graph_event_id:string};
@@ -137,12 +137,16 @@ export function validateEnvironment(file:File,zone:string,sensor:string,publish:
  return request<{published:boolean;assessments:EnvironmentalAssessment[];events:{event_id:string;assessment:EnvironmentalAssessment;workflow:EnvironmentalEvent["workflow"]}[]}>("/api/v1/environment/validate",{method:"POST",body});
 }
 
-export type OperationalCorrelation={id:string;zone_id:string;maintenance_event_id:string;environment_event_id:string;maintenance:MaintenanceEvent;environment:EnvironmentalEvent;time_difference_seconds:number;matched_environment_timestamp:string;correlation_type:string;scope:"ZONE";status:"CORRELATION_CANDIDATE"|"DECISION_COMPLETE";decision:Decision|null;decision_severity:"LOW"|"MEDIUM"|"HIGH"|null;explanation:string};
+export type OperationalCorrelation={id:string;zone_id:string;maintenance_event_id:string;environment_event_id:string;maintenance:MaintenanceEvent;environment:EnvironmentalEvent;time_difference_seconds:number;matched_environment_timestamp:string;correlation_type:string;scope:"ZONE";status:"CORRELATION_CANDIDATE"|"DECISION_COMPLETE";decision:ReevaluableDecision|null;decision_severity:"LOW"|"MEDIUM"|"HIGH"|null;explanation:string;original_decision?:{severity:"LOW"|"MEDIUM"|"HIGH"|null}|null;reevaluation?:DecisionReevaluation|null;input_review?:DecisionInputReview};
 export const getOperationalCorrelations=()=>request<OperationalCorrelation[]>("/api/v1/operations/correlations");
 
 export const getOperationalGraph=(id:string)=>request<IncidentGraph>(`/api/v1/operations/correlations/${encodeURIComponent(id)}/graph`);
 
-export type OperationalDecisionResult={candidate_id:string;evaluated_at:string;specialist:SpecialistAssessment;decision:Decision;evidence_event_ids:string[]};
+export type DecisionInputReview={reevaluation_required:boolean;changed_inputs:string[];current_inputs:Record<string,{abnormal:boolean;status:string|null;source:string;verdict_audit_id:string|null}>};
+export type DecisionReevaluation={reevaluation_id:string;evaluated_at:string;evaluated_by:string;inputs:DecisionInputReview["current_inputs"]};
+export type ReevaluableDecision=Omit<Decision,"severity">&{severity:"LOW"|"MEDIUM"|"HIGH"|null};
+export type OperationalDecisionResult={candidate_id:string;evaluated_at:string;specialist:SpecialistAssessment;decision:ReevaluableDecision;evidence_event_ids:string[];original_decision?:{severity:"LOW"|"MEDIUM"|"HIGH"|null}|null;reevaluation?:DecisionReevaluation|null;input_review?:DecisionInputReview};
+export const reevaluateDecision=(kind:"ssh"|"operations",id:string)=>request<{reevaluation_id:string;decision:ReevaluableDecision}>(`/api/v1/decisions/${kind}/${encodeURIComponent(id)}/reevaluate`,{method:"POST"});
 export const getOperationalDecision=(id:string)=>request<OperationalDecisionResult>(`/api/v1/operations/correlations/${encodeURIComponent(id)}/decision`);
 export const evaluateOperationalDecision=(id:string)=>request<OperationalDecisionResult>(`/api/v1/operations/correlations/${encodeURIComponent(id)}/decision`,{method:"POST"});
 

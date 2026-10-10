@@ -75,11 +75,15 @@ def operational_correlations(principal:Principal=Depends(current_principal)):
     with storage() as conn:
         rows=conn.execute("SELECT candidate_id,decision_json FROM operational_decisions").fetchall()
     decisions={candidate_id:__import__("json").loads(payload) for candidate_id,payload in rows}
+    from presentation.backend.app.decision_reevaluation import overlay,operational_members
     for candidate in candidates:
         decision=decisions.get(candidate["id"])
         if decision is not None:
-            candidate["decision"]=decision
-            candidate["decision_severity"]=decision["severity"]
+            # Current Decision may be a re-evaluation on human-verified inputs.
+            view=overlay("operations",candidate["id"],decision,operational_members(candidate))
+            candidate.update({"decision":view["decision"],"original_decision":view["original_decision"],
+                              "reevaluation":view["reevaluation"],"input_review":view["input_review"]})
+            candidate["decision_severity"]=view["decision"]["severity"]
             candidate["status"]="DECISION_COMPLETE"
     return candidates
 

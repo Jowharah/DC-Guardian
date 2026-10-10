@@ -1,4 +1,5 @@
 import {useEffect,useState} from "react";
+import DecisionReviewNotice from "./DecisionReviewNotice";
 import {getOperationalDecision,evaluateOperationalDecision,type OperationalDecisionResult} from "./api";
 export default function OperationalDecisionViewer({candidateId}:{candidateId:string}){
  const [saved,setSaved]=useState<OperationalDecisionResult|null>(null);
@@ -15,7 +16,8 @@ export default function OperationalDecisionViewer({candidateId}:{candidateId:str
  <p className="muted">Grounded cross-domain assessment and deterministic Decision v1. Requires verified Neo4j Evidence and approved knowledge. Human review only.</p>
  <button disabled={busy} onClick={()=>void run()}>{busy?"Evaluating…":saved?"Re-evaluate Correlated Decision":"Evaluate Correlated Decision"}</button>
  {error&&<p className="error" role="alert">{error}</p>}
- {saved&&<><div className="evidenceItem"><div className="incidentTop"><b>Decision · <span className={`severity severity-${saved.decision.severity.toLowerCase()}`}>{saved.decision.severity}</span></b><span>{saved.decision.incident_status}</span></div>
+ {saved&&<DecisionReviewNotice key={saved.evaluated_at} kind="operations" id={candidateId} onChanged={()=>void getOperationalDecision(candidateId).then(setSaved)}/>}
+ {saved&&<><div className="evidenceItem"><div className="incidentTop"><b>Decision · <span className={`severity severity-${(saved.decision.severity??"none").toLowerCase()}`}>{saved.decision.severity??"NO SEVERITY"}</span></b><span>{saved.decision.incident_status}</span></div>
  <p>{saved.decision.response_mode} · {saved.decision.policy_version} · Autonomous action disabled</p><p>Evaluated: {new Date(saved.evaluated_at).toLocaleString()}</p>
  <b>Triggered Decision rules</b><ul>{saved.decision.decision_rules_triggered.map(x=><li key={x}>{x}</li>)}</ul></div>
  <article className="evidenceItem"><div className="incidentTop"><b>OPERATIONS SPECIALIST</b><span className="mode">{saved.specialist.grounding_status}</span></div>

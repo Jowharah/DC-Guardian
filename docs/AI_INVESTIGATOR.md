@@ -130,3 +130,12 @@ Operators can record a verdict on any single Evidence item in all five domains, 
 - The latest verdict is effective. An override to a non-concerning status (PPE `COMPLIANT`, Face `AUTHORIZED`/`NO_FACE`, SSH `BENIGN`, Maintenance `HEALTHY`, Environment `NORMAL`) removes the event from every correlation pair and unified group; an override to a concerning status makes it eligible under the Reasoning-contract pair rule. Dedicated matchers do not add pairs for human escalations.
 - Domain operators review their own domain in their zones (safety: PPE/Face; security: SSH; operations: Maintenance/Environment); viewers cannot record verdicts.
 - The Investigator receives a verdict summary (verdict, detector status, effective status, time) without the free-text rationale or reviewer identity, and must report both the detector result and the human verdict.
+
+### Human verdicts and Decision severity
+
+Severity is still assigned only by deterministic Decision Rules v1; a human never types a severity.
+
+- Saved SSH standalone and Maintenance+Environment operational Decisions report `input_review`. When the current human-verified input differs from the input the current Decision used, `reevaluation_required` is true and the UI shows **⚠ Re-evaluate**.
+- `POST /api/v1/decisions/{ssh|operations}/{id}/reevaluate` (Decision authority, i.e. `scenario:execute` in the zone) re-runs the same rules on human-verified inputs, reusing the saved specialist grounding (no model call). It is appended to `decision_reevaluations`; the original Decision row is never modified and stays visible as `original_decision`.
+- If a human clears an input, no rule applies: the new Decision has `severity: null` and status `INPUT_CLEARED_BY_HUMAN_VERDICT`, not a guessed lower severity. Reversing the override raises the flag again; re-evaluation restores the rule result.
+- The PPE+Face review disposition uses a human PPE override (`ppe_status_source: HUMAN_OVERRIDE`). Scenario-run incidents use synthetic events and are not re-evaluated.

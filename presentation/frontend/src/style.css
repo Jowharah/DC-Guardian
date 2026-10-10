@@ -387,3 +387,6 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .investigatorGroundingWarning{color:#ffc68d}
 .investigatorGrounding small{color:#bdaecb;line-height:1.5}
 .investigatorGrounding p{color:#ffc68d;overflow-wrap:anywhere;margin:0}
+
+.severity-none{background:#39254F;color:#E3B8E0;border:1px solid #8392CF}
+.decisionReviewNotice{margin:10px 0;padding:10px 12px;border-radius:10px;border:1px solid #524184;background:#21142D}.decisionReviewPending{border-color:#F3B65D}.decisionReviewNotice p{margin:6px 0}

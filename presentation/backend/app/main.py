@@ -81,6 +81,8 @@ from presentation.backend.app.correlation_pairs import router as correlation_pai
 app.include_router(correlation_pairs_router)
 from presentation.backend.app.evidence_review import router as evidence_review_router
 app.include_router(evidence_review_router)
+from presentation.backend.app.decision_reevaluation import router as decision_reevaluation_router
+app.include_router(decision_reevaluation_router)
 from presentation.backend.app.investigator_tools import router as investigator_tools_router
 app.include_router(investigator_tools_router)
 from presentation.backend.app.investigator_chat import router as investigator_chat_router

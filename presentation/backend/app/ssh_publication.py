@@ -107,7 +107,8 @@ def published(principal: Principal = Depends(current_principal)):
     with connect() as conn:
         rows=conn.execute("""SELECT event_id,received_at,zone_id,server_id,payload
                              FROM ssh_published_evidence ORDER BY received_at DESC LIMIT 200""").fetchall()
-    return [{**json.loads(payload),"decision_record":load_decision(eid),"event_id":eid,"received_at":received,
+    from presentation.backend.app.decision_reevaluation import ssh_view
+    return [{**json.loads(payload),"decision_record":ssh_view(eid,load_decision(eid)),"event_id":eid,"received_at":received,
              "zone_id":zone,"server_id":server,"record_type":"SSH_DETECTOR_EVIDENCE",
              "source_type":"OPERATOR_UPLOADED_OPENSSH_LOG","decision_severity":None}
             for eid,received,zone,server,payload in rows if zone in principal.zones]
@@ -357,7 +358,8 @@ def read_standalone_decision(event_id: str, principal: Principal = Depends(curre
     if row is None:
         raise HTTPException(404,"Published SSH evidence not found")
     authorize(principal, Permission.SSH_DETAIL, row[0])
-    result=load_decision(event_id)
+    from presentation.backend.app.decision_reevaluation import ssh_view
+    result=ssh_view(event_id,load_decision(event_id))
     if result is None:
         raise HTTPException(404,"No completed Decision for this event")
     return result
