@@ -1,8 +1,10 @@
 ﻿# DC-GUARDIAN
 
-DC-GUARDIAN is a research prototype for multi-domain data-center monitoring, deterministic cross-domain reasoning, grounded response, and governed decision support. The architecture is organized as Evidence -> Reasoning -> Response -> Decision, with Presentation/dashboard development next.
+DC-GUARDIAN is a research prototype for multi-domain data-center monitoring, deterministic cross-domain reasoning, grounded response, and governed decision support. The architecture is organized as Evidence -> Reasoning -> Response -> Decision, with a controlled Presentation/dashboard prototype and ongoing security validation.
 
-> **Current baseline:** Evidence model and monitoring baselines are frozen for integration. Reasoning, Response, and deterministic Decision contracts are implemented and validated by the integrated pipeline. The clean Python 3.12 runtime also retains the frozen-model smoke verification. Presentation/dashboard development is the next major development stage.
+> **Current branch baseline (2026-10-10):** The five frozen Evidence domains, Reasoning/Neo4j correlation, approved-knowledge Response, deterministic Decision contracts, and the controlled Presentation dashboard are implemented in the research prototype. The Presentation layer now includes Monitoring Center, Scenario Lab, Analytics Dashboard, Human Review Queue, authenticated human-review audit records, and local audit-integrity verification. The AI Investigator remains a disabled placeholder. This is not a production deployment or security certification.
+
+**Documentation:** Start at [docs/README.md](docs/README.md) for the complete documentation index, [Development History](docs/PROJECT_DEVELOPMENT_HISTORY.md), [Validation and Operations](docs/VALIDATION_AND_OPERATIONS.md), and [Remaining Roadmap](docs/REMAINING_ROADMAP.md).
 
 ## Architecture
 
