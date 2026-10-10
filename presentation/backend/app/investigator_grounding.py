@@ -28,17 +28,17 @@ SSH_PATTERNS={
   r"\b(\d+)\s+failed\s+(?:SSH\s+)?login\s+attempts?\b",
   r"\bfailed\s+login\s+count\s*[:=]\s*(\d+)\b"],
  "invalid_user_count":[r"\binvalid\s+user\s+count\s*[:=]\s*(\d+)\b"],
- "unique_users":[r"\bunique\s+users?\s+(?:attempted\s*)?[:=]\s*(\d+)\b"],
+ "unique_users":[r"\bunique\s+users?(?:\s+attempted)?\s*[:=]\s*(\d+)\b"],
  "detector_votes":[r"\b(\d+)\s+(?:detector|component)\s+votes?\b",
                    r"\bdetector\s+votes?\s*(?:count\s*)?[:=]\s*(\d+)\b"],
  "successful_login_count":[r"\b(\d+)\s+successful\s+logins?\b",
                            r"\bsuccessful\s+login\s+count\s*[:=]\s*(\d+)\b"],
  "failure_ratio":[r"\bfailure\s+ratio\s*(?:is|of|=|:)\s*(\d+(?:\.\d+)?%?)"],
  "root_attempt_ratio":[r"\broot\s+attempt\s+ratio\s*(?:is|of|=|:)\s*(\d+(?:\.\d+)?%?)"],
- "breakin_warning_count":[r"\bbreak[- ]in\s+warning\s+count\s*[:=]\s*(\d+)\b"],
+ "breakin_warning_count":[r"\bbreak[- ]?in\s+warning\s+count\s*[:=]\s*(\d+)\b"],
  "disconnect_count":[r"\bdisconnect\s+count\s*[:=]\s*(\d+)\b"],
  "no_identification_count":[r"\bno\s+identification\s+count\s*[:=]\s*(\d+)\b"],
- "success_after_failures":[r"\bsuccess\s+after\s+failures\s+count\s*[:=]\s*(\d+)\b"],
+ "success_after_failures":[r"\bsuccess\s+after\s+failures(?:\s+count)?\s*[:=]\s*(\d+)\b"],
 }
 SSH_PATTERNS={key:[re.compile(p,re.I) for p in patterns] for key,patterns in SSH_PATTERNS.items()}
 
@@ -88,4 +88,8 @@ def ssh_field_checks(answer:str,assessment:dict)->dict:
             else "PARTIAL_FIELD_CHECK" if checks
             else "NO_RECOGNIZED_CLAIMS")
     return {"status":status,"checks":checks,
+            "summary":{"matched":sum(c["status"]=="MATCH" for c in checks),
+                       "mismatched":sum(c["status"]=="MISMATCH" for c in checks),
+                       "source_unavailable":sum(c["status"]=="SOURCE_FIELD_UNAVAILABLE" for c in checks),
+                       "recognized":len(checks)},
             "note":"Only recognized numeric phrases were compared with saved detector fields; other claims remain unverified."}
