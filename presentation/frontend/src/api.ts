@@ -216,3 +216,6 @@ export const saveInvestigatorHistory=(id:string,question:string,answer:string)=>
 export const clearInvestigatorHistory=(id:string)=>request<{cleared:boolean}>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`,{method:"DELETE"});
 
 export const askOperationalInvestigator=(candidateId:string,question:string)=>request<{candidate_id:string;answer:string;read_only:boolean}>(`/api/v1/investigator/operations/${encodeURIComponent(candidateId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
+
+export type InvestigatorSingleKind="ssh"|"ppe"|"face"|"maintenance"|"environment";
+export const askSingleEvidenceInvestigator=(kind:InvestigatorSingleKind,evidenceId:string,question:string)=>request<{kind:string;evidence_id:string;answer:string;read_only:boolean}>(`/api/v1/investigator/evidence/${encodeURIComponent(kind)}/${encodeURIComponent(evidenceId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
