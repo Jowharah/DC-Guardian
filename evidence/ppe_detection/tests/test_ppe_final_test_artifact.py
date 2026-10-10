@@ -494,12 +494,14 @@ print(
 # Compliance boundary
 # ============================================================
 
-assert (
-    config[
-        "compliance_policy_frozen"
-    ]
-    is False
-)
+# PPE-POLICY-v1 was frozen after the locked detector evaluation (the runtime
+# pipeline and test_ppe_config.py require it). Separation is a property of
+# the frozen evaluation record: it must carry no compliance-policy outcome.
+assert result["compliance_policy_selection_performed"] is False
+assert not [
+    key for key in result
+    if "policy" in key and key != "compliance_policy_selection_performed"
+]
 
 
 print(
