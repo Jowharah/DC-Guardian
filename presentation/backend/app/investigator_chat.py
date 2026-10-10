@@ -134,3 +134,34 @@ have its own deterministic severity; do not reassign or transfer it."""
             "evidence_refs":context["evidence_event_ids"],
             "read_only":True,"decision_severity_assigned":False,
             "notice":"LLM explanation only. Existing saved operational Decision, if present, remains authoritative."}
+
+@router.post("/api/v1/investigator/evidence/{kind}/{evidence_id}/ask")
+def ask_single_evidence(kind:str,evidence_id:str,request:InvestigatorQuestion,
+                        principal:Principal=Depends(current_principal)):
+    from presentation.backend.app.investigator_tools import single_evidence_context
+    # Source-level and zone authorization happen before any OpenAI call.
+    context=single_evidence_context(kind,evidence_id,principal)
+    if local_setting("DCG_INVESTIGATOR_ENABLED")!="1":
+        raise HTTPException(503,"INVESTIGATOR_NOT_ENABLED")
+    if not local_setting("OPENAI_API_KEY"):
+        raise HTTPException(503,"OPENAI_API_KEY_NOT_CONFIGURED")
+    instructions=INSTRUCTIONS+"""
+This is an individual Evidence investigation. Do not assume it is correlated.
+Do not assign or invent a standalone Decision. Distinguish the saved detector
+state from confirmed events, and explicitly state any unsupported conclusions."""
+    try:
+        from openai import OpenAI
+        client=OpenAI(api_key=local_setting("OPENAI_API_KEY"),timeout=30.0,max_retries=0)
+        response=client.responses.create(
+            model=local_setting("DCG_INVESTIGATOR_MODEL") or "gpt-4.1-mini",
+            instructions=instructions,
+            input=json.dumps({"question":request.question,"authorized_context":context},ensure_ascii=False),
+            max_output_tokens=700,store=False)
+        answer=response.output_text.strip()
+        if not answer:raise ValueError("Empty model response")
+    except Exception as exc:
+        logger.warning("Single Evidence Investigator failure: %s",type(exc).__name__)
+        raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
+    return {"kind":kind,"evidence_id":evidence_id,"answer":answer,
+            "read_only":True,"decision_severity_assigned":False,
+            "notice":"LLM explanation only; no new correlation, Decision or autonomous action."}
