@@ -46,3 +46,43 @@ def unified_context(group_id:str,principal:Principal=Depends(current_principal))
 @router.get("/api/v1/investigator/unified/{group_id}/graph")
 def unified_graph_context(group_id:str,principal:Principal=Depends(current_principal)):
     return unified_graph(group_id,principal)
+
+@router.get("/api/v1/investigator/operations/{candidate_id}/context")
+def operational_context(candidate_id:str,principal:Principal=Depends(current_principal)):
+    """Reuse the saved Maintenance+Environmental correlation and Decision.
+
+    No new inference, graph writes, or synthetic Evidence is produced.
+    """
+    from presentation.backend.app.operational_decision import get_candidate,read_decision
+    candidate=get_candidate(candidate_id,principal)
+    saved=None
+    try:
+        saved=read_decision(candidate_id,principal)
+    except HTTPException as exc:
+        if exc.status_code!=404:raise
+    return {
+        "candidate_id":candidate_id,
+        "zone_id":candidate["zone_id"],
+        "maintenance":candidate["maintenance"],
+        "environment":candidate["environment"],
+        "correlation":{
+            "id":candidate["id"],
+            "shared_scope":candidate.get("shared_scope"),
+            "shared_entity":candidate.get("shared_entity"),
+            "time_difference_seconds":candidate.get("time_difference_seconds"),
+            "status":candidate.get("status"),
+        },
+        "saved_specialist":saved["specialist"] if saved else None,
+        "saved_decision":saved["decision"] if saved else None,
+        "evidence_event_ids":saved["evidence_event_ids"] if saved else [],
+        "restrictions":{
+            "read_only":True,"causation_established":False,
+            "root_cause_established":False,"autonomous_action_allowed":False
+        },
+        "provenance_note":"Saved model/sensor Evidence and correlation context. Shared zone/time does not establish environmental causation of drive risk."
+    }
+
+@router.get("/api/v1/investigator/operations/{candidate_id}/graph")
+def operational_graph_context(candidate_id:str,principal:Principal=Depends(current_principal)):
+    from presentation.backend.app.operational_correlations import operational_graph
+    return operational_graph(candidate_id,principal)
