@@ -376,3 +376,14 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .investigatorSources ul{padding-left:18px;margin:8px 0;display:grid;gap:7px}
 .investigatorSources li{overflow-wrap:anywhere}
 .investigatorSources code{color:#a9d8ff;overflow-wrap:anywhere}
+
+
+/* Investigator grounding verification: neutral unless unrecognized references found */
+.investigatorGrounding{margin-top:14px;padding:12px;border:1px solid #66527e;background:#292039;border-radius:10px;display:grid;gap:9px;font-size:11px}
+.investigatorGroundingTitle{display:flex;gap:8px;align-items:center;color:#dfccf7;font-size:12px}
+.investigatorGrounding>div:not(.investigatorGroundingTitle){display:flex;justify-content:space-between;align-items:start;gap:10px}
+.investigatorGrounding b{font-weight:650}
+.investigatorGroundingNeutral{color:#c7b4dd}
+.investigatorGroundingWarning{color:#ffc68d}
+.investigatorGrounding small{color:#bdaecb;line-height:1.5}
+.investigatorGrounding p{color:#ffc68d;overflow-wrap:anywhere;margin:0}
