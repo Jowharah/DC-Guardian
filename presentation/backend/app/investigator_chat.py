@@ -1,4 +1,7 @@
-"""Opt-in, read-only OpenAI Investigator over existing authorized unified Evidence.
+"""Opt-in, read-only OpenAI Investigator over existing authorized Evidence.
+
+Modes: unified group (three or more correlated events), correlation pair (any
+two correlated events), operational pair (legacy route) and single Evidence.
 
 No user-provided tool execution, synthetic fixture creation, or graph mutation.
 """
@@ -11,7 +14,7 @@ from pydantic import BaseModel,Field
 from presentation.backend.app.authentication import current_principal
 from presentation.backend.app.authorization import Principal
 from presentation.backend.app.investigator_tools import unified_context
-from presentation.backend.app.investigator_sources import unified_sources,operational_sources,single_sources
+from presentation.backend.app.investigator_sources import unified_sources,operational_sources,single_sources,pair_sources
 from presentation.backend.app.investigator_grounding import check_answer_references,ssh_field_checks
 
 router=APIRouter()
@@ -66,15 +69,50 @@ assume two independent detectors without supporting architecture evidence.
 Never say an individually selected event has no correlation; correlation
 was not assessed by the single-Evidence request."""
 
+OPERATIONS_INSTRUCTIONS="""
+For Maintenance and Environmental findings, distinguish SMART failure-risk
+predictions from actual drive failure. A high temperature reading is a sensor
+assessment, not verified hardware damage. Correlation in a zone/time window
+does not establish causation or root cause. A saved operational Decision may
+have its own deterministic severity; do not reassign or transfer it."""
+
+def require_enabled():
+    # Called only after authorization and source retrieval have succeeded.
+    if local_setting("DCG_INVESTIGATOR_ENABLED")!="1":
+        raise HTTPException(503,"INVESTIGATOR_NOT_ENABLED")
+    if not local_setting("OPENAI_API_KEY"):
+        raise HTTPException(503,"OPENAI_API_KEY_NOT_CONFIGURED")
+
+def ask_model(instructions,question,context,label):
+    require_enabled()
+    try:
+        from openai import OpenAI
+        client=OpenAI(api_key=local_setting("OPENAI_API_KEY"),timeout=30.0,max_retries=0)
+        response=client.responses.create(
+            model=local_setting("DCG_INVESTIGATOR_MODEL") or "gpt-4.1-mini",
+            instructions=instructions,
+            input=json.dumps({"question":question,"authorized_context":context},ensure_ascii=False),
+            max_output_tokens=700,store=False)
+        answer=response.output_text.strip()
+        if not answer:raise ValueError("Empty model response")
+    except Exception as exc:
+        # Log only a safe exception class; provider messages may contain
+        # private request data or credentials and must not be exposed.
+        logger.warning("%s Investigator provider failure: %s",label,type(exc).__name__)
+        raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
+    return answer
+
+def grounded(answer,sources):
+    return {"answer":answer,"sources":sources,"source_validation":"REFERENCES_ONLY_NOT_CLAIM_VERIFIED",
+            "grounding_check":check_answer_references(answer,sources),
+            "read_only":True,"decision_severity_assigned":False}
+
 @router.post("/api/v1/investigator/unified/{group_id}/ask")
 def ask_investigator(group_id:str,request:InvestigatorQuestion,
                      principal:Principal=Depends(current_principal)):
     # Authorization and source retrieval must precede the external LLM call.
     context=unified_context(group_id,principal)
-    if local_setting("DCG_INVESTIGATOR_ENABLED")!="1":
-        raise HTTPException(503,"INVESTIGATOR_NOT_ENABLED")
-    if not local_setting("OPENAI_API_KEY"):
-        raise HTTPException(503,"OPENAI_API_KEY_NOT_CONFIGURED")
+    require_enabled()
     # Explicit allowlist prevents accidentally transmitting entire records
     # including free-form human rationale and biometric identity data.
     minimal={
@@ -87,27 +125,30 @@ def ask_investigator(group_id:str,request:InvestigatorQuestion,
       "human_review_outcomes":[{"outcome":r["outcome"],"recorded_at":r["recorded_at"]}
                                for r in context["human_review_records"]]
     }
-    try:
-        from openai import OpenAI
-        client=OpenAI(api_key=local_setting("OPENAI_API_KEY"),timeout=30.0,max_retries=0)
-        response=client.responses.create(
-            model=local_setting("DCG_INVESTIGATOR_MODEL") or "gpt-4.1-mini",
-            instructions=INSTRUCTIONS,
-            input=json.dumps({"question":request.question,"authorized_context":minimal},
-                             ensure_ascii=False),
-            max_output_tokens=700,store=False)
-        answer=response.output_text.strip()
-        if not answer:
-            raise ValueError("Empty model response")
-    except Exception as exc:
-        # Log only a safe exception class; provider messages may contain
-        # private request data or credentials and must not be exposed.
-        logger.warning("Investigator provider failure: %s",type(exc).__name__)
-        raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
-    return {"group_id":group_id,"answer":answer,"sources":unified_sources(context),"source_validation":"REFERENCES_ONLY_NOT_CLAIM_VERIFIED","grounding_check":check_answer_references(answer,unified_sources(context)),
+    instructions=INSTRUCTIONS+OPERATIONS_INSTRUCTIONS+"""
+This is a unified group of three or more events. source_assessments lists
+every member per domain. Membership is transitive: two members are directly
+linked only if contextual_links contains that link."""
+    answer=ask_model(instructions,request.question,minimal,"Unified")
+    return {"group_id":group_id,**grounded(answer,unified_sources(context)),
             "evidence_refs":context["evidence_refs"],
-            "read_only":True,"decision_severity_assigned":False,
             "notice":"LLM explanation is not a Decision or verified identity/causal finding."}
+
+@router.post("/api/v1/investigator/pairs/{pair_id}/ask")
+def ask_pair(pair_id:str,request:InvestigatorQuestion,
+             principal:Principal=Depends(current_principal)):
+    from presentation.backend.app.investigator_tools import pair_context
+    # Both members' domain and zone permissions are checked before any API call.
+    context=pair_context(pair_id,principal)
+    require_enabled()
+    instructions=INSTRUCTIONS+OPERATIONS_INSTRUCTIONS+"""
+This is a correlation pair of exactly two events. link_type and link_details
+describe how the pair was linked (zone/server scope and time difference).
+The link is contextual only. Explain each member separately, then what the
+link does and does not support."""
+    answer=ask_model(instructions,request.question,context,"Pair")
+    return {"pair_id":pair_id,**grounded(answer,pair_sources(context)),
+            "notice":"LLM explanation only; the pair link is contextual and no Decision is created."}
 
 @router.post("/api/v1/investigator/operations/{candidate_id}/ask")
 def ask_operations(candidate_id:str,request:InvestigatorQuestion,
@@ -115,10 +156,7 @@ def ask_operations(candidate_id:str,request:InvestigatorQuestion,
     from presentation.backend.app.investigator_tools import operational_context
     # Existing operational RBAC and zone restrictions run before any API call.
     context=operational_context(candidate_id,principal)
-    if local_setting("DCG_INVESTIGATOR_ENABLED")!="1":
-        raise HTTPException(503,"INVESTIGATOR_NOT_ENABLED")
-    if not local_setting("OPENAI_API_KEY"):
-        raise HTTPException(503,"OPENAI_API_KEY_NOT_CONFIGURED")
+    require_enabled()
     # Explicitly allowlist numerical model/sensor assessments and saved
     # specialist/Decision context; never send arbitrary database rows.
     maintenance=context["maintenance"]
@@ -135,29 +173,9 @@ def ask_operations(candidate_id:str,request:InvestigatorQuestion,
       "evidence_event_ids":context["evidence_event_ids"],
       "restrictions":context["restrictions"],
     }
-    instructions=INSTRUCTIONS+"""
-For Maintenance and Environmental findings, distinguish SMART failure-risk
-predictions from actual drive failure. A high temperature reading is a sensor
-assessment, not verified hardware damage. Correlation in a zone/time window
-does not establish causation or root cause. A saved operational Decision may
-have its own deterministic severity; do not reassign or transfer it."""
-    try:
-        from openai import OpenAI
-        client=OpenAI(api_key=local_setting("OPENAI_API_KEY"),timeout=30.0,max_retries=0)
-        response=client.responses.create(
-            model=local_setting("DCG_INVESTIGATOR_MODEL") or "gpt-4.1-mini",
-            instructions=instructions,
-            input=json.dumps({"question":request.question,"authorized_context":minimal},
-                             ensure_ascii=False),
-            max_output_tokens=700,store=False)
-        answer=response.output_text.strip()
-        if not answer:raise ValueError("Empty model response")
-    except Exception as exc:
-        logger.warning("Operational Investigator provider failure: %s",type(exc).__name__)
-        raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
-    return {"candidate_id":candidate_id,"answer":answer,"sources":operational_sources(context),"source_validation":"REFERENCES_ONLY_NOT_CLAIM_VERIFIED","grounding_check":check_answer_references(answer,operational_sources(context)),
+    answer=ask_model(INSTRUCTIONS+OPERATIONS_INSTRUCTIONS,request.question,minimal,"Operational")
+    return {"candidate_id":candidate_id,**grounded(answer,operational_sources(context)),
             "evidence_refs":context["evidence_event_ids"],
-            "read_only":True,"decision_severity_assigned":False,
             "notice":"LLM explanation only. Existing saved operational Decision, if present, remains authoritative."}
 
 @router.post("/api/v1/investigator/evidence/{kind}/{evidence_id}/ask")
@@ -166,27 +184,12 @@ def ask_single_evidence(kind:str,evidence_id:str,request:InvestigatorQuestion,
     from presentation.backend.app.investigator_tools import single_evidence_context
     # Source-level and zone authorization happen before any OpenAI call.
     context=single_evidence_context(kind,evidence_id,principal)
-    if local_setting("DCG_INVESTIGATOR_ENABLED")!="1":
-        raise HTTPException(503,"INVESTIGATOR_NOT_ENABLED")
-    if not local_setting("OPENAI_API_KEY"):
-        raise HTTPException(503,"OPENAI_API_KEY_NOT_CONFIGURED")
+    require_enabled()
     instructions=INSTRUCTIONS+"""
 This is an individual Evidence investigation. Do not assume it is correlated.
 Do not assign or invent a standalone Decision. Distinguish the saved detector
 state from confirmed events, and explicitly state any unsupported conclusions."""
-    try:
-        from openai import OpenAI
-        client=OpenAI(api_key=local_setting("OPENAI_API_KEY"),timeout=30.0,max_retries=0)
-        response=client.responses.create(
-            model=local_setting("DCG_INVESTIGATOR_MODEL") or "gpt-4.1-mini",
-            instructions=instructions,
-            input=json.dumps({"question":request.question,"authorized_context":context},ensure_ascii=False),
-            max_output_tokens=700,store=False)
-        answer=response.output_text.strip()
-        if not answer:raise ValueError("Empty model response")
-    except Exception as exc:
-        logger.warning("Single Evidence Investigator failure: %s",type(exc).__name__)
-        raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
-    return {"kind":kind,"evidence_id":evidence_id,"answer":answer,"sources":single_sources(context),"source_validation":"REFERENCES_ONLY_NOT_CLAIM_VERIFIED","grounding_check":check_answer_references(answer,single_sources(context)),"field_grounding":ssh_field_checks(answer,context["source_assessment"]) if kind=="ssh" else None,
-            "read_only":True,"decision_severity_assigned":False,
+    answer=ask_model(instructions,request.question,context,"Single Evidence")
+    return {"kind":kind,"evidence_id":evidence_id,**grounded(answer,single_sources(context)),
+            "field_grounding":ssh_field_checks(answer,context["source_assessment"]) if kind=="ssh" else None,
             "notice":"LLM explanation only; no new correlation, Decision or autonomous action."}

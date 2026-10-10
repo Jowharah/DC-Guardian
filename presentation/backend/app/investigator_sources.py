@@ -21,3 +21,7 @@ def operational_sources(context):
 
 def single_sources(context):
     return [{"kind":context["kind"],"id":context["evidence_id"],"role":"saved_source_evidence"}]
+
+def pair_sources(context):
+    return [{"kind":m["kind"],"id":m["observation_id"],"role":"saved_source_evidence"}
+            for m in context.get("members",[]) if m.get("kind") and m.get("observation_id")]

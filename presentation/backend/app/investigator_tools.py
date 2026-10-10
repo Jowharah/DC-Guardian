@@ -87,6 +87,31 @@ def operational_graph_context(candidate_id:str,principal:Principal=Depends(curre
     from presentation.backend.app.operational_correlations import operational_graph
     return operational_graph(candidate_id,principal)
 
+@router.get("/api/v1/investigator/pairs/{pair_id}/context")
+def pair_context(pair_id:str,principal:Principal=Depends(current_principal)):
+    """Any two correlated events, whichever matcher produced the link.
+
+    Both members' domain permissions are checked in the pair's zone before any
+    Evidence is read. Only an operational pair carries a saved specialist and
+    Decision; no other pair has a Decision, and none is created here.
+    """
+    from presentation.backend.app.correlation_pairs import find_pair
+    from presentation.backend.app.unified_specialists import member_evidence
+    pair=find_pair(pair_id,principal)
+    members=[{**m,"assessment":member_evidence(m["kind"],m["observation_id"],pair["zone_id"])}
+             for m in pair["members"]]
+    saved_specialist=saved_decision=None
+    if pair["type"]=="OPERATIONAL":
+        saved=operational_context(pair_id,principal)
+        saved_specialist,saved_decision=saved["saved_specialist"],saved["saved_decision"]
+    return {"pair_id":pair_id,"zone_id":pair["zone_id"],"link_type":pair["type"],
+            "link_details":pair["details"],"link_explanation":pair["explanation"],
+            "members":members,"saved_specialist":saved_specialist,"saved_decision":saved_decision,
+            "restrictions":{"read_only":True,"severity_assigned":False,
+                "identity_link_established":False,"causation_established":False,
+                "autonomous_action_allowed":False},
+            "provenance_note":"Two saved Evidence records linked by a contextual zone/time candidate. The link does not establish causation, identity, or physical presence."}
+
 SINGLE_KINDS={"ssh","ppe","face","maintenance","environment"}
 
 @router.get("/api/v1/investigator/evidence/{kind}/{evidence_id}/context")

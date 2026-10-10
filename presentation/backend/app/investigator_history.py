@@ -75,6 +75,9 @@ def _other_scope(kind,identifier,principal):
     if kind=="operations":
         from presentation.backend.app.operational_decision import get_candidate
         get_candidate(identifier,principal)
+    elif kind=="pairs":
+        from presentation.backend.app.correlation_pairs import find_pair
+        find_pair(identifier,principal)
     else:
         from presentation.backend.app.investigator_tools import single_evidence_context
         single_evidence_context(kind,identifier,principal)
@@ -124,3 +127,15 @@ def evidence_save(kind:str,evidence_id:str,entry:HistoryEntry,principal:Principa
 @router.delete("/api/v1/investigator/evidence/{kind}/{evidence_id}/history")
 def evidence_clear(kind:str,evidence_id:str,principal:Principal=Depends(current_principal)):
     return _other_clear(kind,evidence_id,principal)
+
+@router.get("/api/v1/investigator/pairs/{pair_id}/history")
+def pair_history(pair_id:str,principal:Principal=Depends(current_principal)):
+    return _other_history("pairs",pair_id,principal)
+
+@router.post("/api/v1/investigator/pairs/{pair_id}/history",status_code=201)
+def pair_save(pair_id:str,entry:HistoryEntry,principal:Principal=Depends(current_principal)):
+    return _other_save("pairs",pair_id,entry,principal)
+
+@router.delete("/api/v1/investigator/pairs/{pair_id}/history")
+def pair_clear(pair_id:str,principal:Principal=Depends(current_principal)):
+    return _other_clear("pairs",pair_id,principal)

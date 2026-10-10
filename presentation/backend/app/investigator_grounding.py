@@ -5,10 +5,14 @@ Checks explicit Evidence identifiers only. This is not semantic claim verificati
 import re
 
 ID_PATTERN=re.compile(r"\b(?:SSH-EVT|PPE-IMG|FACE-IMG|MAINT-EVT|ENV-BATCH|ENV-EVT)-[A-Z0-9-]+\b",re.I)
+# Pair/candidate IDs embed member IDs (DCG-PHYSICAL-PPE-IMG-x-FACE-IMG-y);
+# split where another Evidence prefix begins so each member is checked.
+EMBEDDED_SPLIT=re.compile(r"-(?=(?:SSH-EVT|PPE-IMG|FACE-IMG|MAINT-EVT|ENV-BATCH|ENV-EVT)-)",re.I)
 
 def check_answer_references(answer:str,sources:list[dict])->dict:
     allowed={str(source["id"]).upper() for source in sources if source.get("id")}
-    mentioned=set(match.group(0).upper() for match in ID_PATTERN.finditer(answer))
+    mentioned={part.upper() for match in ID_PATTERN.finditer(answer)
+               for part in EMBEDDED_SPLIT.split(match.group(0))}
     unknown=sorted(mentioned-allowed)
     supported=sorted(mentioned & allowed)
     return {

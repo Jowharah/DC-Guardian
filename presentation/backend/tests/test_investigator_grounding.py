@@ -88,3 +88,12 @@ def test_original_ssh_metric_keys_match_frozen_evidence():
 def test_original_metric_key_mismatch_is_reported():
     result=ssh_field_checks("failed_login_count: 9",{"evidence":{"failed_login_count":6}})
     assert result["status"]=="MISMATCH"
+
+def test_pair_id_embedding_member_ids_is_not_unrecognized():
+    from presentation.backend.app.investigator_grounding import check_answer_references
+    sources=[{"id":"PPE-IMG-AAA1"},{"id":"FACE-IMG-BBB2"}]
+    result=check_answer_references("Pair DCG-PHYSICAL-PPE-IMG-AAA1-FACE-IMG-BBB2 links them.",sources)
+    assert result["status"]=="REFERENCE_CHECK_ONLY"
+    assert result["referenced_ids"]==["FACE-IMG-BBB2","PPE-IMG-AAA1"]
+    unknown=check_answer_references("See DCG-PHYSICAL-PPE-IMG-AAA1-FACE-IMG-ZZZ9.",sources)
+    assert unknown["unrecognized_ids"]==["FACE-IMG-ZZZ9"]
