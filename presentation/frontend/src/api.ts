@@ -207,7 +207,7 @@ export type AuditIntegrityResult={
 };
 export const getAuditIntegrity=()=>request<AuditIntegrityResult>("/api/v1/reviews/audit-integrity");
 
-export type InvestigatorAnswer={group_id:string;answer:string;evidence_refs:{kind:string;observation_id:string}[];read_only:true;decision_severity_assigned:false;notice:string};
+export type InvestigatorAnswer={group_id:string;answer:string;evidence_refs:{kind:string;observation_id:string}[];read_only:true;decision_severity_assigned:false;notice:string;sources?:{kind:string;id:string;role:string}[]};
 export const askUnifiedInvestigator=(groupId:string,question:string)=>request<InvestigatorAnswer>(`/api/v1/investigator/unified/${encodeURIComponent(groupId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
 
 export type InvestigatorHistoryEntry={id:string;created_at:string;question:string;answer:string};
@@ -215,10 +215,10 @@ export const getInvestigatorHistory=(id:string)=>request<{group_id:string;messag
 export const saveInvestigatorHistory=(id:string,question:string,answer:string)=>request<InvestigatorHistoryEntry>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question,answer})});
 export const clearInvestigatorHistory=(id:string)=>request<{cleared:boolean}>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`,{method:"DELETE"});
 
-export const askOperationalInvestigator=(candidateId:string,question:string)=>request<{candidate_id:string;answer:string;read_only:boolean}>(`/api/v1/investigator/operations/${encodeURIComponent(candidateId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
+export const askOperationalInvestigator=(candidateId:string,question:string)=>request<{candidate_id:string;answer:string;read_only:boolean;sources?:{kind:string;id:string;role:string}[]}>(`/api/v1/investigator/operations/${encodeURIComponent(candidateId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
 
 export type InvestigatorSingleKind="ssh"|"ppe"|"face"|"maintenance"|"environment";
-export const askSingleEvidenceInvestigator=(kind:InvestigatorSingleKind,evidenceId:string,question:string)=>request<{kind:string;evidence_id:string;answer:string;read_only:boolean}>(`/api/v1/investigator/evidence/${encodeURIComponent(kind)}/${encodeURIComponent(evidenceId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
+export const askSingleEvidenceInvestigator=(kind:InvestigatorSingleKind,evidenceId:string,question:string)=>request<{kind:string;evidence_id:string;answer:string;read_only:boolean;sources?:{kind:string;id:string;role:string}[]}>(`/api/v1/investigator/evidence/${encodeURIComponent(kind)}/${encodeURIComponent(evidenceId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
 
 export type InvestigatorScope="unified"|"operations"|"single";
 export function investigatorHistoryPath(scope:InvestigatorScope,id:string,kind?:InvestigatorSingleKind):string{
