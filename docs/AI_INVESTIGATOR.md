@@ -84,6 +84,12 @@ The model instructions now distinguish single-source `NOT_ASSESSED_BY_SINGLE_EVI
 
 **Remaining:** deterministic numeric field-level validation (for example, failed login count and detector votes), claim-to-field citations, and tests with deliberately unsupported model claims. These have not yet been implemented.
 
+## Initial SSH numerical field checks — October 2026
+
+For individual SSH Evidence questions, `investigator_grounding.ssh_field_checks` now recognizes a deliberately narrow set of explicit numerical statements: failed-login count, successful-login count, detector votes, failure ratio and root-attempt ratio. It compares recognized numbers to the saved structured assessment and returns `MATCH`, `MISMATCH`, or `SOURCE_FIELD_UNAVAILABLE`. Percentages are normalized (for example, 100% = 1.0). The frontend shows these comparisons under **SSH field checks**.
+
+**Critical limitations:** unrecognized wording is **not checked**, matching a numeric field does not validate the real-world event, and missing fields must never be treated as zero. The check does not validate causal, identity, security-incident or remediation claims. The current implementation is limited to **single SSH Evidence**, not unified SSH source assessments. Extend the structured extraction and tests before relying on broader phrasing or other domains.
+
 ## Outstanding safeguards
 
 1. Claim-level source/field verification and model-grounding/abstention evaluations, including misleading time/correlation statements.
