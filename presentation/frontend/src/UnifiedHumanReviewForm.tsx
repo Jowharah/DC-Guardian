@@ -1,5 +1,5 @@
 import {useEffect,useState} from "react";
-import {getUnifiedHumanReviews,submitUnifiedHumanReview,type HumanReviewRecord} from "./api";
+import {getUnifiedHumanReviews,submitUnifiedHumanReview,evaluateUnifiedSpecialists,type HumanReviewRecord} from "./api";
 type Outcome=HumanReviewRecord["outcome"];
 export default function UnifiedHumanReviewForm({id,canSubmit}:{id:string;canSubmit:boolean}){
  const [records,setRecords]=useState<HumanReviewRecord[]>([]);
@@ -10,7 +10,17 @@ export default function UnifiedHumanReviewForm({id,canSubmit}:{id:string;canSubm
  const [error,setError]=useState("");
  const [message,setMessage]=useState("");
  const [historyReady,setHistoryReady]=useState(false);
+ const [consent,setConsent]=useState(false);
+ const [evaluating,setEvaluating]=useState(false);
+ const [evaluation,setEvaluation]=useState("");
  useEffect(()=>{let active=true;setHistoryReady(false);getUnifiedHumanReviews(id).then(r=>{if(active){setRecords(r.records);setHistoryReady(true);setError("")}}).catch(()=>{if(active){setHistoryReady(false);setError("Audit history unavailable; submission disabled.")}});return()=>{active=false}},[id]);
+ async function evaluate(){
+  if(!consent||evaluating)return;
+  setEvaluating(true);setEvaluation("");
+  try{await evaluateUnifiedSpecialists(id);setEvaluation("Specialist evaluation saved. Review recording unlocks within a few seconds.");setConsent(false)}
+  catch(e){setEvaluation(e instanceof Error&&e.message.includes("(403)")?"Only administrators can run the specialist evaluation.":e instanceof Error&&e.message.includes("(503)")?"Specialist evaluation unavailable: check that the OpenAI key is configured and approved knowledge is available.":e instanceof Error?e.message:"Specialist evaluation failed")}
+  finally{setEvaluating(false)}
+ }
  async function submit(){
   if(!canSubmit||!historyReady||!ack||rationale.trim().length<15||busy)return;
   setBusy(true);setError("");setMessage("");
@@ -33,7 +43,10 @@ export default function UnifiedHumanReviewForm({id,canSubmit}:{id:string;canSubm
   <textarea id="humanReviewRationale" value={rationale} disabled={!canSubmit||!historyReady||busy} maxLength={2000} rows={4} onChange={e=>setRationale(e.target.value)} placeholder="Describe the Evidence reviewed and why you selected this outcome."/>
   <label className="reviewAck"><input type="checkbox" checked={ack} disabled={!canSubmit||!historyReady||busy} onChange={e=>setAck(e.target.checked)}/> I confirm this is my human review of the selected Evidence. The original assessments and Decision remain unchanged.</label>
   <button type="button" disabled={!canSubmit||!historyReady||!ack||rationale.trim().length<15||busy} onClick={()=>void submit()}>{busy?"Saving review…":"Record human review"}</button>
-  {!canSubmit&&<p className="muted">Recording is disabled until this group has a current specialist evaluation. Run it from the group in Monitoring Center; if the group's links changed since the last run, it must be run again.</p>}
+  {!canSubmit&&<div className="decisionReviewNotice decisionReviewPending"><p><b>Recording is disabled until this group has a current specialist evaluation.</b> It has never been run for this group, or the group's links changed since the last run.</p>
+   <label className="reviewAck"><input type="checkbox" checked={consent} disabled={evaluating} onChange={e=>setConsent(e.target.checked)}/> I authorize sending this group's filtered Evidence to OpenAI for the specialist evaluation.</label>
+   <button type="button" disabled={!consent||evaluating} onClick={()=>void evaluate()}>{evaluating?"Evaluating specialists… (can take a minute)":"Run specialist evaluation"}</button>
+   {evaluation&&<p role="status">{evaluation}</p>}</div>}
   {error&&<p role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
   <h4>Local audit history · {records.length}</h4>
   {records.length===0?<p className="muted">No recorded human reviews for this group.</p>:<div className="reviewHistory">{records.map(x=><article key={x.audit_id} className="reviewRecord">
