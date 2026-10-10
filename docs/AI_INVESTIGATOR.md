@@ -104,3 +104,7 @@ The Investigator is an **explanation aid**; DC-GUARDIAN's frozen Evidence, exist
 ## SSH numeric coverage refinement — October 2026
 
 The narrow SSH field checker additionally recognizes label-first `Unique Users`, `Breakin Warning Count`, and `Success After Failures` values, and returns a count of matched, mismatched and unavailable source fields. The UI distinguishes numerical field consistency from narrative/causal claim verification and independent source authenticity. These are implementation updates pending local test and browser validation; do not interpret a partial match count as complete verification of the answer.
+
+## Original SSH metric-key grounding — October 2026
+
+The single-SSH numeric checker now recognizes explicit frozen metric keys in label-value format, for example `failed_login_count: 6` and `root_attempt_ratio: 1.0`, in addition to human-readable phrases. Ten SSH metrics have a focused test, including a deliberately mismatched value. Only recognized numeric claims are checked against saved output; all other claims and underlying source authenticity remain unverified. Changes require local pytest and browser validation.
