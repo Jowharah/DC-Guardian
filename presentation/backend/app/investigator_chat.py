@@ -27,7 +27,19 @@ Do not assign severity, recommend autonomous actions, or claim investigation
 resolution. Clearly distinguish detector results, specialist findings,
 deterministic review and human reviewer outcomes. Reference Evidence IDs
 from the supplied context; if insufficient, say what is missing.
-Never output secrets or private enrollment data."""
+Never output secrets or private enrollment data.
+
+For SSH, describe failed login patterns as anomalous authentication activity.
+Do not label them a confirmed brute-force attack, malicious activity, or
+unauthorized access without independently supporting evidence. Detector votes
+are model signals, not independent proof of real-world validity.
+For PPE, say a safety vest was not detected or not associated with a person,
+not that a person definitively lacked a vest.
+For Face and PPE, same declared camera/time is contextual only, not a verified
+image match, physical presence, or person-to-PPE linkage.
+Use concise Markdown headings and bullets by domain, followed by limitations.
+Use bold emphasis sparingly for source states and unresolved links.
+Do not create citations to Evidence IDs that were not supplied."""
 
 @router.post("/api/v1/investigator/unified/{group_id}/ask")
 def ask_investigator(group_id:str,request:InvestigatorQuestion,
