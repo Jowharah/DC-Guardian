@@ -83,3 +83,54 @@ def ask_investigator(group_id:str,request:InvestigatorQuestion,
             "evidence_refs":context["evidence_refs"],
             "read_only":True,"decision_severity_assigned":False,
             "notice":"LLM explanation is not a Decision or verified identity/causal finding."}
+
+@router.post("/api/v1/investigator/operations/{candidate_id}/ask")
+def ask_operations(candidate_id:str,request:InvestigatorQuestion,
+                   principal:Principal=Depends(current_principal)):
+    from presentation.backend.app.investigator_tools import operational_context
+    # Existing operational RBAC and zone restrictions run before any API call.
+    context=operational_context(candidate_id,principal)
+    if local_setting("DCG_INVESTIGATOR_ENABLED")!="1":
+        raise HTTPException(503,"INVESTIGATOR_NOT_ENABLED")
+    if not local_setting("OPENAI_API_KEY"):
+        raise HTTPException(503,"OPENAI_API_KEY_NOT_CONFIGURED")
+    # Explicitly allowlist numerical model/sensor assessments and saved
+    # specialist/Decision context; never send arbitrary database rows.
+    maintenance=context["maintenance"]
+    environment=context["environment"]
+    minimal={
+      "candidate_id":context["candidate_id"],"zone_id":context["zone_id"],
+      "correlation":context["correlation"],
+      "maintenance":{"event_id":maintenance.get("event_id"),
+                     "assessment":maintenance.get("assessment")},
+      "environment":{"event_id":environment.get("event_id"),
+                     "assessment":environment.get("assessment")},
+      "saved_specialist":context["saved_specialist"],
+      "saved_decision":context["saved_decision"],
+      "evidence_event_ids":context["evidence_event_ids"],
+      "restrictions":context["restrictions"],
+    }
+    instructions=INSTRUCTIONS+"""
+For Maintenance and Environmental findings, distinguish SMART failure-risk
+predictions from actual drive failure. A high temperature reading is a sensor
+assessment, not verified hardware damage. Correlation in a zone/time window
+does not establish causation or root cause. A saved operational Decision may
+have its own deterministic severity; do not reassign or transfer it."""
+    try:
+        from openai import OpenAI
+        client=OpenAI(api_key=local_setting("OPENAI_API_KEY"),timeout=30.0,max_retries=0)
+        response=client.responses.create(
+            model=local_setting("DCG_INVESTIGATOR_MODEL") or "gpt-4.1-mini",
+            instructions=instructions,
+            input=json.dumps({"question":request.question,"authorized_context":minimal},
+                             ensure_ascii=False),
+            max_output_tokens=700,store=False)
+        answer=response.output_text.strip()
+        if not answer:raise ValueError("Empty model response")
+    except Exception as exc:
+        logger.warning("Operational Investigator provider failure: %s",type(exc).__name__)
+        raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
+    return {"candidate_id":candidate_id,"answer":answer,
+            "evidence_refs":context["evidence_event_ids"],
+            "read_only":True,"decision_severity_assigned":False,
+            "notice":"LLM explanation only. Existing saved operational Decision, if present, remains authoritative."}
