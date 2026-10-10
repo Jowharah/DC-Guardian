@@ -34,6 +34,20 @@ python -m pytest presentation/backend/tests/test_human_review_api_security.py pr
 
 **Reported local result (2026-10-10):** 16 passed in 0.17s. Other reported local runs: 11 passed for audit-integrity and review-audit tests after the append guard, 23 passed for earlier human-review/Decision/security contract groups, and successful Vite builds at prior development milestones. These runs are snapshots of their respective revisions, not a blanket claim that the entire suite passes today.
 
+## Consolidated HTTP security regression — 2026-10-10
+
+**Reported local PowerShell result:** **46 passed, 1 warning in 0.42s**. The user ran this combined command on `feature/presentation-dashboard`:
+
+```powershell
+python -m pytest presentation/backend/tests/test_image_http_rbac.py presentation/backend/tests/test_domain_feed_http_rbac.py presentation/backend/tests/test_review_http_rbac.py presentation/backend/tests/test_human_review_api_security.py presentation/backend/tests/test_human_review_audit.py presentation/backend/tests/test_review_integrity.py presentation/backend/tests/test_review_integrity_access.py -q
+```
+
+Coverage includes PPE/Face image authentication, response headers and zone isolation; SSH/Maintenance/Environmental feed RBAC and zone filtering; human-review HTTP authentication, reviewer identity and audit-history access; audit-chain verification, mutation detection, and rejection of appends to an inconsistent chain.
+
+**Warning:** `StarletteDeprecationWarning` in FastAPI TestClient regarding `httpx` / `httpx2`. This was non-fatal; review framework compatibility before changing dependencies.
+
+**Boundary:** These are isolated targeted regression tests with stubbed model/database inputs where appropriate. They do not establish complete production security, live multi-user penetration testing, or independent audit tamper resistance. Re-run on subsequent revisions.
+
 ## Local controlled ingestion
 
 A previously used workflow:
