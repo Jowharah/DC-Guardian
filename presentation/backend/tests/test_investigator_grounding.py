@@ -64,3 +64,11 @@ def test_number_first_claims_cannot_cross_lines():
     result=ssh_field_checks(answer,source)
     assert len(result["checks"])==2, result["checks"]
     assert all(c["status"]=="MATCH" for c in result["checks"]), result["checks"]
+
+def test_remaining_ssh_label_variants_and_summary():
+    source={"detector_votes":2,"evidence":{"unique_users":1,"breakin_warning_count":0,"success_after_failures":0}}
+    answer="**Unique Users:** 1\n**Breakin Warning Count:** 0\n**Success After Failures:** 0"
+    result=ssh_field_checks(answer,source)
+    assert len(result["checks"])==3, result["checks"]
+    assert all(c["status"]=="MATCH" for c in result["checks"]),result["checks"]
+    assert result["summary"]=={"matched":3,"mismatched":0,"source_unavailable":0,"recognized":3}
