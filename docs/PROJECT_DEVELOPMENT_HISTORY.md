@@ -16,6 +16,8 @@ Evidence: SSH | PPE | Face | SMART | Environmental
   -> Audited human reviewer outcomes (separate from Evidence/Decision)
 ```
 
+**New stage — AI Investigator (October 2026):** The presentation now supports an opt-in OpenAI Responses API Investigator over existing unified, operational, and individual five-domain Evidence; expand/collapse chat; safe domain-colored response formatting; operator-scoped, opt-in SQLite history; and deterministic source-reference manifests. The Investigator does not assign severity or create correlations. Source manifests are not claim-level verification. See [AI Investigator](AI_INVESTIGATOR.md) for endpoint contracts and limitations.
+
 **Scope:** a controlled research prototype. Data may be synthetic, operator-declared, historical, or unverified. Autonomous action is disabled.
 
 ## Stage 1 — Frozen Evidence baselines
