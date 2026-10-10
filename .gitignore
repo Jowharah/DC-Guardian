@@ -270,3 +270,7 @@ presentation/frontend/node_modules/
 presentation/frontend/dist/
 presentation/frontend/tsconfig.tsbuildinfo
 presentation/frontend/build_errors.txt
+
+# Local runtime logs and check reports (may contain Evidence IDs)
+/logs/*
+!/logs/README.md

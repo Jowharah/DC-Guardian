@@ -58,6 +58,14 @@ python -m pytest presentation/backend/tests/test_investigator_sources.py present
 
 Browser demonstrations included live OpenAI responses for unified, operational, and individual SSH Evidence, as well as opt-in history restoration. The latest frontend build and full end-to-end security suite have not been confirmed by this test result. See [AI Investigator](AI_INVESTIGATOR.md).
 
+## Full project check and logs — 2026-10-10
+
+`python check_all.py` runs every layer and writes `logs/checks/<timestamp>/report.md`. Reported local run on this branch: **50 passed, 1 failed, 0 skipped** — runtime 4/4; Evidence 28/29; Reasoning 24/24 (contract-test graph nodes removed afterwards); Response 15/15; Decision/integration 4/4; Presentation backend 305 tests; frontend build; live API 54 GET requests with 0 server errors. The one failure is local data, not code: the private Face `validation_known/P005` folder is empty (expected 1 image).
+
+Fixed during this check: a stale PPE final-test assertion (the compliance policy was frozen after the locked detector evaluation; separation is now asserted on the evaluation record) and a stale integration service test (the service has applied Decision Rules v1 since `d4cb326`).
+
+The backend logs requests (method, path, status, duration), application messages and errors with tracebacks to `logs/`. Bodies, headers, credentials and query strings are never logged; HTTP client libraries are limited to warnings so outgoing URLs are not recorded.
+
 ## Local controlled ingestion
 
 A previously used workflow:

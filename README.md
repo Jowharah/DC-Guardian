@@ -71,6 +71,18 @@ Implemented integration currently includes:
 - Deterministic pairwise and three-domain correlation
 - Deterministic/idempotent correlation persistence
 
+### Full project check (one command)
+
+```powershell
+python check_all.py              # every layer; ~3 minutes
+python check_all.py --skip-live  # without calling the running backend
+python check_all.py --only ppe   # checks whose name contains "ppe"
+```
+
+Runs the runtime smoke test, all Evidence component contracts (GPU scripts in `.venv-ppe` / `.venv-gru`), the 24 Reasoning contracts (Neo4j; test nodes are removed afterwards), Response, Decision and integration contracts, the Presentation backend tests, the frontend build and, if the backend is running, a GET-only live API smoke test. No check calls OpenAI. Results go to `logs/checks/<timestamp>/report.md` (and `logs/checks/latest.md`), with one log file per check. Checks that need private local data are skipped when that data is absent.
+
+The running backend writes `logs/api_access.log`, `logs/backend.log` and `logs/errors.log` (see `logs/README.md`).
+
 ### Runtime and regression verification
 
 The verified integrated runtime uses Python 3.12 and the repository-level

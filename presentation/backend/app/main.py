@@ -45,6 +45,10 @@ app = FastAPI(
     docs_url=None, redoc_url=None,
 )
 
+from presentation.backend.app.logging_setup import configure as configure_logging,request_logging
+configure_logging()
+app.middleware("http")(request_logging)
+
 app.include_router(ppe_image_router)
 app.include_router(face_image_router)
 app.include_router(employee_access_router)
