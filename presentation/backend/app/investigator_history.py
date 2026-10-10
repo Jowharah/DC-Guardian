@@ -89,7 +89,7 @@ def _other_history(kind,identifier,principal):
 
 def _other_save(kind,identifier,entry,principal):
     key=_other_scope(kind,identifier,principal)
-    row={"id":"DCG-CHAT-"+uuid4().hex.upper,"created_at":datetime.now(timezone.utc).isoformat(),"question":entry.question,"answer":entry.answer}
+    row={"id":"DCG-CHAT-"+uuid4().hex.upper(),"created_at":datetime.now(timezone.utc).isoformat(),"question":entry.question,"answer":entry.answer}
     with connect() as db:
         prune(db)
         db.execute("INSERT INTO investigator_history VALUES (?,?,?,?,?,?)",(row["id"],key,principal.subject,row["created_at"],row["question"],row["answer"]))
