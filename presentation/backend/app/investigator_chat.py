@@ -15,7 +15,8 @@ from presentation.backend.app.authentication import current_principal
 from presentation.backend.app.authorization import Principal
 from presentation.backend.app.investigator_tools import unified_context
 from presentation.backend.app.investigator_sources import unified_sources,operational_sources,single_sources,pair_sources
-from presentation.backend.app.investigator_grounding import check_answer_references,ssh_field_checks
+from presentation.backend.app.investigator_grounding import check_answer_references
+from presentation.backend.app.investigator_field_checks import context_field_checks
 
 router=APIRouter()
 logger=logging.getLogger(__name__)
@@ -134,7 +135,10 @@ This is a unified group of three or more events. source_assessments lists
 every member per domain. Membership is transitive: two members are directly
 linked only if contextual_links contains that link."""
     answer=ask_model(instructions,request.question,minimal,"Unified")
+    records=[(kind,item.get("observation_id"),item) for kind,items in context["source_assessments"].items()
+             for item in (items if isinstance(items,list) else [items])]
     return {"group_id":group_id,**grounded(answer,unified_sources(context)),
+            "field_grounding":context_field_checks(answer,records),
             "evidence_refs":context["evidence_refs"],
             "notice":"LLM explanation is not a Decision or verified identity/causal finding."}
 
@@ -151,7 +155,9 @@ describe how the pair was linked (zone/server scope and time difference).
 The link is contextual only. Explain each member separately, then what the
 link does and does not support."""
     answer=ask_model(instructions,request.question,context,"Pair")
+    records=[(m["kind"],m["observation_id"],m["assessment"]) for m in context["members"]]
     return {"pair_id":pair_id,**grounded(answer,pair_sources(context)),
+            "field_grounding":context_field_checks(answer,records),
             "notice":"LLM explanation only; the pair link is contextual and no Decision is created."}
 
 @router.post("/api/v1/investigator/operations/{candidate_id}/ask")
@@ -178,7 +184,9 @@ def ask_operations(candidate_id:str,request:InvestigatorQuestion,
       "restrictions":context["restrictions"],
     }
     answer=ask_model(INSTRUCTIONS+OPERATIONS_INSTRUCTIONS,request.question,minimal,"Operational")
+    records=[("maintenance",maintenance.get("event_id"),maintenance),("environment",environment.get("event_id"),environment)]
     return {"candidate_id":candidate_id,**grounded(answer,operational_sources(context)),
+            "field_grounding":context_field_checks(answer,records),
             "evidence_refs":context["evidence_event_ids"],
             "notice":"LLM explanation only. Existing saved operational Decision, if present, remains authoritative."}
 
@@ -195,5 +203,5 @@ Do not assign or invent a standalone Decision. Distinguish the saved detector
 state from confirmed events, and explicitly state any unsupported conclusions."""
     answer=ask_model(instructions,request.question,context,"Single Evidence")
     return {"kind":kind,"evidence_id":evidence_id,**grounded(answer,single_sources(context)),
-            "field_grounding":ssh_field_checks(answer,context["source_assessment"]) if kind=="ssh" else None,
+            "field_grounding":context_field_checks(answer,[(kind,evidence_id,context["source_assessment"])]),
             "notice":"LLM explanation only; no new correlation, Decision or autonomous action."}

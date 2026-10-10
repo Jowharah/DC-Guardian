@@ -146,3 +146,13 @@ Severity is still assigned only by deterministic Decision Rules v1; a human neve
 - **Provisional group severity** (`unified_severity.py`, `DCG-UNIFIED-SEVERITY-PROVISIONAL-v1`): Decision Rules v1 applied to the domains of active-concern members (detector-abnormal or human-escalated, not cleared), with `UNAUTHORIZED` authorization when an active Face member is unauthorized. It is recomputed from frozen detector output and audited verdicts, never from specialist or standalone severity, and is labelled provisional until validated. Example: Face (unauthorized) + PPE + SSH is HIGH; clearing the PPE leaves MEDIUM.
 - **Verdict-aware disposition:** source-review reasons are dropped for members a human confirmed or overrode; `HUMAN_CLEARED_MEMBERS_PRESENT` / `HUMAN_VERIFIED_CONCERNS_PRESENT` are added; a human `AUTHORIZED` Face override suppresses the graph-unauthorized reason. A group with MEDIUM/HIGH severity and no other reason is `REVIEW_REQUIRED`.
 - **Re-review flag:** the review-decision response reports `member_verdicts_changed_since_review` when a member verdict was recorded after the latest group review; the Review Queue shows "Member verdict changed".
+
+## Numeric and identity field checks for all domains — October 2026
+
+`investigator_field_checks.py` extends the SSH numeric checks to every domain and mode. Each answer returns `field_grounding` (status, checks, summary, skipped) for single Evidence, pairs, operational pairs and unified groups.
+
+- **Maintenance:** failure probability, operating threshold, failure horizon (days). **Environment:** temperature, humidity, high-temperature threshold. **PPE:** persons detected, non-compliant and compliant counts (derived from per-person results). **Face:** similarity, distance, threshold. Frozen field names (`temperature_c: 38.0`) and simple number words ("two persons") are recognized.
+- **Precision-aware comparison:** ratios may be claimed as percentages; a claim matches within one unit of its last stated digit (so "64.1%" matches 0.64147); counts must match exactly. A missing source field is `SOURCE_FIELD_UNAVAILABLE`, never zero.
+- **Identity:** every person ID (P###) in the answer must belong to a Face record in the context; otherwise MISMATCH (including answers that name a person when no Face Evidence was supplied).
+- **Multi-member contexts:** each member is checked against its own record. A domain with several members in one group is reported as `AMBIGUOUS_MULTIPLE_MEMBERS` and skipped rather than guessed.
+- **Limits:** only recognized, explicitly labelled claims are checked; unlabelled numbers, narrative, causal and identity-to-activity claims remain unverified, and a MATCH confirms agreement with saved detector output only.

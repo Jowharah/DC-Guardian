@@ -1,4 +1,4 @@
-export type InvestigatorFieldCheck={status:string;checks:{field:string;claim:string;source_value:number|null;status:string}[];note:string};
+export type InvestigatorFieldCheck={status:string;summary?:{matched:number;mismatched:number;source_unavailable:number;recognized:number};checks:{field:string;claim:string;source_value:number|string|string[]|null;status:string;domain?:string;evidence_id?:string|null}[];skipped?:{domain:string;reason:string;count:number}[];note:string};
 export type InvestigatorGroundingCheck={status:"REFERENCE_CHECK_ONLY"|"UNVERIFIED_REFERENCES";referenced_ids:string[];unrecognized_ids:string[];claim_validation:"NOT_PERFORMED";note:string};
 export type Scenario = { name: string; description: string };
 export type Decision = { incident_status:string; severity:"LOW"|"MEDIUM"|"HIGH"; response_mode:string; escalation_required:boolean; autonomous_action_allowed:false; decision_rules_triggered:string[]; rationale:string[]; protected_boundaries:Record<string,boolean>; policy_version:string };
@@ -226,7 +226,7 @@ export const getEvidenceReview=(kind:InvestigatorSingleKind,id:string)=>request<
 export const recordEvidenceReview=(kind:InvestigatorSingleKind,id:string,payload:{verdict:EvidenceVerdict;corrected_status:string|null;rationale:string;acknowledgment:boolean})=>request<EvidenceReviewRecord>(`/api/v1/evidence-reviews/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
 export const getLatestEvidenceReviews=()=>request<LatestEvidenceReview[]>("/api/v1/evidence-reviews");
 
-export type InvestigatorAnswer={group_id:string;answer:string;evidence_refs:{kind:string;observation_id:string}[];read_only:true;decision_severity_assigned:false;notice:string;grounding_check?:InvestigatorGroundingCheck;sources?:{kind:string;id:string;role:string}[]};
+export type InvestigatorAnswer={group_id:string;field_grounding?:InvestigatorFieldCheck|null;answer:string;evidence_refs:{kind:string;observation_id:string}[];read_only:true;decision_severity_assigned:false;notice:string;grounding_check?:InvestigatorGroundingCheck;sources?:{kind:string;id:string;role:string}[]};
 export const askUnifiedInvestigator=(groupId:string,question:string)=>request<InvestigatorAnswer>(`/api/v1/investigator/unified/${encodeURIComponent(groupId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
 
 export type InvestigatorHistoryEntry={id:string;created_at:string;question:string;answer:string};
@@ -234,13 +234,13 @@ export const getInvestigatorHistory=(id:string)=>request<{group_id:string;messag
 export const saveInvestigatorHistory=(id:string,question:string,answer:string)=>request<InvestigatorHistoryEntry>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question,answer})});
 export const clearInvestigatorHistory=(id:string)=>request<{cleared:boolean}>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`,{method:"DELETE"});
 
-export const askOperationalInvestigator=(candidateId:string,question:string)=>request<{candidate_id:string;answer:string;read_only:boolean;grounding_check?:InvestigatorGroundingCheck;sources?:{kind:string;id:string;role:string}[]}>(`/api/v1/investigator/operations/${encodeURIComponent(candidateId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
+export const askOperationalInvestigator=(candidateId:string,question:string)=>request<{candidate_id:string;answer:string;read_only:boolean;grounding_check?:InvestigatorGroundingCheck;field_grounding?:InvestigatorFieldCheck|null;sources?:{kind:string;id:string;role:string}[]}>(`/api/v1/investigator/operations/${encodeURIComponent(candidateId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
 
 export type InvestigatorSingleKind="ssh"|"ppe"|"face"|"maintenance"|"environment";
 export const askSingleEvidenceInvestigator=(kind:InvestigatorSingleKind,evidenceId:string,question:string)=>request<{kind:string;evidence_id:string;answer:string;read_only:boolean;grounding_check?:InvestigatorGroundingCheck;field_grounding?:InvestigatorFieldCheck|null;sources?:{kind:string;id:string;role:string}[]}>(`/api/v1/investigator/evidence/${encodeURIComponent(kind)}/${encodeURIComponent(evidenceId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
 
 export type InvestigatorScope="unified"|"pairs"|"operations"|"single";
-export const askPairInvestigator=(pairId:string,question:string)=>request<{pair_id:string;answer:string;read_only:boolean;grounding_check?:InvestigatorGroundingCheck;sources?:{kind:string;id:string;role:string}[]}>(`/api/v1/investigator/pairs/${encodeURIComponent(pairId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
+export const askPairInvestigator=(pairId:string,question:string)=>request<{pair_id:string;answer:string;read_only:boolean;grounding_check?:InvestigatorGroundingCheck;field_grounding?:InvestigatorFieldCheck|null;sources?:{kind:string;id:string;role:string}[]}>(`/api/v1/investigator/pairs/${encodeURIComponent(pairId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
 export function investigatorHistoryPath(scope:InvestigatorScope,id:string,kind?:InvestigatorSingleKind):string{
  if(scope==="unified")return `/api/v1/investigator/unified/${encodeURIComponent(id)}/history`;
  if(scope==="pairs")return `/api/v1/investigator/pairs/${encodeURIComponent(id)}/history`;

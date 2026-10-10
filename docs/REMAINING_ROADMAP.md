@@ -17,7 +17,7 @@
 | Human verdicts on individual Evidence (confirm / override / inconclusive) | Implemented; focused tests and copy-database HTTP check | Browser validation; policy for who may override which domain in production; reporting overrides as model false-positive/negative metrics; Decision re-evaluation for human-escalated events that never had a Decision |
 | Audit hash-chain verification | Implemented; local 11-test and 16-test runs reported | Trusted external checkpoint, backup/recovery and production audit controls |
 | Unified cross-domain severity | **Provisional policy implemented** (`DCG-UNIFIED-SEVERITY-PROVISIONAL-v1`: Decision Rules v1 on active-concern member domains) | Validate the policy against labelled multi-domain scenarios and approve it before treating group severity as authoritative |
-| AI Investigator | **Implemented research prototype; 23 targeted tests passed** | Claim-level grounding, outbound privacy review, tool audit, prompt-injection evaluation, cost limits and production hardening; see [AI Investigator](AI_INVESTIGATOR.md) |
+| AI Investigator | **Implemented research prototype**; numeric/identity field checks for all domains and modes | Narrative/causal claim grounding, abstention evaluation, outbound privacy review, tool audit, prompt-injection evaluation, cost limits and production hardening; see [AI Investigator](AI_INVESTIGATOR.md) |
 | Deployment / production security | Pending | Production authentication, TLS, secrets, monitoring, dependency audit, threat modeling, penetration tests |
 
 ## Suggested order
