@@ -209,3 +209,8 @@ export const getAuditIntegrity=()=>request<AuditIntegrityResult>("/api/v1/review
 
 export type InvestigatorAnswer={group_id:string;answer:string;evidence_refs:{kind:string;observation_id:string}[];read_only:true;decision_severity_assigned:false;notice:string};
 export const askUnifiedInvestigator=(groupId:string,question:string)=>request<InvestigatorAnswer>(`/api/v1/investigator/unified/${encodeURIComponent(groupId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
+
+export type InvestigatorHistoryEntry={id:string;created_at:string;question:string;answer:string};
+export const getInvestigatorHistory=(id:string)=>request<{group_id:string;messages:InvestigatorHistoryEntry[]}>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`);
+export const saveInvestigatorHistory=(id:string,question:string,answer:string)=>request<InvestigatorHistoryEntry>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question,answer})});
+export const clearInvestigatorHistory=(id:string)=>request<{cleared:boolean}>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`,{method:"DELETE"});
