@@ -11,6 +11,7 @@ from pydantic import BaseModel,Field
 from presentation.backend.app.authentication import current_principal
 from presentation.backend.app.authorization import Principal
 from presentation.backend.app.investigator_tools import unified_context
+from presentation.backend.app.investigator_sources import unified_sources,operational_sources,single_sources
 
 router=APIRouter()
 logger=logging.getLogger(__name__)
@@ -89,7 +90,7 @@ def ask_investigator(group_id:str,request:InvestigatorQuestion,
         # private request data or credentials and must not be exposed.
         logger.warning("Investigator provider failure: %s",type(exc).__name__)
         raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
-    return {"group_id":group_id,"answer":answer,
+    return {"group_id":group_id,"answer":answer,"sources":unified_sources(context),"source_validation":"REFERENCES_ONLY_NOT_CLAIM_VERIFIED",
             "evidence_refs":context["evidence_refs"],
             "read_only":True,"decision_severity_assigned":False,
             "notice":"LLM explanation is not a Decision or verified identity/causal finding."}
@@ -140,7 +141,7 @@ have its own deterministic severity; do not reassign or transfer it."""
     except Exception as exc:
         logger.warning("Operational Investigator provider failure: %s",type(exc).__name__)
         raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
-    return {"candidate_id":candidate_id,"answer":answer,
+    return {"candidate_id":candidate_id,"answer":answer,"sources":operational_sources(context),"source_validation":"REFERENCES_ONLY_NOT_CLAIM_VERIFIED",
             "evidence_refs":context["evidence_event_ids"],
             "read_only":True,"decision_severity_assigned":False,
             "notice":"LLM explanation only. Existing saved operational Decision, if present, remains authoritative."}
@@ -172,6 +173,6 @@ state from confirmed events, and explicitly state any unsupported conclusions.""
     except Exception as exc:
         logger.warning("Single Evidence Investigator failure: %s",type(exc).__name__)
         raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
-    return {"kind":kind,"evidence_id":evidence_id,"answer":answer,
+    return {"kind":kind,"evidence_id":evidence_id,"answer":answer,"sources":single_sources(context),"source_validation":"REFERENCES_ONLY_NOT_CLAIM_VERIFIED",
             "read_only":True,"decision_severity_assigned":False,
             "notice":"LLM explanation only; no new correlation, Decision or autonomous action."}
