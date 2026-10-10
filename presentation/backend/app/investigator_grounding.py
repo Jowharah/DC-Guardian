@@ -60,6 +60,9 @@ def ssh_field_checks(answer:str,assessment:dict)->dict:
         found=[]
         for pattern in patterns:
             for match in pattern.finditer(normalized):
+                # Numeric claims must not span adjacent Markdown lines.
+                if "\\n" in match.group(0) or "\\r" in match.group(0):
+                    continue
                 if any(match.start()<end and match.end()>begin for begin,end in found):
                     continue
                 found.append(match.span())
