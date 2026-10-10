@@ -219,3 +219,14 @@ export const askOperationalInvestigator=(candidateId:string,question:string)=>re
 
 export type InvestigatorSingleKind="ssh"|"ppe"|"face"|"maintenance"|"environment";
 export const askSingleEvidenceInvestigator=(kind:InvestigatorSingleKind,evidenceId:string,question:string)=>request<{kind:string;evidence_id:string;answer:string;read_only:boolean}>(`/api/v1/investigator/evidence/${encodeURIComponent(kind)}/${encodeURIComponent(evidenceId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
+
+export type InvestigatorScope="unified"|"operations"|"single";
+export function investigatorHistoryPath(scope:InvestigatorScope,id:string,kind?:InvestigatorSingleKind):string{
+ if(scope==="unified")return `/api/v1/investigator/unified/${encodeURIComponent(id)}/history`;
+ if(scope==="operations")return `/api/v1/investigator/operations/${encodeURIComponent(id)}/history`;
+ if(!kind)throw new Error("Single Evidence kind is required");
+ return `/api/v1/investigator/evidence/${encodeURIComponent(kind)}/${encodeURIComponent(id)}/history`;
+}
+export const getScopedInvestigatorHistory=(scope:InvestigatorScope,id:string,kind?:InvestigatorSingleKind)=>request<{messages:InvestigatorHistoryEntry[]}>(investigatorHistoryPath(scope,id,kind));
+export const saveScopedInvestigatorHistory=(scope:InvestigatorScope,id:string,question:string,answer:string,kind?:InvestigatorSingleKind)=>request<InvestigatorHistoryEntry>(investigatorHistoryPath(scope,id,kind),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question,answer})});
+export const clearScopedInvestigatorHistory=(scope:InvestigatorScope,id:string,kind?:InvestigatorSingleKind)=>request<{cleared:boolean}>(investigatorHistoryPath(scope,id,kind),{method:"DELETE"});
