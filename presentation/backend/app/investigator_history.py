@@ -69,3 +69,58 @@ def clear_history(group_id:str,principal:Principal=Depends(current_principal)):
     with connect() as db:
         db.execute("DELETE FROM investigator_history WHERE group_id=? AND reviewer=?",(group_id,principal.subject))
     return {"cleared":True,"group_id":group_id}
+
+def _other_scope(kind,identifier,principal):
+    if not enabled():raise HTTPException(503,"INVESTIGATOR_HISTORY_DISABLED")
+    if kind=="operations":
+        from presentation.backend.app.operational_decision import get_candidate
+        get_candidate(identifier,principal)
+    else:
+        from presentation.backend.app.investigator_tools import single_evidence_context
+        single_evidence_context(kind,identifier,principal)
+    return kind+":"+identifier
+
+def _other_history(kind,identifier,principal):
+    key=_other_scope(kind,identifier,principal)
+    with connect() as db:
+        prune(db)
+        rows=db.execute("SELECT id,created_at,question,answer FROM investigator_history WHERE group_id=? AND reviewer=? ORDER BY created_at DESC,id DESC LIMIT 30",(key,principal.subject)).fetchall()
+    return {"messages":[dict(zip(("id","created_at","question","answer"),r)) for r in reversed(rows)]}
+
+def _other_save(kind,identifier,entry,principal):
+    key=_other_scope(kind,identifier,principal)
+    row={"id":"DCG-CHAT-"+uuid4().hex.upper,"created_at":datetime.now(timezone.utc).isoformat(),"question":entry.question,"answer":entry.answer}
+    with connect() as db:
+        prune(db)
+        db.execute("INSERT INTO investigator_history VALUES (?,?,?,?,?,?)",(row["id"],key,principal.subject,row["created_at"],row["question"],row["answer"]))
+    return row
+
+def _other_clear(kind,identifier,principal):
+    key=_other_scope(kind,identifier,principal)
+    with connect() as db:
+        db.execute("DELETE FROM investigator_history WHERE group_id=? AND reviewer=?",(key,principal.subject))
+    return {"cleared":True}
+
+@router.get("/api/v1/investigator/operations/{candidate_id}/history")
+def operations_history(candidate_id:str,principal:Principal=Depends(current_principal)):
+    return _other_history("operations",candidate_id,principal)
+
+@router.post("/api/v1/investigator/operations/{candidate_id}/history",status_code=201)
+def operations_save(candidate_id:str,entry:HistoryEntry,principal:Principal=Depends(current_principal)):
+    return _other_save("operations",candidate_id,entry,principal)
+
+@router.delete("/api/v1/investigator/operations/{candidate_id}/history")
+def operations_clear(candidate_id:str,principal:Principal=Depends(current_principal)):
+    return _other_clear("operations",candidate_id,principal)
+
+@router.get("/api/v1/investigator/evidence/{kind}/{evidence_id}/history")
+def evidence_history(kind:str,evidence_id:str,principal:Principal=Depends(current_principal)):
+    return _other_history(kind,evidence_id,principal)
+
+@router.post("/api/v1/investigator/evidence/{kind}/{evidence_id}/history",status_code=201)
+def evidence_save(kind:str,evidence_id:str,entry:HistoryEntry,principal:Principal=Depends(current_principal)):
+    return _other_save(kind,evidence_id,entry,principal)
+
+@router.delete("/api/v1/investigator/evidence/{kind}/{evidence_id}/history")
+def evidence_clear(kind:str,evidence_id:str,principal:Principal=Depends(current_principal)):
+    return _other_clear(kind,evidence_id,principal)
