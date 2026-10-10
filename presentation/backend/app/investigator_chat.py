@@ -39,7 +39,17 @@ For Face and PPE, same declared camera/time is contextual only, not a verified
 image match, physical presence, or person-to-PPE linkage.
 Use concise Markdown headings and bullets by domain, followed by limitations.
 Use bold emphasis sparingly for source states and unresolved links.
-Do not create citations to Evidence IDs that were not supplied."""
+Do not create citations to Evidence IDs that were not supplied.
+When asked what can be done, distinguish verified findings from general
+security or maintenance considerations. Recommend checking source records,
+configuration and applicable internal policy before any remediation.
+Never present IP blocking, disabling SSH root login, changing authentication
+rules, or tuning alert thresholds as a required or approved action solely
+because the detector reported failed attempts. Do not claim an SSH attack,
+brute-force attempt, compromise or malicious intent is established.
+Treat a seven-day model prediction horizon as an assessment horizon, not
+a deadline for drive failure. Preserve saved deterministic Decision severity
+as a reported outcome only; never independently upgrade it."""
 
 @router.post("/api/v1/investigator/unified/{group_id}/ask")
 def ask_investigator(group_id:str,request:InvestigatorQuestion,
