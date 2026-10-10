@@ -14,6 +14,7 @@ CONTEXT={"group_id":"G1","zone_id":"ZONE-A",
 def test_feature_flag_denies_without_provider(monkeypatch):
     monkeypatch.setattr(chat,"unified_context",lambda group_id,principal:CONTEXT)
     monkeypatch.delenv("DCG_INVESTIGATOR_ENABLED",raising=False)
+    monkeypatch.setattr(chat,"local_setting",lambda name: "0" if name=="DCG_INVESTIGATOR_ENABLED" else "")
     with pytest.raises(HTTPException) as exc:
         chat.ask_investigator("G1",chat.InvestigatorQuestion(question="Explain this anomaly"),ADMIN)
     assert exc.value.status_code==503
