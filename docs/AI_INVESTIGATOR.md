@@ -36,7 +36,7 @@ For SSH, six failed root logins with zero successful logins support anomalous au
 
 `investigator_sources.py` constructs deterministic **source manifests** from authorized context, returned as `sources` with `source_validation: REFERENCES_ONLY_NOT_CLAIM_VERIFIED`. The React UI shows a collapsible **Source Evidence** list beneath newly generated answers.
 
-**Current limitation:** this is a source manifest, **not claim-level citation validation**. A model can still make unsupported or overly strong assertions; the presence of an Evidence ID under an answer does not validate each sentence. Previously stored conversations lack the new source metadata. Claim-to-field verification, approved knowledge citation checking, and explicit abstention/grounding evaluations remain future work.
+The backend now also returns a conservative `grounding_check` that compares explicit Evidence IDs appearing in generated text against the authorized source manifest. Unknown IDs are reported as `UNVERIFIED_REFERENCES`; matching IDs yield `REFERENCE_CHECK_ONLY`. The check explicitly reports `claim_validation: NOT_PERFORMED` and must not be presented as factual verification. This feature has focused tests but requires local validation after pulling.\n\n**Current limitation:** this is a source manifest, **not claim-level citation validation**. A model can still make unsupported or overly strong assertions; the presence of an Evidence ID under an answer does not validate each sentence. Previously stored conversations lack the new source metadata. Claim-to-field verification, approved knowledge citation checking, and explicit abstention/grounding evaluations remain future work.
 
 ## Frontend interaction
 
