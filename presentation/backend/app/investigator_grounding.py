@@ -22,11 +22,11 @@ def check_answer_references(answer:str,sources:list[dict])->dict:
 # Narrow, deterministic SSH numeric claim checks. Unsupported phrasing is
 # deliberately left unassessed rather than being marked verified.
 SSH_PATTERNS={
- "failed_login_count":re.compile(r"\\b(\\d+)\\s+failed\\s+(?:SSH\\s+)?login\\s+attempts?\\b",re.I),
- "detector_votes":re.compile(r"\\b(\\d+)\\s+(?:detector|component)\\s+votes?\\b",re.I),
- "successful_login_count":re.compile(r"\\b(\\d+)\\s+successful\\s+logins?\\b",re.I),
- "failure_ratio":re.compile(r"\\bfailure\\s+ratio\\s*(?:is|of|=|:)\\s*(\\d+(?:\\.\\d+)?%?)",re.I),
- "root_attempt_ratio":re.compile(r"\\broot\\s+attempt\\s+ratio\\s*(?:is|of|=|:)\\s*(\\d+(?:\\.\\d+)?%?)",re.I),
+ "failed_login_count":re.compile(r"\b(\d+)\s+failed\s+(?:SSH\s+)?login\s+attempts?\b",re.I),
+ "detector_votes":re.compile(r"\b(\d+)\s+(?:detector|component)\s+votes?\b",re.I),
+ "successful_login_count":re.compile(r"\b(\d+)\s+successful\s+logins?\b",re.I),
+ "failure_ratio":re.compile(r"\bfailure\s+ratio\s*(?:is|of|=|:)\s*(\d+(?:\.\d+)?%?)",re.I),
+ "root_attempt_ratio":re.compile(r"\broot\s+attempt\s+ratio\s*(?:is|of|=|:)\s*(\d+(?:\.\d+)?%?)",re.I),
 }
 def ssh_field_checks(answer:str,assessment:dict)->dict:
     if not isinstance(assessment,dict):return {"status":"NO_STRUCTURED_SOURCE","checks":[]}
