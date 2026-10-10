@@ -314,3 +314,31 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .agentConversation .agentMessage{overflow-wrap:anywhere;white-space:pre-wrap}
 .agentConversation .agentMessage p{margin:7px 0 0}
 .agentContext p{overflow-wrap:anywhere}
+
+
+/* AI Investigator persona separation and evidence-oriented typography */
+.agentConversation .investigatorChatBubble{white-space:normal;overflow-wrap:anywhere;padding:14px;border:1px solid transparent;border-radius:13px;margin-bottom:12px;line-height:1.6}
+.agentConversation .investigatorOperatorBubble{background:#38234e;border-color:#6c4a8c}
+.agentConversation .investigatorAssistantBubble{background:#21182f;border-color:#65448d}
+.investigatorSpeaker{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.investigatorSpeakerIcon{display:grid;place-items:center;width:26px;height:26px;flex:none;border-radius:50%;background:#7540a7;color:#fff;font-size:14px}
+.investigatorAssistantBubble .investigatorSpeakerIcon{background:#32699c;color:#e9f7ff}
+.investigatorFormatted{display:grid;gap:10px;font-size:12px;line-height:1.65}
+.investigatorFormatted p{margin:0}
+.investigatorSectionHeading{display:flex;align-items:center;gap:9px;margin:8px 0 1px;padding:9px 10px;border-left:3px solid var(--investigator-accent,#a783d2);background:rgba(155,125,185,.09);border-radius:6px;color:var(--investigator-accent,#e6d1fa);font-size:12px}
+.investigatorSectionHeading>span{display:grid;place-items:center;flex:none;width:23px;height:23px;border-radius:7px;background:rgba(130,120,170,.18)}
+.investigatorTone-cyber{--investigator-accent:#ff979d}
+.investigatorTone-physical{--investigator-accent:#81c9ff}
+.investigatorTone-safety{--investigator-accent:#76dbb1}
+.investigatorTone-review{--investigator-accent:#d2a8ff}
+.investigatorTone-uncertain{--investigator-accent:#ffd184}
+.investigatorBullet{display:flex;gap:8px;align-items:flex-start}
+.investigatorBullet>span{color:var(--investigator-accent,#baa0d8);font-weight:700}
+.investigatorBullet p{flex:1;min-width:0}
+.investigatorParagraph{line-height:1.7}
+.investigatorSummaryHeading{font-size:12px;color:#eee0ff;margin:9px 0 0}
+.investigatorHighlightWarning{color:#ffbc88;font-weight:750}
+.investigatorHighlightSuccess{color:#7ee0b5;font-weight:750}
+.investigatorHighlightInfo{color:#8ed4ff;font-weight:750}
+.investigatorEvidenceId{font-size:10px;overflow-wrap:anywhere;color:#c8b3f1;background:rgba(139,109,182,.14);padding:1px 3px;border-radius:3px}
+@media(prefers-reduced-motion:reduce){.investigatorChatBubble{transition:none}}
