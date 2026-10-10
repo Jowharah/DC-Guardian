@@ -77,6 +77,8 @@ from presentation.backend.app.face_ssh_specialists import router as face_ssh_spe
 app.include_router(face_ssh_specialists_router)
 from presentation.backend.app.human_review_audit import router as human_review_audit_router
 app.include_router(human_review_audit_router)
+from presentation.backend.app.investigator_tools import router as investigator_tools_router
+app.include_router(investigator_tools_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
