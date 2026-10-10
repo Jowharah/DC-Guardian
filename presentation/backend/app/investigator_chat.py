@@ -60,7 +60,11 @@ Preserve the original timestamp as recorded. If it is historical or has
 no verified timezone/provenance, state only that limitation. Do not guess
 that it came from an archive, a placeholder, or a test case.
 Separate reported source fields from interpretations, and avoid describing
-anomalous detector votes as independent verification."""
+anomalous detector votes as independent verification.
+Use precise language: two detector component votes were recorded; do not
+assume two independent detectors without supporting architecture evidence.
+Never say an individually selected event has no correlation; correlation
+was not assessed by the single-Evidence request."""
 
 @router.post("/api/v1/investigator/unified/{group_id}/ask")
 def ask_investigator(group_id:str,request:InvestigatorQuestion,
