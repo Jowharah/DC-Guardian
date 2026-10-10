@@ -38,7 +38,9 @@ def test_duplicate_edges_produce_one_stable_group():
 def test_zone_separation_prevents_cross_zone_grouping():
     a=edge("FACE_SSH_CONTEXT",("face","F1"),("ssh","S1"),"FS1","ZONE-A")
     b=edge("PHYSICAL_IMAGE",("ppe","P1"),("face","F1"),"PF1","ZONE-B")
-    groups=group_edges([a,b])
+    # Merged across zones these would form one three-event unified group.
+    assert group_edges([a,b])==[]
+    groups=group_edges([a,b],min_members=2)
     assert len(groups)==2
     assert {g["zone_id"] for g in groups}=={"ZONE-A","ZONE-B"}
 

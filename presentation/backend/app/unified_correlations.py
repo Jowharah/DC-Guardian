@@ -1,7 +1,9 @@
 """Unified cross-domain correlation groups from existing validated candidate contracts.
 
-V1 is a read-only orchestration layer: no inferred edges, severity, causal or
-identity claims. Edges are sourced from the existing domain-specific matchers.
+A unified group is any connected set of three or more correlated events; two
+events form a pair (see correlation_pairs). Read-only orchestration: no
+inferred edges, severity, causal or identity claims. Edges come from the
+dedicated matchers and the Reasoning-contract pair rule.
 """
 from collections import defaultdict
 from fastapi import APIRouter,Depends
@@ -21,7 +23,9 @@ def edge(kind,left,right,source,zone,*,details=None):
     return {"type":kind,"left":left,"right":right,"source_id":source,
             "zone_id":zone,"details":details or {}}
 
-def group_edges(edges):
+MIN_GROUP_MEMBERS=3
+
+def group_edges(edges,min_members=MIN_GROUP_MEMBERS):
     """Connected Evidence components, scoped to one zone.
 
     Edges remain explicit. Transitive group membership does NOT imply a direct
@@ -51,7 +55,7 @@ def group_edges(edges):
                 (e for e in zone_edges if tuple(e["left"]) in members and tuple(e["right"]) in members),
                 key=lambda e:(e["type"],e["source_id"],tuple(e["left"]),tuple(e["right"]))
             )
-            if len(members)<2:continue
+            if len(members)<min_members:continue
             refs=[{"kind":kind,"domain":DOMAIN[kind],"observation_id":oid} for kind,oid in sorted(members)]
             source_ids=sorted({e["source_id"] for e in relevant})
             # Deterministic across restarts and input ordering; no new Evidence.
@@ -68,25 +72,9 @@ def group_edges(edges):
     return sorted(groups,key=lambda g:(g["zone_id"],g["id"]))
 
 def collect_existing(principal):
-    """Reuse published candidate decisions; never invent eligibility rules."""
-    from presentation.backend.app.operational_correlations import operational_correlations
-    from presentation.backend.app.physical_image_correlations import image_correlations
-    from presentation.backend.app.face_ssh_correlations import face_ssh_candidates
-    edges=[]
-    for c in operational_correlations(principal):
-        edges.append(edge("OPERATIONAL",("maintenance",c["maintenance_event_id"]),
-                          ("environment",c["environment_event_id"]),c["id"],c["zone_id"],
-                          details={"time_difference_seconds":c["time_difference_seconds"]}))
-    for c in image_correlations(principal):
-        edges.append(edge("PHYSICAL_IMAGE",("ppe",c["ppe_observation_id"]),
-                          ("face",c["face_observation_id"]),c["id"],c["zone_id"],
-                          details={"source_match":c["source_match"],
-                                   "time_difference_seconds":c["time_difference_seconds"]}))
-    for c in face_ssh_candidates(principal):
-        edges.append(edge("FACE_SSH_CONTEXT",("face",c["face_observation_id"]),
-                          ("ssh",c["ssh_event_id"]),c["id"],c["zone_id"],
-                          details={"time_difference_seconds":c["time_difference_seconds"]}))
-    return edges
+    """Reuse published candidate contracts; never invent eligibility rules."""
+    from presentation.backend.app.correlation_pairs import all_edges
+    return all_edges(principal)
 
 @router.get("/api/v1/correlations/unified")
 def unified_correlations(principal:Principal=Depends(current_principal)):

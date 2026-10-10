@@ -8,6 +8,7 @@ from pydantic import BaseModel,Field
 from presentation.backend.app.authentication import current_principal,authorize
 from presentation.backend.app.authorization import Principal,Permission
 from presentation.backend.app.unified_correlations import unified_correlations
+from presentation.backend.app.correlation_pairs import correlation_pairs
 
 router=APIRouter()
 KINDS={"ssh","maintenance","environment","ppe","face"}
@@ -30,7 +31,10 @@ def check_published(payload:CheckRequest,principal:Principal=Depends(current_pri
     groups=unified_correlations(principal)
     ids=set(payload.observation_ids)
     matched=[g for g in groups if matches(g,payload.kind,ids)]
+    # A new event may only form a pair; that is still a correlation candidate.
+    pairs=[p for p in correlation_pairs(principal)
+           if any(m["kind"]==payload.kind and m["observation_id"] in ids for m in p["members"])]
     return {"kind":payload.kind,"observation_ids":sorted(ids),
-            "status":"CANDIDATES_FOUND" if matched else "NO_ELIGIBLE_CORRELATION",
-            "groups":matched,"checked_against":"PERSISTED_EVIDENCE",
+            "status":"CANDIDATES_FOUND" if matched or pairs else "NO_ELIGIBLE_CORRELATION",
+            "groups":matched,"pairs":pairs,"checked_against":"PERSISTED_EVIDENCE",
             "note":"A correlation candidate is contextual; no identity, causation, or severity is inferred."}

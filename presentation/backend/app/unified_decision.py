@@ -28,15 +28,21 @@ def evaluate(group, specialists, authorization=None):
         reasons.append("PPE_EVIDENCE_REQUIRES_SOURCE_REVIEW")
     if "face" in kinds:
         reasons.append("FACE_IDENTITY_CONTEXT_UNVERIFIED")
-        if isinstance(authorization, dict) and authorization.get("recognition_status") == "RECOGNIZED":
-            auth = authorization.get("zone_authorization")
-            if (isinstance(auth, dict)
-                    and auth.get("status") == "UNAUTHORIZED"
-                    and auth.get("source") == "NEO4J_READ_ONLY"
-                    and auth.get("reason") == "GRAPH_RELATIONSHIP_CHECK"):
-                reasons.append("RECOGNIZED_IDENTITY_NOT_AUTHORIZED_FOR_DECLARED_ZONE")
+        # A group may hold several face observations; one is enough to flag.
+        faces = authorization if isinstance(authorization, list) else [authorization]
+        if any(isinstance(face, dict) and face.get("recognition_status") == "RECOGNIZED"
+               and isinstance(face.get("zone_authorization"), dict)
+               and face["zone_authorization"].get("status") == "UNAUTHORIZED"
+               and face["zone_authorization"].get("source") == "NEO4J_READ_ONLY"
+               and face["zone_authorization"].get("reason") == "GRAPH_RELATIONSHIP_CHECK"
+               for face in faces):
+            reasons.append("RECOGNIZED_IDENTITY_NOT_AUTHORIZED_FOR_DECLARED_ZONE")
     if any(a["grounding_status"] == "INSUFFICIENT" for a in specialists.values()):
         reasons.append("SPECIALIST_GROUNDING_INSUFFICIENT")
+    if "maintenance" in kinds:
+        reasons.append("MAINTENANCE_RISK_REQUIRES_SOURCE_REVIEW")
+    if "environment" in kinds:
+        reasons.append("ENVIRONMENTAL_CONDITION_REQUIRES_SOURCE_REVIEW")
     if "FACE_SSH_CONTEXT" in edges:
         reasons.append("FACE_SSH_CONTEXTUAL_ASSOCIATION_UNVERIFIED")
     return {"policy_version": POLICY,
