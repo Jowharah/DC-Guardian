@@ -73,15 +73,16 @@ def test_severity_without_reasons_still_requires_review():
     result=evaluate(group,{"operations":{"grounding_status":"SUPPORTED"}})
     assert result["status"]=="REVIEW_REQUIRED" and result["response_mode"]=="HUMAN_REVIEW"
 
-def test_member_verdict_after_group_review_flags_re_review(monkeypatch):
-    from presentation.backend.app import human_review_audit
+def test_member_verdict_after_group_review_flags_re_review():
+    from presentation.backend.app.human_review_audit import connect
     from presentation.backend.app.unified_decision import member_verdicts_changed
     group={**GROUP,"members":members({("ppe","P1"):False},{("ppe","P1"):CLEARED_PPE})}
-    monkeypatch.setattr(human_review_audit,"list_reviews",lambda gid,p:{"records":[]})
     assert member_verdicts_changed(group,None) is False
-    monkeypatch.setattr(human_review_audit,"list_reviews",
-                        lambda gid,p:{"records":[{"recorded_at":"2026-10-10T17:00:00+00:00"}]})
+    def review_at(stamp):
+        with connect() as db:
+            db.execute("INSERT INTO human_review_audit VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                       ("DCG-HR-"+stamp,"G1","ZONE-A","r",stamp,"NEEDS_FOLLOW_UP","x"*15,"s","p","EVIDENCE_REVIEW_REQUIRED","GENESIS","h"))
+    review_at("2026-10-10T17:00:00+00:00")
     assert member_verdicts_changed(group,None) is True
-    monkeypatch.setattr(human_review_audit,"list_reviews",
-                        lambda gid,p:{"records":[{"recorded_at":"2026-10-10T18:00:00+00:00"}]})
+    review_at("2026-10-10T18:00:00+00:00")
     assert member_verdicts_changed(group,None) is False

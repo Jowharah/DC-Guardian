@@ -12,19 +12,34 @@ RETURN p IS NOT NULL AS person_exists,
        EXISTS { MATCH (p)-[:AUTHORIZED_FOR]->(z) } AS authorized
 """
 
+_driver = None
+
+def _shared_driver():
+    """One long-lived driver: opening a connection costs seconds, a query ms."""
+    global _driver
+    if _driver is None:
+        _driver = create_driver()
+    return _driver
+
+def _reset_driver():
+    global _driver
+    try:
+        if _driver is not None:
+            _driver.close()
+    finally:
+        _driver = None
+
 def assess(person_id: str, zone_id: str) -> dict:
     base = {"status": "UNKNOWN", "source": "NEO4J_READ_ONLY",
             "reason": "GRAPH_UNAVAILABLE"}
     if not person_id or person_id == "UNKNOWN":
         return {**base, "reason": "IDENTITY_NOT_RECOGNIZED"}
     try:
-        driver = create_driver()
-        try:
-            with driver.session(database=NEO4J_DATABASE, default_access_mode="READ") as session:
-                record = session.run(QUERY, person_id=person_id, zone_id=zone_id).single()
-        finally:
-            driver.close()
+        with _shared_driver().session(database=NEO4J_DATABASE, default_access_mode="READ") as session:
+            record = session.run(QUERY, person_id=person_id, zone_id=zone_id).single()
     except Exception:
+        # Drop a broken connection so the next call reconnects.
+        _reset_driver()
         return base
     if record is None or not record["person_exists"]:
         return {**base, "reason": "PERSON_NOT_IN_TOPOLOGY"}

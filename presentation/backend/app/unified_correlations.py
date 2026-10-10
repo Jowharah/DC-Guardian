@@ -71,13 +71,13 @@ def group_edges(edges,min_members=MIN_GROUP_MEMBERS):
                 "note":"Grouping reflects only listed source correlations. Shared group membership does not establish pairwise identity, causation, or compromise."})
     return sorted(groups,key=lambda g:(g["zone_id"],g["id"]))
 
-def collect_existing(principal):
+def collect_existing(principal,nodes=None):
     """Reuse published candidate contracts; never invent eligibility rules."""
     from presentation.backend.app.correlation_pairs import all_edges
     # Human-cleared members stay in their group, marked; see annotate().
-    return all_edges(principal,include_cleared=True)
+    return all_edges(principal,include_cleared=True,nodes=nodes)
 
-def annotate(groups,principal):
+def annotate(groups,principal,nodes=None):
     """Member verdicts, concern flags and provisional severity per group.
 
     Group ID and fingerprint depend only on membership and links, so verdicts
@@ -87,7 +87,7 @@ def annotate(groups,principal):
     from presentation.backend.app.correlation_pairs import member_states
     from presentation.backend.app.evidence_review import overrides,summary
     from presentation.backend.app.unified_severity import members_with_review,group_severity
-    states=member_states(principal)
+    states=member_states(principal,nodes)
     human=overrides()
     result=[]
     for group in groups:
@@ -109,7 +109,10 @@ def unified_correlations(principal:Principal=Depends(current_principal)):
                        Permission.ENVIRONMENT_DETAIL,Permission.CAMERA_DETAIL,
                        Permission.PERSON_DETAIL,Permission.SSH_DETAIL):
         authorize(principal,permission)
-    groups=group_edges(collect_existing(principal))
+    from presentation.backend.app.correlation_pairs import load_nodes
+    from presentation.backend.app.evidence_review import overrides
+    nodes=load_nodes(principal,overrides())
+    groups=group_edges(collect_existing(principal,nodes))
     result=[]
     for group in groups:
         zone=group["zone_id"]
@@ -118,4 +121,4 @@ def unified_correlations(principal:Principal=Depends(current_principal)):
                            Permission.PERSON_DETAIL,Permission.SSH_DETAIL):
             authorize(principal,permission,zone)
         result.append(group)
-    return annotate(result,principal)
+    return annotate(result,principal,nodes)

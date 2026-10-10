@@ -15,6 +15,10 @@ def isolated_presentation_storage(tmp_path, monkeypatch):
     DCG_PRESENTATION_DB; tests that set their own path still override this.
     """
     monkeypatch.setenv("DCG_PRESENTATION_DB", str(tmp_path / "presentation.sqlite3"))
+    # The Face authorization check keeps one shared Neo4j driver; never let a
+    # test's fake (or a real connection) carry over into another test.
+    from presentation.backend.app import face_zone_authorization
+    monkeypatch.setattr(face_zone_authorization, "_driver", None)
 
 @pytest.fixture(autouse=True)
 def authorized_legacy_test(request):

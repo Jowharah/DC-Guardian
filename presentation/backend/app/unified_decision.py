@@ -87,8 +87,11 @@ def evaluate(group, specialists, authorization=None):
 
 def member_verdicts_changed(group, principal):
     """True when a member verdict was recorded after the latest group review."""
-    from presentation.backend.app.human_review_audit import list_reviews
-    records = list_reviews(group["id"], principal)["records"]
+    from presentation.backend.app.human_review_audit import connect
+    with connect() as db:
+        records = [{"recorded_at": row[0]} for row in db.execute(
+            "SELECT recorded_at FROM human_review_audit WHERE group_id=? ORDER BY rowid ASC",
+            (group["id"],)).fetchall()]
     if not records:
         return False
     last = records[-1]["recorded_at"]

@@ -81,7 +81,7 @@ def test_cleared_evidence_leaves_pairs_but_keeps_group_links(monkeypatch):
     monkeypatch.setattr(pairs,"specialized_edges",lambda p:[
         edge("PHYSICAL_IMAGE",("ppe","PPE-IMG-1"),("face","F1"),"PF1","ZONE-B"),
         edge("FACE_SSH_CONTEXT",("face","F1"),("ssh","S1"),"FS1","ZONE-B")])
-    monkeypatch.setattr(pairs,"generic_edges",lambda p,h:[])
+    monkeypatch.setattr(pairs,"generic_edges",lambda p,h,n=None:[])
     assert len(pairs.all_edges(ADMIN))==2
     verdict()
     assert [e["source_id"] for e in pairs.all_edges(ADMIN)]==["FS1"]
