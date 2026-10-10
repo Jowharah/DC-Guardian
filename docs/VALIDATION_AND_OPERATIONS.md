@@ -48,6 +48,16 @@ Coverage includes PPE/Face image authentication, response headers and zone isola
 
 **Boundary:** These are isolated targeted regression tests with stubbed model/database inputs where appropriate. They do not establish complete production security, live multi-user penetration testing, or independent audit tamper resistance. Re-run on subsequent revisions.
 
+## AI Investigator validation — 2026-10-10
+
+**Reported local result:** **23 passed in 0.23s**, covering source manifests, history, unified context, OpenAI feature-gate behavior, operational correlations and single-source retrieval.
+
+```powershell
+python -m pytest presentation/backend/tests/test_investigator_sources.py presentation/backend/tests/test_investigator_history.py presentation/backend/tests/test_investigator_tools.py presentation/backend/tests/test_investigator_chat.py presentation/backend/tests/test_investigator_operations.py presentation/backend/tests/test_investigator_single_evidence.py -q
+```
+
+Browser demonstrations included live OpenAI responses for unified, operational, and individual SSH Evidence, as well as opt-in history restoration. The latest frontend build and full end-to-end security suite have not been confirmed by this test result. See [AI Investigator](AI_INVESTIGATOR.md).
+
 ## Local controlled ingestion
 
 A previously used workflow:
