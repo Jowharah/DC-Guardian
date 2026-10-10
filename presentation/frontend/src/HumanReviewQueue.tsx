@@ -12,7 +12,7 @@ export default function HumanReviewQueue({ppe,face,unified,ssh,operational,openM
  const [reviews,setReviews]=useState<Record<string,UnifiedReviewDecision>>({});
  const [reviewErrors,setReviewErrors]=useState<Record<string,boolean>>({});
  const [audit,setAudit]=useState<Record<string,HumanReviewRecord[]>>({});
- const groupIds=unified.filter(x=>x.domains.length>=3).map(x=>x.id).sort().join("|");
+ const groupIds=unified.map(x=>x.id).sort().join("|");
  useEffect(()=>{
   let active=true;
   const ids=groupIds?groupIds.split("|"):[];
@@ -49,7 +49,7 @@ export default function HumanReviewQueue({ppe,face,unified,ssh,operational,openM
   ...ssh.map(x=>["ssh:"+x.event_id,x.received_at] as [string,string])
  ]);
  const latest=(id:string)=>audit[id]?.at(-1);
- const candidates:QueueItem[]=unified.filter(x=>x.domains.length>=3).map(x=>{
+ const candidates:QueueItem[]=unified.map(x=>{
   const times=x.evidence.map(e=>Date.parse(receipts.get(e.kind+":"+e.observation_id)??"")).filter(Number.isFinite);
   return {id:x.id,kind:"UNIFIED",zone:x.zone_id,received:times.length?new Date(Math.max(...times)).toISOString():"",
    state:latest(x.id)?.outcome==="NEEDS_FOLLOW_UP"?"FOLLOW_UP_OUTSTANDING":latest(x.id)?.outcome==="INCONCLUSIVE"?"HUMAN_REVIEW_INCONCLUSIVE":latest(x.id)?.outcome==="REVIEWED_NO_FINDING"?"HUMAN_REVIEW_RECORDED":reviews[x.id]?.decision.status==="EVIDENCE_REVIEW_REQUIRED"?"EVIDENCE_REVIEW_REQUIRED":reviewErrors[x.id]?"REVIEW_STATUS_UNAVAILABLE":"CANDIDATE_ASSESSMENT",note:latest(x.id)?("Human review recorded: "+latest(x.id)!.outcome.replaceAll("_"," ")+". Investigation resolution is not established."):reviews[x.id]?("Saved deterministic disposition · "+reviews[x.id].decision.review_reasons.map(r=>r.replaceAll("_"," ")).join("; ")+". No human completion recorded."):reviewErrors[x.id]?"Review status could not be retrieved; no completion inferred.":"Correlation candidate; no saved grounded review available. No human completion recorded."};

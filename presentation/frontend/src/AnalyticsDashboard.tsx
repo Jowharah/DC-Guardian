@@ -21,7 +21,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
  const [range,setRange]=useState("all");
  const [audit,setAudit]=useState<Record<string,HumanReviewRecord[]>>({});
  const [auditUnavailable,setAuditUnavailable]=useState<string[]>([]);
- const groupIds=unified.filter(g=>g.domains.length>=3).map(g=>g.id).sort().join("|");
+ const groupIds=unified.map(g=>g.id).sort().join("|");
  useEffect(()=>{
    let active=true;
    const ids=groupIds?groupIds.split("|"):[];
@@ -64,7 +64,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
   ...face.map(x=>["face:"+x.observation_id,x.created_at] as [string,string])]);
  const candidateTime=(g:UnifiedCorrelationGroup)=>{const times=g.evidence.map(e=>Date.parse(received.get(e.kind+":"+e.observation_id)??"")).filter(Number.isFinite);return times.length?new Date(Math.max(...times)).toISOString():undefined};
  const severity=[{name:"HIGH",value:decisions.filter(x=>x==="HIGH").length},{name:"MEDIUM",value:decisions.filter(x=>x==="MEDIUM").length},{name:"LOW",value:decisions.filter(x=>x==="LOW").length}];
- const candidates=unified.filter(x=>x.domains.length>=3&&valid(candidateTime(x)));
+ const candidates=unified.filter(x=>valid(candidateTime(x)));
  const combinations=new Map<string,number>();
  for(const group of candidates){const name=group.domains.join(" + ");combinations.set(name,(combinations.get(name)??0)+1)}
  const correlationBars=[...combinations].map(([name,value])=>({name,value}));

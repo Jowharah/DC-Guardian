@@ -171,6 +171,9 @@ export const getFaceSSHCandidates=()=>request<FaceSSHCandidate[]>("/api/v1/cyber
 
 export type UnifiedCorrelationGroup={id:string;zone_id:string;domains:string[];evidence:{kind:string;domain:string;observation_id:string}[];edges:{type:string;left:[string,string];right:[string,string];source_id:string;zone_id:string;details:Record<string,string|number>}[];source_candidate_ids:string[];status:"CORRELATION_GROUP_CANDIDATE";decision:null;decision_severity:null;autonomous_action_allowed:false;identity_link_established:false;causal_relationship_established:false;note:string};
 export const getUnifiedCorrelations=()=>request<UnifiedCorrelationGroup[]>("/api/v1/correlations/unified");
+export type CorrelationPairMember={kind:InvestigatorSingleKind;domain:string;observation_id:string};
+export type CorrelationPair={id:string;type:"OPERATIONAL"|"PHYSICAL_IMAGE"|"FACE_SSH_CONTEXT"|"REASONING_CONTEXT";zone_id:string;members:[CorrelationPairMember,CorrelationPairMember];domains:string[];details:{scope?:"SERVER"|"ZONE";time_difference_seconds?:number;left_state?:string;right_state?:string;left_time_provenance?:string;right_time_provenance?:string;source_match?:string};status:"CORRELATION_CANDIDATE";decision_severity:"LOW"|"MEDIUM"|"HIGH"|null;autonomous_action_allowed:false;identity_link_established:false;causal_relationship_established:false;explanation:string};
+export const getCorrelationPairs=()=>request<CorrelationPair[]>("/api/v1/correlations/pairs");
 
 export const getUnifiedGraph=(id:string)=>request<IncidentGraph>(`/api/v1/correlations/unified/${encodeURIComponent(id)}/graph`);
 
@@ -222,9 +225,11 @@ export const askOperationalInvestigator=(candidateId:string,question:string)=>re
 export type InvestigatorSingleKind="ssh"|"ppe"|"face"|"maintenance"|"environment";
 export const askSingleEvidenceInvestigator=(kind:InvestigatorSingleKind,evidenceId:string,question:string)=>request<{kind:string;evidence_id:string;answer:string;read_only:boolean;grounding_check?:InvestigatorGroundingCheck;field_grounding?:InvestigatorFieldCheck|null;sources?:{kind:string;id:string;role:string}[]}>(`/api/v1/investigator/evidence/${encodeURIComponent(kind)}/${encodeURIComponent(evidenceId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
 
-export type InvestigatorScope="unified"|"operations"|"single";
+export type InvestigatorScope="unified"|"pairs"|"operations"|"single";
+export const askPairInvestigator=(pairId:string,question:string)=>request<{pair_id:string;answer:string;read_only:boolean;grounding_check?:InvestigatorGroundingCheck;sources?:{kind:string;id:string;role:string}[]}>(`/api/v1/investigator/pairs/${encodeURIComponent(pairId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
 export function investigatorHistoryPath(scope:InvestigatorScope,id:string,kind?:InvestigatorSingleKind):string{
  if(scope==="unified")return `/api/v1/investigator/unified/${encodeURIComponent(id)}/history`;
+ if(scope==="pairs")return `/api/v1/investigator/pairs/${encodeURIComponent(id)}/history`;
  if(scope==="operations")return `/api/v1/investigator/operations/${encodeURIComponent(id)}/history`;
  if(!kind)throw new Error("Single Evidence kind is required");
  return `/api/v1/investigator/evidence/${encodeURIComponent(kind)}/${encodeURIComponent(id)}/history`;
