@@ -360,3 +360,10 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .agentSidebarExpanded .investigatorFormatted{font-size:14px}
 .agentSidebarExpanded .investigatorSectionHeading{font-size:14px}
 @media(max-width:800px){.investigatorExpandedShell>.sidebar{width:76px;padding:16px 7px}.investigatorExpandedShell .sidebar .brand{font-size:11px;overflow-wrap:anywhere}.investigatorExpandedShell .sidebar .subtle,.investigatorExpandedShell .sidebarBottom{display:none}.investigatorExpandedShell .sidebar nav{margin-top:24px}.investigatorExpandedShell .navButton{font-size:11px;padding:10px 5px}.investigatorExpandedShell>.agentSidebar{padding:16px 12px}}
+
+
+/* Optional Investigator history controls */
+.investigatorHistoryControls{display:grid;gap:8px;border-top:1px solid #524184;padding:12px 0}
+.investigatorHistoryControls button{justify-self:start;background:transparent;border:1px solid #705493;border-radius:8px;color:#e9d5fa;padding:7px 11px;font-size:11px}
+.investigatorHistoryControls button:disabled{opacity:.5}
+.investigatorHistoryControls small{color:#c6b1d8;font-size:11px;line-height:1.5}
