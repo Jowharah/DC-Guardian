@@ -214,3 +214,5 @@ export type InvestigatorHistoryEntry={id:string;created_at:string;question:strin
 export const getInvestigatorHistory=(id:string)=>request<{group_id:string;messages:InvestigatorHistoryEntry[]}>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`);
 export const saveInvestigatorHistory=(id:string,question:string,answer:string)=>request<InvestigatorHistoryEntry>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question,answer})});
 export const clearInvestigatorHistory=(id:string)=>request<{cleared:boolean}>(`/api/v1/investigator/unified/${encodeURIComponent(id)}/history`,{method:"DELETE"});
+
+export const askOperationalInvestigator=(candidateId:string,question:string)=>request<{candidate_id:string;answer:string;read_only:boolean}>(`/api/v1/investigator/operations/${encodeURIComponent(candidateId)}/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question})});
