@@ -2,7 +2,7 @@
 
 DC-GUARDIAN is a research prototype for multi-domain data-center monitoring, deterministic cross-domain reasoning, grounded response, and governed decision support. The architecture is organized as Evidence -> Reasoning -> Response -> Decision, with a controlled Presentation/dashboard prototype and ongoing security validation.
 
-> **Current branch baseline (2026-10-10):** The five frozen Evidence domains, Reasoning/Neo4j correlation, approved-knowledge Response, deterministic Decision contracts, and the controlled Presentation dashboard are implemented in the research prototype. The Presentation layer now includes Monitoring Center, Scenario Lab, Analytics Dashboard, Human Review Queue, authenticated human-review audit records, and local audit-integrity verification. The AI Investigator remains a disabled placeholder. This is not a production deployment or security certification.
+> **Current branch baseline (2026-10-10):** The five frozen Evidence domains, Reasoning/Neo4j correlation, approved-knowledge Response, deterministic Decision contracts, and the controlled Presentation dashboard are implemented in the research prototype. The Presentation layer now includes Monitoring Center, Scenario Lab, Analytics Dashboard, Human Review Queue, authenticated human-review audit records, and local audit-integrity verification. The AI Investigator is an opt-in, read-only research prototype (see [docs/AI_INVESTIGATOR.md](docs/AI_INVESTIGATOR.md)). Correlation covers any two events (pairs) and any connected set of three or more events (unified groups) across all five domains. This is not a production deployment or security certification.
 
 **Documentation:** Start at [docs/README.md](docs/README.md) for the complete documentation index, [Development History](docs/PROJECT_DEVELOPMENT_HISTORY.md), [Validation and Operations](docs/VALIDATION_AND_OPERATIONS.md), and [Remaining Roadmap](docs/REMAINING_ROADMAP.md).
 
@@ -301,7 +301,7 @@ Local credentials belong in `.env`, which is excluded from Git. `.env.example` d
 3. Response RAG and governed knowledge - IMPLEMENTED / VERIFIED
 4. Grounded specialist reasoning and cross-domain synthesis - IMPLEMENTED / VERIFIED
 5. Deterministic Decision rules - IMPLEMENTED / VERIFIED
-6. Presentation/dashboard integration - NEXT
+6. Presentation/dashboard integration - IN PROGRESS (AI Investigator prototype implemented)
 
 ## Security Assessment
 

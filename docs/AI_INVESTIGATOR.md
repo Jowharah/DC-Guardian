@@ -10,12 +10,13 @@ The Investigator is an OpenAI-powered, read-only explanation interface over **ex
 
 Source records can still originate from controlled uploads, historical logs, or operator-declared camera/time metadata. A successful LLM answer does **not** independently verify the underlying observation.
 
-## Existing integrations and three investigation modes
+## Existing integrations and investigation modes
 
 | Mode | Backend question endpoint | Sources |
 |---|---|---|
-| Unified correlation | `POST /api/v1/investigator/unified/{group_id}/ask` | Saved SSH, Face and PPE Evidence, correlation links, deterministic unified review, human-review outcomes |
-| Operational correlation | `POST /api/v1/investigator/operations/{candidate_id}/ask` | Existing SMART/Maintenance and Environmental assessments, operational correlation, saved specialist and deterministic Decision |
+| Unified correlation group (3+ events) | `POST /api/v1/investigator/unified/{group_id}/ask` | Every member's saved Evidence across all five domains (several per domain allowed), explicit correlation links, deterministic unified review, human-review outcomes |
+| Correlation pair (any 2 events) | `POST /api/v1/investigator/pairs/{pair_id}/ask` | Both members' saved Evidence, link type, scope (SERVER/ZONE), time difference and per-side time provenance; saved operational specialist/Decision only for Maintenance+Environment pairs |
+| Operational correlation (legacy route) | `POST /api/v1/investigator/operations/{candidate_id}/ask` | Existing SMART/Maintenance and Environmental assessments, operational correlation, saved specialist and deterministic Decision |
 | Individual Evidence | `POST /api/v1/investigator/evidence/{kind}/{evidence_id}/ask` | Existing authorized SSH, PPE, Face, Maintenance, or Environmental Evidence detail/feed |
 
 The read-only context endpoints are `/api/v1/investigator/unified/{group_id}/context`, `/api/v1/investigator/operations/{candidate_id}/context`, and `/api/v1/investigator/evidence/{kind}/{evidence_id}/context`. Unified and operational graph endpoints reuse existing Neo4j read-only projections.
@@ -108,3 +109,15 @@ The narrow SSH field checker additionally recognizes label-first `Unique Users`,
 ## Original SSH metric-key grounding — October 2026
 
 The single-SSH numeric checker now recognizes explicit frozen metric keys in label-value format, for example `failed_login_count: 6` and `root_attempt_ratio: 1.0`, in addition to human-readable phrases. Ten SSH metrics have a focused test, including a deliberately mismatched value. Only recognized numeric claims are checked against saved output; all other claims and underlying source authenticity remain unverified. Changes require local pytest and browser validation.
+
+## Generalized pairs and unified groups — October 2026
+
+DC-GUARDIAN is treated as both a research project and an industrial prototype, so correlation is no longer limited to three hard-coded domain combinations.
+
+- **Pair** = any two correlated events. `GET /api/v1/correlations/pairs` (`correlation_pairs.py`) returns every pair in one shape. The three dedicated matchers (Maintenance+Environment, PPE+Face, Face+SSH) keep their stricter contracts. The other seven domain combinations use the Reasoning-layer contract: both events abnormal (`ABNORMAL_STATES`, `UNKNOWN_PERSON`, graph-confirmed `UNAUTHORIZED`), different domains, same declared zone, and times within 15 minutes. Scope is `SERVER` when both events name the same server, otherwise `ZONE`. Rack scope is not yet resolved.
+- **Unified group** = a connected component of three or more events in one zone, of any domains, possibly several per domain. Two-event components are pairs, not unified groups. Membership is transitive; only listed links are direct.
+- Unified specialists add the Operations specialist when Maintenance or Environmental members are present. The provisional unified review adds `MAINTENANCE_RISK_REQUIRES_SOURCE_REVIEW` / `ENVIRONMENTAL_CONDITION_REQUIRES_SOURCE_REVIEW` and checks every Face member. No unified severity is assigned.
+- Selecting any pair in Monitoring Center, including PPE+Face and Face+SSH candidates, routes the Investigator to pair mode. Pair history uses `/api/v1/investigator/pairs/{pair_id}/history`.
+- Reference checks split pair/candidate IDs that embed member Evidence IDs, so `DCG-PHYSICAL-PPE-IMG-…-FACE-IMG-…` no longer appears as an unrecognized reference.
+
+**Caveats:** Group IDs are a hash of membership. Groups whose membership grows get a new ID and require specialist re-evaluation; earlier human-review records and Investigator history stay attached to the old ID. Times must be timezone-aware. SSH uses only an operator-declared test time or a trustworthy source time, never receipt time. A pair or group is contextual and never establishes causation, identity, physical presence, or severity.
