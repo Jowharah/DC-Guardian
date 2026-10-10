@@ -3,7 +3,8 @@ import {useEffect,useState} from "react";
 import {askSingleEvidenceInvestigator,type InvestigatorSingleKind,askOperationalInvestigator,askUnifiedInvestigator,getScopedInvestigatorHistory,saveScopedInvestigatorHistory,clearScopedInvestigatorHistory} from "./api";
 
 type SourceRef={kind:string;id:string;role:string};
-type Message={role:"operator"|"investigator";text:string;sources?:SourceRef[]};
+type GroundingCheck={status:string;referenced_ids:string[];unrecognized_ids:string[];claim_validation:string;note:string};
+type Message={role:"operator"|"investigator";text:string;sources?:SourceRef[];grounding?:GroundingCheck};
 export default function InvestigatorPanel({groupId,investigationType="unified",singleKind,workspace,expanded,onToggleExpanded}:{groupId:string|null;investigationType?:"unified"|"operations"|"single";singleKind?:InvestigatorSingleKind;workspace:string;expanded:boolean;onToggleExpanded:()=>void}){
  const [question,setQuestion]=useState("");
  const [consent,setConsent]=useState(false);
@@ -29,7 +30,7 @@ export default function InvestigatorPanel({groupId,investigationType="unified",s
   setBusy(true);setError("");
   try{
    const result=investigationType==="single"&&singleKind?await askSingleEvidenceInvestigator(singleKind,groupId,value):investigationType==="operations"?await askOperationalInvestigator(groupId,value):await askUnifiedInvestigator(groupId,value);
-   setMessages(previous=>[...previous,{role:"operator",text:value},{role:"investigator",text:result.answer,sources:"sources" in result?result.sources:undefined}]);
+   setMessages(previous=>[...previous,{role:"operator",text:value},{role:"investigator",text:result.answer,sources:"sources" in result?result.sources:undefined,grounding:"grounding_check" in result?result.grounding_check:undefined}]);
    if(saveChats&&historyAvailable&&groupId){
     try{await saveScopedInvestigatorHistory(investigationType,groupId,value,result.answer,singleKind)}
     catch{setHistoryNote("Answer received, but conversation history could not be saved.")}
@@ -44,7 +45,7 @@ export default function InvestigatorPanel({groupId,investigationType="unified",s
    <p>{groupId?"Selected "+(investigationType==="operations"?"operational correlation":investigationType==="single"?"single "+(singleKind??"")+" Evidence":"unified investigation")+": "+groupId:"Select an Evidence event or correlation in Monitoring Center to ask questions."}</p></div>
   <div className="agentConversation" aria-live="polite">
    {messages.length===0?<div className="agentMessage">Ask about existing saved detector assessments, contextual correlations, deterministic review, or recorded human outcomes. No new model inference or Decision is created.</div>:
-    messages.map((m,i)=><div key={i} className={`agentMessage investigatorChatBubble ${m.role==="operator"?"investigatorOperatorBubble":"investigatorAssistantBubble"}`}><div className="investigatorSpeaker"><span className="investigatorSpeakerIcon" aria-hidden="true">{m.role==="operator"?"●":"✦"}</span><b>{m.role==="operator"?"You":"AI Investigator"}</b></div>{m.role==="operator"?<p>{m.text}</p>:<><InvestigatorMessage text={m.text}/>{m.sources&&m.sources.length>0&&<details className="investigatorSources"><summary>Source Evidence ({m.sources.length})</summary><p>Authorized source references only. Individual AI claims have not been independently verified.</p><ul>{m.sources.map((source,j)=><li key={j}><strong>{source.kind}</strong> · <code>{source.id}</code></li>)}</ul></details>}</>}</div>)}
+    messages.map((m,i)=><div key={i} className={`agentMessage investigatorChatBubble ${m.role==="operator"?"investigatorOperatorBubble":"investigatorAssistantBubble"}`}><div className="investigatorSpeaker"><span className="investigatorSpeakerIcon" aria-hidden="true">{m.role==="operator"?"●":"✦"}</span><b>{m.role==="operator"?"You":"AI Investigator"}</b></div>{m.role==="operator"?<p>{m.text}</p>:<><InvestigatorMessage text={m.text}/>{m.grounding&&<div className="investigatorGrounding" role="status"><div className="investigatorGroundingTitle"><span aria-hidden="true">◇</span><strong>Evidence grounding</strong></div><div><span>Reference check</span><b className={m.grounding.status==="UNVERIFIED_REFERENCES"?"investigatorGroundingWarning":"investigatorGroundingNeutral"}>{m.grounding.status==="UNVERIFIED_REFERENCES"?"Unrecognized Evidence IDs":"Reference check only"}</b></div><div><span>Claim-level verification</span><b>Not performed</b></div>{m.grounding.unrecognized_ids.length>0&&<p>Unrecognized references: {m.grounding.unrecognized_ids.join(", ")}</p>}<small>Matching an Evidence ID does not validate the AI's factual claims.</small></div>}{m.sources&&m.sources.length>0&&<details className="investigatorSources"><summary>Source Evidence ({m.sources.length})</summary><p>Authorized source references only. Individual AI claims have not been independently verified.</p><ul>{m.sources.map((source,j)=><li key={j}><strong>{source.kind}</strong> · <code>{source.id}</code></li>)}</ul></details>}</>}</div>)}
    {error&&<p role="alert" className="error">{error.includes("INVESTIGATOR_NOT_ENABLED")||error.includes("(503)")?"The Investigator backend is not enabled or the OpenAI provider is unavailable. Ask your administrator to check the server configuration.":error}</p>}
   </div>
   {groupId&&<div className="investigatorHistoryControls">
