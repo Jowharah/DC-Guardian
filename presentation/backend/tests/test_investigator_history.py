@@ -33,3 +33,14 @@ def test_disabled_by_default(isolated,monkeypatch):
     with pytest.raises(HTTPException) as exc:
         history.get_history("G1",ADMIN)
     assert exc.value.status_code==503
+
+def test_same_zone_different_operator_is_private(isolated):
+    colleague=Principal("operator-colleague",frozenset({"administrator"}),frozenset({"ZONE-A"}))
+    history.save_history("G1",history.HistoryEntry(question="What happened?",answer="An anomaly was reported."),ADMIN)
+    assert history.get_history("G1",colleague)["messages"]==[]
+    history.save_history("G1",history.HistoryEntry(question="What now?",answer="Review the evidence."),colleague)
+    assert len(history.get_history("G1",ADMIN)["messages"])==1
+    assert len(history.get_history("G1",colleague)["messages"])==1
+    history.clear_history("G1",colleague)
+    assert len(history.get_history("G1",ADMIN)["messages"])==1
+    assert history.get_history("G1",colleague)["messages"]==[]
