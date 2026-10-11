@@ -6,6 +6,15 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — API access matrix (every endpoint × every role)
+
+- **What:** `test_access_matrix.py`: a reviewed `POLICY` table classifying all 99 API operations (public, any role, a domain's detail permission, administrator only, or permission-filtered lookup), and tests that call each operation (each `{kind}` expanded, schema-generated valid bodies) without credentials and as each non-admin role.
+- **How it was built:** a probe ran every operation as every role in isolation (temp DB, Neo4j at an unreachable port, OpenAI blocked); results were read against the handler code before being written into the table. The first runs corrected three classifications (cross-domain `check-published`, SSH controlled time and image capture declarations are administrator-only by design).
+- **Findings:** no endpoint answers without credentials except `/health`; no role reaches another domain's detail. Two **policy differences** (not changed, awaiting the operator): maintenance/environment feeds are readable by every role in its zones, while SSH/PPE/Face feeds need detail permission (an existing test makes this deliberate); PPE/Face uploads need only the safety detail permission, while maintenance/environment/SSH uploads need `scenario:execute`.
+- **Verified:** backend pytest 339 passed. Runs in CI with the other backend tests.
+
+---
+
 ## 2026-10-11 — Specialist evaluation for single events (all domains)
 
 - **What:** `single_specialists.py` (`GET/POST /api/v1/evidence/{kind}/{id}/specialist`) and `SingleSpecialistPanel.tsx` beside the verdict panel for any selected single event. Reuses the unified specialists (same retrieval, grounding check, retry); consent required (400 without it), administrator only, authorization before Evidence is read; saved with an Evidence + verdict fingerprint so a later verdict shows "changed since; re-run". New table `single_specialist_results` (included in the dev reset).
