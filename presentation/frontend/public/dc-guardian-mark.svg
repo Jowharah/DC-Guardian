@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+<defs>
+<linearGradient id="dcg-ring" x1="0" y1="1" x2="1" y2="0">
+<stop offset="0" stop-color="#5B8DEF"/><stop offset="0.5" stop-color="#8B5CF6"/><stop offset="1" stop-color="#EC7BDD"/>
+</linearGradient>
+<linearGradient id="dcg-core" x1="0" y1="1" x2="1" y2="0">
+<stop offset="0" stop-color="#B58CF9"/><stop offset="1" stop-color="#F7A8EC"/>
+</linearGradient>
+</defs>
+<g transform="rotate(-86 60 60)"><circle cx="60" cy="60" r="46" fill="none" stroke="url(#dcg-ring)" stroke-width="9" stroke-dasharray="49.81 8"/></g>
+<circle cx="60" cy="60" r="28" fill="none" stroke="#B6A6C8" stroke-opacity="0.6" stroke-width="1.5"/>
+<circle cx="60" cy="60" r="13" fill="url(#dcg-core)"/>
+</svg>

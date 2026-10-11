@@ -396,3 +396,10 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .analyticsOutcomes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:12px}
 .analyticsOutcome{border:1px solid #524184;border-radius:10px;padding:12px;min-width:0}
 .analyticsOutcome h4{margin:0 0 4px}.analyticsVerdicts{font-size:11px;margin-top:8px}
+/* Brand: logo mark beside the name; source files in /logo, served from public/. */
+.brand{display:flex;align-items:center;gap:10px;line-height:1}
+.brandMark{width:34px;height:34px;flex-shrink:0}
+.brandName{color:#F3E6F7;white-space:nowrap}.brandDash{color:#EC7BDD}
+.authLockup{display:block;width:100%;max-width:320px;height:auto;margin:0 auto 4px}
+@media(max-width:800px){.investigatorExpandedShell .sidebar .brand{justify-content:center}.investigatorExpandedShell .sidebar .brandName{display:none}}
+.sidebar .brand+.subtle{margin-left:44px}
