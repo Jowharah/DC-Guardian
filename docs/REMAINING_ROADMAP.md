@@ -18,6 +18,7 @@
 | Audit hash-chain verification | Implemented; local 11-test and 16-test runs reported | Trusted external checkpoint, backup/recovery and production audit controls |
 | Unified cross-domain severity | **Provisional policy implemented** (`DCG-UNIFIED-SEVERITY-PROVISIONAL-v1`: Decision Rules v1 on active-concern member domains) | Validate the policy against labelled multi-domain scenarios and approve it before treating group severity as authoritative |
 | AI Investigator | **Implemented research prototype**; numeric/identity field checks for all domains and modes | Narrative/causal claim grounding, abstention evaluation, outbound privacy review, tool audit, prompt-injection evaluation, cost limits and production hardening; see [AI Investigator](AI_INVESTIGATOR.md) |
+| Probabilistic correlation (Bayesian) | **Offline research component** on `feature/uncertainty-reasoning`; labelled-scenario evaluation and contract tests | Independent scenario labelling, TimeGap conditioned on Topology for slow cascades, live scoring in correlation pairs; see [Uncertainty Reasoning](UNCERTAINTY_REASONING.md) |
 | Deployment / production security | Pending | Production authentication, TLS, secrets, monitoring, dependency audit, threat modeling, penetration tests |
 
 ## Testing modernization (agreed 2026-10-11)

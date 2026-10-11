@@ -1,0 +1,2082 @@
+{
+  "knowledge_base_version": "DCG-UNCERTAINTY-KB-v1",
+  "decision_threshold": 0.5,
+  "results": {
+    "dev": {
+      "scenarios": 16,
+      "abnormal_events": 37,
+      "candidate_pairs": 26,
+      "related_pairs": 16,
+      "crisp": {
+        "tp": 11,
+        "fp": 7,
+        "fn": 5,
+        "precision": 0.611,
+        "recall": 0.688,
+        "f1": 0.647,
+        "alerts_shown": 23,
+        "incidents": 13,
+        "incidents_fully_linked": 9,
+        "incidents_linked_cleanly": 7
+      },
+      "bayesian": {
+        "tp": 12,
+        "fp": 6,
+        "fn": 4,
+        "precision": 0.667,
+        "recall": 0.75,
+        "f1": 0.706,
+        "alerts_shown": 22,
+        "incidents": 13,
+        "incidents_fully_linked": 10,
+        "incidents_linked_cleanly": 8,
+        "average_precision": 0.85,
+        "roc_auc": 0.719
+      },
+      "single_domain": {
+        "alerts_shown": 37
+      }
+    },
+    "test": {
+      "scenarios": 24,
+      "abnormal_events": 65,
+      "candidate_pairs": 59,
+      "related_pairs": 28,
+      "crisp": {
+        "tp": 16,
+        "fp": 10,
+        "fn": 12,
+        "precision": 0.615,
+        "recall": 0.571,
+        "f1": 0.593,
+        "alerts_shown": 44,
+        "incidents": 18,
+        "incidents_fully_linked": 11,
+        "incidents_linked_cleanly": 10
+      },
+      "bayesian": {
+        "tp": 19,
+        "fp": 5,
+        "fn": 9,
+        "precision": 0.792,
+        "recall": 0.679,
+        "f1": 0.731,
+        "alerts_shown": 43,
+        "incidents": 18,
+        "incidents_fully_linked": 12,
+        "incidents_linked_cleanly": 10,
+        "average_precision": 0.829,
+        "roc_auc": 0.838
+      },
+      "single_domain": {
+        "alerts_shown": 65
+      }
+    },
+    "all": {
+      "scenarios": 40,
+      "abnormal_events": 102,
+      "candidate_pairs": 85,
+      "related_pairs": 44,
+      "crisp": {
+        "tp": 27,
+        "fp": 17,
+        "fn": 17,
+        "precision": 0.614,
+        "recall": 0.614,
+        "f1": 0.614,
+        "alerts_shown": 67,
+        "incidents": 31,
+        "incidents_fully_linked": 20,
+        "incidents_linked_cleanly": 17
+      },
+      "bayesian": {
+        "tp": 31,
+        "fp": 11,
+        "fn": 13,
+        "precision": 0.738,
+        "recall": 0.705,
+        "f1": 0.721,
+        "alerts_shown": 65,
+        "incidents": 31,
+        "incidents_fully_linked": 22,
+        "incidents_linked_cleanly": 18,
+        "average_precision": 0.82,
+        "roc_auc": 0.809
+      },
+      "single_domain": {
+        "alerts_shown": 102
+      }
+    }
+  },
+  "ablation_test_f1_without_factor": {
+    "TimeGap": 0.605,
+    "Topology": 0.588,
+    "DomainMechanism": 0.604,
+    "EvidenceStrength": 0.604
+  },
+  "sensitivity": {
+    "draws": 200,
+    "log_normal_sigma": 0.3,
+    "test_f1_median": 0.704,
+    "test_f1_p05": 0.578,
+    "test_f1_p95": 0.815,
+    "share_of_draws_beating_crisp": 0.87
+  },
+  "pairs": [
+    {
+      "scenario_id": "D01",
+      "split": "dev",
+      "event_ids": [
+        "D01-E1",
+        "D01-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 9.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.8994,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D02",
+      "split": "dev",
+      "event_ids": [
+        "D02-E1",
+        "D02-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 4.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_SERVER",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.905,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D03",
+      "split": "dev",
+      "event_ids": [
+        "D03-E1",
+        "D03-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 41.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "DEPENDENCY",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.4089,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "D03",
+      "split": "dev",
+      "event_ids": [
+        "D03-E2",
+        "D03-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 19.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.5564,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D04",
+      "split": "dev",
+      "event_ids": [
+        "D04-E1",
+        "D04-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 6.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.8994,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D05",
+      "split": "dev",
+      "event_ids": [
+        "D05-E1",
+        "D05-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "SAFETY"
+      ],
+      "minutes_apart": 1.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.8951,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D06",
+      "split": "dev",
+      "event_ids": [
+        "D06-E1",
+        "D06-E2"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "SAFETY"
+      ],
+      "minutes_apart": 11.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.0805,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "D07",
+      "split": "dev",
+      "event_ids": [
+        "D07-E1",
+        "D07-E2"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 13.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.7428,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D08",
+      "split": "dev",
+      "event_ids": [
+        "D08-E1",
+        "D08-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 38.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.5564,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D09",
+      "split": "dev",
+      "event_ids": [
+        "D09-E1",
+        "D09-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 12.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.8994,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D09",
+      "split": "dev",
+      "event_ids": [
+        "D09-E1",
+        "D09-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 5.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.7428,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D09",
+      "split": "dev",
+      "event_ids": [
+        "D09-E1",
+        "D09-E4"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 2.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.8965,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D09",
+      "split": "dev",
+      "event_ids": [
+        "D09-E2",
+        "D09-E3"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 7.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_RACK",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.6929,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D09",
+      "split": "dev",
+      "event_ids": [
+        "D09-E2",
+        "D09-E4"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 10.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.7428,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D09",
+      "split": "dev",
+      "event_ids": [
+        "D09-E3",
+        "D09-E4"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 3.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.964,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D10",
+      "split": "dev",
+      "event_ids": [
+        "D10-E1",
+        "D10-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "SAFETY"
+      ],
+      "minutes_apart": 7.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.4788,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "D11",
+      "split": "dev",
+      "event_ids": [
+        "D11-E1",
+        "D11-E2"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 72.0,
+      "factors": {
+        "TimeGap": "GT_60_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0001,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "D11",
+      "split": "dev",
+      "event_ids": [
+        "D11-E1",
+        "D11-E3"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "ENVIRONMENTAL"
+      ],
+      "minutes_apart": 70.0,
+      "factors": {
+        "TimeGap": "GT_60_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0001,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "D11",
+      "split": "dev",
+      "event_ids": [
+        "D11-E2",
+        "D11-E3"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "ENVIRONMENTAL"
+      ],
+      "minutes_apart": 2.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_SERVER",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.905,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D12",
+      "split": "dev",
+      "event_ids": [
+        "D12-E1",
+        "D12-E2"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "SAFETY"
+      ],
+      "minutes_apart": 35.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.2884,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "D13",
+      "split": "dev",
+      "event_ids": [
+        "D13-E1",
+        "D13-E2"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 3.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.6263,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D14",
+      "split": "dev",
+      "event_ids": [
+        "D14-E1",
+        "D14-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 16.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.5564,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D15",
+      "split": "dev",
+      "event_ids": [
+        "D15-E1",
+        "D15-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 8.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.4483,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "D16",
+      "split": "dev",
+      "event_ids": [
+        "D16-E1",
+        "D16-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "SAFETY"
+      ],
+      "minutes_apart": 1.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.964,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D16",
+      "split": "dev",
+      "event_ids": [
+        "D16-E1",
+        "D16-E3"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 9.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.8994,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "D16",
+      "split": "dev",
+      "event_ids": [
+        "D16-E2",
+        "D16-E3"
+      ],
+      "domains": [
+        "SAFETY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 8.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.4904,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T01",
+      "split": "test",
+      "event_ids": [
+        "T01-E1",
+        "T01-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 3.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_SERVER",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.9709,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T01",
+      "split": "test",
+      "event_ids": [
+        "T01-E1",
+        "T01-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 20.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0008,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T01",
+      "split": "test",
+      "event_ids": [
+        "T01-E2",
+        "T01-E3"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 17.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0027,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T02",
+      "split": "test",
+      "event_ids": [
+        "T02-E1",
+        "T02-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 52.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "DEPENDENCY",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.4089,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T02",
+      "split": "test",
+      "event_ids": [
+        "T02-E1",
+        "T02-E4"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 55.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "DEPENDENCY",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.1804,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T02",
+      "split": "test",
+      "event_ids": [
+        "T02-E2",
+        "T02-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 34.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.5564,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T02",
+      "split": "test",
+      "event_ids": [
+        "T02-E2",
+        "T02-E4"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 37.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.2853,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T03",
+      "split": "test",
+      "event_ids": [
+        "T03-E1",
+        "T03-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 3.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.964,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T04",
+      "split": "test",
+      "event_ids": [
+        "T04-E1",
+        "T04-E2"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "ENVIRONMENTAL"
+      ],
+      "minutes_apart": 9.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.1509,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T05",
+      "split": "test",
+      "event_ids": [
+        "T05-E1",
+        "T05-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 7.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.4904,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T06",
+      "split": "test",
+      "event_ids": [
+        "T06-E1",
+        "T06-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "SAFETY"
+      ],
+      "minutes_apart": 2.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.7091,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T07",
+      "split": "test",
+      "event_ids": [
+        "T07-E1",
+        "T07-E2"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "SAFETY"
+      ],
+      "minutes_apart": 48.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.2884,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T08",
+      "split": "test",
+      "event_ids": [
+        "T08-E1",
+        "T08-E2"
+      ],
+      "domains": [
+        "SAFETY",
+        "ENVIRONMENTAL"
+      ],
+      "minutes_apart": 6.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.4788,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T08",
+      "split": "test",
+      "event_ids": [
+        "T08-E1",
+        "T08-E3"
+      ],
+      "domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 14.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.4788,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T08",
+      "split": "test",
+      "event_ids": [
+        "T08-E1",
+        "T08-E4"
+      ],
+      "domains": [
+        "SAFETY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 10.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.0805,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T08",
+      "split": "test",
+      "event_ids": [
+        "T08-E2",
+        "T08-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 8.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.8994,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T08",
+      "split": "test",
+      "event_ids": [
+        "T08-E2",
+        "T08-E4"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 4.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.4788,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T08",
+      "split": "test",
+      "event_ids": [
+        "T08-E3",
+        "T08-E4"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 4.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_RACK",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.6829,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T09",
+      "split": "test",
+      "event_ids": [
+        "T09-E1",
+        "T09-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 33.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "DEPENDENCY",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.4089,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T09",
+      "split": "test",
+      "event_ids": [
+        "T09-E1",
+        "T09-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "SAFETY"
+      ],
+      "minutes_apart": 5.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.7338,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T09",
+      "split": "test",
+      "event_ids": [
+        "T09-E2",
+        "T09-E3"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "SAFETY"
+      ],
+      "minutes_apart": 28.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.008,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T10",
+      "split": "test",
+      "event_ids": [
+        "T10-E1",
+        "T10-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 21.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.5564,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T10",
+      "split": "test",
+      "event_ids": [
+        "T10-E1",
+        "T10-E3"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "ENVIRONMENTAL"
+      ],
+      "minutes_apart": 80.0,
+      "factors": {
+        "TimeGap": "GT_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0715,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T10",
+      "split": "test",
+      "event_ids": [
+        "T10-E2",
+        "T10-E3"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "ENVIRONMENTAL"
+      ],
+      "minutes_apart": 59.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.119,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T11",
+      "split": "test",
+      "event_ids": [
+        "T11-E1",
+        "T11-E2"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "SAFETY"
+      ],
+      "minutes_apart": 4.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0161,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T11",
+      "split": "test",
+      "event_ids": [
+        "T11-E1",
+        "T11-E3"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 30.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0008,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T11",
+      "split": "test",
+      "event_ids": [
+        "T11-E2",
+        "T11-E3"
+      ],
+      "domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 26.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0355,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T12",
+      "split": "test",
+      "event_ids": [
+        "T12-E1",
+        "T12-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "SAFETY"
+      ],
+      "minutes_apart": 4.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.8965,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T12",
+      "split": "test",
+      "event_ids": [
+        "T12-E1",
+        "T12-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 5.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.7338,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T12",
+      "split": "test",
+      "event_ids": [
+        "T12-E2",
+        "T12-E3"
+      ],
+      "domains": [
+        "SAFETY",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 1.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.8951,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T13",
+      "split": "test",
+      "event_ids": [
+        "T13-E1",
+        "T13-E2"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 2.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_SERVER",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.9186,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T14",
+      "split": "test",
+      "event_ids": [
+        "T14-E1",
+        "T14-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "SAFETY"
+      ],
+      "minutes_apart": 1.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.8951,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T15",
+      "split": "test",
+      "event_ids": [
+        "T15-E1",
+        "T15-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 27.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.5564,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T15",
+      "split": "test",
+      "event_ids": [
+        "T15-E1",
+        "T15-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 29.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.2853,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T16",
+      "split": "test",
+      "event_ids": [
+        "T16-E1",
+        "T16-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 8.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.8994,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T16",
+      "split": "test",
+      "event_ids": [
+        "T16-E1",
+        "T16-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 4.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.3512,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T16",
+      "split": "test",
+      "event_ids": [
+        "T16-E1",
+        "T16-E4"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 7.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0567,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T16",
+      "split": "test",
+      "event_ids": [
+        "T16-E2",
+        "T16-E3"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 4.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.3512,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T16",
+      "split": "test",
+      "event_ids": [
+        "T16-E2",
+        "T16-E4"
+      ],
+      "domains": [
+        "MAINTENANCE",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 1.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.1529,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T16",
+      "split": "test",
+      "event_ids": [
+        "T16-E3",
+        "T16-E4"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 3.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.964,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T17",
+      "split": "test",
+      "event_ids": [
+        "T17-E1",
+        "T17-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 11.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_SERVER",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.7604,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T18",
+      "split": "test",
+      "event_ids": [
+        "T18-E1",
+        "T18-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 3.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.7091,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T19",
+      "split": "test",
+      "event_ids": [
+        "T19-E1",
+        "T19-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "ENVIRONMENTAL"
+      ],
+      "minutes_apart": 12.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.7428,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T19",
+      "split": "test",
+      "event_ids": [
+        "T19-E1",
+        "T19-E3"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 58.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.0247,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T19",
+      "split": "test",
+      "event_ids": [
+        "T19-E2",
+        "T19-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 46.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "DEPENDENCY",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.4089,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T20",
+      "split": "test",
+      "event_ids": [
+        "T20-E1",
+        "T20-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 95.0,
+      "factors": {
+        "TimeGap": "GT_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.1925,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T21",
+      "split": "test",
+      "event_ids": [
+        "T21-E1",
+        "T21-E2"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 44.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": true,
+      "crisp": false,
+      "probability": 0.2853,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T22",
+      "split": "test",
+      "event_ids": [
+        "T22-E1",
+        "T22-E2"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "SAFETY"
+      ],
+      "minutes_apart": 9.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.7428,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T22",
+      "split": "test",
+      "event_ids": [
+        "T22-E1",
+        "T22-E3"
+      ],
+      "domains": [
+        "ENVIRONMENTAL",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 15.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "DEPENDENCY",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.6106,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T22",
+      "split": "test",
+      "event_ids": [
+        "T22-E2",
+        "T22-E3"
+      ],
+      "domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 6.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0543,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T23",
+      "split": "test",
+      "event_ids": [
+        "T23-E1",
+        "T23-E2"
+      ],
+      "domains": [
+        "SAFETY",
+        "PHYSICAL_SECURITY"
+      ],
+      "minutes_apart": 6.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0483,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T23",
+      "split": "test",
+      "event_ids": [
+        "T23-E1",
+        "T23-E3"
+      ],
+      "domains": [
+        "SAFETY",
+        "ENVIRONMENTAL"
+      ],
+      "minutes_apart": 10.0,
+      "factors": {
+        "TimeGap": "LE_15_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0161,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T23",
+      "split": "test",
+      "event_ids": [
+        "T23-E2",
+        "T23-E3"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "ENVIRONMENTAL"
+      ],
+      "minutes_apart": 4.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "BOTH_WEAK"
+      },
+      "truth": false,
+      "crisp": true,
+      "probability": 0.4406,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T24",
+      "split": "test",
+      "event_ids": [
+        "T24-E1",
+        "T24-E2"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "SAFETY"
+      ],
+      "minutes_apart": 1.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.964,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T24",
+      "split": "test",
+      "event_ids": [
+        "T24-E1",
+        "T24-E3"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 4.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "KNOWN",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.964,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T24",
+      "split": "test",
+      "event_ids": [
+        "T24-E1",
+        "T24-E4"
+      ],
+      "domains": [
+        "PHYSICAL_SECURITY",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 20.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.008,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T24",
+      "split": "test",
+      "event_ids": [
+        "T24-E2",
+        "T24-E3"
+      ],
+      "domains": [
+        "SAFETY",
+        "CYBERSECURITY"
+      ],
+      "minutes_apart": 3.0,
+      "factors": {
+        "TimeGap": "LE_5_MIN",
+        "Topology": "SAME_ZONE",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "BOTH_STRONG"
+      },
+      "truth": true,
+      "crisp": true,
+      "probability": 0.7428,
+      "bayesian": true
+    },
+    {
+      "scenario_id": "T24",
+      "split": "test",
+      "event_ids": [
+        "T24-E2",
+        "T24-E4"
+      ],
+      "domains": [
+        "SAFETY",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 19.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "POSSIBLE",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.008,
+      "bayesian": false
+    },
+    {
+      "scenario_id": "T24",
+      "split": "test",
+      "event_ids": [
+        "T24-E3",
+        "T24-E4"
+      ],
+      "domains": [
+        "CYBERSECURITY",
+        "MAINTENANCE"
+      ],
+      "minutes_apart": 16.0,
+      "factors": {
+        "TimeGap": "LE_60_MIN",
+        "Topology": "UNRELATED",
+        "DomainMechanism": "UNLIKELY",
+        "EvidenceStrength": "MIXED"
+      },
+      "truth": false,
+      "crisp": false,
+      "probability": 0.0027,
+      "bayesian": false
+    }
+  ]
+}

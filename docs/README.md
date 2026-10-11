@@ -9,6 +9,7 @@ Start with [Project Development History](PROJECT_DEVELOPMENT_HISTORY.md) for wha
 
 ## Existing reference documents
 
+- [Uncertainty Reasoning](UNCERTAINTY_REASONING.md) — Bayesian cross-domain correlation, expert knowledge base, labelled scenarios and evaluation against the crisp rule.
 - [Response Architecture and Validation](DC_Guardian_Response_Architecture_and_Validation.md) — approved RAG, grounded specialist reasoning, evaluation methodology, and earlier Response contracts.
 - [Security Assessment and Hardening](DC_Guardian_Security_Assessment_and_Hardening.md) — **pre-dashboard** security baseline, dependency/static analysis, and residual risks. This document is historical and is not a current penetration test.
 - [Repository README](../README.md) — project overview and earlier Evidence/Reasoning setup.
