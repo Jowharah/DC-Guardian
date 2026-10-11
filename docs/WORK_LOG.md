@@ -6,6 +6,15 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — Logo in the dashboard
+
+- **What:** the operator's logo set (`logo/`: mark, dark/light lockups, PNG sizes, favicons) is now the source of the dashboard branding. Copies served by Vite live in `presentation/frontend/public/` (favicon.ico, favicon-32.png, mark SVG, 256 px mark for touch icons, dark-background lockup).
+- **Where:** browser-tab icons and theme colour in `index.html`; sidebar brand is the mark plus "DC-GUARDIAN" with the pink hyphen (mark only when the Investigator is expanded on narrow screens); the sign-in card shows the dark-background lockup.
+- **Verified:** `npm run build`; Playwright 6 passed; screenshots of sign-in and sidebar checked.
+- **Note:** if the logo changes, update `logo/` and re-copy the five files into `public/`.
+
+---
+
 ## 2026-10-11 — Specialist grounding failures, verdict badge, detector-outcome analytics
 
 - **Verdict badge** (`f32b7a0`): on PPE, Face, Maintenance and Environment feed rows the human-verdict pill was a fifth grid cell and wrapped onto its own line; it now shares the status cell (as SSH rows did) and never wraps. Specialist failures in the maintenance/environment ingestion workflows and the unified endpoint are now logged to `logs/errors.log` (type and message only) instead of being swallowed.
