@@ -1,6 +1,6 @@
 # DC-GUARDIAN documentation index
 
-**Updated:** 2026-10-10  
+**Updated:** 2026-10-11  
 **Scope:** DC-GUARDIAN research prototype on `main`; controlled/synthetic demonstration, not production certification.
 
 For the current OpenAI-powered investigation feature, see [AI Investigator](AI_INVESTIGATOR.md) (all five Evidence domains, correlations, conversation history, source manifests, privacy and grounding limitations).
@@ -29,7 +29,7 @@ Working on the repository with Claude Code: see [`CLAUDE.md`](../CLAUDE.md) at t
 1. **Evidence** is a detector output or operator-declared controlled test record. Detection is not independently verified physical reality.
 2. **Correlation candidates** use explicit source rules and topology. Same zone/time does not establish identity, causation, compromise, or physical presence.
 3. **Specialist assessments** use approved knowledge and may be partially supported. They do not override deterministic correlation or Decision authority.
-4. **Saved Decision severity** applies only when an explicit validated policy assigns it. Unified evidence review does not inherit SSH/operational severity.
+4. **Decision severity** comes only from deterministic rules: DCG-DECISION-v1 (saved SSH, operational and pipeline Decisions) and DCG-DECISION-v2 (single events in every domain, and unified groups: most severe member, +1 level only for linked evidence; validated on author labels, independent labels pending). Specialists and the Investigator never assign severity; unified review does not inherit SSH/operational severity.
 5. **Human review outcomes** are authenticated operator records, not incident resolution or changes to frozen Evidence.
 6. **Audit integrity PASS** verifies local record/hash consistency only; an independent checkpoint is needed to detect database replacement or deletion of the trailing suffix.
 

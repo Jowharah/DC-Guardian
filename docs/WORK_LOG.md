@@ -6,6 +6,13 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — Documentation refresh
+
+- Roadmap (`REMAINING_ROADMAP.md`) updated to 2026-10-11: rows for the Monitoring summary, single-event severity, single-event specialists; human-verdict row no longer lists browser validation as missing; suggested order refreshed (independent labelling first, since it now validates both the Bayesian study and the v2 group rule).
+- `VALIDATION_AND_OPERATIONS.md`: latest full check (54/54) and the Decision v2 validation command; `docs/README.md` distinction 4 now describes v1/v2 Decision severity; testing plan item 4 counts 8 browser tests.
+
+---
+
 ## 2026-10-11 — Decision Rules v2: every domain and unified groups
 
 - **Why:** unified groups had only a provisional severity that validation showed was non-discriminating (3+ domains → HIGH regardless of whether the events belong together), and single maintenance, environment, PPE and Face events had no severity at all.
@@ -258,7 +265,7 @@ Keep every existing check; change how they are organized. Status is updated as i
 | 1 | GitHub Actions: run the fast tests on every push | Automatic ✓/✗ per commit | **Done** 2026-10-11 (`ci.yml`; green since `4d055ef`) |
 | 2 | Move `inspect_sh17_*.py` to `evidence/ppe_detection/tools/` | Exploration scripts, not tests | **Done** 2026-10-11 |
 | 3 | Pilot: convert Reasoning graph/correlation scripts to pytest with shared Neo4j fixtures and markers (`neo4j`, `gpu`, `private_data`) | ~19,400 lines for 541 checks; 13 copies of driver/cleanup code; stops at first failure; order-dependent | **Pilot done** 2026-10-11 (SSH and maintenance ingestion); awaiting group review |
-| 4 | Browser tests (Playwright) for verdict, group review and Decision re-evaluation | Frontend has no automated tests | **Done** 2026-10-11 (5 tests, in CI) |
+| 4 | Browser tests (Playwright) for verdict, group review and Decision re-evaluation | Frontend has no automated tests | **Done** 2026-10-11 (5 tests, in CI); 8 tests since (analytics outcomes, monitoring summary, v2 Decisions) |
 | 5 | Convert remaining script tests (Evidence, Response, integration) after the pilot is reviewed | Single runner, per-test results, selectable tests | Planned |
 
 Rule for conversions: the same checks must still run — assertion counts are compared before and after.

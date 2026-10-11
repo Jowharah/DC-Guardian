@@ -59,6 +59,14 @@ python -m pytest presentation/backend/tests/test_investigator_sources.py present
 
 Browser demonstrations included live OpenAI responses for unified, operational, and individual SSH Evidence, as well as opt-in history restoration. The latest frontend build and full end-to-end security suite have not been confirmed by this test result. See [AI Investigator](AI_INVESTIGATOR.md).
 
+## Full project check — 2026-10-11 (after Decision Rules v2)
+
+`python check_all.py`: **54 passed, 0 failed, 0 skipped** — backend pytest 327, frontend build, Playwright 8 browser tests, live API GET smoke test with 0 server errors. Report: `logs/checks/20261011-212808/report.md` (local, not committed).
+
+## Decision Rules v2 validation — 2026-10-11
+
+`python presentation/backend/validation/decision_v2_validation.py` reproduces the dev-split selection and the single test-split evaluation of the group linkage rule (`results/decision_v2_validation.md`): escalated groups 89% genuine vs 38% (difference +0.51, 95% CI +0.08 to +0.88, scenario bootstrap). Author labels; see [AI Investigator — Decision Rules v2](AI_INVESTIGATOR.md#decision-rules-v2-2026-10-11).
+
 ## Full project check and logs — 2026-10-10
 
 `python check_all.py` runs every layer and writes `logs/checks/<timestamp>/report.md`. Reported local run on this branch: **50 passed, 1 failed, 0 skipped** — runtime 4/4; Evidence 28/29; Reasoning 24/24 (contract-test graph nodes removed afterwards); Response 15/15; Decision/integration 4/4; Presentation backend 305 tests; frontend build; live API 54 GET requests with 0 server errors. The one failure is local data, not code: the private Face `validation_known/P005` folder is empty (expected 1 image).

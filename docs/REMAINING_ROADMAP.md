@@ -1,6 +1,6 @@
 # DC-GUARDIAN — Remaining development roadmap
 
-**Updated:** 2026-10-10. Status reflects observed code and reported local tests on `main`, not production readiness.
+**Updated:** 2026-10-11. Status reflects observed code and reported local tests on `main`, not production readiness.
 
 | Feature | Status | Remaining work |
 |---|---|---|
@@ -12,11 +12,14 @@
 | SMART measurements and server health history | Implemented and demonstrated | Longitudinal reliability, edge cases and UI tests |
 | Environmental measurements and trends | Implemented and demonstrated | Sensor data validation, temporal handling and UI tests |
 | RBAC-protected Evidence artifact access | Implemented in part; regression tests passing | Full API/asset access matrix and multi-user integration testing |
-| Analytics and interactive drill-down | Implemented and locally demonstrated | Additional chart and filter regression |
+| Analytics and interactive drill-down | Implemented; detector outcomes per domain with human verdicts, Decision severity from one shared per-row rule; Playwright test | Additional chart and filter regression |
+| Monitoring Center summary | Implemented 2026-10-11: live/delayed/offline status, Needs attention, abnormal results, correlations, Decisions by level, domain freshness strip, card filters; Playwright test | Accessibility review |
 | Human Review Queue and saved outcomes | Implemented and locally demonstrated | Multi-review lifecycle policy and investigation resolution contract |
-| Human verdicts on individual Evidence (confirm / override / inconclusive) | Implemented; focused tests and copy-database HTTP check | Browser validation; policy for who may override which domain in production; reporting overrides as model false-positive/negative metrics; Decision re-evaluation for human-escalated events that never had a Decision |
+| Human verdicts on individual Evidence (confirm / override / inconclusive) | Implemented; backend and Playwright browser tests; v2 single-event Decisions follow verdicts (cleared → no severity, override → human status) | Policy for who may override which domain in production; reporting overrides as model false-positive/negative metrics |
 | Audit hash-chain verification | Implemented; local 11-test and 16-test runs reported | Trusted external checkpoint, backup/recovery and production audit controls |
-| Unified cross-domain severity | **DCG-DECISION-v2 implemented** (most severe member, +1 level for a known mechanism within 10 min; chosen on dev split, test split +0.51 genuine-share difference, CI +0.08 to +0.88; author labels) | Validate the policy against labelled multi-domain scenarios and approve it before treating group severity as authoritative |
+| Unified cross-domain severity | **DCG-DECISION-v2 implemented** (most severe member, +1 level for a known mechanism within 10 min; chosen on dev split, test split +0.51 genuine-share difference, CI +0.08 to +0.88; author labels) | Re-run `decision_v2_validation.py` on the teammates' independent labels; add severity labels to validate MEDIUM vs LOW ordering; more 3+-event test groups |
+| Single-event severity (all domains) | **DCG-DECISION-v2 policy** (operator-approved, conservative; not data-validated) | Operator/stakeholder review of the levels; consider detector-strength grading |
+| Single-event specialists (PPE, Face; retry for Maintenance) | Maintenance/Environment run once at ingestion; PPE and Face alone have none | Consented "Run specialist evaluation" for any single event (offered, not started) |
 | AI Investigator | **Implemented research prototype**; numeric/identity field checks for all domains and modes | Narrative/causal claim grounding, abstention evaluation, outbound privacy review, tool audit, prompt-injection evaluation, cost limits and production hardening; see [AI Investigator](AI_INVESTIGATOR.md) |
 | Probabilistic correlation (Bayesian) | **Research component:** labelled-scenario evaluation with bootstrap confidence intervals, blind labelling pack, contract tests; display-only P(Related) beside each dashboard pair | Independent labelling by teammates (pack ready), TimeGap conditioned on Topology for slow cascades, validation on independent labels before any non-display use; see [Uncertainty Reasoning](UNCERTAINTY_REASONING.md) |
 | Deployment / production security | Pending | Production authentication, TLS, secrets, monitoring, dependency audit, threat modeling, penetration tests |
@@ -25,13 +28,16 @@
 
 Keep every existing check; reorganize them. Tracked with status in [Work Log — Testing plan](WORK_LOG.md#testing-plan-agreed-2026-10-11): GitHub Actions for fast tests, move exploration scripts out of `tests/`, pytest pilot for Reasoning graph/correlation with shared Neo4j fixtures and markers, Playwright browser tests for key review flows, then remaining script conversions.
 
-## Suggested order
+## Suggested order (refreshed 2026-10-11)
 
-1. Full API authorization and protected artifact-access regression; browser-level end-to-end test.
-2. Review lifecycle, audit integrity external checkpoint design, and failure/recovery handling.
-3. AI Investigator **claim-level grounding**, source-field citations, privacy review, audit and authorization regression (read-only Evidence tools and source manifests are already implemented).
-4. Dashboard accessibility, live-time synthetic event contracts, and multi-domain demo verification.
-5. Production deployment design and independent security review.
+1. **Independent labelling round** (pack ready in `reasoning/uncertainty/labelling/pack/`): it now validates two things at once, the Bayesian correlation study and the Decision v2 group rule. Then re-run `evaluate.py` and `decision_v2_validation.py` on those labels.
+2. **Live checks of today's changes:** restart the backend, re-run the specialists on the operator-cleared group (sends Evidence to OpenAI; operator consent), confirm `logs/errors.log` is clean.
+3. **Single-event specialists:** consented evaluation for any single event, all five domains.
+4. Full API authorization and protected artifact-access regression matrix.
+5. Testing plan item 5: convert the remaining script tests after the pytest pilot is reviewed; branch protection on `main` (CI required).
+6. AI Investigator **claim-level grounding**, privacy review, audit and authorization regression.
+7. Review lifecycle, audit external checkpoint, failure/recovery; dashboard accessibility.
+8. Production deployment design and independent security review.
 
 ## Acceptance rules
 
