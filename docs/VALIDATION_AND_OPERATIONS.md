@@ -66,6 +66,10 @@ Fixed during this check: a stale PPE final-test assertion (the compliance policy
 
 The backend logs requests (method, path, status, duration), application messages and errors with tracebacks to `logs/`. Bodies, headers, credentials and query strings are never logged; HTTP client libraries are limited to warnings so outgoing URLs are not recorded.
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs `check_all.py --skip-live` (with a CI-only Neo4j container) and the frontend build on every push and pull request. GPU-environment, private-data and locally rebuilt RAG checks are skipped with a reason; the full 51-check run requires the local machine. See [Work Log](WORK_LOG.md).
+
 ## Local controlled ingestion
 
 A previously used workflow:
