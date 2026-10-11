@@ -25,3 +25,31 @@ def test_inventory_does_not_modify_database(tmp_path):
     assert report["mapped_event_ids"]==["IMG-EVT-PPE-IMG-ONE"]
     with sqlite3.connect(path) as db:
         assert db.execute("SELECT COUNT(*) FROM ppe_observations").fetchone()[0]==1
+
+
+def test_reset_covers_every_presentation_table():
+    """A new feature table must be added to TABLES (or deliberately excluded)."""
+    import sqlite3 as _sqlite3
+    from presentation.backend.app import dev_reset
+    from presentation.backend.app.main import app  # noqa: F401  creates nothing by itself
+    from presentation.backend.app.incident_store import _db_path
+    # Exercise every store so its CREATE TABLE IF NOT EXISTS runs in the test DB.
+    from presentation.backend.app import (evidence_review, decision_reevaluation, human_review_audit,
+        investigator_history, unified_specialists, operational_decision, ssh_publication,
+        maintenance_workflow, environment_workflow, image_metadata_store, image_source_hashes,
+        ssh_temporal_context, face_observations, ppe_observations)
+    evidence_review.connect().close(); decision_reevaluation.storage().close()
+    human_review_audit.connect().close(); investigator_history.connect().close()
+    unified_specialists.storage().close(); operational_decision.storage().close()
+    ssh_publication.connect().close(); maintenance_workflow.db().close(); environment_workflow.db().close()
+    image_metadata_store.connect().close(); image_source_hashes.connect().close()
+    ssh_temporal_context.context_db().close(); face_observations._connect().close(); ppe_observations._connect().close()
+    with _sqlite3.connect(_db_path()) as db:
+        existing={r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    assert existing - set(dev_reset.TABLES) == set(), existing - set(dev_reset.TABLES)
+
+def test_graph_cleanup_never_targets_topology_or_people():
+    from presentation.backend.app.dev_reset import GRAPH_CLEANUP
+    text=" ".join(match for _,match in GRAPH_CLEANUP)
+    for protected in ("Zone","Rack","Server","Camera","Sensor","Person","AccessAudit","DataCenter"):
+        assert f":{protected}" not in text.replace("(:Event)","")
