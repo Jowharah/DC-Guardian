@@ -31,6 +31,23 @@ PROJECT_ROOT = (
 # Contract suite
 # ============================================================
 
+# Contracts that need private, Git-excluded local data. When the data is
+# absent (fresh clone, CI) they are reported as SKIP and the suite continues.
+REQUIRES_PRIVATE_DATA = {
+    "Face Adapter": [
+        "evidence/face_recognition/models/employee_embeddings.npz",
+        "evidence/face_recognition/data/controlled_faces",
+    ],
+}
+
+
+def missing_private_data(name):
+    return [
+        path for path in REQUIRES_PRIVATE_DATA.get(name, [])
+        if not (PROJECT_ROOT / path).exists()
+    ]
+
+
 CONTRACTS = [
 
     # --------------------------------------------------------
@@ -423,6 +440,8 @@ def main():
 
     passed = 0
 
+    skipped = []
+
     timings = []
 
 
@@ -452,6 +471,22 @@ def main():
             print(
                 f"\n--- {section} ---"
             )
+
+
+        missing = missing_private_data(name)
+
+        if missing:
+
+            print()
+            print(
+                f"[{index:02d}/{total:02d}] {section} :: {name}"
+            )
+            print(
+                "SKIP: private local data not present: "
+                + ", ".join(missing)
+            )
+            skipped.append(name)
+            continue
 
 
         success, elapsed = run_contract(
@@ -571,6 +606,7 @@ def main():
     print(
         f"REASONING CONTRACTS PASSED: "
         f"{passed}/{total}"
+        + (f" ({len(skipped)} skipped: private data absent: {', '.join(skipped)})" if skipped else "")
     )
 
     print(
