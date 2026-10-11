@@ -1,8 +1,15 @@
 """Controlled LOCAL TEST Evidence reset; never a general-purpose Neo4j wipe.
 
-Stop API and ingestion before running. Dry-run by default. The SQLite DB is
-backed up before changes. Only explicitly identified Evidence Event IDs are
-removed from Neo4j; topology, enrollment, and approved RAG remain untouched.
+Stop API and ingestion before running. Dry-run by default. The SQLite DB,
+ingestion state and retained images are backed up before changes.
+
+Removed: every Evidence-derived SQLite table (Evidence, Decisions, verdicts,
+re-evaluations, specialist results, group reviews and their audit chain,
+Investigator history, access logs) and, in Neo4j, dashboard Evidence events
+(IDs traced from SQLite, Scenario Lab DCG-* scenarios, IMG-EVT-* images),
+property-less unlabelled nodes, and drives/source IPs no event refers to.
+Kept: topology, people, employee access records (AccessAudit), enrollment,
+approved RAG, integration-test fixtures, and the incoming source files.
 """
 import argparse
 import json
@@ -17,7 +24,31 @@ TABLES=("incidents","standalone_events","ssh_validation_previews","ssh_published
         "maintenance_evidence","environmental_batches","environmental_evidence",
         "ppe_observations","face_observations","ppe_image_access","face_image_access",
         "image_observation_metadata","image_source_hashes",
-        "physical_specialist_results","operational_decisions")
+        "physical_specialist_results","operational_decisions",
+        # Added with later features; derived from Evidence or reviews of it.
+        "evidence_details","graph_access_audit","unified_specialist_results",
+        "face_ssh_specialist_results","human_review_audit","investigator_history",
+        "evidence_review_audit","decision_reevaluations")
+
+# Read-only counts and the matching deletes, run in this order. Topology,
+# Person, AccessAudit and integration fixtures (INTEGRATION-*) never match.
+GRAPH_CLEANUP=(
+    ("dashboard_events",
+     "MATCH (e:Event) WHERE e.event_id IN $ids OR e.scenario_id STARTS WITH 'DCG-' "
+     "OR e.event_id STARTS WITH 'IMG-EVT-'"),
+    ("unlabelled_empty_nodes",
+     "MATCH (n) WHERE size(labels(n))=0 AND size(keys(n))=0"),
+    ("orphan_source_ips",
+     "MATCH (n:SourceIP) WHERE NOT (n)<-[:ORIGINATED_FROM]-(:Event)"),
+    ("orphan_assets",
+     "MATCH (n:Asset) WHERE NOT (n)<-[:TARGETS]-(:Event)"),
+)
+
+def graph_counts(session,ids):
+    """Dry-run view of the graph cleanup (orphan counts assume events are gone)."""
+    events=session.run(GRAPH_CLEANUP[0][1]+" RETURN count(e) AS c",ids=ids).single()["c"]
+    empty=session.run(GRAPH_CLEANUP[1][1]+" RETURN count(n) AS c").single()["c"]
+    return {"dashboard_events":events,"unlabelled_empty_nodes":empty}
 
 def tables(conn):
     return {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
@@ -73,6 +104,12 @@ def reset(args):
         raise ValueError("Set DCG_ALLOW_LOCAL_TEST_RESET=YES only for disposable local test data")
     report=inventory(db_path,state_path)
     report["mode"]="DRY_RUN" if not args.execute else "EXECUTE"
+    from reasoning.graph.ingest_event import create_driver,NEO4J_DATABASE
+    driver=create_driver()
+    try:
+        with driver.session(database=NEO4J_DATABASE,default_access_mode="READ") as session:
+            report["graph"]=graph_counts(session,report["mapped_event_ids"])
+    finally:driver.close()
     print(json.dumps({k:v for k,v in report.items() if k!="image_files"},indent=2))
     print("Retained image files:",len(report["image_files"]))
     if not args.execute:return
@@ -96,10 +133,12 @@ def reset(args):
     driver=create_driver()
     try:
         with driver.session(database=NEO4J_DATABASE) as session:
-            ids=report["mapped_event_ids"]
-            if ids:
-                session.run("""MATCH (e:Event) WHERE e.event_id IN $ids
-                    DETACH DELETE e""",ids=ids).consume()
+            removed={}
+            for name,match in GRAPH_CLEANUP:
+                variable="e" if name=="dashboard_events" else "n"
+                removed[name]=session.run(match+f" DETACH DELETE {variable} RETURN count(*) AS c",
+                                          ids=report["mapped_event_ids"]).single()["c"]
+            print("Neo4j removed:",json.dumps(removed))
     finally:driver.close()
     with sqlite3.connect(str(db_path)) as conn:
         existing=tables(conn)
