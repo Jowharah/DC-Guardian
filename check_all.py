@@ -44,9 +44,19 @@ COMPONENT_ENV = {
     "evidence/predictive_maintenance/tests/test_gru_dataset.py": ".venv-gru",
 }
 # Scripts that need private/excluded local data, with the directory required.
+FACE_ENROLLMENT = "evidence/face_recognition/models/employee_embeddings.npz"  # private biometric artifact
+RAG_KNOWLEDGE = "response/rag/knowledge_base/chunks"  # rebuilt locally from public sources
 NEEDS_DATA = {
     "evidence/face_recognition/tests/test_controlled_dataset.py": "evidence/face_recognition/data/controlled_faces",
+    "evidence/face_recognition/tests/test_enrollment_artifact.py": FACE_ENROLLMENT,
+    "evidence/face_recognition/tests/test_face_pipeline.py": FACE_ENROLLMENT,
     "evidence/ppe_detection/tests/test_sh17_dataset.py": "evidence/ppe_detection/data",
+    "evidence/ppe_detection/tests/test_ppe_config.py": "evidence/ppe_detection/data/processed/sh17_yolo/dataset.yaml",
+    "response/rag/verify_response_rag.py": RAG_KNOWLEDGE,
+    "response/rag/tests/test_chunking.py": RAG_KNOWLEDGE,
+    "response/rag/tests/test_parsing.py": RAG_KNOWLEDGE,
+    "response/rag/tests/test_preprocessing.py": RAG_KNOWLEDGE,
+    "response/rag/tests/test_retrieval_contract.py": RAG_KNOWLEDGE,
 }
 
 
@@ -198,11 +208,17 @@ def main() -> int:
 
     neo4j_skip = neo4j_reachable()
     checks = script_checks()
-    checks.insert(len(checks), ("Presentation", "presentation backend tests (pytest)",
-                               [str(MAIN_PY), "-m", "pytest", "presentation/backend/tests", "-q", "-p", "no:cacheprovider"], None))
+    checks.append(("Presentation", "presentation backend tests (pytest)",
+                   [str(MAIN_PY), "-m", "pytest", "presentation/backend/tests", "-q", "-p", "no:cacheprovider"], None))
     npm = shutil.which("npm") or shutil.which("npm.cmd")
+    if not npm:
+        frontend_skip = "npm not found on PATH"
+    elif not (ROOT / "presentation" / "frontend" / "node_modules").exists():
+        frontend_skip = "frontend dependencies not installed (run npm ci in presentation/frontend)"
+    else:
+        frontend_skip = None
     checks.append(("Presentation", "frontend type-check + build (npm run build)",
-                   [npm or "npm", "run", "build"], None if npm else "npm not found on PATH"))
+                   [npm or "npm", "run", "build"], frontend_skip))
 
     for layer, name, command, skip in checks:
         if args.only and args.only.lower() not in name.lower():
