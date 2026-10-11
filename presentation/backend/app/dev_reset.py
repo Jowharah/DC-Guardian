@@ -42,7 +42,7 @@ def event_ids(conn):
             ids.update(r[0]+"-MAPPED" for r in conn.execute("SELECT event_id FROM environmental_evidence"))
     for table in ("ppe_observations","face_observations"):
         if table in existing:
-            ids.update("IMG-EVT-"+r[0] for r in conn.execute("SELECT observation_id FROM "+table))
+            ids.update("IMG-EVT-"+r[0] for r in conn.execute("SELECT observation_id FROM "+table))  # nosec B608: table from fixed tuple
     return sorted(ids)
 
 def inventory(db_path,state_path):
@@ -51,7 +51,7 @@ def inventory(db_path,state_path):
     if db_path.is_file():
         with sqlite3.connect(f"file:{db_path.as_posix()}?mode=ro",uri=True) as conn:
             existing=tables(conn)
-            result["tables"]={name:conn.execute("SELECT COUNT(*) FROM "+name).fetchone()[0]
+            result["tables"]={name:conn.execute("SELECT COUNT(*) FROM "+name).fetchone()[0]  # nosec B608: name from TABLES allowlist
                               for name in TABLES if name in existing}
             result["mapped_event_ids"]=event_ids(conn)
     for folder in ("ppe_images","face_images"):
@@ -104,7 +104,7 @@ def reset(args):
     with sqlite3.connect(str(db_path)) as conn:
         existing=tables(conn)
         for table in TABLES:
-            if table in existing:conn.execute("DELETE FROM "+table)
+            if table in existing:conn.execute("DELETE FROM "+table)  # nosec B608: table from TABLES allowlist
     if state_path.is_file():
         with sqlite3.connect(str(state_path)) as conn:
             if "ingested_files" in tables(conn):

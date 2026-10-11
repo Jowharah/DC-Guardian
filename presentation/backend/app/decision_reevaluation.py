@@ -45,7 +45,7 @@ def effective_inputs(members):
     """
     result={}
     for kind,evidence_id in members:
-        records=evidence_review.rows("WHERE kind=? AND evidence_id=?",(kind,evidence_id))
+        records=evidence_review.rows(kind,evidence_id)
         state=evidence_review.effective(kind,records)
         overridden=bool(state and state["source"]=="HUMAN_OVERRIDE")
         result[kind+":"+evidence_id]={

@@ -31,7 +31,8 @@ def verify_records(rows,fields=FIELDS):
             "limitation":"No trusted external checkpoint; deletion of trailing records or replacement of the database cannot be detected."}
 
 def verify_database(db):
-    rows=db.execute("SELECT "+",".join(FIELDS)+" FROM human_review_audit ORDER BY rowid ASC").fetchall()
+    # nosec B608: column names are the constant FIELDS tuple, never user input.
+    rows=db.execute("SELECT "+",".join(FIELDS)+" FROM human_review_audit ORDER BY rowid ASC").fetchall()  # nosec B608
     return verify_records(rows)
 
 def verify_evidence_database(db):
@@ -40,5 +41,5 @@ def verify_evidence_database(db):
         zone_id TEXT NOT NULL, reviewer TEXT NOT NULL, recorded_at TEXT NOT NULL,
         verdict TEXT NOT NULL, corrected_status TEXT, model_status TEXT,
         rationale TEXT NOT NULL, previous_hash TEXT NOT NULL, entry_hash TEXT NOT NULL)""")
-    rows=db.execute("SELECT "+",".join(EVIDENCE_FIELDS)+" FROM evidence_review_audit ORDER BY rowid ASC").fetchall()
+    rows=db.execute("SELECT "+",".join(EVIDENCE_FIELDS)+" FROM evidence_review_audit ORDER BY rowid ASC").fetchall()  # nosec B608: constant columns
     return verify_records(rows,EVIDENCE_FIELDS)

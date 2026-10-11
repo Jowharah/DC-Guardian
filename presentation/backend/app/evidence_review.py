@@ -67,9 +67,17 @@ def effective(kind,records):
             "recorded_at":latest["recorded_at"],"reviewer":latest["reviewer"],
             "source":"HUMAN_OVERRIDE" if overridden else "HUMAN_"+latest["verdict"]}
 
-def rows(where="",params=()):
+SELECT_ALL=("SELECT audit_id,kind,evidence_id,zone_id,reviewer,recorded_at,verdict,corrected_status,"
+            "model_status,rationale,previous_hash,entry_hash FROM evidence_review_audit")
+
+def rows(kind=None,evidence_id=None):
+    """All verdicts in audit order, or those for one Evidence item. Fixed SQL only."""
     with connect() as db:
-        found=db.execute("SELECT "+",".join(EVIDENCE_FIELDS)+" FROM evidence_review_audit "+where+" ORDER BY rowid ASC",params).fetchall()
+        if kind is None:
+            found=db.execute(SELECT_ALL+" ORDER BY rowid ASC").fetchall()
+        else:
+            found=db.execute(SELECT_ALL+" WHERE kind=? AND evidence_id=? ORDER BY rowid ASC",
+                             (kind,evidence_id)).fetchall()
     return [dict(zip(EVIDENCE_FIELDS,row)) for row in found]
 
 def overrides():
@@ -82,7 +90,7 @@ def overrides():
 
 def summary(kind,evidence_id):
     """Verdict summary for model input: no free-text rationale or reviewer identity."""
-    result=effective(kind,rows("WHERE kind=? AND evidence_id=?",(kind,evidence_id)))
+    result=effective(kind,rows(kind,evidence_id))
     if result is None:return None
     return {k:result[k] for k in ("verdict","model_status","effective_status","recorded_at","source")}
 
@@ -129,7 +137,7 @@ def record_evidence_review(kind:str,evidence_id:str,payload:EvidenceReviewInput,
 @router.get("/api/v1/evidence-reviews/{kind}/{evidence_id}")
 def list_evidence_reviews(kind:str,evidence_id:str,principal:Principal=Depends(current_principal)):
     authorized_context(kind,evidence_id,principal)
-    records=rows("WHERE kind=? AND evidence_id=?",(kind,evidence_id))
+    records=rows(kind,evidence_id)
     return {"kind":kind,"evidence_id":evidence_id,"records":records,
             "effective":effective(kind,records),"vocabulary":list(VOCABULARY[kind])}
 

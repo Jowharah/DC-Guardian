@@ -131,7 +131,7 @@ def live_api_check(log: list[str]) -> tuple[str, str]:
     """GET-only smoke test of the running backend with the local operator."""
     base = "http://127.0.0.1:8000"
     try:
-        urllib.request.urlopen(base + "/api/v1/health", timeout=5)
+        urllib.request.urlopen(base + "/api/v1/health", timeout=5)  # nosec B310: fixed local http URL
     except Exception:
         return "SKIP", "backend not running on 127.0.0.1:8000"
     sys.path.insert(0, str(ROOT))
@@ -145,7 +145,7 @@ def live_api_check(log: list[str]) -> tuple[str, str]:
         request = urllib.request.Request(base + path, headers={"Authorization": "Basic " + token})
         start = time.perf_counter()
         try:
-            with urllib.request.urlopen(request, timeout=60) as response:
+            with urllib.request.urlopen(request, timeout=60) as response:  # nosec B310: fixed local http URL
                 body = response.read()
                 status = response.status
         except urllib.error.HTTPError as exc:

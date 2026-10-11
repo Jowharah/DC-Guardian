@@ -45,21 +45,21 @@ jobs:
       DCG_INVESTIGATOR_ENABLED: "0"
       PYTHONUTF8: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The 318 MB Random Forest model is stored in Git LFS. Cache it so the
       # free LFS bandwidth allowance is spent once, not on every run.
       - name: List Git LFS objects
         run: git lfs ls-files --long | cut -d' ' -f1 | sort > .lfs-assets-id
       - name: Restore Git LFS cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .git/lfs
           key: lfs-${{ hashFiles('.lfs-assets-id') }}
       - name: Fetch Git LFS objects
         run: git lfs pull
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -71,6 +71,15 @@ jobs:
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
 
+      # Security gates: known-vulnerable dependencies and medium/high static
+      # findings fail the build. Reviewed exceptions carry a "# nosec" reason.
+      - name: Dependency vulnerability audit
+        run: |
+          pip install pip-audit bandit
+          pip-audit --progress-spinner off
+      - name: Static security analysis (Bandit, medium and high)
+        run: bandit -q -r presentation/backend/app reasoning response decision integration shared check_all.py -x "*/tests/*,*/test_*" -ll
+
       - name: Load Neo4j schema and synthetic topology
         run: python reasoning/graph/load_topology.py
 
@@ -79,7 +88,7 @@ jobs:
 
       - name: Upload check report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: check-report
           path: logs/checks/
@@ -93,11 +102,13 @@ jobs:
       run:
         working-directory: presentation/frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: presentation/frontend/package-lock.json
       - run: npm ci
+      - name: Dependency vulnerability audit (high and critical)
+        run: npm audit --audit-level=high
       - run: npm run build
