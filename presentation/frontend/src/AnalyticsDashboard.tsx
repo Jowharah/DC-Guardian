@@ -2,9 +2,7 @@ import {useEffect,useState} from "react";
 import {getUnifiedHumanReviews,type HumanReviewRecord,type LatestEvidenceReview} from "./api";
 import type {Incident,PublishedSSH,PPEObservation,FaceObservation,MaintenanceEvent,EnvironmentalEvent,OperationalCorrelation,UnifiedCorrelationGroup} from "./api";
 type Props={incidents:Incident[];ssh:PublishedSSH[];ppe:PPEObservation[];face:FaceObservation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];operational:OperationalCorrelation[];unified:UnifiedCorrelationGroup[];verdicts?:Record<string,LatestEvidenceReview>;openMonitoring:()=>void};
-// Abnormal as the Reasoning layer defines it (correlation_rules.ABNORMAL_STATES plus the
-// physical-security states; the PPE feed reports NON_COMPLIANT); environment uses the detector's own anomaly flag. Display only.
-const ABNORMAL=new Set(["EXPLICIT_SECURITY_EVENT","HIGH_CONFIDENCE_ANOMALY","ANOMALY_CANDIDATE","AT_RISK","NON_COMPLIANT","PPE_NON_COMPLIANT","UNKNOWN_PERSON","UNAUTHORIZED"]);
+import {DOMAINS,outcomeRecords as buildOutcomes} from "./detectorOutcomes";
 const words=(value:string)=>value.replaceAll("_"," ");
 const palette=["#8564c8","#299eaa","#e0a449","#d76e96","#6592dc"];
 function Donut({items,onSelect}:{items:{name:string;value:number}[];onSelect?:(name:string)=>void}){
@@ -58,15 +56,9 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
   ...maintenance.map(x=>({id:x.event_id,kind:"Maintenance",zone:x.zone_id,time:x.received_at})),
   ...environment.map(x=>({id:x.event_id,kind:"Environmental",zone:x.zone_id,time:x.received_at}))
  ].filter(x=>valid(x.time));
- // Detector result per published record, with any recorded human verdict beside it (never replacing it).
- const outcomeRecords=[
-  ...ssh.filter(x=>valid(x.received_at)).map(x=>({domain:"Cybersecurity",key:"ssh:"+x.event_id,id:x.event_id,zone:x.zone_id,state:x.evidence_state})),
-  ...ppe.filter(x=>valid(x.created_at)).map(x=>({domain:"Safety / PPE",key:"ppe:"+x.observation_id,id:x.observation_id,zone:x.zone_id,state:x.status})),
-  ...face.filter(x=>valid(x.created_at)).map(x=>({domain:"Physical Security",key:"face:"+x.observation_id,id:x.observation_id,zone:x.zone_id,state:x.recognition_status})),
-  ...maintenance.filter(x=>valid(x.received_at)).map(x=>({domain:"Maintenance",key:"maintenance:"+x.event_id,id:x.event_id,zone:x.zone_id,state:x.assessment.assessment})),
-  ...environment.filter(x=>valid(x.received_at)).map(x=>({domain:"Environmental",key:"environment:"+x.event_id,id:x.event_id,zone:x.zone_id,state:x.assessment.assessment,flag:x.assessment.anomaly_detected}))
- ].map(x=>({...x,abnormal:"flag" in x?x.flag===true:ABNORMAL.has(x.state),verdict:verdicts[x.key]}));
- const outcomeDomains=["Cybersecurity","Safety / PPE","Physical Security","Maintenance","Environmental"].map(domain=>{
+ // Detector result per published record, with any recorded human verdict beside it (shared with Monitoring Center).
+ const outcomeRecords=buildOutcomes({ssh,ppe,face,maintenance,environment},verdicts).filter(x=>valid(x.time));
+ const outcomeDomains=DOMAINS.map(domain=>{
   const records=outcomeRecords.filter(x=>x.domain===domain);
   const states=new Map<string,number>();
   for(const r of records)states.set(r.state,(states.get(r.state)??0)+1);

@@ -10,7 +10,10 @@ let credentials:string|null=null;
 export function setCredentials(username:string,password:string){credentials=btoa(unescape(encodeURIComponent(username+":"+password)))}
 export function clearCredentials(){credentials=null}
 export const getCurrentUser=()=>request<{username:string;roles:string[];zones:string[]}>("/api/v1/auth/me");
-async function request<T>(url:string,options?:RequestInit):Promise<T>{const response=await fetch(url,{...options,headers:{"Accept":"application/json",...(credentials?{"Authorization":`Basic ${credentials}`} : {}),...options?.headers}});if(!response.ok){const body=await response.json().catch(()=>null);const detail=typeof body?.detail==="string"?`: ${body.detail}`:"";throw new Error(`API request failed (${response.status})${detail}`)}return response.json() as Promise<T>}
+// API reachability for the live indicator: any answer below 500 means the server is up
+// (a 404 or 409 is a normal answer); network errors and 5xx count as failures.
+export const apiHealth={lastContact:0,lastFailure:0};
+async function request<T>(url:string,options?:RequestInit):Promise<T>{const response=await fetch(url,{...options,headers:{"Accept":"application/json",...(credentials?{"Authorization":`Basic ${credentials}`} : {}),...options?.headers}}).catch(e=>{apiHealth.lastFailure=Date.now();throw e});if(response.status<500)apiHealth.lastContact=Date.now();else apiHealth.lastFailure=Date.now();if(!response.ok){const body=await response.json().catch(()=>null);const detail=typeof body?.detail==="string"?`: ${body.detail}`:"";throw new Error(`API request failed (${response.status})${detail}`)}return response.json() as Promise<T>}
 export const getScenarios=()=>request<Scenario[]>("/api/v1/scenarios");
 export const runScenario=(name:string)=>request<Incident>(`/api/v1/scenarios/${encodeURIComponent(name)}/run`,{method:"POST"});
 
