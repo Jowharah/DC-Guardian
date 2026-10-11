@@ -12,6 +12,7 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 - **Workflow** (recorded in `CLAUDE.md`): short-lived branches from `main` (`feat/`, `fix/`, `docs/`, `test/`), pull request into `main`, green CI, **Create a merge commit**, delete the branch.
 - **Stale references fixed:** docs and `CLAUDE.md` that named `feature/presentation-dashboard` as the active branch (headers, the `git pull` command, the README baseline) now name `main`; the roadmap's Bayesian row no longer lists live scoring as missing. Historical statements ("developed on …", "reported on …") were kept as written.
 - **Path references:** a script checked every path in tracked Markdown files; none are broken (the remaining mentions of `phase1/` describe its removal).
+- **`feature/presentation-dashboard` archived:** fully merged (no unique commits), tagged `archive/feature/presentation-dashboard` at its last commit `aafd492`, then deleted on GitHub and locally.
 - **CI** now runs on pushes to any branch (it previously covered only `main` and `feature/**`, so `docs/` or `fix/` branches had no checks before a pull request).
 
 ---
