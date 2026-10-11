@@ -22,7 +22,8 @@ permissions:
 jobs:
   python:
     name: Python layers (Evidence, Reasoning, Response, Decision, backend)
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moves to Ubuntu 26 on 2026-10-19; upgrade deliberately.
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     services:
       neo4j:
@@ -86,7 +87,7 @@ jobs:
 
   frontend:
     name: Frontend type-check and build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
