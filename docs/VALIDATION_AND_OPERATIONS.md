@@ -1,7 +1,7 @@
 # DC-GUARDIAN — Validation and local operations
 
 **Updated:** 2026-10-10  
-**Branch:** `feature/presentation-dashboard`
+**Branch:** `main`
 
 ## Environment
 
@@ -14,7 +14,8 @@ Use the repository-level `requirements.txt` and `presentation/frontend/package.j
 From the repository root:
 
 ```powershell
-git pull --ff-only origin feature/presentation-dashboard
+git pull --ff-only origin main
+python check_all.py          # every layer below in one run; report in logs/checks/latest.md
 python verify_runtime.py
 python verify_dc_guardian_pipeline.py
 python reasoning/run_contract_tests.py

@@ -1,8 +1,18 @@
 # DC-GUARDIAN — Engineering work log
 
-Dated record of changes on `feature/presentation-dashboard`: what changed, why, the commit, how it was verified, and known caveats. Newest first. Detailed contracts live in the linked documents; this log is the index of *what happened when*.
+Dated record of changes to DC-GUARDIAN (on `main` since 2026-10-11; earlier entries were made on `feature/presentation-dashboard`, merged by PR #2): what changed, why, the commit, how it was verified, and known caveats. Newest first. Detailed contracts live in the linked documents; this log is the index of *what happened when*.
 
-Conventions: commit hashes refer to `feature/presentation-dashboard`. "Verified" lists what was actually run. Local data results are time-specific, not permanent expected values.
+Conventions: commit hashes are in the history of `main` (PR #2 used a merge commit, so every hash cited before the merge remains valid). "Verified" lists what was actually run. Local data results are time-specific, not permanent expected values.
+
+---
+
+## 2026-10-11 — `main` brought up to date; branch and path references
+
+- **PR #2** merged `feature/presentation-dashboard` into `main` (merge commit `f2b8273`, 653 commits); CI green on `main` afterwards. `main` is now the default working line.
+- **Workflow** (recorded in `CLAUDE.md`): short-lived branches from `main` (`feat/`, `fix/`, `docs/`, `test/`), pull request into `main`, green CI, **Create a merge commit**, delete the branch.
+- **Stale references fixed:** docs and `CLAUDE.md` that named `feature/presentation-dashboard` as the active branch (headers, the `git pull` command, the README baseline) now name `main`; the roadmap's Bayesian row no longer lists live scoring as missing. Historical statements ("developed on …", "reported on …") were kept as written.
+- **Path references:** a script checked every path in tracked Markdown files; none are broken (the remaining mentions of `phase1/` describe its removal).
+- **CI** now runs on pushes to any branch (it previously covered only `main` and `feature/**`, so `docs/` or `fix/` branches had no checks before a pull request).
 
 ---
 

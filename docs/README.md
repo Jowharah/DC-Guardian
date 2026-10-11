@@ -1,7 +1,7 @@
 # DC-GUARDIAN documentation index
 
 **Updated:** 2026-10-10  
-**Scope:** `feature/presentation-dashboard` research prototype; controlled/synthetic demonstration, not production certification.
+**Scope:** DC-GUARDIAN research prototype on `main`; controlled/synthetic demonstration, not production certification.
 
 For the current OpenAI-powered investigation feature, see [AI Investigator](AI_INVESTIGATOR.md) (all five Evidence domains, correlations, conversation history, source manifests, privacy and grounding limitations).
 
