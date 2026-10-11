@@ -6,6 +6,16 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — Decision Rules v2: every domain and unified groups
+
+- **Why:** unified groups had only a provisional severity that validation showed was non-discriminating (3+ domains → HIGH regardless of whether the events belong together), and single maintenance, environment, PPE and Face events had no severity at all.
+- **What:** `decision/rules_v2.py` (`DCG-DECISION-v2`; v1 unchanged): conservative single-event policy for every domain (operator choice); group severity = most severe active member, +1 level for linked evidence (`L2_KNOWN_MECHANISM_WITHIN_10_MIN`). Live: unified groups carry the v2 Decision and linkage signals (`unified_severity.group_severity`, `annotate`); new `GET /api/v1/decisions/standalone` (`standalone_decision.py`) gives v2 Decisions for PPE/Face/Maintenance/Environment after human verdicts. Dashboard: severity pills on single-event rows, "HIGH · LINKED" on escalated groups, group detail explains base level and linkage, the Unified Decision line shows the v2 severity with its caveat; the severity filter, Decisions card and Analytics now use one `entrySeverity` (a correlated event counts once, with its group).
+- **Validation protocol** (`presentation/backend/validation/decision_v2_validation.py`): candidates and criterion declared in code before scoring; selection on dev only; the script refuses to score the test split until the rule is fixed and fails if the fixed rule differs from the dev selection. Test split, evaluated once: escalated 89% genuine vs 38% (difference +0.51, 95% CI +0.08 to +0.88); v2 HIGH 86% genuine vs 67% for the old policy.
+- **Verified:** backend pytest 327 passed (new `test_decision_v2.py`: policy table, escalation, KB consistency, dev selection reproduces the fixed rule, live wiring, verdict handling); `tsc`, build, Playwright 8 passed (new v2 test); on the local data the SSH + unauthorized Face + PPE group is HIGH (linked) and the operator-cleared group is LOW.
+- **Caveats:** author labels (independent round pending); small test sample; MEDIUM/LOW ordering is policy, not validated. Correlation group IDs are unchanged, so saved specialist results stay valid.
+
+---
+
 ## 2026-10-11 — Monitoring Center summary redesign
 
 - **What:** the four total-count cards (including the redundant "Operating mode" card) became an attention-first summary (`MonitoringSummary.tsx`):

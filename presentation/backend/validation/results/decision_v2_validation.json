@@ -1,0 +1,53 @@
+{
+  "policy": "DCG-DECISION-v2",
+  "selected_rule": "L2_KNOWN_MECHANISM_WITHIN_10_MIN",
+  "dev_scores": {
+    "L1_SERVER_OR_UNAUTHORIZED_CYBER": {
+      "escalated": 5,
+      "escalated_genuine": 4,
+      "not_escalated": 6,
+      "not_escalated_genuine": 3,
+      "difference": 0.3
+    },
+    "L2_KNOWN_MECHANISM_WITHIN_10_MIN": {
+      "escalated": 7,
+      "escalated_genuine": 6,
+      "not_escalated": 4,
+      "not_escalated_genuine": 1,
+      "difference": 0.607
+    },
+    "L3_ANY_MECHANISM_WITHIN_10_MIN": {
+      "escalated": 7,
+      "escalated_genuine": 6,
+      "not_escalated": 4,
+      "not_escalated_genuine": 1,
+      "difference": 0.607
+    },
+    "L4_ANY_MECHANISM_WITHIN_5_MIN": {
+      "escalated": 3,
+      "escalated_genuine": 3,
+      "not_escalated": 8,
+      "not_escalated_genuine": 4,
+      "difference": 0.5
+    }
+  },
+  "test": {
+    "escalated": 9,
+    "escalated_genuine": 8,
+    "not_escalated": 8,
+    "not_escalated_genuine": 3,
+    "difference": 0.514,
+    "difference_ci95": [
+      0.076,
+      0.882
+    ],
+    "groups": 17,
+    "unified_groups_3plus": 3
+  },
+  "labels": "scenario author (independent labels pending)",
+  "bootstrap": {
+    "draws": 2000,
+    "unit": "scenario",
+    "seed": 20261011
+  }
+}

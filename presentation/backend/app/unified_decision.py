@@ -65,7 +65,7 @@ def evaluate(group, specialists, authorization=None):
         reasons.append("SPECIALIST_GROUNDING_INSUFFICIENT")
     if "FACE_SSH_CONTEXT" in edges:
         reasons.append("FACE_SSH_CONTEXTUAL_ASSOCIATION_UNVERIFIED")
-    # Severity comes only from the group's provisional deterministic policy
+    # Severity comes only from the group's deterministic DCG-DECISION-v2 rule
     # (unified_severity), never from specialists or standalone Decisions.
     severity = group.get("decision_severity")
     status = ("EVIDENCE_REVIEW_REQUIRED" if reasons
@@ -83,7 +83,7 @@ def evaluate(group, specialists, authorization=None):
             "person_to_ppe_verified": False,
             "causal_relationship_established": False,
             "standalone_severity_inherited": False,
-            "note": "Provisional evidence disposition; any severity is the group's provisional deterministic policy, not a validated unified Decision."}
+            "note": "Evidence disposition; severity is the group's deterministic DCG-DECISION-v2 Decision (validated on author labels; independent labels pending), never a specialist's."}
 
 def member_verdicts_changed(group, principal):
     """True when a member verdict was recorded after the latest group review."""

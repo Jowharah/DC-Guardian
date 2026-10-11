@@ -1,5 +1,6 @@
 import {useEffect,useState} from "react";
-import {apiHealth,getUnifiedSpecialists,type Incident,type OperationalCorrelation,type PublishedSSH,type UnifiedCorrelationGroup} from "./api";
+import type {DecisionRow} from "./App";
+import {apiHealth,getUnifiedSpecialists,type OperationalCorrelation,type PublishedSSH,type UnifiedCorrelationGroup} from "./api";
 import {DOMAINS,type Domain,type OutcomeRecord} from "./detectorOutcomes";
 
 export type Focus="attention"|"abnormal"|"correlations"|"decisions"|`domain:${Domain}`;
@@ -40,11 +41,11 @@ export function LiveStatus(){
  return <span className={`liveStatus live-${state}`} role="status" title="Time since the dashboard last received an answer from the API (refresh every 5 seconds)"><span className="liveDot"/>{text}</span>;
 }
 
-type Props={records:OutcomeRecord[];incidents:Incident[];ssh:PublishedSSH[];operational:OperationalCorrelation[];
+type Props={records:OutcomeRecord[];decisions:DecisionRow[];ssh:PublishedSSH[];operational:OperationalCorrelation[];
  unified:UnifiedCorrelationGroup[];pairCount:number;unevaluated:Set<string>;
  focus:Focus|null;setFocus:(focus:Focus|null)=>void;openReview:()=>void};
 
-export default function MonitoringSummary({records,incidents,ssh,operational,unified,pairCount,unevaluated,focus,setFocus,openReview}:Props){
+export default function MonitoringSummary({records,decisions,ssh,operational,unified,pairCount,unevaluated,focus,setFocus,openReview}:Props){
  const now=Date.now();
  const toReview=records.filter(r=>r.abnormal&&!r.verdict).length;
  const reevaluate=ssh.filter(x=>x.decision_record?.input_review?.reevaluation_required).length+
@@ -53,9 +54,7 @@ export default function MonitoringSummary({records,incidents,ssh,operational,uni
  const attention=toReview+notEvaluated+reevaluate;
  const abnormal=records.filter(r=>r.abnormal);
  const recentAbnormal=abnormal.filter(r=>now-Date.parse(r.time)<DAY).length;
- const severities=[...incidents.map(x=>x.decision.severity),
-  ...ssh.flatMap(x=>x.decision_record?.decision.severity?[x.decision_record.decision.severity]:[]),
-  ...operational.flatMap(x=>x.decision_severity?[x.decision_severity]:[])];
+ const severities=decisions.map(d=>d.severity);
  const count=(level:string)=>severities.filter(x=>x===level).length;
  const toggle=(next:Focus)=>setFocus(focus===next?null:next);
  const card=(id:Focus,title:string,value:string|number,detail:React.ReactNode,tone="")=>
@@ -66,7 +65,7 @@ export default function MonitoringSummary({records,incidents,ssh,operational,uni
    {card("attention","Needs attention",attention,[toReview?`${toReview} abnormal without verdict`:"",notEvaluated?`${notEvaluated} group${notEvaluated===1?"":"s"} not evaluated`:"",reevaluate?`${reevaluate} Decision${reevaluate===1?"":"s"} to re-evaluate`:""].filter(Boolean).join(" · ")||"Nothing outstanding",attention?"summaryAlert":"")}
    {card("abnormal","Abnormal detector results",`${abnormal.length} of ${records.length}`,<>{recentAbnormal} in the last 24 h · display only, not severity</>)}
    {card("correlations","Correlations",`${unified.length} group${unified.length===1?"":"s"}`,<>{pairCount} pair{pairCount===1?"":"s"} · {notEvaluated} group{notEvaluated===1?"":"s"} awaiting specialists</>)}
-   {card("decisions","Saved Decisions",severities.length,<><span className="severity severity-high">HIGH {count("HIGH")}</span> <span className="severity severity-medium">MED {count("MEDIUM")}</span> <span className="severity severity-low">LOW {count("LOW")}</span>{reevaluate?<> · ⚠ {reevaluate} re-evaluate</>:null}</>)}
+   {card("decisions","Decisions",severities.length,<><span className="severity severity-high">HIGH {count("HIGH")}</span> <span className="severity severity-medium">MED {count("MEDIUM")}</span> <span className="severity severity-low">LOW {count("LOW")}</span>{reevaluate?<> · ⚠ {reevaluate} re-evaluate</>:null}</>)}
   </div>
   <div className="domainStrip" role="group" aria-label="Domain status">
    {DOMAINS.map(domain=>{

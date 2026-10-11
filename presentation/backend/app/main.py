@@ -93,6 +93,8 @@ from presentation.backend.app.investigator_chat import router as investigator_ch
 app.include_router(investigator_chat_router)
 from presentation.backend.app.investigator_history import router as investigator_history_router
 app.include_router(investigator_history_router)
+from presentation.backend.app.standalone_decision import router as standalone_decision_router
+app.include_router(standalone_decision_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:

@@ -16,7 +16,7 @@
 | Human Review Queue and saved outcomes | Implemented and locally demonstrated | Multi-review lifecycle policy and investigation resolution contract |
 | Human verdicts on individual Evidence (confirm / override / inconclusive) | Implemented; focused tests and copy-database HTTP check | Browser validation; policy for who may override which domain in production; reporting overrides as model false-positive/negative metrics; Decision re-evaluation for human-escalated events that never had a Decision |
 | Audit hash-chain verification | Implemented; local 11-test and 16-test runs reported | Trusted external checkpoint, backup/recovery and production audit controls |
-| Unified cross-domain severity | **Provisional policy implemented** (`DCG-UNIFIED-SEVERITY-PROVISIONAL-v1`: Decision Rules v1 on active-concern member domains) | Validate the policy against labelled multi-domain scenarios and approve it before treating group severity as authoritative |
+| Unified cross-domain severity | **DCG-DECISION-v2 implemented** (most severe member, +1 level for a known mechanism within 10 min; chosen on dev split, test split +0.51 genuine-share difference, CI +0.08 to +0.88; author labels) | Validate the policy against labelled multi-domain scenarios and approve it before treating group severity as authoritative |
 | AI Investigator | **Implemented research prototype**; numeric/identity field checks for all domains and modes | Narrative/causal claim grounding, abstention evaluation, outbound privacy review, tool audit, prompt-injection evaluation, cost limits and production hardening; see [AI Investigator](AI_INVESTIGATOR.md) |
 | Probabilistic correlation (Bayesian) | **Research component:** labelled-scenario evaluation with bootstrap confidence intervals, blind labelling pack, contract tests; display-only P(Related) beside each dashboard pair | Independent labelling by teammates (pack ready), TimeGap conditioned on Topology for slow cascades, validation on independent labels before any non-display use; see [Uncertainty Reasoning](UNCERTAINTY_REASONING.md) |
 | Deployment / production security | Pending | Production authentication, TLS, secrets, monitoring, dependency audit, threat modeling, penetration tests |
@@ -36,7 +36,7 @@ Keep every existing check; reorganize them. Tracked with status in [Work Log —
 ## Acceptance rules
 
 - Never reinterpret contextual correlation as verified identity, causation, or physical presence.
-- Group severity stays labelled provisional until `DCG-UNIFIED-SEVERITY-PROVISIONAL-v1` is validated; never derive it from specialist or standalone severity.
+- Group severity (DCG-DECISION-v2) is shown as "validated on author labels; independent labels pending" until the independent labelling round confirms it; never derive it from specialist or standalone severity. Single-event v2 severities are policy, not data-validated.
 - Do not replace original detector output with agent-generated conclusions.
 - Do not claim human review resolution solely from a recorded follow-up outcome.
 - Treat local test results as revision-specific and rerun after code changes.

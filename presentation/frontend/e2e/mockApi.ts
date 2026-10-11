@@ -80,8 +80,12 @@ const group = {id: GROUP_ID, zone_id: "ZONE-B", domains: ["CYBERSECURITY", "PHYS
     {kind: "ssh", domain: "CYBERSECURITY", observation_id: SSH_ID}],
   edges: [{type: "PHYSICAL_IMAGE", left: ["ppe", PPE_ID], right: ["face", FACE_ID], source_id: "PAIR-1", zone_id: "ZONE-B", details: {}},
     {type: "FACE_SSH_CONTEXT", left: ["face", FACE_ID], right: ["ssh", SSH_ID], source_id: "PAIR-2", zone_id: "ZONE-B", details: {}}],
-  source_candidate_ids: ["PAIR-1", "PAIR-2"], status: "CORRELATION_GROUP_CANDIDATE", decision: null, decision_severity: "HIGH",
-  severity_policy: "DCG-UNIFIED-SEVERITY-PROVISIONAL-v1", severity_rules_triggered: ["MULTI_DOMAIN_CORRELATED_RISK"],
+  source_candidate_ids: ["PAIR-1", "PAIR-2"], status: "CORRELATION_GROUP_CANDIDATE", decision: {incident_status: "REVIEW_REQUIRED", severity: "HIGH", response_mode: "HUMAN_REVIEW", escalation_required: true,
+    autonomous_action_allowed: false, decision_rules_triggered: ["LINKED_GROUP_ESCALATION"], rationale: [], policy_version: "DCG-DECISION-v2",
+    validation_status: "VALIDATED_ON_AUTHOR_LABELS_INDEPENDENT_LABELS_PENDING"}, decision_severity: "HIGH",
+  severity_policy: "DCG-DECISION-v2", severity_rules_triggered: ["CYBERSECURITY_ANOMALY_EVIDENCE", "LINKED_GROUP_ESCALATION"],
+  base_severity: "MEDIUM", escalated: true, linkage_rule: "L2_KNOWN_MECHANISM_WITHIN_10_MIN",
+  linkage: {same_server: false, same_rack: false, unauthorized_with_cyber: false, known_mechanism: true, time_spread_minutes: 4},
   active_concern_domains: ["CYBERSECURITY", "PHYSICAL_SECURITY", "SAFETY"], severity_provisional: true, members: [],
   autonomous_action_allowed: false, identity_link_established: false, causal_relationship_established: false, note: "Synthetic group."};
 
@@ -145,7 +149,7 @@ export async function installMockApi(page: Page): Promise<MockState> {
       if (!state.specialistsEvaluated) return json(route, {detail: "Evaluate unified specialists first"}, 409);
       return json(route, {group_id: GROUP_ID, specialists_evaluated_at: NOW, member_verdicts_changed_since_review: false,
         decision: {policy_version: "DCG-UNIFIED-EVIDENCE-REVIEW-v1", status: "EVIDENCE_REVIEW_REQUIRED", response_mode: "HUMAN_REVIEW",
-          review_reasons: ["CYBERSECURITY_EVIDENCE_PRESENT"], severity: "HIGH", severity_policy: "DCG-UNIFIED-SEVERITY-PROVISIONAL-v1",
+          review_reasons: ["CYBERSECURITY_EVIDENCE_PRESENT"], severity: "HIGH", severity_policy: "DCG-DECISION-v2",
           autonomous_action_allowed: false, note: "Synthetic."}});
     }
     if (path === `/api/v1/correlations/unified/${GROUP_ID}/specialists`) {
@@ -171,6 +175,12 @@ export async function installMockApi(page: Page): Promise<MockState> {
       return json(route, {reevaluation_id: "DCG-RE-TEST", decision: decision(null, "INPUT_CLEARED_BY_HUMAN_VERDICT")}, 201);
     }
     if (path.endsWith("/graph")) return json(route, {scenario_id: "test", source: "NEO4J_READ_ONLY", nodes: [], edges: []});
+    if (path === "/api/v1/decisions/standalone") {
+      return json(route, [{kind: "ppe", evidence_id: PPE_ID, zone_id: "ZONE-B", decision: {incident_status: "REVIEW_REQUIRED", severity: "LOW",
+        response_mode: "HUMAN_REVIEW", escalation_required: false, autonomous_action_allowed: false,
+        decision_rules_triggered: ["PPE_NON_COMPLIANCE"], rationale: [], policy_version: "DCG-DECISION-v2",
+        validation_status: "POLICY_NOT_DATA_VALIDATED", input_source: "DETECTOR", effective_state: "NON_COMPLIANT"}}]);
+    }
     // Every other list endpoint is empty; anything else does not exist.
     if (method === "GET" && /^\/api\/v1\/(incidents|events\/standalone|maintenance\/events|environment\/events|operations\/correlations|physical\/image-correlations|cyber\/face-ssh\/candidates|correlations\/pairs|scenarios|topology\/options|topology\/cameras|access\/employees)$/.test(path)) {
       return json(route, []);
