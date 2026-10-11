@@ -28,7 +28,7 @@ TABLES=("incidents","standalone_events","ssh_validation_previews","ssh_published
         # Added with later features; derived from Evidence or reviews of it.
         "evidence_details","graph_access_audit","unified_specialist_results",
         "face_ssh_specialist_results","human_review_audit","investigator_history",
-        "evidence_review_audit","decision_reevaluations")
+        "evidence_review_audit","decision_reevaluations","single_specialist_results")
 
 # Read-only counts and the matching deletes, run in this order. Topology,
 # Person, AccessAudit and integration fixtures (INTEGRATION-*) never match.
