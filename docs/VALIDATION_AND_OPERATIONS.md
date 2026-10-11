@@ -63,6 +63,10 @@ Browser demonstrations included live OpenAI responses for unified, operational, 
 
 `python check_all.py`: **54 passed, 0 failed, 0 skipped** — backend pytest 327, frontend build, Playwright 8 browser tests, live API GET smoke test with 0 server errors. Report: `logs/checks/20261011-212808/report.md` (local, not committed).
 
+## API access matrix — 2026-10-11
+
+`presentation/backend/tests/test_access_matrix.py` lists every operation from the OpenAPI schema (99; 147 calls with each `{kind}` expanded) in a reviewed `POLICY` table and checks, with a throw-away database, unreachable Neo4j and OpenAI blocked: every operation except `/health` answers 401 without credentials; each non-admin role gets 403 exactly where it lacks the required permission and is not refused where it holds it. A new endpoint fails the test until classified. Zone isolation with real records stays in the domain RBAC tests. Current policy differences recorded in the table: maintenance/environment feeds are readable by every role in its zones (other domains need detail permission); PPE/Face uploads need only the safety detail permission (maintenance/environment/SSH uploads need `scenario:execute`).
+
 ## Decision Rules v2 validation — 2026-10-11
 
 `python presentation/backend/validation/decision_v2_validation.py` reproduces the dev-split selection and the single test-split evaluation of the group linkage rule (`results/decision_v2_validation.md`): escalated groups 89% genuine vs 38% (difference +0.51, 95% CI +0.08 to +0.88, scenario bootstrap). Author labels; see [AI Investigator — Decision Rules v2](AI_INVESTIGATOR.md#decision-rules-v2-2026-10-11).
