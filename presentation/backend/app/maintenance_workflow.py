@@ -4,6 +4,7 @@ No hardcoded model outputs, no fabricated correlated incidents, and no invented
 Decision severity for standalone maintenance (Decision v1 has no such rule).
 """
 import io
+import logging
 import json
 import sqlite3
 from datetime import datetime, timezone
@@ -57,6 +58,8 @@ def mapped_event(event_id, assessment, server, zone):
         "scenario_id":"DCG-MAINT-"+event_id.removeprefix("MAINT-EVT-")})
     return event
 
+logger=logging.getLogger("dcg.response")
+
 def run_workflow(event_id, assessment, server, zone):
     event=mapped_event(event_id,assessment,server,zone)
     stages=[{"stage":"EVIDENCE","status":"COMPLETE","detail":"Frozen Temporal RF v2 inference"},
@@ -100,7 +103,9 @@ def run_workflow(event_id, assessment, server, zone):
                     task="Analyze standalone frozen SMART risk without predicting exact failure, assigning severity, or inferring cause.",
                     domains=("MAINTENANCE",)))
             stages.append({"stage":"RESPONSE","status":"COMPLETE","detail":"Grounded Operations Specialist"})
-        except Exception:
+        except Exception as exc:
+            # The stage stays generic for the dashboard; the cause goes to logs/errors.log.
+            logger.warning("Maintenance specialist unavailable for %s: %s: %s",event_id,type(exc).__name__,exc)
             stages.append({"stage":"RESPONSE","status":"UNAVAILABLE",
                            "detail":"Approved knowledge or Response provider unavailable"})
     else:

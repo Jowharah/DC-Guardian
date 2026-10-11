@@ -1,5 +1,6 @@
 """Grounded unified specialist evaluations; no unified Decision authority."""
 import json
+import logging
 import sqlite3
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
@@ -199,6 +200,8 @@ def evaluate_specialists(group_id: str, principal: Principal = Depends(current_p
     except HTTPException:
         raise
     except Exception as exc:
+        logging.getLogger("dcg.response").warning("Unified specialists failed for %s: %s: %s",
+                                                  group_id, type(exc).__name__, exc)
         raise HTTPException(503, "Unified specialist evaluation unavailable") from exc
     evaluated = datetime.now(timezone.utc).isoformat()
     with storage() as db:

@@ -3,6 +3,7 @@
 Operator-controlled batch, not a live sensor connection. No unsupported severity.
 """
 import io
+import logging
 import json
 import sqlite3
 from datetime import datetime,timezone
@@ -103,7 +104,9 @@ def process_sensor_batch(rows,zone,sensor,publish):
                         domains=("ENVIRONMENTAL",)))
                 stages[-2]={"stage":"RESPONSE","status":"COMPLETE",
                             "detail":"Grounded Operations Specialist"}
-            except Exception:
+            except Exception as exc:
+                logging.getLogger("dcg.response").warning("Environmental specialist unavailable for %s: %s: %s",
+                                                          eid,type(exc).__name__,exc)
                 stages[-2]={"stage":"RESPONSE","status":"UNAVAILABLE",
                             "detail":"Approved knowledge or Response provider unavailable"}
         workflow={"stages":stages,"correlation":{"status":"CORRELATED" if correlated else "NO_CORRELATION",
