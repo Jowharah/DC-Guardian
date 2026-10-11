@@ -63,6 +63,17 @@ Browser demonstrations included live OpenAI responses for unified, operational, 
 
 `python check_all.py`: **54 passed, 0 failed, 0 skipped** — backend pytest 327, frontend build, Playwright 8 browser tests, live API GET smoke test with 0 server errors. Report: `logs/checks/20261011-212808/report.md` (local, not committed).
 
+## Audit checkpoints — 2026-10-11
+
+The audit chains detect edited records; a checkpoint also detects deleted recent records and a replaced database. Keep checkpoint files **outside** `presentation/backend/data/` (the tool refuses otherwise), on media or in a place the database operator cannot alter:
+
+```powershell
+python -m presentation.backend.app.audit_checkpoint write --out-dir E:\dcg-checkpoints
+python -m presentation.backend.app.audit_checkpoint verify --file E:\dcg-checkpoints\dcg-audit-checkpoint-<time>.json
+```
+
+Optional: set `DCG_CHECKPOINT_KEY` (kept out of the repository) to sign checkpoints with HMAC-SHA256, so a forged checkpoint is rejected. Verification reports each chain's records added since the checkpoint; anything added after the latest checkpoint is covered only by the next one.
+
 ## API access matrix — 2026-10-11
 
 `presentation/backend/tests/test_access_matrix.py` lists every operation from the OpenAPI schema (99; 147 calls with each `{kind}` expanded) in a reviewed `POLICY` table and checks, with a throw-away database, unreachable Neo4j and OpenAI blocked: every operation except `/health` answers 401 without credentials; each non-admin role gets 403 exactly where it lacks the required permission and is not refused where it holds it. A new endpoint fails the test until classified. Zone isolation with real records stays in the domain RBAC tests. Current policy differences recorded in the table: maintenance/environment feeds are readable by every role in its zones (other domains need detail permission); PPE/Face uploads need only the safety detail permission (maintenance/environment/SSH uploads need `scenario:execute`).

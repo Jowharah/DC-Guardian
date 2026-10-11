@@ -6,6 +6,15 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — External audit checkpoints
+
+- **What:** `audit_checkpoint.py` (CLI `write` / `verify`): records each audit chain's length and head hash (group reviews, Evidence verdicts, Investigator calls) in a JSON file stored outside the data folder, optionally HMAC-signed with `DCG_CHECKPOINT_KEY`. `verify` checks each chain is intact and still holds the checkpointed record at the checkpointed position.
+- **Why:** the chains alone could not detect deletion of the newest records or replacement of the database (documented limitation since the audit was introduced).
+- **Verified:** backend pytest 365 passed (new `test_audit_checkpoint.py`: added records pass, tail deletion and database replacement fail, forged signed checkpoint rejected, refuses a location inside the data folder); read-only snapshot and verify on the local data: PASS (1 group review, 4 verdicts, 0 Investigator calls).
+- **Operator to decide:** where checkpoints are kept and how often they are written.
+
+---
+
 ## 2026-10-11 — Investigator claim checks, outbound privacy, call audit
 
 - **Claim checks** (`investigator_claim_checks.py`): every mode returns `claim_checks`: boundary claims (causation, identity, physical presence, compromise, autonomous action) flagged VIOLATION / NEGATED / HEDGED, and detector-state wording compared with the record and its human verdict (multi-member domains skipped). Shown under each answer in the Investigator panel (opens automatically on a violation or mismatch).
