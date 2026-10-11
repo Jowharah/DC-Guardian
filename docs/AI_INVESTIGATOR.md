@@ -140,6 +140,26 @@ Severity is still assigned only by deterministic Decision Rules v1; a human neve
 - If a human clears an input, no rule applies: the new Decision has `severity: null` and status `INPUT_CLEARED_BY_HUMAN_VERDICT`, not a guessed lower severity. Reversing the override raises the flag again; re-evaluation restores the rule result.
 - The PPE+Face review disposition uses a human PPE override (`ppe_status_source: HUMAN_OVERRIDE`). Scenario-run incidents use synthetic events and are not re-evaluated.
 
+### Claim checks, outbound privacy and call audit (2026-10-11)
+
+**Claim checks** (`investigator_claim_checks.py`, returned as `claim_checks` by every mode and shown under each answer). Sentence-level and deterministic, beside the existing numeric/person-ID field checks:
+
+- *Boundary claims*: causation, identity (a person ID performing an action), physical presence, compromise, and autonomous action. Every Investigator context states these are not established, so an affirmative sentence is a `VIOLATION`; a negated one ("does not establish that the heat caused…") is `NEGATED`; a hedged one ("may have contributed") is `HEDGED` (speculation, flagged but not an error).
+- *State claims*: detector-state wording per domain ("compliant", "at risk", "unauthorized", "benign", "high temperature" …) is compared with the record's detector state and any human verdict; either counts as a match. A domain with several members in context is skipped (`AMBIGUOUS_MULTIPLE_MEMBERS`), as for numbers.
+- Overall: `VIOLATION` > `MISMATCH` > `HEDGED` > `NO_RECOGNIZED_PROBLEM`. Pattern-based: unrecognized wording is not assessed, so a clean result means no recognized problem, not verification. A labelled set of 15 example answers (honest and overclaiming) is part of the tests.
+
+**What leaves the system** (`investigator_audit.minimize`, applied at the single outbound point `ask_model`, after each mode's allowlist):
+
+| Mode | Sent | Never sent |
+|---|---|---|
+| Single Evidence | Allowlisted saved assessment for the record (SSH: state, detector votes, counts, source IP, attempted usernames, window; PPE: per-person PPE results and boxes; Face: recognition status, person ID, similarity/distance, zone authorization; maintenance/environment: assessment and measurements), human-verdict summary (verdict, statuses, time) | Images, embeddings, facial landmarks and face box (removed 2026-10-11), reviewer identity, rationale, raw logs, full histories, credentials |
+| Pair / unified group | The same allowlisted member assessments, contextual links, deterministic review status, review outcomes with times | As above; group review rationale and reviewer |
+| Operational pair | Maintenance and environment assessments, saved specialist and Decision | As above |
+
+Requests use `store=False`. **Open privacy decisions for the operator:** SSH attempted usernames and source IPs, and the pseudonymous person ID (P###), are still sent because explanations rely on them; mask them if your data-protection policy requires (e.g. send counts, or a salted hash for usernames).
+
+**Call audit** (`investigator_audit` table, hash-chained like the review audits): one row per OpenAI call, answered or failed: operator, time, mode, target, zone, Evidence references, model, SHA-256 of the exact payload sent and of the answer, claim-check status. Content is not stored there (the opt-in history keeps conversations). `GET /api/v1/reviews/audit-integrity` now verifies all three chains (unified reviews, Evidence verdicts, Investigator calls); the same limitation applies (no external checkpoint).
+
 ### Single-event specialist evaluation (2026-10-11)
 
 `POST /api/v1/evidence/{kind}/{id}/specialist` (`single_specialists.py`) runs the same grounded specialists, knowledge retrieval, grounding check and one retry as unified groups (`unified_specialists.run_agents`), for one Evidence record in any domain, with no contextual links. It requires `{"acknowledgment": true}` (the dashboard consent checkbox: the allowlisted saved assessment and human-verdict summary go to OpenAI; never images or raw logs), administrator permission (`scenario:execute`) in the record's zone, and runs domain/zone authorization before any Evidence is read. Results are saved with a fingerprint of the Evidence and verdict; `GET` reports `evidence_changed_since` when a later verdict or change makes the result outdated. No severity: Decisions come only from the deterministic rules. Maintenance and environmental ingestion still run their specialist once automatically; this endpoint is the consented re-run and covers SSH, PPE and Face too.

@@ -97,10 +97,12 @@ def audit_integrity(principal:Principal=Depends(current_principal)):
     authorize(principal,Permission.SCENARIO_EXECUTE)
     if "administrator" not in principal.roles:
         raise HTTPException(403,"Administrator required")
+    from presentation.backend.app.investigator_audit import verify as verify_investigator
     with connect() as db:
         unified=verify_database(db)
         evidence=verify_evidence_database(db)
+    investigator=verify_investigator()
     # Top-level fields keep describing the unified chain for existing clients;
-    # the overall status fails if either chain fails.
-    return {**unified,"status":"PASS" if unified["status"]==evidence["status"]=="PASS" else "FAILED",
-            "unified_chain":unified,"evidence_chain":evidence}
+    # the overall status fails if any chain fails.
+    return {**unified,"status":"PASS" if unified["status"]==evidence["status"]==investigator["status"]=="PASS" else "FAILED",
+            "unified_chain":unified,"evidence_chain":evidence,"investigator_chain":investigator}

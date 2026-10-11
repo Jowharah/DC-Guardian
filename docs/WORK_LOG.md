@@ -6,6 +6,16 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — Investigator claim checks, outbound privacy, call audit
+
+- **Claim checks** (`investigator_claim_checks.py`): every mode returns `claim_checks`: boundary claims (causation, identity, physical presence, compromise, autonomous action) flagged VIOLATION / NEGATED / HEDGED, and detector-state wording compared with the record and its human verdict (multi-member domains skipped). Shown under each answer in the Investigator panel (opens automatically on a violation or mismatch).
+- **Privacy review:** the single-Evidence Face context sent `facial_area` (face box and eye/nose/mouth landmarks). `investigator_audit.minimize` now strips biometric, identity, rationale and credential fields at the one outbound point for all modes. Still sent, for the operator to decide: SSH attempted usernames and source IPs, pseudonymous person IDs. Table of what each mode sends in `AI_INVESTIGATOR.md`.
+- **Call audit:** `investigator_audit` table, hash-chained, one row per OpenAI call (answered or failed) with payload/answer SHA-256 and claim status; verified by `/api/v1/reviews/audit-integrity` and shown in the audit panel. Added to the dev reset.
+- **Verified:** backend pytest 360 passed (new `test_investigator_claim_checks.py` with 15 labelled answers and mode wiring; `test_investigator_privacy_audit.py` with a fake OpenAI client: no landmarks/embedding/reviewer/rationale in the payload, exact payload hash audited, failures audited, tampering detected); build; Playwright 9 passed. No live OpenAI call.
+- **Caveats:** pattern-based; precision/recall on real Investigator answers not yet measured.
+
+---
+
 ## 2026-10-11 — API access matrix (every endpoint × every role)
 
 - **What:** `test_access_matrix.py`: a reviewed `POLICY` table classifying all 99 API operations (public, any role, a domain's detail permission, administrator only, or permission-filtered lookup), and tests that call each operation (each `{kind}` expanded, schema-generated valid bodies) without credentials and as each non-admin role.
