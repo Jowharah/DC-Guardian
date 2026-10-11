@@ -28,7 +28,14 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-MAIN_PY = ROOT / ".venv-dc-guardian" / "Scripts" / "python.exe"
+def venv_python(name: str) -> Path:
+    folder = ROOT / name
+    return folder / "Scripts" / "python.exe" if os.name == "nt" else folder / "bin" / "python"
+
+
+# The integrated environment when present (local Windows), else the current
+# interpreter (CI or any other setup that installed requirements.txt).
+MAIN_PY = venv_python(".venv-dc-guardian") if venv_python(".venv-dc-guardian").exists() else Path(sys.executable)
 # Scripts that need a GPU-enabled PyTorch from their component environment.
 COMPONENT_ENV = {
     "evidence/ppe_detection/tests/test_ppe_model_artifact.py": ".venv-ppe",
@@ -45,7 +52,7 @@ NEEDS_DATA = {
 
 def python_for(rel: str) -> Path:
     env = COMPONENT_ENV.get(rel)
-    return ROOT / env / "Scripts" / "python.exe" if env else MAIN_PY
+    return venv_python(env) if env else MAIN_PY
 
 
 def script_checks() -> list[tuple[str, str, list[str], str | None]]:
