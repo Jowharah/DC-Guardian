@@ -137,7 +137,8 @@ DC-Guardian/
 |   `-- rag/               # approved-knowledge retrieval and abstention
 |
 |-- decision/
-|   `-- rules.py           # deterministic Decision rules (DCG-DECISION-v1)
+|   |-- rules.py           # deterministic Decision rules (DCG-DECISION-v1)
+|   `-- rules_v2.py        # DCG-DECISION-v2: single events in every domain + unified groups
 |
 |-- integration/           # scenario pipeline, runners, service contracts
 |

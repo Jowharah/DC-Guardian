@@ -26,7 +26,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from presentation.backend.app.unified_severity import group_severity  # noqa: E402
+from presentation.backend.app.unified_severity import group_severity_provisional_v1 as group_severity  # noqa: E402
 from reasoning.uncertainty.bayesian_correlation import is_abnormal, load_knowledge_base  # noqa: E402
 from reasoning.uncertainty.evaluate import components, load_scenarios, score_rows  # noqa: E402
 

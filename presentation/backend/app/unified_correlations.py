@@ -78,28 +78,34 @@ def collect_existing(principal,nodes=None):
     return all_edges(principal,include_cleared=True,nodes=nodes)
 
 def annotate(groups,principal,nodes=None):
-    """Member verdicts, concern flags and provisional severity per group.
+    """Member verdicts, concern flags and the DCG-DECISION-v2 group Decision.
 
     Group ID and fingerprint depend only on membership and links, so verdicts
     never invalidate saved specialists or review history. A group with fewer
     than two members left un-cleared is no longer a correlation candidate.
     """
-    from presentation.backend.app.correlation_pairs import member_states
+    from presentation.backend.app.correlation_pairs import member_states,load_nodes
     from presentation.backend.app.evidence_review import overrides,summary
     from presentation.backend.app.unified_severity import members_with_review,group_severity
-    states=member_states(principal,nodes)
     human=overrides()
+    if nodes is None:
+        nodes=load_nodes(principal,human)
+    states=member_states(principal,nodes)
+    by_key={(n["kind"],n["id"]):n for n in nodes}
     result=[]
     for group in groups:
         summaries={(r["kind"],r["observation_id"]):summary(r["kind"],r["observation_id"]) for r in group["evidence"]}
         members=members_with_review(group,states,human,summaries)
         if sum(not m["cleared_by_human"] for m in members)<2:continue
-        severity=group_severity(members)
+        severity=group_severity(members,by_key)
         result.append({**group,"members":members,
             "decision_severity":severity["severity"],"severity_policy":severity["policy"],
             "severity_rules_triggered":severity["rules_triggered"],
             "active_concern_domains":severity["active_concern_domains"],
-            "severity_provisional":True})
+            "severity_provisional":False,"severity_validation":severity["validation_status"],
+            "base_severity":severity["base_severity"],"escalated":severity["escalated"],
+            "linkage":severity["linkage"],"linkage_rule":severity["linkage_rule"],
+            "decision":severity["decision"]})
     return result
 
 @router.get("/api/v1/correlations/unified")

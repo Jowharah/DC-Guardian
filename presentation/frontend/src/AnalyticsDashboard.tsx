@@ -1,8 +1,9 @@
 import {useEffect,useState} from "react";
 import {getUnifiedHumanReviews,type HumanReviewRecord,type LatestEvidenceReview} from "./api";
 import type {Incident,PublishedSSH,PPEObservation,FaceObservation,MaintenanceEvent,EnvironmentalEvent,OperationalCorrelation,UnifiedCorrelationGroup} from "./api";
-type Props={incidents:Incident[];ssh:PublishedSSH[];ppe:PPEObservation[];face:FaceObservation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];operational:OperationalCorrelation[];unified:UnifiedCorrelationGroup[];verdicts?:Record<string,LatestEvidenceReview>;openMonitoring:()=>void};
+type Props={incidents:Incident[];ssh:PublishedSSH[];ppe:PPEObservation[];face:FaceObservation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];operational:OperationalCorrelation[];unified:UnifiedCorrelationGroup[];verdicts?:Record<string,LatestEvidenceReview>;decisions?:DecisionRow[];openMonitoring:()=>void};
 import {DOMAINS,outcomeRecords as buildOutcomes} from "./detectorOutcomes";
+import type {DecisionRow} from "./App";
 const words=(value:string)=>value.replaceAll("_"," ");
 const palette=["#8564c8","#299eaa","#e0a449","#d76e96","#6592dc"];
 function Donut({items,onSelect}:{items:{name:string;value:number}[];onSelect?:(name:string)=>void}){
@@ -18,7 +19,7 @@ function Bars({items,onSelect}:{items:{name:string;value:number}[];onSelect?:(na
  const max=Math.max(1,...items.map(x=>x.value));
  return <div className="analyticsBars">{items.map((item,i)=><button type="button" key={item.name} className="analyticsBarRow" disabled={!onSelect||!item.value} onClick={()=>onSelect?.(item.name)}><span>{item.name}</span><div className="analyticsTrack"><div style={{width:`${item.value/max*100}%`,background:palette[i%palette.length]}}/></div><b>{item.value}</b></button>)}</div>
 }
-export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,environment,operational,unified,verdicts={},openMonitoring}:Props){
+export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,environment,operational,unified,verdicts={},decisions:allDecisions=[],openMonitoring}:Props){
 
  const [range,setRange]=useState("all");
  const [audit,setAudit]=useState<Record<string,HumanReviewRecord[]>>({});
@@ -70,9 +71,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
  const abnormalTotal=outcomeDomains.reduce((a,b)=>a+b.abnormal,0);
  const verdictTotal=outcomeRecords.filter(x=>x.verdict).length;
  const domains=["Cybersecurity","Safety / PPE","Physical Security","Maintenance","Environmental"].map(name=>({name,value:sources.filter(x=>x.kind===name).length}));
- const decisions=[...incidents.filter(x=>valid(x.received_at)).map(x=>x.decision.severity),
-  ...ssh.filter(x=>valid(x.received_at)).flatMap(x=>x.decision_record?[x.decision_record.decision.severity]:[]),
-  ...operational.filter(x=>valid(x.maintenance.received_at)).flatMap(x=>x.decision_severity?[x.decision_severity]:[])];
+ const decisions=allDecisions.filter(x=>valid(x.time)).map(x=>x.severity);
  const received=new Map<string,string>([
   ...ssh.map(x=>["ssh:"+x.event_id,x.received_at] as [string,string]),
   ...ppe.map(x=>["ppe:"+x.observation_id,x.created_at] as [string,string]),
@@ -87,11 +86,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
  for(const item of sources)zoneCounts.set(item.zone,(zoneCounts.get(item.zone)??0)+1);
  const zones=[...zoneCounts].sort(([a],[b])=>a.localeCompare(b)).map(([name,value])=>({name,value}));
  const sourceTotal=domains.reduce((a,b)=>a+b.value,0);
- const decisionRows=[
-  ...incidents.filter(x=>valid(x.received_at)).map(x=>({id:x.scenario_id,kind:"Pipeline incident",severity:x.decision.severity})),
-  ...ssh.filter(x=>valid(x.received_at)&&x.decision_record).map(x=>({id:x.event_id,kind:"SSH standalone",severity:x.decision_record!.decision.severity})),
-  ...operational.filter(x=>valid(x.maintenance.received_at)&&x.decision_severity).map(x=>({id:x.id,kind:"Operational correlation",severity:x.decision_severity!}))
- ];
+ const decisionRows=allDecisions.filter(x=>valid(x.time)).map(x=>({id:x.id,kind:x.kind+" · "+x.policy,severity:x.severity}));
 
  // These are separate workflow populations, not mutually exclusive incident severities.
  // A candidate is never interpreted as a completed review or assigned Decision.
@@ -115,7 +110,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
   "Human review inconclusive":withOutcome("INCONCLUSIVE"),
   "Human review recorded — no finding":withOutcome("REVIEWED_NO_FINDING"),
   "Review history unavailable":candidates.filter(x=>auditUnavailable.includes(x.id)).map(x=>({id:x.id,detail:x.zone_id+" · Audit history unavailable"})),
-  "Saved severity Decisions":decisionRows.map(x=>({id:x.id,detail:x.kind+" · "+x.severity}))
+  "Decisions":decisionRows.map(x=>({id:x.id,detail:x.kind+" · "+x.severity}))
  };
  const reviewCounts=Object.entries(reviewRows).map(([name,rows])=>({name,value:rows.length}));
  const detailRows=selection?.type==="domain"?sources.filter(x=>x.kind===selection.value).map(x=>({id:x.id,detail:x.zone+" · "+new Date(x.time).toLocaleString()})):
@@ -136,7 +131,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
   </div>
   <p className="muted analyticsFilterNote">Filters use receipt timestamps, not declared capture times. Authorized feed limits still apply.</p>
  </section>
- <div className="stats"><div className="panel"><small>Published source Evidence</small><strong>{sourceTotal}</strong></div><div className="panel"><small>Saved severity Decisions</small><strong>{decisions.length}</strong></div><div className="panel"><small>Unified candidates</small><strong>{candidates.length}</strong></div><div className="panel"><small>Abnormal detector results</small><strong>{abnormalTotal}</strong></div><div className="panel"><small>Human verdicts recorded</small><strong>{verdictTotal}</strong></div><div className="panel"><small>Observed zones</small><strong>{zones.length}</strong></div></div>
+ <div className="stats"><div className="panel"><small>Published source Evidence</small><strong>{sourceTotal}</strong></div><div className="panel"><small>Decisions</small><strong>{decisions.length}</strong></div><div className="panel"><small>Unified candidates</small><strong>{candidates.length}</strong></div><div className="panel"><small>Abnormal detector results</small><strong>{abnormalTotal}</strong></div><div className="panel"><small>Human verdicts recorded</small><strong>{verdictTotal}</strong></div><div className="panel"><small>Observed zones</small><strong>{zones.length}</strong></div></div>
  <section className="panel"><h3>Detector outcomes by domain</h3><p className="muted">What each frozen detector reported, per published record. Human verdicts are counted beside the detector result and do not replace it. Not severities or incidents.</p>
   <div className="analyticsOutcomes">{outcomeDomains.map(d=><div key={d.domain} className="analyticsOutcome"><h4>{d.domain}</h4><p className="muted">{d.total} records · {d.abnormal} abnormal{d.total?` (${Math.round(d.abnormal/d.total*100)}%)`:""}</p>
    {d.states.length?<Bars items={d.states.map(s=>({name:s.name,value:s.value}))} onSelect={value=>setSelection({type:"outcome",value:d.domain+" · "+value})}/>:<p className="muted">No records in this range.</p>}
@@ -144,7 +139,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
  </section>
  <div className="analyticsGrid">
  <section className="panel"><h3>Evidence by domain</h3><p className="muted">Published source records; not incidents or Decisions.</p><Donut items={domains} onSelect={value=>setSelection({type:"domain",value})}/></section>
- <section className="panel"><h3>Saved Decision severity</h3><p className="muted">Only assigned standalone or operational Decision severities. Candidates and provisional reviews excluded.</p><Donut items={severity} onSelect={value=>setSelection({type:"severity",value})}/></section>
+ <section className="panel"><h3>Decision severity</h3><p className="muted">Deterministic Decisions only: saved v1 Decisions plus v2 group and single-event Decisions (a correlated event counts once, with its group). Specialists never assign severity.</p><Donut items={severity} onSelect={value=>setSelection({type:"severity",value})}/></section>
  <section className="panel"><h3>Multi-domain correlation candidates</h3><p className="muted">One count per unified group; pairwise links inside groups are not counted as separate incidents.</p>{correlationBars.length?<Bars items={correlationBars} onSelect={value=>setSelection({type:"correlation",value})}/>:<p className="muted">No unified groups available.</p>}</section>
  <section className="panel"><h3>Evidence by zone</h3><p className="muted">Published source Evidence counts by declared zone.</p>{zones.length?<Bars items={zones} onSelect={value=>setSelection({type:"zone",value})}/>:<p className="muted">No source Evidence available.</p>}</section>
  <section className="panel"><h3>Review & workflow status</h3><p className="muted">Source-review states, recorded human outcomes, and saved severity Decisions are separate workflow populations. Follow-up is not investigation resolution.</p><Bars items={reviewCounts} onSelect={value=>setSelection({type:"review",value})}/></section>

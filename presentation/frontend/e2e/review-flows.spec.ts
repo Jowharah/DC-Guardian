@@ -123,3 +123,21 @@ test("monitoring summary counts what needs attention and filters the feed", asyn
   await page.locator(".domainChip", {hasText: "Maintenance"}).click();
   await expect(page.locator("button.feedRow", {hasText: "Unified correlation"})).toHaveCount(0);
 });
+
+test("v2 Decisions show on single events and groups, and the severity filter uses them", async ({page}) => {
+  await installMockApi(page);
+  await signIn(page);
+  const ppeRow = page.locator("button.feedRow", {hasText: PPE_ID});
+  await expect(ppeRow.locator(".severity-low")).toHaveText("LOW");
+  await expect(page.locator("button.feedRow", {hasText: "Unified correlation"})).toContainText("HIGH · LINKED");
+  await expect(page.locator(".summaryCard", {hasText: "Decisions"}).last()).toContainText("HIGH 1");
+
+  await page.getByLabel("Filter incidents").selectOption("LOW");
+  await expect(ppeRow).toBeVisible();
+  await expect(page.locator("button.feedRow", {hasText: "Unified correlation"})).toHaveCount(0);
+  await page.getByLabel("Filter incidents").selectOption("ALL");
+
+  await page.locator("button.feedRow", {hasText: "Unified correlation"}).click();
+  await expect(page.getByText("Group Decision · DCG-DECISION-v2")).toBeVisible();
+  await expect(page.getByText(/Unified Decision: HIGH · DCG-DECISION-v2 · validated on author labels/)).toBeVisible();
+});

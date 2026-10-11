@@ -1,5 +1,6 @@
-"""Provisional group severity and verdict-aware unified groups."""
-from presentation.backend.app.unified_severity import members_with_review,group_severity,POLICY
+"""Historical provisional group severity (v1) and verdict-aware unified groups."""
+from presentation.backend.app.unified_severity import members_with_review,POLICY
+from presentation.backend.app.unified_severity import group_severity_provisional_v1 as group_severity  # historical policy
 from presentation.backend.app.unified_decision import evaluate
 
 GROUP={"id":"G1","zone_id":"ZONE-A","edges":[{"type":"PHYSICAL_IMAGE"},{"type":"FACE_SSH_CONTEXT"}],
