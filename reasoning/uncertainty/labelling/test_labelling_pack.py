@@ -51,16 +51,18 @@ def pack_reveals_no_answers():
 
 
 def pack_covers_every_candidate_pair_once():
-    rows = list(csv.DictReader(open(pack.PACK_DIR / "labels.csv", encoding="utf-8")))
+    rows = list(csv.DictReader(open(pack.PACK_DIR / "labels.csv", encoding="utf-8-sig")))
     pairs = [(r["event_a"], r["event_b"]) for r in rows]
     assert len(pairs) == len(set(pairs)) == 85
     assert all(not r["related"] for r in rows), "Pack must ship with empty labels"
+    # Each row is self-contained: both events are described in the sheet itself.
+    assert all(r["a_domain"] and r["b_domain"] and r["a_time"] and r["b_time"] for r in rows)
 
 
 def author_labels_reproduce_published_results():
     key = json.loads(pack.KEY_PATH.read_text(encoding="utf-8"))
     events = {e["event_id"]: e for s in load_scenarios() for e in s["events"]}
-    rows = list(csv.DictReader(open(pack.PACK_DIR / "labels.csv", encoding="utf-8")))
+    rows = list(csv.DictReader(open(pack.PACK_DIR / "labels.csv", encoding="utf-8-sig")))
     for r in rows:
         a, b = events[key["events"][r["event_a"]]], events[key["events"][r["event_b"]]]
         same = a["ground_truth_incident"] is not None and a["ground_truth_incident"] == b["ground_truth_incident"]

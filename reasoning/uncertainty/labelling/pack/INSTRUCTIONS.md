@@ -16,7 +16,7 @@ Fill in for each row:
 - `confidence`: **1** guess · **2** fairly sure · **3** sure.
 - `note` (optional): your reason, especially when unsure.
 
-There are 85 rows in 40 scenarios; expect about 60–90 minutes. Events are in `scenarios_blind.md`; event IDs in the CSV refer to it. Save the CSV (keep the columns) and send it back.
+There are 85 rows in 40 scenarios; expect about 60–90 minutes. Each row of `labels.csv` shows both events in full, the minutes between them and the other alerts in the same scenario, so you can work in Excel alone; `scenarios_blind.md` shows each scenario as a whole if you prefer. **Make a copy of `labels.csv`, fill in the copy**, save it as CSV (keep the columns) and send it back.
 
 ## The facility (synthetic data center DC-01)
 
