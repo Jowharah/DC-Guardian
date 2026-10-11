@@ -140,6 +140,10 @@ Severity is still assigned only by deterministic Decision Rules v1; a human neve
 - If a human clears an input, no rule applies: the new Decision has `severity: null` and status `INPUT_CLEARED_BY_HUMAN_VERDICT`, not a guessed lower severity. Reversing the override raises the flag again; re-evaluation restores the rule result.
 - The PPE+Face review disposition uses a human PPE override (`ppe_status_source: HUMAN_OVERRIDE`). Scenario-run incidents use synthetic events and are not re-evaluated.
 
+### Single-event specialist evaluation (2026-10-11)
+
+`POST /api/v1/evidence/{kind}/{id}/specialist` (`single_specialists.py`) runs the same grounded specialists, knowledge retrieval, grounding check and one retry as unified groups (`unified_specialists.run_agents`), for one Evidence record in any domain, with no contextual links. It requires `{"acknowledgment": true}` (the dashboard consent checkbox: the allowlisted saved assessment and human-verdict summary go to OpenAI; never images or raw logs), administrator permission (`scenario:execute`) in the record's zone, and runs domain/zone authorization before any Evidence is read. Results are saved with a fingerprint of the Evidence and verdict; `GET` reports `evidence_changed_since` when a later verdict or change makes the result outdated. No severity: Decisions come only from the deterministic rules. Maintenance and environmental ingestion still run their specialist once automatically; this endpoint is the consented re-run and covers SSH, PPE and Face too.
+
 ### Decision Rules v2 (2026-10-11)
 
 `decision/rules_v2.py` (`DCG-DECISION-v2`) adds what v1 lacked; v1 (`decision/rules.py`) is unchanged and remains the policy of every Decision saved before.

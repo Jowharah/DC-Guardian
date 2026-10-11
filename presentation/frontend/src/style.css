@@ -424,3 +424,4 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .focusChip{margin:0 0 10px;font-size:13px;color:#E3B8E0}
 .linkButton{background:none;border:0;padding:0;color:#F7A8EC;text-decoration:underline;font-weight:600;cursor:pointer}
 .sshFeedStatuses .severity:not(.humanVerdictBadge){white-space:normal;overflow-wrap:anywhere;text-align:center;width:auto;max-width:100%}
+.consentLine{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:13px;color:#E3B8E0}.staleNote{color:#F4D9A6}

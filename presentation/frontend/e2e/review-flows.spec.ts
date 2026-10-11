@@ -145,3 +145,18 @@ test("v2 Decisions show on single events and groups, and the severity filter use
   await expect(page.getByText("Group Decision · DCG-DECISION-v2")).toBeVisible();
   await expect(page.getByText(/Unified Decision: HIGH · DCG-DECISION-v2 · validated on author labels/)).toBeVisible();
 });
+
+test("a single event's specialist evaluation needs consent and is saved", async ({page}) => {
+  const state = await installMockApi(page);
+  await signIn(page);
+  await page.locator("button.feedRow", {hasText: PPE_ID}).click();
+  const panel = page.getByRole("region", {name: "Single-event specialist evaluation"});
+  const run = panel.getByRole("button", {name: "Run specialist evaluation"});
+  await expect(run).toBeDisabled();
+  await panel.getByText(/I understand this sends this record/).click();
+  await run.click();
+  await expect(panel.getByText(/PHYSICAL SECURITY · SUPPORTED/)).toBeVisible();
+  const post = state.requests.find(r => r.method === "POST" && r.path === `/api/v1/evidence/ppe/${PPE_ID}/specialist`);
+  expect(post?.body).toMatchObject({acknowledgment: true});
+  await expect(panel.getByRole("button", {name: "Re-run specialist evaluation"})).toBeDisabled();
+});

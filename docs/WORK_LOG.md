@@ -6,6 +6,14 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — Specialist evaluation for single events (all domains)
+
+- **What:** `single_specialists.py` (`GET/POST /api/v1/evidence/{kind}/{id}/specialist`) and `SingleSpecialistPanel.tsx` beside the verdict panel for any selected single event. Reuses the unified specialists (same retrieval, grounding check, retry); consent required (400 without it), administrator only, authorization before Evidence is read; saved with an Evidence + verdict fingerprint so a later verdict shows "changed since; re-run". New table `single_specialist_results` (included in the dev reset).
+- **Why:** PPE and Face events alone had no specialist path, and a maintenance event whose ingestion-time specialist failed could not be retried.
+- **Verified:** backend pytest 333 passed (new `test_single_specialists.py`, OpenAI blocked); Playwright 9 passed (consent flow). No live OpenAI call made; first live run is the operator's.
+
+---
+
 ## 2026-10-11 — Live check: blank page on a group with an overridden PPE image
 
 - **Symptom:** opening the unified group `DCG-UNIFIED-EF17…` blanked the whole dashboard.

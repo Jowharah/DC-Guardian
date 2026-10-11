@@ -19,7 +19,7 @@
 | Audit hash-chain verification | Implemented; local 11-test and 16-test runs reported | Trusted external checkpoint, backup/recovery and production audit controls |
 | Unified cross-domain severity | **DCG-DECISION-v2 implemented** (most severe member, +1 level for a known mechanism within 10 min; chosen on dev split, test split +0.51 genuine-share difference, CI +0.08 to +0.88; author labels) | Re-run `decision_v2_validation.py` on the teammates' independent labels; add severity labels to validate MEDIUM vs LOW ordering; more 3+-event test groups |
 | Single-event severity (all domains) | **DCG-DECISION-v2 policy** (operator-approved, conservative; not data-validated) | Operator/stakeholder review of the levels; consider detector-strength grading |
-| Single-event specialists (PPE, Face; retry for Maintenance) | Maintenance/Environment run once at ingestion; PPE and Face alone have none | Consented "Run specialist evaluation" for any single event (offered, not started) |
+| Single-event specialists (all domains) | **Implemented** 2026-10-11: consented, administrator-only evaluation for any single Evidence record; saved with an Evidence/verdict fingerprint (outdated flag) | Live OpenAI check by the operator |
 | AI Investigator | **Implemented research prototype**; numeric/identity field checks for all domains and modes | Narrative/causal claim grounding, abstention evaluation, outbound privacy review, tool audit, prompt-injection evaluation, cost limits and production hardening; see [AI Investigator](AI_INVESTIGATOR.md) |
 | Probabilistic correlation (Bayesian) | **Research component:** labelled-scenario evaluation with bootstrap confidence intervals, blind labelling pack, contract tests; display-only P(Related) beside each dashboard pair | Independent labelling by teammates (pack ready), TimeGap conditioned on Topology for slow cascades, validation on independent labels before any non-display use; see [Uncertainty Reasoning](UNCERTAINTY_REASONING.md) |
 | Deployment / production security | Pending | Production authentication, TLS, secrets, monitoring, dependency audit, threat modeling, penetration tests |
@@ -32,7 +32,7 @@ Keep every existing check; reorganize them. Tracked with status in [Work Log —
 
 1. **Independent labelling round** (pack ready in `reasoning/uncertainty/labelling/pack/`): it now validates two things at once, the Bayesian correlation study and the Decision v2 group rule. Then re-run `evaluate.py` and `decision_v2_validation.py` on those labels.
 2. **Live checks of today's changes:** restart the backend, re-run the specialists on the operator-cleared group (sends Evidence to OpenAI; operator consent), confirm `logs/errors.log` is clean.
-3. **Single-event specialists:** consented evaluation for any single event, all five domains.
+3. ~~Single-event specialists~~ (done 2026-10-11).
 4. Full API authorization and protected artifact-access regression matrix.
 5. Testing plan item 5: convert the remaining script tests after the pytest pilot is reviewed; branch protection on `main` (CI required).
 6. AI Investigator **claim-level grounding**, privacy review, audit and authorization regression.

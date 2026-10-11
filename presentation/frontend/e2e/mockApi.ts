@@ -22,6 +22,7 @@ export type MockState = {
   verdicts: Verdict[];
   groupReviews: Record<string, unknown>[];
   specialistsEvaluated: boolean;
+  singleSpecialist: boolean;
   sshInputOverridden: boolean;
   sshReevaluated: boolean;
   requests: {method: string; path: string; body: unknown}[];
@@ -107,7 +108,7 @@ function effective(records: Verdict[]) {
 }
 
 export async function installMockApi(page: Page): Promise<MockState> {
-  const state: MockState = {verdicts: [], groupReviews: [], specialistsEvaluated: false,
+  const state: MockState = {verdicts: [], groupReviews: [], specialistsEvaluated: false, singleSpecialist: false,
     sshInputOverridden: false, sshReevaluated: false, requests: []};
   const json = (route: Route, body: unknown, status = 200) =>
     route.fulfill({status, contentType: "application/json", body: JSON.stringify(body)});
@@ -175,6 +176,13 @@ export async function installMockApi(page: Page): Promise<MockState> {
       return json(route, {reevaluation_id: "DCG-RE-TEST", decision: decision(null, "INPUT_CLEARED_BY_HUMAN_VERDICT")}, 201);
     }
     if (path.endsWith("/graph")) return json(route, {scenario_id: "test", source: "NEO4J_READ_ONLY", nodes: [], edges: []});
+    if (path === `/api/v1/evidence/ppe/${PPE_ID}/specialist`) {
+      if (method === "POST") state.singleSpecialist = true;
+      if (!state.singleSpecialist) return json(route, {detail: "No saved specialist assessment"}, 404);
+      return json(route, {kind: "ppe", evidence_id: PPE_ID, zone_id: "ZONE-B", evaluated_at: NOW, evidence_changed_since: false,
+        decision_severity: null, specialists: {physical_security: {specialist_id: "physical_security", assessment: "Synthetic single-event assessment.",
+          grounding_status: "SUPPORTED", supported_findings: ["Vest not detected."], recommended_considerations: [], limitations: [], citations: []}}});
+    }
     if (path === "/api/v1/decisions/standalone") {
       return json(route, [{kind: "ppe", evidence_id: PPE_ID, zone_id: "ZONE-B", decision: {incident_status: "REVIEW_REQUIRED", severity: "LOW",
         response_mode: "HUMAN_REVIEW", escalation_required: false, autonomous_action_allowed: false,
