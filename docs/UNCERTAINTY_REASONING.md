@@ -121,6 +121,10 @@ Correlation of either kind cuts alerts by about a third against single-domain al
 
 `reasoning/uncertainty/labelling/` contains a **blind labelling pack** for teammates: the 40 scenarios with neutral IDs and shuffled order, events only (no titles, narratives, labels, split or model output), a facility brief and a glossary, and a `labels.csv` with the 85 candidate pairs to mark related or not. `score_labels.py` reports agreement with the author (percent and Cohen's kappa) and re-evaluates both methods on the independent labels with bootstrap intervals; a contract test checks the pack reveals no answers. See the folder's README for the procedure.
 
+### LLM rater (ChatGPT), 2026-10-11
+
+ChatGPT labelled the blind pack (`labelling/results/llm-chatgpt.md`). Test split: 78% agreement with the author, Cohen's kappa 0.55; against its labels crisp F1 0.596 (0.40–0.77) and Bayesian F1 0.756 (0.61–0.86), difference +0.03 to +0.29. The ranking and gap match the author-label result. **This is not independent human validation:** its labels follow a fixed rule (cross-zone always N, including chiller-to-hall cascades despite the stated cooling dependency; same-zone Y only for the three domain pairs the knowledge base marks as known mechanisms), so agreement with the Bayesian model is partly circular. Its disagreements with the author highlight the judgement calls (S17 same-server cyber + drive; S22, S30 and S15 context cases) that human labellers should settle.
+
 ## Integration path
 
 1. **Done (2026-10-11):** `presentation/backend/app/correlation_uncertainty.py` scores every live pair returned by `GET /api/v1/correlations/pairs` and the dashboard shows P(Related) with its factor explanation beside each pair, labelled a research estimate. Factors that live Evidence cannot supply (PPE confidence) are marginalized, not guessed; pairs with a non-abnormal event are reported as not scored.

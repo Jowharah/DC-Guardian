@@ -6,6 +6,14 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — LLM rater for the uncertainty study
+
+- **What:** ChatGPT labelled the blind pack; scored with `score_labels.py` into `reasoning/uncertainty/labelling/results/llm-chatgpt.*` (labels kept as `llm-chatgpt_labels.csv`).
+- **Result (test split):** 78% agreement with the author (kappa 0.55); Bayesian F1 0.756 vs crisp 0.596, difference +0.03 to +0.29, so the Bayesian advantage holds with a second labeller.
+- **Caveat:** recorded as an LLM rater, not independent validation. Its labels follow a fixed same-zone/domain-pair rule that mirrors the knowledge base's known mechanisms (partly circular), and it labelled all chiller-to-hall cascades unrelated despite the stated cooling dependency. Human labellers are still needed.
+
+---
+
 ## 2026-10-11 — `main` brought up to date; branch and path references
 
 - **PR #2** merged `feature/presentation-dashboard` into `main` (merge commit `f2b8273`, 653 commits); CI green on `main` afterwards. `main` is now the default working line.
