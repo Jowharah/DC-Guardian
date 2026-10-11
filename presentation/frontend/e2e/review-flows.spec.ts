@@ -37,6 +37,10 @@ test("operator overrides a PPE result and it shows as human verified", async ({p
   await expect(item.getByText("HUMAN OVERRIDDEN")).toBeVisible({timeout: 10_000});
   await page.getByRole("button", {name: /Monitoring Center/}).first().click();
   await expect(page.getByText("COMPLIANT · HUMAN VERIFIED")).toBeVisible({timeout: 10_000});
+  // Opening the overridden image must not crash the page (regression: the detail has no top-level status).
+  await page.locator("button.feedRow", {hasText: PPE_ID}).click();
+  await expect(page.getByText(/human verified/).first()).toBeVisible({timeout: 10_000});
+  await expect(page.getByText(/detector reported NON COMPLIANT/)).toBeVisible();
 });
 
 test("override must name a different status and needs a rationale", async ({page}) => {

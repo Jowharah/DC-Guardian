@@ -6,6 +6,16 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — Live check: blank page on a group with an overridden PPE image
+
+- **Symptom:** opening the unified group `DCG-UNIFIED-EF17…` blanked the whole dashboard.
+- **Cause** (reproduced with a browser script against the running app; `TypeError: Cannot read properties of undefined (reading 'replaceAll')` in `PPEObservationViewer`): the PPE detail endpoint carries the detector status in `assessment.overall_status` and has no top-level `status`; the viewer read `detail.status`, which only rendered empty text normally but crashed in the human-override branch. Pre-existing, exposed by the first PPE override inside a group.
+- **Fix:** the viewer reads `assessment.overall_status` (fallbacks for older records); per-person status is null-safe. Long status pills in the feed (e.g. HIGH TEMPERATURE) now wrap inside the column instead of being clipped (`.severity` had `width:max-content`).
+- **Live check of the specialist fix:** the group's specialists were re-run by the operator at 18:27 and succeeded (operations PARTIALLY_SUPPORTED, physical security SUPPORTED); `logs/errors.log` has no errors after the 18:15 failure that led to the grounding fix.
+- **Verified:** the Playwright override test now opens the overridden PPE image (it would have hit the same crash); 8 browser tests pass; the live app renders the group.
+
+---
+
 ## 2026-10-11 — Documentation refresh
 
 - Roadmap (`REMAINING_ROADMAP.md`) updated to 2026-10-11: rows for the Monitoring summary, single-event severity, single-event specialists; human-verdict row no longer lists browser validation as missing; suggested order refreshed (independent labelling first, since it now validates both the Bayesian study and the v2 group rule).
