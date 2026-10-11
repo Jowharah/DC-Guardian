@@ -221,6 +221,9 @@ def main() -> int:
         frontend_skip = None
     checks.append(("Presentation", "frontend type-check + build (npm run build)",
                    [npm or "npm", "run", "build"], frontend_skip))
+    npx = shutil.which("npx") or shutil.which("npx.cmd")
+    checks.append(("Presentation", "frontend browser tests (npx playwright test)",
+                   [npx or "npx", "playwright", "test"], frontend_skip or (None if npx else "npx not found on PATH")))
 
     for layer, name, command, skip in checks:
         if args.only and args.only.lower() not in name.lower():

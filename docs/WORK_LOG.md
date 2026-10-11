@@ -6,6 +6,40 @@ Conventions: commit hashes refer to `feature/presentation-dashboard`. "Verified"
 
 ---
 
+## 2026-10-11 — Research strengthening, testing plan items 3–5, security gates
+
+### Uncertainty study: confidence intervals and a blind labelling pack — `59c7e89`
+
+- **Confidence intervals:** `evaluate.py` adds a scenario-level bootstrap (2,000 draws, separate seed; all earlier numbers unchanged). Test split: crisp F1 0.375–0.788, Bayesian F1 0.571–0.862, **difference +0.022 to +0.261**, Bayesian higher in 99.2% of resamples. The advantage is unlikely to be noise; its size is uncertain.
+- **Blind labelling pack** (`reasoning/uncertainty/labelling/`): the scenario file states its answers in titles and narratives, so teammates get a generated `pack/` instead: neutral shuffled IDs, events only, a facility brief and glossary, and `labels.csv` with the 85 candidate pairs. `score_labels.py` reports agreement (percent, Cohen's kappa) and re-evaluates both methods on the independent labels with bootstrap intervals. Contract tests check the pack leaks no answers and that the author's own labels reproduce the published F1 exactly.
+
+### Research P(Related) in the dashboard — `b7352bf`
+
+- Every pair from `GET /api/v1/correlations/pairs` carries the Bayesian estimate and factor explanation, shown in all pair views as a research estimate. Display only; the deterministic rule stays authoritative. Unobservable factors (PPE confidence) are marginalized; non-abnormal pairs are "not scored".
+- Local example: unauthorized Face + SSH in ZONE-A 0.96; PPE + SSH 0.51 (unlikely mechanism).
+
+### Group severity validation — `48cd511`
+
+- `presentation/backend/validation/group_severity_validation.py` applies the provisional group severity to groups formed from the labelled scenarios. Finding: severity does **not** separate genuine incidents from coincidences (test split genuine share HIGH 2/3, MEDIUM 5/8, LOW 4/6), because the level depends only on domain count. The policy stays provisional; validating levels needs severity labels.
+
+### Security gates in CI — `41ebea3`, `109c42b`, `5ac2996`
+
+- Bandit (medium/high), pip-audit and `npm audit` (high) now fail the build. Baseline locally: Bandit 0 medium/high after refactoring `evidence_review.rows()` to fixed parameterized queries and annotating reviewed-safe findings with their reason; pip-audit and npm audit 0.
+- CI found what local runs could not: the runner's preinstalled **setuptools 78.1.0** had two advisories (upgraded in CI). CPU PyTorch wheels are not on PyPI and are reported as not auditable.
+- pip-audit findings are emitted as annotations so they are readable without admin log access. Actions upgraded to their Node 24 releases.
+
+### Browser tests (testing plan item 4) — `109c42b`
+
+- Playwright 1.63.0, five tests against the built dashboard with a stateful mocked API (synthetic data): sign-in; PPE override shown as human verified; override validation; consented specialist evaluation then group review; Decision re-evaluation after a cleared input. Locally they use the installed Edge (`npm run test:e2e`); CI runs them on Chromium.
+- **Bug found by the tests:** before any verdict existed, the override list offered the detector's own status, which the backend rejects. The verdict endpoint now returns `detector_status` and the panel excludes it.
+
+### Pytest pilot (testing plan item 3) — `5ac2996`
+
+- The two graph contracts that left nodes behind (SSH and maintenance ingestion) are now pytest with a shared `reasoning/graph/conftest.py`: session Neo4j driver (skip with reason), `single()` query helper, `cleanup_graph()` before and after. Same 15 checks per file (counted), 12 named tests; ~1,290 lines became ~200. Reasoning suite 24/24; end-of-suite cleanup now removes 40 instead of 42 nodes.
+- **For review:** if the group likes this style, the remaining 21 Reasoning, 29 Evidence and 15 Response/integration script contracts can follow the same pattern (item 5).
+
+---
+
 ## 2026-10-11 — Uncertainty study: dev-split disclosure
 
 - **What:** `UNCERTAINTY_REASONING.md` now states that seven dev scenarios (D06, D07, D08, D12, D13, D15, D16) were scored by hand with the Bayesian model while being written, so dev results are not independent; the test split (written unscored) is the one to cite.
@@ -161,8 +195,8 @@ Keep every existing check; change how they are organized. Status is updated as i
 |---|---|---|---|
 | 1 | GitHub Actions: run the fast tests on every push | Automatic ✓/✗ per commit | **Done** 2026-10-11 (`ci.yml`; green since `4d055ef`) |
 | 2 | Move `inspect_sh17_*.py` to `evidence/ppe_detection/tools/` | Exploration scripts, not tests | **Done** 2026-10-11 |
-| 3 | Pilot: convert Reasoning graph/correlation scripts to pytest with shared Neo4j fixtures and markers (`neo4j`, `gpu`, `private_data`) | ~19,400 lines for 541 checks; 13 copies of driver/cleanup code; stops at first failure; order-dependent | Planned |
-| 4 | Browser tests (Playwright) for verdict, group review and Decision re-evaluation | Frontend has no automated tests | Planned |
+| 3 | Pilot: convert Reasoning graph/correlation scripts to pytest with shared Neo4j fixtures and markers (`neo4j`, `gpu`, `private_data`) | ~19,400 lines for 541 checks; 13 copies of driver/cleanup code; stops at first failure; order-dependent | **Pilot done** 2026-10-11 (SSH and maintenance ingestion); awaiting group review |
+| 4 | Browser tests (Playwright) for verdict, group review and Decision re-evaluation | Frontend has no automated tests | **Done** 2026-10-11 (5 tests, in CI) |
 | 5 | Convert remaining script tests (Evidence, Response, integration) after the pilot is reviewed | Single runner, per-test results, selectable tests | Planned |
 
 Rule for conversions: the same checks must still run — assertion counts are compared before and after.
