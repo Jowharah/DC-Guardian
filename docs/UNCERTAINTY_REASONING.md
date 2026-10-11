@@ -1,7 +1,7 @@
 # DC-GUARDIAN — Reasoning under uncertainty (Bayesian correlation)
 
 **Updated:** 2026-10-11  
-**Branch:** developed on `feature/uncertainty-reasoning` (from `bf37dba`), merged into `feature/presentation-dashboard` on 2026-10-11  
+**Branch:** developed on `feature/uncertainty-reasoning` (from `bf37dba`), merged into `feature/presentation-dashboard` on 2026-10-11 and into `main` with PR #2  
 **Status:** research component with contract tests and an offline evaluation. Not yet wired into the dashboard, the Decision layer or Neo4j.
 
 ## Why

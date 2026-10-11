@@ -1,7 +1,7 @@
 # AI Investigator — architecture, usage, safeguards, and validation
 
 **Updated:** 2026-10-10  
-**Branch:** `feature/presentation-dashboard`  
+**Branch:** `main`  
 **Status:** Implemented research prototype, locally demonstrated on approved test observations; **not** production-certified.
 
 ## Purpose and operating boundaries

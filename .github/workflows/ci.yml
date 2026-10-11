@@ -7,9 +7,10 @@
 name: CI
 
 on:
+  # Every branch is checked on push, so a pull request shows results for its
+  # head commit; there is no separate pull_request trigger (it would run twice).
   push:
-    branches: [main, "feature/**"]
-  pull_request:
+    branches: ["**"]
   workflow_dispatch:
 
 concurrency:

@@ -14,7 +14,7 @@ A research project **and** an industrial prototype for multi-domain data-center 
 | Decision | `decision/rules.py` | Deterministic severity rules (DCG-DECISION-v1) |
 | Presentation | `presentation/` | FastAPI backend + React/Vite dashboard: Monitoring Center, Review Queue, AI Investigator |
 
-Active branch: `feature/presentation-dashboard`. `main` holds older merged work. Retired branches are kept as `archive/*` tags.
+Default branch: **`main`** (current code; CI runs on every push). Work happens on short-lived branches from `main`, merged back by pull request. Retired branches are kept as `archive/*` tags.
 
 ## Non-negotiable rules
 
@@ -51,7 +51,7 @@ python check_all.py --only <x>   # checks whose name contains <x>
 
 ## Conventions
 
-- **Work on a branch** off `feature/presentation-dashboard` for anything larger than a small fix; the operator reviews and merges.
+- **Work on a short-lived branch from `main`** (`feat/<topic>`, `fix/<topic>`, `docs/<topic>`, `test/<topic>`), push it, and open a pull request into `main`. CI must be green; the operator reviews and merges with **Create a merge commit** (never squash or rebase: the docs cite commit hashes). Delete the branch after merging.
 - **Record every change in `docs/WORK_LOG.md`:** what, why, commit, how verified, caveats. Update the testing-plan status there when items land.
 - Update the relevant doc (`docs/README.md` indexes them) when behaviour or contracts change.
 - Commit messages: `type(scope): summary` (`feat`, `fix`, `test`, `docs`, `ci`, `perf`, `chore`, `ui`), with a body explaining why.
