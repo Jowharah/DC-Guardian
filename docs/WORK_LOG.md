@@ -6,13 +6,14 @@ Conventions: commit hashes refer to `feature/presentation-dashboard`. "Verified"
 
 ---
 
-## 2026-10-11 — Reasoning under uncertainty (branch `feature/uncertainty-reasoning`)
+## 2026-10-11 — Reasoning under uncertainty (developed on `feature/uncertainty-reasoning`, merged)
 
 - **What:** a Bayesian correlation model that estimates P(Related) for a pair of abnormal events from time gap, topology, domain mechanism and evidence strength, with a per-factor explanation. Expert knowledge base with sources, 40 labelled DC-01 scenarios (16 dev, 24 test), offline evaluation against the frozen crisp rule, and 15 contract tests added to `check_all.py`. Details: [Uncertainty Reasoning](UNCERTAINTY_REASONING.md).
 - **Why:** the crisp zone/15-minute rule cannot express degrees of belief or explain itself, and the cross-domain claim had no quantitative evaluation.
-- **Commits:** `c0b9dc3` froze the knowledge base and scenarios before any evaluation; the evaluation and docs follow.
+- **Commits:** `c0b9dc3` committed the knowledge base, scenarios and model code before the evaluation script (`22119f2`); the knowledge base is unchanged since. The commit order cannot show that no scenario was scored before that commit (same session, three minutes apart).
 - **Verified:** `python reasoning/uncertainty/test_uncertainty_reasoning.py` (15/15) and `python reasoning/uncertainty/evaluate.py` in a cloud session (Python 3.13, no Neo4j). Test split: crisp F1 0.593, Bayesian F1 0.731; alerts 65 single-domain / 44 crisp / 43 Bayesian.
-- **Caveats:** author-labelled synthetic scenarios and a small sample; not yet wired into the dashboard or Decision layer. The full `check_all.py` has not been run on this branch; run it locally before merging.
+- **Merged** into `feature/presentation-dashboard` on 2026-10-11 after review: tests 15/15 and the evaluation reproduced byte for byte locally; full `python check_all.py` on the merged code: **52/52**. The branch was then deleted.
+- **Caveats:** author-labelled synthetic scenarios and a small sample; not yet wired into the dashboard or Decision layer.
 
 ---
 

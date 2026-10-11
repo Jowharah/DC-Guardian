@@ -1,7 +1,7 @@
 # DC-GUARDIAN — Reasoning under uncertainty (Bayesian correlation)
 
 **Updated:** 2026-10-11  
-**Branch:** `feature/uncertainty-reasoning` (from `feature/presentation-dashboard` at `bf37dba`)  
+**Branch:** developed on `feature/uncertainty-reasoning` (from `bf37dba`), merged into `feature/presentation-dashboard` on 2026-10-11  
 **Status:** research component with contract tests and an offline evaluation. Not yet wired into the dashboard, the Decision layer or Neo4j.
 
 ## Why
@@ -68,7 +68,7 @@ Scenarios cover true incidents (cooling cascades, intrusions followed by console
 - **dev (16):** written first and used while writing the model code.
 - **test (24):** written afterwards without scoring them.
 
-The knowledge base and scenarios were committed (`c0b9dc3`) before the first evaluation run, and nothing was tuned afterwards. The commit history is the evidence for that.
+The knowledge base, scenarios and model code were committed (`c0b9dc3`) before the evaluation script and results (`22119f2`), and the knowledge base has not changed since. Both commits come from one working session three minutes apart, so the commit order shows only that the knowledge base was not changed after it was committed; it cannot show that no scenario was scored before that commit. Independent labelling (see Limitations) is the stronger safeguard.
 
 ## Results
 
