@@ -158,7 +158,7 @@ CONTRACTS = [
         "GRAPH",
         "SSH Event Ingestion",
         [
-            "reasoning/graph/test_event_ingestion.py"
+            "-m", "pytest", "reasoning/graph/test_event_ingestion.py", "-q", "-p", "no:cacheprovider"
         ],
     ),
 
@@ -166,7 +166,7 @@ CONTRACTS = [
         "GRAPH",
         "Maintenance Event Ingestion",
         [
-            "reasoning/graph/test_maintenance_event_ingestion.py"
+            "-m", "pytest", "reasoning/graph/test_maintenance_event_ingestion.py", "-q", "-p", "no:cacheprovider"
         ],
     ),
 
