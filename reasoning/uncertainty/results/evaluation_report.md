@@ -22,6 +22,18 @@ Bayesian ranking quality (threshold-free):
 | test | 0.829 | 0.838 |
 | all | 0.820 | 0.809 |
 
+## Confidence intervals (test split)
+
+Bootstrap over whole scenarios (2000 resamples; pairs within a scenario are not independent).
+
+| Quantity | 95% interval |
+|---|---|
+| Crisp F1 | 0.375–0.788 |
+| Bayesian F1 | 0.571–0.862 |
+| Bayesian − crisp F1 | +0.022 to +0.261 |
+
+Bayesian F1 exceeded crisp F1 in 99% of resamples.
+
 ## Operator view
 
 | Split | Incidents | Method | Alerts shown | Fully linked | Linked cleanly |

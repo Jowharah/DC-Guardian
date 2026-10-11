@@ -16,6 +16,9 @@ Metrics
 - Operator view: alerts shown (connected groups plus uncorrelated events),
   incidents fully linked into one group, and incidents linked cleanly
   (one group containing no unrelated event).
+- Uncertainty: 95% confidence intervals for test F1 and for the
+  Bayesian-minus-crisp difference, by bootstrap over whole scenarios
+  (pairs in one scenario are not independent).
 - Robustness: factor ablation and random perturbation of every
   conditional probability (CPT sensitivity).
 
@@ -56,6 +59,9 @@ RESULTS_DIR = HERE / "results"
 SENSITIVITY_DRAWS = 200
 SENSITIVITY_SIGMA = 0.3
 SEED = 20261011
+BOOTSTRAP_DRAWS = 2000
+# Separate stream so adding the bootstrap leaves every earlier number unchanged.
+BOOTSTRAP_SEED = SEED + 1
 
 
 # ============================================================
@@ -179,6 +185,34 @@ def score_rows(scenarios: list[dict], knowledge_base: dict, drop_factor: str | N
     return rows
 
 
+def percentile(sorted_values: list[float], q: float) -> float:
+    return sorted_values[min(len(sorted_values) - 1, max(0, round(q * (len(sorted_values) - 1))))]
+
+
+def bootstrap_f1(scenarios: list[dict], rows: list[dict], rng: random.Random,
+                 truth_key: str = "truth", draws: int = BOOTSTRAP_DRAWS) -> dict:
+    """Scenario-level (cluster) bootstrap of crisp F1, Bayesian F1 and their difference.
+
+    Whole scenarios are resampled with replacement, because pairs inside one
+    scenario share events and context and are not independent.
+    """
+    ids = [s["scenario_id"] for s in scenarios]
+    by_scenario = {i: [{**r, "truth": r[truth_key]} for r in rows if r["scenario_id"] == i] for i in ids}
+    crisp, bayes, diff = [], [], []
+    for _ in range(draws):
+        sample = [r for i in (rng.choice(ids) for _ in ids) for r in by_scenario[i]]
+        c, b = prf(sample, "crisp")["f1"], prf(sample, "bayesian")["f1"]
+        crisp.append(c)
+        bayes.append(b)
+        diff.append(b - c)
+    crisp.sort(); bayes.sort(); diff.sort()
+    ci = lambda v: [round(percentile(v, 0.025), 3), round(percentile(v, 0.975), 3)]
+    return {"draws": draws, "unit": "scenario",
+            "crisp_f1_ci95": ci(crisp), "bayesian_f1_ci95": ci(bayes),
+            "difference_f1_ci95": ci(diff),
+            "share_bayesian_better": round(sum(d > 0 for d in diff) / draws, 3)}
+
+
 def perturbed(knowledge_base: dict, rng: random.Random) -> dict:
     kb = copy.deepcopy(knowledge_base)
 
@@ -239,10 +273,13 @@ def evaluate() -> dict:
         "test_f1_p95": round(f1s[int(0.95 * len(f1s)) - 1], 3),
         "share_of_draws_beating_crisp": round(sum(f > crisp_f1 for f in f1s) / len(f1s), 3),
     }
+    test_rows = [r for r in rows if r["split"] == "test"]
+    bootstrap = bootstrap_f1(test, test_rows, random.Random(BOOTSTRAP_SEED))
     return {
         "knowledge_base_version": knowledge_base["knowledge_base_version"],
         "decision_threshold": knowledge_base["decision_threshold"],
         "results": by_split,
+        "bootstrap_test": bootstrap,
         "ablation_test_f1_without_factor": ablation,
         "sensitivity": sensitivity,
         "pairs": rows,
@@ -281,7 +318,15 @@ def write_report(result: dict) -> str:
     for split in ("dev", "test", "all"):
         b = r[split]["bayesian"]
         lines.append(f"| {split} | {b['average_precision']:.3f} | {b['roc_auc']:.3f} |")
-    lines += ["", "## Operator view", "",
+    bs = result["bootstrap_test"]
+    lines += ["", "## Confidence intervals (test split)", "",
+              f"Bootstrap over whole scenarios ({bs['draws']} resamples; pairs within a scenario are not independent).", "",
+              "| Quantity | 95% interval |", "|---|---|",
+              f"| Crisp F1 | {bs['crisp_f1_ci95'][0]:.3f}–{bs['crisp_f1_ci95'][1]:.3f} |",
+              f"| Bayesian F1 | {bs['bayesian_f1_ci95'][0]:.3f}–{bs['bayesian_f1_ci95'][1]:.3f} |",
+              f"| Bayesian − crisp F1 | {bs['difference_f1_ci95'][0]:+.3f} to {bs['difference_f1_ci95'][1]:+.3f} |",
+              "", f"Bayesian F1 exceeded crisp F1 in {_pct(bs['share_bayesian_better'])} of resamples.",
+              "", "## Operator view", "",
               "| Split | Incidents | Method | Alerts shown | Fully linked | Linked cleanly |",
               "|---|---:|---|---:|---:|---:|"]
     for split in ("dev", "test", "all"):

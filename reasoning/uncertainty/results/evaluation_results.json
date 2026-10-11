@@ -108,6 +108,23 @@
       }
     }
   },
+  "bootstrap_test": {
+    "draws": 2000,
+    "unit": "scenario",
+    "crisp_f1_ci95": [
+      0.375,
+      0.788
+    ],
+    "bayesian_f1_ci95": [
+      0.571,
+      0.862
+    ],
+    "difference_f1_ci95": [
+      0.022,
+      0.261
+    ],
+    "share_bayesian_better": 0.992
+  },
   "ablation_test_f1_without_factor": {
     "TimeGap": 0.605,
     "Topology": 0.588,

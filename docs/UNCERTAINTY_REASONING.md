@@ -83,6 +83,8 @@ Regenerate with `python reasoning/uncertainty/evaluate.py`; the full per-pair ta
 
 On the dev split the Bayesian model also leads (F1 0.706 vs 0.647), but some dev scenarios were scored by hand while being written, so that figure is not independent evidence. Across all 85 pairs: 0.721 vs 0.614. The Bayesian probability ranks pairs well without any threshold: test average precision 0.829, ROC-AUC 0.838.
 
+**Confidence intervals (test split).** Resampling whole scenarios (2,000 bootstrap draws; pairs in one scenario are not independent) gives 95% intervals of 0.375–0.788 for crisp F1 and 0.571–0.862 for Bayesian F1. The difference, Bayesian minus crisp, is **+0.022 to +0.261**, and Bayesian F1 is higher in 99.2% of resamples. The advantage is therefore unlikely to be noise on this test set, but its size is uncertain: anything from a marginal to a large gain is consistent with 24 scenarios.
+
 **Operator view, test split (18 incidents):**
 
 | Method | Alerts shown | Incidents fully linked | Linked cleanly |
@@ -108,12 +110,16 @@ Correlation of either kind cuts alerts by about a third against single-domain al
 
 ## Limitations
 
-- **Author-labelled scenarios.** The same author wrote the knowledge base and the scenarios, so there is a risk of shared assumptions. Seven dev scenarios were also scored by hand while being written. Unscored test scenarios, the unchanged knowledge base and the sensitivity analysis reduce but do not remove this risk. Independent labelling by a classmate or practitioner would strengthen the result.
-- **Small sample.** 59 test pairs; a difference of a few pairs moves F1 by several points. No confidence intervals are claimed.
+- **Author-labelled scenarios.** The same author wrote the knowledge base and the scenarios, so there is a risk of shared assumptions. Seven dev scenarios were also scored by hand while being written. Unscored test scenarios, the unchanged knowledge base and the sensitivity analysis reduce but do not remove this risk. Independent labelling by a classmate or practitioner would strengthen the result; a blind labelling pack is ready (see below).
+- **Small sample.** 59 test pairs in 24 scenarios; the bootstrap intervals above are wide, so the size of the gain is uncertain.
 - **Synthetic setting.** One three-zone topology and an assumed cooling dependency; no real multi-domain data exists for the project.
 - **Naive structure.** Conditional independence of the four factors is a simplification (time and topology interact in cascades, as shown above).
 - **Fixed threshold.** 0.5 was set in the knowledge base in advance; a deployment would choose it from the cost of a missed incident versus a false link.
 - **Offline only.** Not yet connected to Neo4j, the presentation backend or the Decision rules.
+
+## Independent labelling
+
+`reasoning/uncertainty/labelling/` contains a **blind labelling pack** for teammates: the 40 scenarios with neutral IDs and shuffled order, events only (no titles, narratives, labels, split or model output), a facility brief and a glossary, and a `labels.csv` with the 85 candidate pairs to mark related or not. `score_labels.py` reports agreement with the author (percent and Cohen's kappa) and re-evaluates both methods on the independent labels with bootstrap intervals; a contract test checks the pack reveals no answers. See the folder's README for the procedure.
 
 ## Integration path (not implemented)
 

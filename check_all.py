@@ -83,6 +83,7 @@ def script_checks() -> list[tuple[str, str, list[str], str | None]]:
         add("Evidence", rel)
     add("Reasoning", "reasoning/run_contract_tests.py")
     add("Reasoning", "reasoning/uncertainty/test_uncertainty_reasoning.py")
+    add("Reasoning", "reasoning/uncertainty/labelling/test_labelling_pack.py")
     add("Response", "response/rag/verify_response_rag.py")
     for rel in sorted(p.relative_to(ROOT).as_posix() for p in ROOT.glob("response/*/tests/test_*.py")):
         add("Response", rel)
