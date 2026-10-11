@@ -7,6 +7,8 @@ For the current OpenAI-powered investigation feature, see [AI Investigator](AI_I
 
 Start with [Project Development History](PROJECT_DEVELOPMENT_HISTORY.md) for what has been implemented, the [Work Log](WORK_LOG.md) for dated changes, commits and the agreed testing plan, [Validation and Operations](VALIDATION_AND_OPERATIONS.md) for reproducible commands and tested boundaries, and [Remaining Roadmap](REMAINING_ROADMAP.md) for open work.
 
+Working on the repository with Claude Code: see [`CLAUDE.md`](../CLAUDE.md) at the repository root for rules, commands and conventions.
+
 ## Existing reference documents
 
 - [Uncertainty Reasoning](UNCERTAINTY_REASONING.md) — Bayesian cross-domain correlation, expert knowledge base, labelled scenarios and evaluation against the crisp rule.

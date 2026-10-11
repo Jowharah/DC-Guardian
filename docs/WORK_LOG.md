@@ -6,6 +6,20 @@ Conventions: commit hashes refer to `feature/presentation-dashboard`. "Verified"
 
 ---
 
+## 2026-10-11 — Repository housekeeping and shared session context
+
+### Branch cleanup
+
+- **What:** five fully merged branches with no unique commits were archived as tags and deleted from GitHub: `archive/docs/security-assessment-report`, `archive/feature/phase3-grounded-reasoning`, `archive/feature/phase3-rag-foundation`, `archive/refactor/architecture-naming`, `archive/security/pre-dashboard-hardening`. Each tag was verified to point at the branch's last commit before deletion. `feature/uncertainty-reasoning` was deleted after its merge.
+- **Result:** GitHub branches are `main` and `feature/presentation-dashboard`. Recreate an archived branch with `git switch -c <name> archive/<name>`.
+
+### `CLAUDE.md`
+
+- **What:** a root `CLAUDE.md` that Claude Code reads at the start of every session, locally and on the web: project layers, non-negotiable rules, environment and run commands, how to verify (`check_all.py`, CI), conventions (branches, work log, commit style, line endings, test isolation) and where to look.
+- **Why:** the Claude Code web session that produced the uncertainty study started without this context: it could not run the full check and did not know the project's conventions. Workflow now: web sessions work on a branch and push; the local session reviews, runs the full check and merges; CI checks every push.
+
+---
+
 ## 2026-10-11 — Reasoning under uncertainty (developed on `feature/uncertainty-reasoning`, merged)
 
 - **What:** a Bayesian correlation model that estimates P(Related) for a pair of abnormal events from time gap, topology, domain mechanism and evidence strength, with a per-factor explanation. Expert knowledge base with sources, 40 labelled DC-01 scenarios (16 dev, 24 test), offline evaluation against the frozen crisp rule, and 15 contract tests added to `check_all.py`. Details: [Uncertainty Reasoning](UNCERTAINTY_REASONING.md).
