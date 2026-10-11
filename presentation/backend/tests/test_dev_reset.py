@@ -44,7 +44,7 @@ def test_reset_covers_every_presentation_table():
     ssh_publication.connect().close(); maintenance_workflow.db().close(); environment_workflow.db().close()
     image_metadata_store.connect().close(); image_source_hashes.connect().close()
     ssh_temporal_context.context_db().close(); face_observations._connect().close(); ppe_observations._connect().close()
-    from presentation.backend.app import single_specialists; single_specialists.storage().close()
+    from presentation.backend.app import single_specialists, investigator_audit; single_specialists.storage().close(); investigator_audit.connect().close()
     with _sqlite3.connect(_db_path()) as db:
         existing={r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     assert existing - set(dev_reset.TABLES) == set(), existing - set(dev_reset.TABLES)

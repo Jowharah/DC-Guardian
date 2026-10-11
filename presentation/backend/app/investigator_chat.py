@@ -17,6 +17,8 @@ from presentation.backend.app.investigator_tools import unified_context
 from presentation.backend.app.investigator_sources import unified_sources,operational_sources,single_sources,pair_sources
 from presentation.backend.app.investigator_grounding import check_answer_references
 from presentation.backend.app.investigator_field_checks import context_field_checks
+from presentation.backend.app.investigator_claim_checks import claim_checks
+from presentation.backend.app.investigator_audit import minimize,record_call
 
 router=APIRouter()
 logger=logging.getLogger(__name__)
@@ -88,15 +90,27 @@ def require_enabled():
     if not local_setting("OPENAI_API_KEY"):
         raise HTTPException(503,"OPENAI_API_KEY_NOT_CONFIGURED")
 
-def ask_model(instructions,question,context,label):
+def new_call(principal,mode,target_id,zone_id,evidence_refs):
+    """Audit record for one outbound call; ask_model fills in model and payload."""
+    return {"subject":principal.subject,"mode":mode,"target_id":target_id,"zone_id":zone_id,
+            "evidence_refs":evidence_refs,"model":"","payload":""}
+
+def audit_call(call,answer,claims):
+    record_call(call,outcome="ANSWERED",answer=answer,claim_status=claims["status"])
+
+def ask_model(instructions,question,context,label,call=None):
     require_enabled()
+    model=local_setting("DCG_INVESTIGATOR_MODEL") or "gpt-4.1-mini"
+    # Single outbound choke point: the mode allowlists ran already; minimize()
+    # strips biometric, identity and credential fields as a backstop.
+    payload=json.dumps({"question":question,"authorized_context":minimize(context)},ensure_ascii=False)
+    if call is not None:
+        call.update(model=model,payload=payload)
     try:
         from openai import OpenAI
         client=OpenAI(api_key=local_setting("OPENAI_API_KEY"),timeout=30.0,max_retries=0)
         response=client.responses.create(
-            model=local_setting("DCG_INVESTIGATOR_MODEL") or "gpt-4.1-mini",
-            instructions=instructions,
-            input=json.dumps({"question":question,"authorized_context":context},ensure_ascii=False),
+            model=model,instructions=instructions,input=payload,
             max_output_tokens=700,store=False)
         answer=response.output_text.strip()
         if not answer:raise ValueError("Empty model response")
@@ -104,6 +118,8 @@ def ask_model(instructions,question,context,label):
         # Log only a safe exception class; provider messages may contain
         # private request data or credentials and must not be exposed.
         logger.warning("%s Investigator provider failure: %s",label,type(exc).__name__)
+        if call is not None:
+            record_call(call,outcome="PROVIDER_FAILED")
         raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
     return answer
 
@@ -134,11 +150,14 @@ def ask_investigator(group_id:str,request:InvestigatorQuestion,
 This is a unified group of three or more events. source_assessments lists
 every member per domain. Membership is transitive: two members are directly
 linked only if contextual_links contains that link."""
-    answer=ask_model(instructions,request.question,minimal,"Unified")
+    call=new_call(principal,"unified",group_id,context["zone_id"],context["evidence_refs"])
+    answer=ask_model(instructions,request.question,minimal,"Unified",call)
     records=[(kind,item.get("observation_id"),item) for kind,items in context["source_assessments"].items()
              for item in (items if isinstance(items,list) else [items])]
+    claims=claim_checks(answer,records)
+    audit_call(call,answer,claims)
     return {"group_id":group_id,**grounded(answer,unified_sources(context)),
-            "field_grounding":context_field_checks(answer,records),
+            "field_grounding":context_field_checks(answer,records),"claim_checks":claims,
             "evidence_refs":context["evidence_refs"],
             "notice":"LLM explanation is not a Decision or verified identity/causal finding."}
 
@@ -154,10 +173,14 @@ This is a correlation pair of exactly two events. link_type and link_details
 describe how the pair was linked (zone/server scope and time difference).
 The link is contextual only. Explain each member separately, then what the
 link does and does not support."""
-    answer=ask_model(instructions,request.question,context,"Pair")
+    call=new_call(principal,"pair",pair_id,context.get("zone_id"),
+                  [{"kind":m["kind"],"observation_id":m["observation_id"]} for m in context["members"]])
+    answer=ask_model(instructions,request.question,context,"Pair",call)
     records=[(m["kind"],m["observation_id"],m["assessment"]) for m in context["members"]]
+    claims=claim_checks(answer,records)
+    audit_call(call,answer,claims)
     return {"pair_id":pair_id,**grounded(answer,pair_sources(context)),
-            "field_grounding":context_field_checks(answer,records),
+            "field_grounding":context_field_checks(answer,records),"claim_checks":claims,
             "notice":"LLM explanation only; the pair link is contextual and no Decision is created."}
 
 @router.post("/api/v1/investigator/operations/{candidate_id}/ask")
@@ -183,10 +206,13 @@ def ask_operations(candidate_id:str,request:InvestigatorQuestion,
       "evidence_event_ids":context["evidence_event_ids"],
       "restrictions":context["restrictions"],
     }
-    answer=ask_model(INSTRUCTIONS+OPERATIONS_INSTRUCTIONS,request.question,minimal,"Operational")
+    call=new_call(principal,"operations",candidate_id,context["zone_id"],context["evidence_event_ids"])
+    answer=ask_model(INSTRUCTIONS+OPERATIONS_INSTRUCTIONS,request.question,minimal,"Operational",call)
     records=[("maintenance",maintenance.get("event_id"),maintenance),("environment",environment.get("event_id"),environment)]
+    claims=claim_checks(answer,records)
+    audit_call(call,answer,claims)
     return {"candidate_id":candidate_id,**grounded(answer,operational_sources(context)),
-            "field_grounding":context_field_checks(answer,records),
+            "field_grounding":context_field_checks(answer,records),"claim_checks":claims,
             "evidence_refs":context["evidence_event_ids"],
             "notice":"LLM explanation only. Existing saved operational Decision, if present, remains authoritative."}
 
@@ -201,7 +227,12 @@ def ask_single_evidence(kind:str,evidence_id:str,request:InvestigatorQuestion,
 This is an individual Evidence investigation. Do not assume it is correlated.
 Do not assign or invent a standalone Decision. Distinguish the saved detector
 state from confirmed events, and explicitly state any unsupported conclusions."""
-    answer=ask_model(instructions,request.question,context,"Single Evidence")
+    call=new_call(principal,"single",f"{kind}:{evidence_id}",context["zone_id"],[{"kind":kind,"observation_id":evidence_id}])
+    answer=ask_model(instructions,request.question,context,"Single Evidence",call)
+    record={**context["source_assessment"],"human_review":context.get("human_review")}
+    claims=claim_checks(answer,[(kind,evidence_id,record)])
+    audit_call(call,answer,claims)
     return {"kind":kind,"evidence_id":evidence_id,**grounded(answer,single_sources(context)),
             "field_grounding":context_field_checks(answer,[(kind,evidence_id,context["source_assessment"])]),
+            "claim_checks":claims,
             "notice":"LLM explanation only; no new correlation, Decision or autonomous action."}
