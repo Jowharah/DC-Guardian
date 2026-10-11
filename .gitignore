@@ -278,3 +278,4 @@ presentation/frontend/build_errors.txt
 # Playwright output
 presentation/frontend/test-results/
 presentation/frontend/playwright-report/
+presentation/frontend/.vite/
