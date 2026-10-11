@@ -1,0 +1,104 @@
+{
+  "knowledge_base_version": "DCG-UNCERTAINTY-KB-v1",
+  "status": "Expert-specified priors, frozen before evaluation. Not fitted to the labelled scenarios.",
+  "frozen_on": "2026-10-11",
+  "purpose": "Knowledge used by the Bayesian correlation model to estimate the probability that two abnormal Evidence events from different domains belong to the same underlying incident.",
+
+  "candidate_window_minutes": 120,
+  "decision_threshold": 0.5,
+
+  "infrastructure_dependencies": {
+    "status": "SYNTHETIC ASSUMPTION. The shared DC-01 topology has no cooling-service relationship, so it is declared here instead of changing the frozen topology contract.",
+    "dependencies": [
+      {
+        "provider_zone": "ZONE-C",
+        "provider_asset": "CHILLER-C1",
+        "provider_domains": ["ENVIRONMENTAL", "MAINTENANCE"],
+        "dependent_zones": ["ZONE-A", "ZONE-B"],
+        "rationale": "The primary cooling unit in Cooling and Utilities serves both server halls; a cooling fault can raise hall temperatures and stress drives downstream."
+      }
+    ]
+  },
+
+  "domain_mechanisms": {
+    "rationale": "Which domain pairs have a known causal or behavioural mechanism linking them within one incident. Derived from data-center operations practice and the project's controlled scenario design, not from data.",
+    "KNOWN": [
+      {"pair": ["ENVIRONMENTAL", "MAINTENANCE"], "mechanism": "Heat, humidity or airflow faults accelerate drive and hardware degradation."},
+      {"pair": ["CYBERSECURITY", "PHYSICAL_SECURITY"], "mechanism": "Unauthorized physical access is a common precursor to direct console or network attacks on servers."},
+      {"pair": ["PHYSICAL_SECURITY", "SAFETY"], "mechanism": "Unauthorized or unknown people in a hall are more likely to lack required PPE."}
+    ],
+    "POSSIBLE": [
+      {"pair": ["MAINTENANCE", "SAFETY"], "mechanism": "A hardware-risk alert triggers an engineer visit; the engineer may work without full PPE."},
+      {"pair": ["ENVIRONMENTAL", "SAFETY"], "mechanism": "Staff responding to an environmental alarm may enter without full PPE."},
+      {"pair": ["ENVIRONMENTAL", "PHYSICAL_SECURITY"], "mechanism": "An intruder may tamper with cooling or environmental equipment."},
+      {"pair": ["MAINTENANCE", "PHYSICAL_SECURITY"], "mechanism": "An intruder may tamper with or remove hardware."}
+    ],
+    "UNLIKELY": [
+      {"pair": ["CYBERSECURITY", "ENVIRONMENTAL"], "mechanism": "No direct mechanism in the modelled scope; building-management attacks are out of scope."},
+      {"pair": ["CYBERSECURITY", "MAINTENANCE"], "mechanism": "Authentication anomalies do not degrade drives; shared timing is usually coincidental."},
+      {"pair": ["CYBERSECURITY", "SAFETY"], "mechanism": "No direct mechanism without a physical-security link."}
+    ]
+  },
+
+  "evidence_strength_rules": {
+    "rationale": "How much each detector state can be trusted as a genuine abnormality, based on each component's frozen evaluation.",
+    "CYBERSECURITY": {
+      "STRONG_STATES": ["EXPLICIT_SECURITY_EVENT", "HIGH_CONFIDENCE_ANOMALY"],
+      "WEAK_STATES": ["ANOMALY_CANDIDATE"],
+      "source": "SSH Detector v1 locked test: two-of-three consensus precision 1.000; single-vote candidates come from the broad operational point with specificity 0.367."
+    },
+    "MAINTENANCE": {
+      "STRONG_IF_PROBABILITY_AT_LEAST": 0.70,
+      "source": "Temporal RF v2 operating threshold is 0.45 with holdout precision 3.4%; only clearly higher probabilities are treated as strong."
+    },
+    "ENVIRONMENTAL": {
+      "STRONG_SOURCE_CLASSES": ["ENVIRONMENTAL_SENSOR"],
+      "WEAK_SOURCE_CLASSES": ["HARDWARE_TELEMETRY"],
+      "ALWAYS_STRONG_STATES": ["SMOKE_DETECTED", "WATER_LEAK_DETECTED"],
+      "source": "Reasoning evidence-independence rule: dedicated sensors are INDEPENDENT, hardware telemetry is a RELATED_SOURCE that can overlap with maintenance evidence."
+    },
+    "PHYSICAL_SECURITY": {
+      "STRONG_AUTHORIZATION": ["UNAUTHORIZED"],
+      "WEAK_STATES": ["UNKNOWN_PERSON"],
+      "source": "A recognized identity with a graph-derived UNAUTHORIZED result is specific; UNKNOWN_PERSON also covers unenrolled visitors."
+    },
+    "SAFETY": {
+      "STRONG_IF_CONFIDENCE_AT_LEAST": 0.75,
+      "source": "PPE-v1 locked test: recall 0.524 and safety-vest precision 0.621, so non-compliance is weak unless the detector is confident."
+    }
+  },
+
+  "network": {
+    "rationale": "Naive-Bayes-structured Bayesian network: one hidden cause (Related) with four conditionally independent observed factors. Conditional probabilities are expert estimates; the 'No' rows describe coincidences among abnormal events inside a 120-minute candidate window in a three-zone data center.",
+    "prior": {
+      "Related": {"Yes": 0.2, "No": 0.8},
+      "rationale": "Most co-occurring abnormal events in a busy window are unrelated; roughly one candidate pair in five is assumed to share a cause."
+    },
+    "cpts": {
+      "TimeGap": {
+        "states": ["LE_5_MIN", "LE_15_MIN", "LE_60_MIN", "GT_60_MIN"],
+        "Yes": [0.45, 0.30, 0.20, 0.05],
+        "No":  [0.04, 0.08, 0.38, 0.50],
+        "rationale": "Related events cluster in time. Unrelated events fall anywhere in the window, so their probabilities follow the width of each bin (5, 10, 45 and 60 of 120 minutes)."
+      },
+      "Topology": {
+        "states": ["SAME_SERVER", "SAME_RACK", "SAME_ZONE", "DEPENDENCY", "UNRELATED"],
+        "Yes": [0.25, 0.15, 0.40, 0.15, 0.05],
+        "No":  [0.04, 0.04, 0.25, 0.17, 0.50],
+        "rationale": "Related events usually share an asset or zone, or are linked by an infrastructure dependency. Unrelated events land in the same zone about one time in four by chance across three zones."
+      },
+      "DomainMechanism": {
+        "states": ["KNOWN", "POSSIBLE", "UNLIKELY"],
+        "Yes": [0.65, 0.28, 0.07],
+        "No":  [0.30, 0.40, 0.30],
+        "rationale": "Real incidents mostly follow known mechanisms. Coincidences follow the share of domain pairs in each class (3, 4 and 3 of 10)."
+      },
+      "EvidenceStrength": {
+        "states": ["BOTH_STRONG", "MIXED", "BOTH_WEAK"],
+        "Yes": [0.55, 0.35, 0.10],
+        "No":  [0.20, 0.40, 0.40],
+        "rationale": "Genuine incidents tend to produce confident detections; coincidental pairs often include at least one false positive."
+      }
+    }
+  }
+}

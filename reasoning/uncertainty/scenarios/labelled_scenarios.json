@@ -1,0 +1,1382 @@
+{
+  "scenario_set_version": "DCG-LABELLED-SCENARIOS-v1",
+  "topology": "DC-01 (synthetic)",
+  "labelling": "Ground truth written from each narrative by the scenario author. Events sharing a ground_truth_incident value belong to one incident; null marks unrelated background abnormalities.",
+  "scenarios": [
+    {
+      "scenario_id": "D01",
+      "split": "dev",
+      "title": "Hall A hotspot",
+      "narrative": "A dedicated sensor reports high temperature in Server Hall A; nine minutes later a drive on SRV-A1-01 is assessed at risk.",
+      "events": [
+        {
+          "event_id": "D01-E1",
+          "timestamp": "2026-10-01T02:00:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D01-E2",
+          "timestamp": "2026-10-01T02:09:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.82,
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D02",
+      "split": "dev",
+      "title": "Server heat and drive risk",
+      "narrative": "Hardware telemetry on SRV-B1-02 reports high temperature and the same server's drive is flagged at moderate risk four minutes later.",
+      "events": [
+        {
+          "event_id": "D02-E1",
+          "timestamp": "2026-10-01T05:30:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "HARDWARE_TELEMETRY",
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D02-E2",
+          "timestamp": "2026-10-01T05:34:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.55,
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D03",
+      "split": "dev",
+      "title": "Chiller fault cascade",
+      "narrative": "The primary chiller loses airflow. Hall B warms 22 minutes later and a Hall B drive is flagged at minute 41.",
+      "events": [
+        {
+          "event_id": "D03-E1",
+          "timestamp": "2026-10-01T11:00:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "AIRFLOW_ANOMALY",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D03-E2",
+          "timestamp": "2026-10-01T11:22:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D03-E3",
+          "timestamp": "2026-10-01T11:41:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.77,
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D04",
+      "split": "dev",
+      "title": "Unauthorized entry then attack",
+      "narrative": "P003, who is authorized only for utilities, is recognized in Hall A; six minutes later OpenSSH logs a break-in attempt on SRV-A1-02.",
+      "events": [
+        {
+          "event_id": "D04-E1",
+          "timestamp": "2026-10-02T01:15:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D04-E2",
+          "timestamp": "2026-10-02T01:21:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "EXPLICIT_SECURITY_EVENT",
+          "server_id": "SRV-A1-02",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D05",
+      "split": "dev",
+      "title": "Tailgater without PPE",
+      "narrative": "An unknown person follows staff into Hall B and is detected without a helmet a minute later.",
+      "events": [
+        {
+          "event_id": "D05-E1",
+          "timestamp": "2026-10-02T09:40:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "UNKNOWN_PERSON",
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D05-E2",
+          "timestamp": "2026-10-02T09:41:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.81,
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D06",
+      "split": "dev",
+      "title": "Scanner noise and a missed vest",
+      "narrative": "A single-vote SSH anomaly from an internet scanner coincides with a low-confidence PPE alert for an authorized engineer.",
+      "events": [
+        {
+          "event_id": "D06-E1",
+          "timestamp": "2026-10-02T14:05:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "ANOMALY_CANDIDATE",
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "D06-E2",
+          "timestamp": "2026-10-02T14:16:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.58,
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "D07",
+      "split": "dev",
+      "title": "Wrong hall, worn drive",
+      "narrative": "A drive on SRV-B1-02 is wearing out; separately, P003 walks into Hall B by mistake 13 minutes later.",
+      "events": [
+        {
+          "event_id": "D07-E1",
+          "timestamp": "2026-10-03T03:20:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.91,
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "D07-E2",
+          "timestamp": "2026-10-03T03:33:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "D08",
+      "split": "dev",
+      "title": "Slow insider attack",
+      "narrative": "P003 is recognized in Hall B; 38 minutes later the SSH detector reaches consensus on SRV-B1-01 as the same person works from a console.",
+      "events": [
+        {
+          "event_id": "D08-E1",
+          "timestamp": "2026-10-03T22:10:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D08-E2",
+          "timestamp": "2026-10-03T22:48:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "HIGH_CONFIDENCE_ANOMALY",
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D09",
+      "split": "dev",
+      "title": "Two incidents in one hall",
+      "narrative": "In Hall A a humidity fault stresses a drive, while at the same time an unauthorized visitor attempts a console break-in.",
+      "events": [
+        {
+          "event_id": "D09-E1",
+          "timestamp": "2026-10-04T13:00:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_HUMIDITY",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D09-E2",
+          "timestamp": "2026-10-04T13:12:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.74,
+          "server_id": "SRV-A1-02",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D09-E3",
+          "timestamp": "2026-10-04T13:05:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "EXPLICIT_SECURITY_EVENT",
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I2"
+        },
+        {
+          "event_id": "D09-E4",
+          "timestamp": "2026-10-04T13:02:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I2"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D10",
+      "split": "dev",
+      "title": "Smoke response",
+      "narrative": "Smoke is detected in utilities; a responder enters without full PPE seven minutes later.",
+      "events": [
+        {
+          "event_id": "D10-E1",
+          "timestamp": "2026-10-05T07:45:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "SMOKE_DETECTED",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D10-E2",
+          "timestamp": "2026-10-05T07:52:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.66,
+          "camera_id": "CAM-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D11",
+      "split": "dev",
+      "title": "Quiet window with one real issue",
+      "narrative": "An isolated SSH candidate is internet noise. Seventy minutes later SRV-A1-01 runs hot and its drive is flagged two minutes after that.",
+      "events": [
+        {
+          "event_id": "D11-E1",
+          "timestamp": "2026-10-05T16:00:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "ANOMALY_CANDIDATE",
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "D11-E2",
+          "timestamp": "2026-10-05T17:12:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.52,
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D11-E3",
+          "timestamp": "2026-10-05T17:10:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "HARDWARE_TELEMETRY",
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D12",
+      "split": "dev",
+      "title": "Engineer dispatched",
+      "narrative": "A high-risk drive alert on SRV-B1-01 brings an engineer, who is seen without a vest 35 minutes later.",
+      "events": [
+        {
+          "event_id": "D12-E1",
+          "timestamp": "2026-10-06T10:30:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.88,
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D12-E2",
+          "timestamp": "2026-10-06T11:05:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.79,
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D13",
+      "split": "dev",
+      "title": "Cross-hall coincidence",
+      "narrative": "An internet brute-force attack reaches consensus on SRV-B1-02 while, unrelatedly, P003 strays into Hall A.",
+      "events": [
+        {
+          "event_id": "D13-E1",
+          "timestamp": "2026-10-06T23:50:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "HIGH_CONFIDENCE_ANOMALY",
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "D13-E2",
+          "timestamp": "2026-10-06T23:53:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "D14",
+      "split": "dev",
+      "title": "Leak and drive",
+      "narrative": "A water leak sensor trips in Hall B; 16 minutes later a drive on SRV-B1-02 is flagged.",
+      "events": [
+        {
+          "event_id": "D14-E1",
+          "timestamp": "2026-10-07T04:10:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "WATER_LEAK_DETECTED",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D14-E2",
+          "timestamp": "2026-10-07T04:26:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.71,
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "D15",
+      "split": "dev",
+      "title": "Escorted visitor and scanner noise",
+      "narrative": "An escorted, unenrolled visitor appears in Hall A while an internet scanner triggers a single-vote SSH anomaly.",
+      "events": [
+        {
+          "event_id": "D15-E1",
+          "timestamp": "2026-10-07T15:25:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "UNKNOWN_PERSON",
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "D15-E2",
+          "timestamp": "2026-10-07T15:33:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "ANOMALY_CANDIDATE",
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "D16",
+      "split": "dev",
+      "title": "Intruder without PPE attacks a server",
+      "narrative": "P003 enters Hall B without PPE and attempts a console break-in on SRV-B1-01.",
+      "events": [
+        {
+          "event_id": "D16-E1",
+          "timestamp": "2026-10-08T02:35:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D16-E2",
+          "timestamp": "2026-10-08T02:36:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.83,
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "D16-E3",
+          "timestamp": "2026-10-08T02:44:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "EXPLICIT_SECURITY_EVENT",
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T01",
+      "split": "test",
+      "title": "Rack A1 overheating",
+      "narrative": "SRV-A1-01 overheats and its drive is flagged three minutes later; an unrelated SSH candidate appears in Hall B.",
+      "events": [
+        {
+          "event_id": "T01-E1",
+          "timestamp": "2026-10-12T01:00:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "HARDWARE_TELEMETRY",
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T01-E2",
+          "timestamp": "2026-10-12T01:03:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.79,
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T01-E3",
+          "timestamp": "2026-10-12T01:20:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "ANOMALY_CANDIDATE",
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T02",
+      "split": "test",
+      "title": "Chiller degradation",
+      "narrative": "A cooling anomaly in utilities warms Hall A after 18 minutes; two Hall A drives are flagged around minute 52-55.",
+      "events": [
+        {
+          "event_id": "T02-E1",
+          "timestamp": "2026-10-12T06:30:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "COOLING_ANOMALY",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T02-E2",
+          "timestamp": "2026-10-12T06:48:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T02-E3",
+          "timestamp": "2026-10-12T07:22:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.73,
+          "server_id": "SRV-A1-02",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T02-E4",
+          "timestamp": "2026-10-12T07:25:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.48,
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T03",
+      "split": "test",
+      "title": "Console attack",
+      "narrative": "P003 is recognized in Hall B and a break-in attempt is logged on SRV-B1-02 three minutes later.",
+      "events": [
+        {
+          "event_id": "T03-E1",
+          "timestamp": "2026-10-12T21:40:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T03-E2",
+          "timestamp": "2026-10-12T21:43:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "EXPLICIT_SECURITY_EVENT",
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T04",
+      "split": "test",
+      "title": "Night-shift coincidence",
+      "narrative": "A Hall B drive is flagged at moderate risk; nine minutes later Hall A reports low humidity from dry outside air.",
+      "events": [
+        {
+          "event_id": "T04-E1",
+          "timestamp": "2026-10-13T03:05:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.62,
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "T04-E2",
+          "timestamp": "2026-10-13T03:14:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "LOW_HUMIDITY",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T05",
+      "split": "test",
+      "title": "Humidity and brute force",
+      "narrative": "Seasonal humidity rises in Hall B while an internet brute-force attack reaches consensus on SRV-B1-01.",
+      "events": [
+        {
+          "event_id": "T05-E1",
+          "timestamp": "2026-10-13T12:20:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_HUMIDITY",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "T05-E2",
+          "timestamp": "2026-10-13T12:27:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "HIGH_CONFIDENCE_ANOMALY",
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T06",
+      "split": "test",
+      "title": "Unenrolled contractor",
+      "narrative": "An unenrolled contractor enters utilities and is seen without PPE two minutes later.",
+      "events": [
+        {
+          "event_id": "T06-E1",
+          "timestamp": "2026-10-13T17:10:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "UNKNOWN_PERSON",
+          "camera_id": "CAM-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T06-E2",
+          "timestamp": "2026-10-13T17:12:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.72,
+          "camera_id": "CAM-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T07",
+      "split": "test",
+      "title": "Engineer dispatched to Hall A",
+      "narrative": "A high-risk drive on SRV-A1-01 brings an engineer, seen without a vest 48 minutes later.",
+      "events": [
+        {
+          "event_id": "T07-E1",
+          "timestamp": "2026-10-14T08:00:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.84,
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T07-E2",
+          "timestamp": "2026-10-14T08:48:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.77,
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T08",
+      "split": "test",
+      "title": "Busy hall",
+      "narrative": "Hall A warms and a drive is flagged eight minutes later. A low-confidence PPE alert and an SSH candidate in the same window are unrelated.",
+      "events": [
+        {
+          "event_id": "T08-E1",
+          "timestamp": "2026-10-14T14:45:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.61,
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "T08-E2",
+          "timestamp": "2026-10-14T14:51:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T08-E3",
+          "timestamp": "2026-10-14T14:59:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.81,
+          "server_id": "SRV-A1-02",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T08-E4",
+          "timestamp": "2026-10-14T14:55:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "ANOMALY_CANDIDATE",
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T09",
+      "split": "test",
+      "title": "Slow cooling cascade",
+      "narrative": "Chiller airflow drops; a Hall B drive is flagged 33 minutes later. A low-confidence PPE alert in utilities is unrelated.",
+      "events": [
+        {
+          "event_id": "T09-E1",
+          "timestamp": "2026-10-15T02:15:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "AIRFLOW_ANOMALY",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T09-E2",
+          "timestamp": "2026-10-15T02:48:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.76,
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T09-E3",
+          "timestamp": "2026-10-15T02:20:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.55,
+          "camera_id": "CAM-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T10",
+      "split": "test",
+      "title": "Insider with delay",
+      "narrative": "P003 is recognized in Hall A and the SSH detector reaches consensus on SRV-A1-01 21 minutes later. A heat alert at minute 80 is unrelated.",
+      "events": [
+        {
+          "event_id": "T10-E1",
+          "timestamp": "2026-10-15T19:30:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T10-E2",
+          "timestamp": "2026-10-15T19:51:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "HIGH_CONFIDENCE_ANOMALY",
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T10-E3",
+          "timestamp": "2026-10-15T20:50:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T11",
+      "split": "test",
+      "title": "Pure noise",
+      "narrative": "Three unrelated low-strength abnormalities in different places.",
+      "events": [
+        {
+          "event_id": "T11-E1",
+          "timestamp": "2026-10-16T04:50:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "ANOMALY_CANDIDATE",
+          "server_id": "SRV-A1-02",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "T11-E2",
+          "timestamp": "2026-10-16T04:54:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.52,
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "T11-E3",
+          "timestamp": "2026-10-16T05:20:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.47,
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T12",
+      "split": "test",
+      "title": "Fire response",
+      "narrative": "Smoke is detected in Hall A; a responder without full PPE and an unknown person (a fire officer) arrive within five minutes.",
+      "events": [
+        {
+          "event_id": "T12-E1",
+          "timestamp": "2026-10-16T11:10:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "SMOKE_DETECTED",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T12-E2",
+          "timestamp": "2026-10-16T11:14:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.88,
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T12-E3",
+          "timestamp": "2026-10-16T11:15:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "UNKNOWN_PERSON",
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T13",
+      "split": "test",
+      "title": "Same server, unrelated",
+      "narrative": "An internet break-in attempt targets SRV-A1-02 while the same server's old drive is independently flagged two minutes later.",
+      "events": [
+        {
+          "event_id": "T13-E1",
+          "timestamp": "2026-10-16T23:00:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "EXPLICIT_SECURITY_EVENT",
+          "server_id": "SRV-A1-02",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "T13-E2",
+          "timestamp": "2026-10-16T23:02:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.86,
+          "server_id": "SRV-A1-02",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T14",
+      "split": "test",
+      "title": "Tailgating into Hall B",
+      "narrative": "P003, authorized only for utilities, follows staff into Hall B and is seen without PPE a minute later.",
+      "events": [
+        {
+          "event_id": "T14-E1",
+          "timestamp": "2026-10-17T07:35:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T14-E2",
+          "timestamp": "2026-10-17T07:36:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.69,
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T15",
+      "split": "test",
+      "title": "Delayed drive risk after heat",
+      "narrative": "Hall B overheats; two drives are flagged 27 and 29 minutes later.",
+      "events": [
+        {
+          "event_id": "T15-E1",
+          "timestamp": "2026-10-17T13:55:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T15-E2",
+          "timestamp": "2026-10-17T14:22:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.72,
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T15-E3",
+          "timestamp": "2026-10-17T14:24:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.49,
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T16",
+      "split": "test",
+      "title": "Simultaneous incidents in two halls",
+      "narrative": "Hall A overheats and stresses a drive while, in Hall B, P003 attempts a console break-in.",
+      "events": [
+        {
+          "event_id": "T16-E1",
+          "timestamp": "2026-10-18T09:20:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T16-E2",
+          "timestamp": "2026-10-18T09:28:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.75,
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T16-E3",
+          "timestamp": "2026-10-18T09:24:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I2"
+        },
+        {
+          "event_id": "T16-E4",
+          "timestamp": "2026-10-18T09:27:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "EXPLICIT_SECURITY_EVENT",
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I2"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T17",
+      "split": "test",
+      "title": "Weak but real",
+      "narrative": "Hardware telemetry shows SRV-B1-02 running warm and its drive reaches moderate risk 11 minutes later.",
+      "events": [
+        {
+          "event_id": "T17-E1",
+          "timestamp": "2026-10-18T16:40:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "HARDWARE_TELEMETRY",
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T17-E2",
+          "timestamp": "2026-10-18T16:51:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.51,
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T18",
+      "split": "test",
+      "title": "Visitor and weak scan",
+      "narrative": "An unenrolled visitor is escorted through Hall B while an internet scanner causes a single-vote SSH anomaly.",
+      "events": [
+        {
+          "event_id": "T18-E1",
+          "timestamp": "2026-10-19T10:05:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "UNKNOWN_PERSON",
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "T18-E2",
+          "timestamp": "2026-10-19T10:08:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "ANOMALY_CANDIDATE",
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T19",
+      "split": "test",
+      "title": "Utilities intruder",
+      "narrative": "P001 is recognized in utilities without authorization and tampers with the chiller; a Hall A drive is flagged later.",
+      "events": [
+        {
+          "event_id": "T19-E1",
+          "timestamp": "2026-10-19T22:25:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P001",
+          "camera_id": "CAM-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T19-E2",
+          "timestamp": "2026-10-19T22:37:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "COOLING_ANOMALY",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T19-E3",
+          "timestamp": "2026-10-19T23:23:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.71,
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T20",
+      "split": "test",
+      "title": "Long gap, unrelated",
+      "narrative": "Hall A humidity rises; 95 minutes later a drive is flagged from long-term wear.",
+      "events": [
+        {
+          "event_id": "T20-E1",
+          "timestamp": "2026-10-20T05:15:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_HUMIDITY",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "T20-E2",
+          "timestamp": "2026-10-20T06:50:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.79,
+          "server_id": "SRV-A1-02",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T21",
+      "split": "test",
+      "title": "Brute force with an on-site helper",
+      "narrative": "SSH consensus on SRV-A1-01, then an unknown person enters Hall A 44 minutes later to plug in a device.",
+      "events": [
+        {
+          "event_id": "T21-E1",
+          "timestamp": "2026-10-20T12:00:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "HIGH_CONFIDENCE_ANOMALY",
+          "server_id": "SRV-A1-01",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T21-E2",
+          "timestamp": "2026-10-20T12:44:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "UNKNOWN_PERSON",
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        }
+      ]
+    },
+    {
+      "scenario_id": "T22",
+      "split": "test",
+      "title": "Leak and responder",
+      "narrative": "A water leak in utilities brings an engineer without PPE nine minutes later; a moderate Hall B drive alert is unrelated.",
+      "events": [
+        {
+          "event_id": "T22-E1",
+          "timestamp": "2026-10-20T18:30:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "WATER_LEAK_DETECTED",
+          "source_class": "ENVIRONMENTAL_SENSOR",
+          "sensor_id": "SEN-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T22-E2",
+          "timestamp": "2026-10-20T18:39:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.8,
+          "camera_id": "CAM-C-01",
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T22-E3",
+          "timestamp": "2026-10-20T18:45:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.53,
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T23",
+      "split": "test",
+      "title": "Multi-hall noise",
+      "narrative": "Three unrelated abnormalities across Halls A and B.",
+      "events": [
+        {
+          "event_id": "T23-E1",
+          "timestamp": "2026-10-21T03:40:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.64,
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "T23-E2",
+          "timestamp": "2026-10-21T03:46:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "UNKNOWN_PERSON",
+          "camera_id": "CAM-B-01",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        },
+        {
+          "event_id": "T23-E3",
+          "timestamp": "2026-10-21T03:50:00+00:00",
+          "domain": "ENVIRONMENTAL",
+          "state": "HIGH_TEMPERATURE",
+          "source_class": "HARDWARE_TELEMETRY",
+          "server_id": "SRV-B1-01",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        }
+      ]
+    },
+    {
+      "scenario_id": "T24",
+      "split": "test",
+      "title": "Intrusion triple",
+      "narrative": "P003 enters Hall A without PPE and attempts a break-in on SRV-A1-02; an unrelated Hall B drive alert follows.",
+      "events": [
+        {
+          "event_id": "T24-E1",
+          "timestamp": "2026-10-21T15:10:00+00:00",
+          "domain": "PHYSICAL_SECURITY",
+          "state": "RECOGNIZED",
+          "authorization": "UNAUTHORIZED",
+          "person_id": "P003",
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T24-E2",
+          "timestamp": "2026-10-21T15:11:00+00:00",
+          "domain": "SAFETY",
+          "state": "PPE_NON_COMPLIANT",
+          "confidence": 0.9,
+          "camera_id": "CAM-A-01",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T24-E3",
+          "timestamp": "2026-10-21T15:14:00+00:00",
+          "domain": "CYBERSECURITY",
+          "state": "EXPLICIT_SECURITY_EVENT",
+          "server_id": "SRV-A1-02",
+          "rack_id": "RACK-A1",
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
+        },
+        {
+          "event_id": "T24-E4",
+          "timestamp": "2026-10-21T15:30:00+00:00",
+          "domain": "MAINTENANCE",
+          "state": "AT_RISK",
+          "failure_probability": 0.66,
+          "server_id": "SRV-B1-02",
+          "rack_id": "RACK-B1",
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
+        }
+      ]
+    }
+  ]
+}
