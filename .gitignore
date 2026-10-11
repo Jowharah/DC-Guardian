@@ -274,3 +274,7 @@ presentation/frontend/build_errors.txt
 # Local runtime logs and check reports (may contain Evidence IDs)
 /logs/*
 !/logs/README.md
+
+# Playwright output
+presentation/frontend/test-results/
+presentation/frontend/playwright-report/

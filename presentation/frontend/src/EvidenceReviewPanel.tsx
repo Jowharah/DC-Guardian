@@ -8,6 +8,7 @@ export default function EvidenceReviewPanel({kind,id}:{kind:InvestigatorSingleKi
  const [records,setRecords]=useState<EvidenceReviewRecord[]>([]);
  const [effective,setEffective]=useState<EvidenceReviewEffective|null>(null);
  const [vocabulary,setVocabulary]=useState<string[]>([]);
+ const [detectorStatus,setDetectorStatus]=useState<string|null>(null);
  const [verdict,setVerdict]=useState<EvidenceVerdict>("CONFIRMED");
  const [corrected,setCorrected]=useState("");
  const [rationale,setRationale]=useState("");
@@ -17,11 +18,11 @@ export default function EvidenceReviewPanel({kind,id}:{kind:InvestigatorSingleKi
  const [error,setError]=useState("");
  const [message,setMessage]=useState("");
  function load(active:()=>boolean){
-  return getEvidenceReview(kind,id).then(r=>{if(!active())return;setRecords(r.records);setEffective(r.effective);setVocabulary(r.vocabulary);setReady(true);setError("")})
+  return getEvidenceReview(kind,id).then(r=>{if(!active())return;setRecords(r.records);setEffective(r.effective);setVocabulary(r.vocabulary);setDetectorStatus(r.detector_status??null);setReady(true);setError("")})
    .catch(()=>{if(active()){setReady(false);setError("Review history unavailable; recording is disabled.")}});
  }
  useEffect(()=>{let active=true;setReady(false);setMessage("");void load(()=>active);return()=>{active=false}},[kind,id]);
- const modelStatus=records.at(-1)?.model_status??effective?.model_status??null;
+ const modelStatus=detectorStatus??records.at(-1)?.model_status??effective?.model_status??null;
  const needsStatus=verdict==="OVERRIDDEN";
  const options=vocabulary.filter(v=>v!==modelStatus);
  const valid=ready&&ack&&rationale.trim().length>=15&&(!needsStatus||options.includes(corrected));

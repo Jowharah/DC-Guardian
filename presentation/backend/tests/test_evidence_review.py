@@ -27,6 +27,7 @@ def test_override_keeps_model_output_and_sets_effective_status():
     assert entry["model_status"]=="NON_COMPLIANT"
     assert entry["detector_output_modified"] is False
     result=review.list_evidence_reviews("ppe","PPE-IMG-1",ADMIN)
+    assert result["detector_status"]=="NON_COMPLIANT"
     assert result["effective"]["effective_status"]=="COMPLIANT"
     assert result["effective"]["abnormal"] is False
     assert result["effective"]["source"]=="HUMAN_OVERRIDE"

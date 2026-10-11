@@ -136,9 +136,11 @@ def record_evidence_review(kind:str,evidence_id:str,payload:EvidenceReviewInput,
 
 @router.get("/api/v1/evidence-reviews/{kind}/{evidence_id}")
 def list_evidence_reviews(kind:str,evidence_id:str,principal:Principal=Depends(current_principal)):
-    authorized_context(kind,evidence_id,principal)
+    context=authorized_context(kind,evidence_id,principal)
     records=rows(kind,evidence_id)
+    # Current detector status, so the UI never offers it as an "override".
     return {"kind":kind,"evidence_id":evidence_id,"records":records,
+            "detector_status":model_status(kind,context["source_assessment"]),
             "effective":effective(kind,records),"vocabulary":list(VOCABULARY[kind])}
 
 @router.get("/api/v1/evidence-reviews")
