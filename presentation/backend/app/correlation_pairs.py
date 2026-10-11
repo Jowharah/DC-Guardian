@@ -41,9 +41,11 @@ def instant(value):
         return None
     return parsed.astimezone(timezone.utc) if parsed.tzinfo else None
 
-def node(kind,oid,zone,state,times,provenance,server=None):
+def node(kind,oid,zone,state,times,provenance,server=None,attributes=None):
+    # attributes: detector details used only by the research P(Related) estimate.
     return {"kind":kind,"id":oid,"zone_id":zone,"server_id":server,"state":state,
-            "times":[t for t in times if t is not None],"time_provenance":provenance}
+            "times":[t for t in times if t is not None],"time_provenance":provenance,
+            "attributes":attributes or {}}
 
 def ssh_nodes(principal):
     from presentation.backend.app.ssh_publication import connect
@@ -70,7 +72,8 @@ def maintenance_nodes(principal):
     from presentation.backend.app.maintenance_workflow import list_events
     return [node("maintenance",m["event_id"],m["zone_id"],m["assessment"].get("assessment"),
                  [instant(m["assessment"].get("observation_timestamp"))],
-                 "MODEL_OBSERVATION_TIMESTAMP",m.get("server_id"))
+                 "MODEL_OBSERVATION_TIMESTAMP",m.get("server_id"),
+                 {"failure_probability":m["assessment"].get("failure_probability")})
             for m in list_events(principal)]
 
 def environment_nodes(principal):
@@ -92,7 +95,8 @@ def environment_nodes(principal):
             times.append(instant(reading.get("timestamp")))
         state=abnormal[-1] if abnormal else e["assessment"].get("assessment")
         result.append(node("environment",e["event_id"],e["zone_id"],state,times,
-                           "SENSOR_READING_TIMESTAMP"))
+                           "SENSOR_READING_TIMESTAMP",
+                           attributes={"source_class":e["assessment"].get("source_class")}))
     return result
 
 def image_nodes(kind,principal):
@@ -236,10 +240,15 @@ def correlation_pairs(principal:Principal=Depends(current_principal)):
     if allowed(principal,DETAIL["maintenance"]) and allowed(principal,DETAIL["environment"]):
         from presentation.backend.app.operational_correlations import operational_correlations
         severities={c["id"]:c.get("decision_severity") for c in operational_correlations(principal)}
+    from presentation.backend.app.evidence_review import overrides
+    from presentation.backend.app.correlation_uncertainty import score_pairs
+    nodes=load_nodes(principal,overrides())
     pairs=[]
-    for e in all_edges(principal):
+    for e in all_edges(principal,nodes=nodes):
         if all(allowed(principal,DETAIL[k],e["zone_id"]) for k,_ in (e["left"],e["right"])):
             pairs.append(as_pair(e,severities))
+    # Research estimate shown beside each pair; the rule above stays authoritative.
+    score_pairs(pairs,nodes)
     return sorted(pairs,key=lambda p:(p["zone_id"],p["details"].get("time_difference_seconds",0),p["id"]))
 
 def find_pair(pair_id,principal):

@@ -121,8 +121,8 @@ Correlation of either kind cuts alerts by about a third against single-domain al
 
 `reasoning/uncertainty/labelling/` contains a **blind labelling pack** for teammates: the 40 scenarios with neutral IDs and shuffled order, events only (no titles, narratives, labels, split or model output), a facility brief and a glossary, and a `labels.csv` with the 85 candidate pairs to mark related or not. `score_labels.py` reports agreement with the author (percent and Cohen's kappa) and re-evaluates both methods on the independent labels with bootstrap intervals; a contract test checks the pack reveals no answers. See the folder's README for the procedure.
 
-## Integration path (not implemented)
+## Integration path
 
-1. Score live pairs in `presentation/backend/app/correlation_pairs.py` and show P(Related) and the factor explanation beside each crisp candidate.
+1. **Done (2026-10-11):** `presentation/backend/app/correlation_uncertainty.py` scores every live pair returned by `GET /api/v1/correlations/pairs` and the dashboard shows P(Related) with its factor explanation beside each pair, labelled a research estimate. Factors that live Evidence cannot supply (PPE confidence) are marginalized, not guessed; pairs with a non-abnormal event are reported as not scored.
 2. Keep the crisp rule as the authoritative candidate filter until the probabilistic score has been validated on independently labelled data.
 3. Never feed P(Related) into Decision severity without a new, versioned Decision policy.
