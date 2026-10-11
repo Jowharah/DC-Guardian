@@ -58,12 +58,20 @@ def main():
         raise AssertionError("Reasoning trace missing.")
     if data["response"]["layer"] != "RESPONSE":
         raise AssertionError("Response trace missing.")
-    if data["decision"]["status"] != "PENDING_DETERMINISTIC_DECISION_RULES":
-        raise AssertionError("Decision boundary changed unexpectedly.")
+    # The service applies deterministic Decision Rules v1 (since d4cb326).
+    decision = data["decision"]
+    if decision.get("policy_version") != "DCG-DECISION-v1":
+        raise AssertionError("Deterministic Decision Rules v1 not applied.")
+    if decision["autonomous_action_allowed"] is not False:
+        raise AssertionError("Autonomous action must never be allowed.")
+    if decision["severity"] not in ("LOW", "MEDIUM", "HIGH"):
+        raise AssertionError("Decision severity missing.")
+    if decision["protected_boundaries"]["identity_link_established"] is not False:
+        raise AssertionError("Identity link must not be inferred.")
 
     print("PASS: Reusable scenario service returns unified PipelineResult.")
     print("PASS: Evidence, Reasoning, and Response traces preserved.")
-    print("PASS: Decision layer remains explicitly pending.")
+    print("PASS: Deterministic Decision Rules v1 applied; no autonomous action.")
     print("=" * 60)
     print("DC-GUARDIAN INTEGRATION SERVICE CONTRACT PASSED")
     print("=" * 60)

@@ -1,8 +1,10 @@
 ﻿# DC-GUARDIAN
 
-DC-GUARDIAN is a research prototype for multi-domain data-center monitoring, deterministic cross-domain reasoning, grounded response, and governed decision support. The architecture is organized as Evidence -> Reasoning -> Response -> Decision, with Presentation/dashboard development next.
+DC-GUARDIAN is a research prototype for multi-domain data-center monitoring, deterministic cross-domain reasoning, grounded response, and governed decision support. The architecture is organized as Evidence -> Reasoning -> Response -> Decision, with a controlled Presentation/dashboard prototype and ongoing security validation.
 
-> **Current baseline:** Evidence model and monitoring baselines are frozen for integration. Reasoning, Response, and deterministic Decision contracts are implemented and validated by the integrated pipeline. The clean Python 3.12 runtime also retains the frozen-model smoke verification. Presentation/dashboard development is the next major development stage.
+> **Current branch baseline (2026-10-10):** The five frozen Evidence domains, Reasoning/Neo4j correlation, approved-knowledge Response, deterministic Decision contracts, and the controlled Presentation dashboard are implemented in the research prototype. The Presentation layer now includes Monitoring Center, Scenario Lab, Analytics Dashboard, Human Review Queue, authenticated human-review audit records, and local audit-integrity verification. The AI Investigator is an opt-in, read-only research prototype (see [docs/AI_INVESTIGATOR.md](docs/AI_INVESTIGATOR.md)). Correlation covers any two events (pairs) and any connected set of three or more events (unified groups) across all five domains. This is not a production deployment or security certification.
+
+**Documentation:** Start at [docs/README.md](docs/README.md) for the complete documentation index, [Development History](docs/PROJECT_DEVELOPMENT_HISTORY.md), [Validation and Operations](docs/VALIDATION_AND_OPERATIONS.md), and [Remaining Roadmap](docs/REMAINING_ROADMAP.md).
 
 ## Architecture
 
@@ -69,6 +71,18 @@ Implemented integration currently includes:
 - Deterministic pairwise and three-domain correlation
 - Deterministic/idempotent correlation persistence
 
+### Full project check (one command)
+
+```powershell
+python check_all.py              # every layer; ~3 minutes
+python check_all.py --skip-live  # without calling the running backend
+python check_all.py --only ppe   # checks whose name contains "ppe"
+```
+
+Runs the runtime smoke test, all Evidence component contracts (GPU scripts in `.venv-ppe` / `.venv-gru`), the 24 Reasoning contracts (Neo4j; test nodes are removed afterwards), Response, Decision and integration contracts, the Presentation backend tests, the frontend build and, if the backend is running, a GET-only live API smoke test. No check calls OpenAI. Results go to `logs/checks/<timestamp>/report.md` (and `logs/checks/latest.md`), with one log file per check. Checks that need private local data are skipped when that data is absent.
+
+The running backend writes `logs/api_access.log`, `logs/backend.log` and `logs/errors.log` (see `logs/README.md`).
+
 ### Runtime and regression verification
 
 The verified integrated runtime uses Python 3.12 and the repository-level
@@ -118,10 +132,29 @@ DC-Guardian/
 |   |-- validate_event_schema.py
 |   `-- validate_topology.py
 |
+|-- response/
+|   |-- agents/            # grounded specialists, routing, cross-domain synthesis
+|   `-- rag/               # approved-knowledge retrieval and abstention
+|
+|-- decision/
+|   `-- rules.py           # deterministic Decision rules (DCG-DECISION-v1)
+|
+|-- integration/           # scenario pipeline, runners, service contracts
+|
+|-- presentation/
+|   |-- backend/           # FastAPI: RBAC, Evidence workflows, correlation,
+|   |                      # human review audit, AI Investigator
+|   `-- frontend/          # React/Vite dashboard
+|
 |-- shared/
 |   |-- schemas/
 |   `-- topology/
 |
+|-- docs/                  # architecture, validation, roadmap, Investigator
+|-- verify_runtime.py      # Evidence runtime smoke test
+|-- verify_dc_guardian_pipeline.py
+|-- requirements.txt
+|-- .env.example
 |-- .gitignore
 `-- .gitattributes
 ```
@@ -271,7 +304,7 @@ After cloning, ensure Git LFS is installed before relying on that artifact.
 
 ## Local Configuration
 
-Local credentials belong in `.env`, which is excluded from Git. A sanitized `.env.example` will document the required local configuration without publishing credentials.
+Local credentials belong in `.env`, which is excluded from Git. `.env.example` documents the required local configuration (Neo4j, OpenAI, Investigator flags) without credentials; copy it to `.env` and fill in local values.
 
 ## Current Development Roadmap
 
@@ -280,7 +313,7 @@ Local credentials belong in `.env`, which is excluded from Git. A sanitized `.en
 3. Response RAG and governed knowledge - IMPLEMENTED / VERIFIED
 4. Grounded specialist reasoning and cross-domain synthesis - IMPLEMENTED / VERIFIED
 5. Deterministic Decision rules - IMPLEMENTED / VERIFIED
-6. Presentation/dashboard integration - NEXT
+6. Presentation/dashboard integration - IN PROGRESS (AI Investigator prototype implemented)
 
 ## Security Assessment
 

@@ -31,6 +31,23 @@ PROJECT_ROOT = (
 # Contract suite
 # ============================================================
 
+# Contracts that need private, Git-excluded local data. When the data is
+# absent (fresh clone, CI) they are reported as SKIP and the suite continues.
+REQUIRES_PRIVATE_DATA = {
+    "Face Adapter": [
+        "evidence/face_recognition/models/employee_embeddings.npz",
+        "evidence/face_recognition/data/controlled_faces",
+    ],
+}
+
+
+def missing_private_data(name):
+    return [
+        path for path in REQUIRES_PRIVATE_DATA.get(name, [])
+        if not (PROJECT_ROOT / path).exists()
+    ]
+
+
 CONTRACTS = [
 
     # --------------------------------------------------------
@@ -141,7 +158,7 @@ CONTRACTS = [
         "GRAPH",
         "SSH Event Ingestion",
         [
-            "reasoning/graph/test_event_ingestion.py"
+            "-m", "pytest", "reasoning/graph/test_event_ingestion.py", "-q", "-p", "no:cacheprovider"
         ],
     ),
 
@@ -149,7 +166,7 @@ CONTRACTS = [
         "GRAPH",
         "Maintenance Event Ingestion",
         [
-            "reasoning/graph/test_maintenance_event_ingestion.py"
+            "-m", "pytest", "reasoning/graph/test_maintenance_event_ingestion.py", "-q", "-p", "no:cacheprovider"
         ],
     ),
 
@@ -304,6 +321,9 @@ def run_contract(
         if not existing_pythonpath
         else str(PROJECT_ROOT) + os.pathsep + existing_pythonpath
     )
+    # Libraries such as DeepFace print emoji; without this, redirected output
+    # on Windows falls back to cp1252 and the contract crashes on import.
+    env["PYTHONIOENCODING"] = "utf-8"
 
     result = subprocess.run(
         command,
@@ -420,6 +440,8 @@ def main():
 
     passed = 0
 
+    skipped = []
+
     timings = []
 
 
@@ -449,6 +471,22 @@ def main():
             print(
                 f"\n--- {section} ---"
             )
+
+
+        missing = missing_private_data(name)
+
+        if missing:
+
+            print()
+            print(
+                f"[{index:02d}/{total:02d}] {section} :: {name}"
+            )
+            print(
+                "SKIP: private local data not present: "
+                + ", ".join(missing)
+            )
+            skipped.append(name)
+            continue
 
 
         success, elapsed = run_contract(
@@ -568,6 +606,7 @@ def main():
     print(
         f"REASONING CONTRACTS PASSED: "
         f"{passed}/{total}"
+        + (f" ({len(skipped)} skipped: private data absent: {', '.join(skipped)})" if skipped else "")
     )
 
     print(
@@ -644,8 +683,56 @@ def main():
     return 0
 
 
+def remove_test_graph_artifacts():
+    """Delete contract-test Events/Correlations from the shared graph.
+
+    Contracts share the operator's Neo4j database, and *_store contracts reuse
+    nodes left by the preceding contract, so cleanup runs once after the whole
+    suite. Only nodes with the test-only SCENARIO- prefix are removed; topology
+    (Server, Rack, Zone, Person, Camera) and DCG-* dashboard data are untouched.
+    Set DCG_KEEP_TEST_GRAPH=1 to keep them for debugging.
+    """
+
+    if os.environ.get("DCG_KEEP_TEST_GRAPH") == "1":
+        print("Test graph artifacts kept (DCG_KEEP_TEST_GRAPH=1).")
+        return
+
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+    from reasoning.graph.ingest_event import (
+        NEO4J_DATABASE,
+        create_driver,
+    )
+
+    try:
+        driver = create_driver()
+        try:
+            with driver.session(database=NEO4J_DATABASE) as session:
+                deleted = session.run(
+                    """
+                    MATCH (n)
+                    WHERE (n:Event OR n:Correlation)
+                      AND n.scenario_id STARTS WITH 'SCENARIO-'
+                    DETACH DELETE n
+                    RETURN count(n) AS deleted
+                    """
+                ).single()["deleted"]
+        finally:
+            driver.close()
+    except Exception as exc:
+        print(f"WARNING: test graph cleanup failed: {type(exc).__name__}")
+        return
+
+    print(f"Removed {deleted} contract-test graph nodes.")
+
+
 if __name__ == "__main__":
 
+    try:
+        exit_code = main()
+    finally:
+        remove_test_graph_artifacts()
+
     raise SystemExit(
-        main()
+        exit_code
     )

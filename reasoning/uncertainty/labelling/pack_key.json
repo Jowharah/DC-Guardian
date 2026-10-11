@@ -1,0 +1,268 @@
+{
+  "scenarios": {
+    "S01": {
+      "original_id": "D14",
+      "split": "dev"
+    },
+    "S02": {
+      "original_id": "T17",
+      "split": "test"
+    },
+    "S03": {
+      "original_id": "T22",
+      "split": "test"
+    },
+    "S04": {
+      "original_id": "D08",
+      "split": "dev"
+    },
+    "S05": {
+      "original_id": "D04",
+      "split": "dev"
+    },
+    "S06": {
+      "original_id": "D12",
+      "split": "dev"
+    },
+    "S07": {
+      "original_id": "T02",
+      "split": "test"
+    },
+    "S08": {
+      "original_id": "D07",
+      "split": "dev"
+    },
+    "S09": {
+      "original_id": "T21",
+      "split": "test"
+    },
+    "S10": {
+      "original_id": "T11",
+      "split": "test"
+    },
+    "S11": {
+      "original_id": "T20",
+      "split": "test"
+    },
+    "S12": {
+      "original_id": "T04",
+      "split": "test"
+    },
+    "S13": {
+      "original_id": "D13",
+      "split": "dev"
+    },
+    "S14": {
+      "original_id": "T07",
+      "split": "test"
+    },
+    "S15": {
+      "original_id": "T24",
+      "split": "test"
+    },
+    "S16": {
+      "original_id": "T08",
+      "split": "test"
+    },
+    "S17": {
+      "original_id": "T13",
+      "split": "test"
+    },
+    "S18": {
+      "original_id": "T09",
+      "split": "test"
+    },
+    "S19": {
+      "original_id": "T18",
+      "split": "test"
+    },
+    "S20": {
+      "original_id": "D01",
+      "split": "dev"
+    },
+    "S21": {
+      "original_id": "T10",
+      "split": "test"
+    },
+    "S22": {
+      "original_id": "T12",
+      "split": "test"
+    },
+    "S23": {
+      "original_id": "T03",
+      "split": "test"
+    },
+    "S24": {
+      "original_id": "D09",
+      "split": "dev"
+    },
+    "S25": {
+      "original_id": "D16",
+      "split": "dev"
+    },
+    "S26": {
+      "original_id": "T16",
+      "split": "test"
+    },
+    "S27": {
+      "original_id": "D06",
+      "split": "dev"
+    },
+    "S28": {
+      "original_id": "D10",
+      "split": "dev"
+    },
+    "S29": {
+      "original_id": "T15",
+      "split": "test"
+    },
+    "S30": {
+      "original_id": "T19",
+      "split": "test"
+    },
+    "S31": {
+      "original_id": "D05",
+      "split": "dev"
+    },
+    "S32": {
+      "original_id": "D11",
+      "split": "dev"
+    },
+    "S33": {
+      "original_id": "T23",
+      "split": "test"
+    },
+    "S34": {
+      "original_id": "T14",
+      "split": "test"
+    },
+    "S35": {
+      "original_id": "T05",
+      "split": "test"
+    },
+    "S36": {
+      "original_id": "T01",
+      "split": "test"
+    },
+    "S37": {
+      "original_id": "D02",
+      "split": "dev"
+    },
+    "S38": {
+      "original_id": "D15",
+      "split": "dev"
+    },
+    "S39": {
+      "original_id": "T06",
+      "split": "test"
+    },
+    "S40": {
+      "original_id": "D03",
+      "split": "dev"
+    }
+  },
+  "events": {
+    "S01-E1": "D14-E1",
+    "S01-E2": "D14-E2",
+    "S02-E1": "T17-E1",
+    "S02-E2": "T17-E2",
+    "S03-E1": "T22-E1",
+    "S03-E2": "T22-E2",
+    "S03-E3": "T22-E3",
+    "S04-E1": "D08-E1",
+    "S04-E2": "D08-E2",
+    "S05-E1": "D04-E1",
+    "S05-E2": "D04-E2",
+    "S06-E1": "D12-E1",
+    "S06-E2": "D12-E2",
+    "S07-E1": "T02-E1",
+    "S07-E2": "T02-E2",
+    "S07-E3": "T02-E3",
+    "S07-E4": "T02-E4",
+    "S08-E1": "D07-E1",
+    "S08-E2": "D07-E2",
+    "S09-E1": "T21-E1",
+    "S09-E2": "T21-E2",
+    "S10-E1": "T11-E1",
+    "S10-E2": "T11-E2",
+    "S10-E3": "T11-E3",
+    "S11-E1": "T20-E1",
+    "S11-E2": "T20-E2",
+    "S12-E1": "T04-E1",
+    "S12-E2": "T04-E2",
+    "S13-E1": "D13-E1",
+    "S13-E2": "D13-E2",
+    "S14-E1": "T07-E1",
+    "S14-E2": "T07-E2",
+    "S15-E1": "T24-E1",
+    "S15-E2": "T24-E2",
+    "S15-E3": "T24-E3",
+    "S15-E4": "T24-E4",
+    "S16-E1": "T08-E1",
+    "S16-E2": "T08-E2",
+    "S16-E3": "T08-E4",
+    "S16-E4": "T08-E3",
+    "S17-E1": "T13-E1",
+    "S17-E2": "T13-E2",
+    "S18-E1": "T09-E1",
+    "S18-E2": "T09-E3",
+    "S18-E3": "T09-E2",
+    "S19-E1": "T18-E1",
+    "S19-E2": "T18-E2",
+    "S20-E1": "D01-E1",
+    "S20-E2": "D01-E2",
+    "S21-E1": "T10-E1",
+    "S21-E2": "T10-E2",
+    "S21-E3": "T10-E3",
+    "S22-E1": "T12-E1",
+    "S22-E2": "T12-E2",
+    "S22-E3": "T12-E3",
+    "S23-E1": "T03-E1",
+    "S23-E2": "T03-E2",
+    "S24-E1": "D09-E1",
+    "S24-E2": "D09-E4",
+    "S24-E3": "D09-E3",
+    "S24-E4": "D09-E2",
+    "S25-E1": "D16-E1",
+    "S25-E2": "D16-E2",
+    "S25-E3": "D16-E3",
+    "S26-E1": "T16-E1",
+    "S26-E2": "T16-E3",
+    "S26-E3": "T16-E4",
+    "S26-E4": "T16-E2",
+    "S27-E1": "D06-E1",
+    "S27-E2": "D06-E2",
+    "S28-E1": "D10-E1",
+    "S28-E2": "D10-E2",
+    "S29-E1": "T15-E1",
+    "S29-E2": "T15-E2",
+    "S29-E3": "T15-E3",
+    "S30-E1": "T19-E1",
+    "S30-E2": "T19-E2",
+    "S30-E3": "T19-E3",
+    "S31-E1": "D05-E1",
+    "S31-E2": "D05-E2",
+    "S32-E1": "D11-E1",
+    "S32-E2": "D11-E3",
+    "S32-E3": "D11-E2",
+    "S33-E1": "T23-E1",
+    "S33-E2": "T23-E2",
+    "S33-E3": "T23-E3",
+    "S34-E1": "T14-E1",
+    "S34-E2": "T14-E2",
+    "S35-E1": "T05-E1",
+    "S35-E2": "T05-E2",
+    "S36-E1": "T01-E1",
+    "S36-E2": "T01-E2",
+    "S36-E3": "T01-E3",
+    "S37-E1": "D02-E1",
+    "S37-E2": "D02-E2",
+    "S38-E1": "D15-E1",
+    "S38-E2": "D15-E2",
+    "S39-E1": "T06-E1",
+    "S39-E2": "T06-E2",
+    "S40-E1": "D03-E1",
+    "S40-E2": "D03-E2",
+    "S40-E3": "D03-E3"
+  }
+}

@@ -1,0 +1,126 @@
+# DC-GUARDIAN continuous integration.
+#
+# Runs the same full project check as `python check_all.py` on every push and
+# pull request. Checks that need a GPU environment (.venv-ppe / .venv-gru),
+# private biometric data, the processed SH17 dataset or the locally rebuilt
+# RAG knowledge base are reported as SKIP with a reason. No check calls OpenAI.
+name: CI
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python layers (Evidence, Reasoning, Response, Decision, backend)
+    # Pinned: ubuntu-latest moves to Ubuntu 26 on 2026-10-19; upgrade deliberately.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      neo4j:
+        # Same version as the local development database.
+        image: neo4j:2026.08.1
+        env:
+          NEO4J_AUTH: neo4j/ci-test-password
+        ports:
+          - 7687:7687
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p ci-test-password 'RETURN 1'"
+          --health-interval 10s --health-timeout 10s --health-retries 18
+    env:
+      # Throwaway credentials for the CI-only container above.
+      NEO4J_URI: bolt://127.0.0.1:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: ci-test-password
+      NEO4J_DATABASE: neo4j
+      DCG_INVESTIGATOR_ENABLED: "0"
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v7
+
+      # The 318 MB Random Forest model is stored in Git LFS. Cache it so the
+      # free LFS bandwidth allowance is spent once, not on every run.
+      - name: List Git LFS objects
+        run: git lfs ls-files --long | cut -d' ' -f1 | sort > .lfs-assets-id
+      - name: Restore Git LFS cache
+        uses: actions/cache@v6
+        with:
+          path: .git/lfs
+          key: lfs-${{ hashFiles('.lfs-assets-id') }}
+      - name: Fetch Git LFS objects
+        run: git lfs pull
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies (CPU PyTorch)
+        run: |
+          # The runner's preinstalled setuptools can carry known advisories.
+          python -m pip install --upgrade pip setuptools
+          # CPU wheels avoid a multi-GB CUDA download; GPU checks are skipped.
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+
+      # Security gates: known-vulnerable dependencies and medium/high static
+      # findings fail the build. Reviewed exceptions carry a "# nosec" reason.
+      - name: Dependency vulnerability audit
+        run: |
+          pip install pip-audit bandit
+          pip-audit --progress-spinner off --format json --output pip-audit.json || true
+          python .github/scripts/report_pip_audit.py pip-audit.json
+      - name: Static security analysis (Bandit, medium and high)
+        run: bandit -q -r presentation/backend/app reasoning response decision integration shared check_all.py -x "*/tests/*,*/test_*" -ll
+
+      - name: Load Neo4j schema and synthetic topology
+        run: python reasoning/graph/load_topology.py
+
+      - name: Full project check
+        run: python check_all.py --skip-live
+
+      - name: Upload check report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: check-report
+          path: logs/checks/
+          if-no-files-found: warn
+
+  frontend:
+    name: Frontend type-check, build and browser tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: presentation/frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: presentation/frontend/package-lock.json
+      - run: npm ci
+      - name: Dependency vulnerability audit (high and critical)
+        run: npm audit --audit-level=high
+      - run: npm run build
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser tests (review flows, mocked API)
+        run: npx playwright test
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: presentation/frontend/playwright-report/

@@ -12,6 +12,7 @@ Supported evidence domains:
     MAINTENANCE
     ENVIRONMENTAL
     PHYSICAL_SECURITY
+    SAFETY
 
 Correlation is deterministic and topology-based.
 No ML or LLM reasoning is performed here.

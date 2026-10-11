@@ -37,21 +37,15 @@ SCHEMA_FILE = (
 # Environment
 # ============================================================
 
-if not ENV_FILE.exists():
-
-    raise FileNotFoundError(
-        f".env file not found: {ENV_FILE}"
-    )
-
-
-load_dotenv(
-    dotenv_path=ENV_FILE
-)
+# A local .env file is optional: CI and deployments supply real
+# environment variables, which take precedence over the file.
+if ENV_FILE.exists():
+    load_dotenv(dotenv_path=ENV_FILE)
 
 
 NEO4J_URI = os.getenv(
     "NEO4J_URI",
-    "bolt://localhost:7687"
+    "bolt://127.0.0.1:7687"
 )
 
 NEO4J_USER = os.getenv(

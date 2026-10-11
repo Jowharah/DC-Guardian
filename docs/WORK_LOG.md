@@ -1,0 +1,202 @@
+# DC-GUARDIAN — Engineering work log
+
+Dated record of changes on `feature/presentation-dashboard`: what changed, why, the commit, how it was verified, and known caveats. Newest first. Detailed contracts live in the linked documents; this log is the index of *what happened when*.
+
+Conventions: commit hashes refer to `feature/presentation-dashboard`. "Verified" lists what was actually run. Local data results are time-specific, not permanent expected values.
+
+---
+
+## 2026-10-11 — Research strengthening, testing plan items 3–5, security gates
+
+### Uncertainty study: confidence intervals and a blind labelling pack — `59c7e89`
+
+- **Confidence intervals:** `evaluate.py` adds a scenario-level bootstrap (2,000 draws, separate seed; all earlier numbers unchanged). Test split: crisp F1 0.375–0.788, Bayesian F1 0.571–0.862, **difference +0.022 to +0.261**, Bayesian higher in 99.2% of resamples. The advantage is unlikely to be noise; its size is uncertain.
+- **Blind labelling pack** (`reasoning/uncertainty/labelling/`): the scenario file states its answers in titles and narratives, so teammates get a generated `pack/` instead: neutral shuffled IDs, events only, a facility brief and glossary, and `labels.csv` with the 85 candidate pairs. `score_labels.py` reports agreement (percent, Cohen's kappa) and re-evaluates both methods on the independent labels with bootstrap intervals. Contract tests check the pack leaks no answers and that the author's own labels reproduce the published F1 exactly.
+
+### Research P(Related) in the dashboard — `b7352bf`
+
+- Every pair from `GET /api/v1/correlations/pairs` carries the Bayesian estimate and factor explanation, shown in all pair views as a research estimate. Display only; the deterministic rule stays authoritative. Unobservable factors (PPE confidence) are marginalized; non-abnormal pairs are "not scored".
+- Local example: unauthorized Face + SSH in ZONE-A 0.96; PPE + SSH 0.51 (unlikely mechanism).
+
+### Group severity validation — `48cd511`
+
+- `presentation/backend/validation/group_severity_validation.py` applies the provisional group severity to groups formed from the labelled scenarios. Finding: severity does **not** separate genuine incidents from coincidences (test split genuine share HIGH 2/3, MEDIUM 5/8, LOW 4/6), because the level depends only on domain count. The policy stays provisional; validating levels needs severity labels.
+
+### Security gates in CI — `41ebea3`, `109c42b`, `5ac2996`
+
+- Bandit (medium/high), pip-audit and `npm audit` (high) now fail the build. Baseline locally: Bandit 0 medium/high after refactoring `evidence_review.rows()` to fixed parameterized queries and annotating reviewed-safe findings with their reason; pip-audit and npm audit 0.
+- CI found what local runs could not: the runner's preinstalled **setuptools 78.1.0** had two advisories (upgraded in CI). CPU PyTorch wheels are not on PyPI and are reported as not auditable.
+- pip-audit findings are emitted as annotations so they are readable without admin log access. Actions upgraded to their Node 24 releases.
+
+### Browser tests (testing plan item 4) — `109c42b`
+
+- Playwright 1.63.0, five tests against the built dashboard with a stateful mocked API (synthetic data): sign-in; PPE override shown as human verified; override validation; consented specialist evaluation then group review; Decision re-evaluation after a cleared input. Locally they use the installed Edge (`npm run test:e2e`); CI runs them on Chromium.
+- **Bug found by the tests:** before any verdict existed, the override list offered the detector's own status, which the backend rejects. The verdict endpoint now returns `detector_status` and the panel excludes it.
+
+### Pytest pilot (testing plan item 3) — `5ac2996`
+
+- The two graph contracts that left nodes behind (SSH and maintenance ingestion) are now pytest with a shared `reasoning/graph/conftest.py`: session Neo4j driver (skip with reason), `single()` query helper, `cleanup_graph()` before and after. Same 15 checks per file (counted), 12 named tests; ~1,290 lines became ~200. Reasoning suite 24/24; end-of-suite cleanup now removes 40 instead of 42 nodes.
+- **For review:** if the group likes this style, the remaining 21 Reasoning, 29 Evidence and 15 Response/integration script contracts can follow the same pattern (item 5).
+
+---
+
+## 2026-10-11 — Uncertainty study: dev-split disclosure
+
+- **What:** `UNCERTAINTY_REASONING.md` now states that seven dev scenarios (D06, D07, D08, D12, D13, D15, D16) were scored by hand with the Bayesian model while being written, so dev results are not independent; the test split (written unscored) is the one to cite.
+- **Why:** disclosed by the web session that wrote the scenarios; the local session could not know it from the commit history.
+- **Verified:** documentation only; no code, scenario or result changed.
+
+---
+
+## 2026-10-11 — Repository housekeeping and shared session context
+
+### Branch cleanup
+
+- **What:** five fully merged branches with no unique commits were archived as tags and deleted from GitHub: `archive/docs/security-assessment-report`, `archive/feature/phase3-grounded-reasoning`, `archive/feature/phase3-rag-foundation`, `archive/refactor/architecture-naming`, `archive/security/pre-dashboard-hardening`. Each tag was verified to point at the branch's last commit before deletion. `feature/uncertainty-reasoning` was deleted after its merge.
+- **Result:** GitHub branches are `main` and `feature/presentation-dashboard`. Recreate an archived branch with `git switch -c <name> archive/<name>`.
+
+### `CLAUDE.md`
+
+- **What:** a root `CLAUDE.md` that Claude Code reads at the start of every session, locally and on the web: project layers, non-negotiable rules, environment and run commands, how to verify (`check_all.py`, CI), conventions (branches, work log, commit style, line endings, test isolation) and where to look.
+- **Why:** the Claude Code web session that produced the uncertainty study started without this context: it could not run the full check and did not know the project's conventions. Workflow now: web sessions work on a branch and push; the local session reviews, runs the full check and merges; CI checks every push.
+
+---
+
+## 2026-10-11 — Reasoning under uncertainty (developed on `feature/uncertainty-reasoning`, merged)
+
+- **What:** a Bayesian correlation model that estimates P(Related) for a pair of abnormal events from time gap, topology, domain mechanism and evidence strength, with a per-factor explanation. Expert knowledge base with sources, 40 labelled DC-01 scenarios (16 dev, 24 test), offline evaluation against the frozen crisp rule, and 15 contract tests added to `check_all.py`. Details: [Uncertainty Reasoning](UNCERTAINTY_REASONING.md).
+- **Why:** the crisp zone/15-minute rule cannot express degrees of belief or explain itself, and the cross-domain claim had no quantitative evaluation.
+- **Commits:** `c0b9dc3` committed the knowledge base, scenarios and model code before the evaluation script (`22119f2`); the knowledge base is unchanged since. The commit order cannot show that no scenario was scored before that commit (same session, three minutes apart).
+- **Verified:** `python reasoning/uncertainty/test_uncertainty_reasoning.py` (15/15) and `python reasoning/uncertainty/evaluate.py` in a cloud session (Python 3.13, no Neo4j). Test split: crisp F1 0.593, Bayesian F1 0.731; alerts 65 single-domain / 44 crisp / 43 Bayesian.
+- **Merged** into `feature/presentation-dashboard` on 2026-10-11 after review: tests 15/15 and the evaluation reproduced byte for byte locally; full `python check_all.py` on the merged code: **52/52**. The branch was then deleted.
+- **Caveats:** author-labelled synthetic scenarios and a small sample; not yet wired into the dashboard or Decision layer.
+
+---
+
+## 2026-10-11 — Continuous integration and fresh-clone reproducibility
+
+### GitHub Actions — `.github/workflows/ci.yml`
+
+- **What:** on every push to `main` / `feature/**` and every pull request, a Python job runs `python check_all.py --skip-live` against a CI-only Neo4j 2026.08.1 container (topology loaded first with `reasoning/graph/load_topology.py`), and a frontend job runs `npm ci && npm run build`. The check report is uploaded as a build artifact.
+- **Cost notes:** CPU PyTorch wheels avoid a multi-GB CUDA download. The 318 MB Git LFS model is cached between runs; GitHub's free LFS bandwidth (1 GB/month) is spent only when the model changes or the cache expires.
+
+### Fresh clone now runs cleanly
+
+Simulated with a clean checkout (only Git-tracked files) before enabling CI. It first showed **11 failures** that a teammate or CI would hit:
+
+| Problem | Fix |
+|---|---|
+| Neo4j modules (`ingest_event`, `load_topology`, `validate_graph`) refused to start without a `.env` file, even when environment variables were set | `.env` is now optional; real environment variables take precedence; default URI `127.0.0.1` |
+| Checks needing private biometric data, the processed SH17 dataset or the locally rebuilt RAG knowledge base failed | `check_all.py` reports them as SKIP with the missing path |
+| Reasoning suite stopped at the Face adapter contract (private enrollment data), so later graph contracts never ran | `run_contract_tests.py` skips contracts whose private data is absent and continues |
+
+Result on a clean checkout: **35 passed, 0 failed, 15 skipped** (each skip names its reason). Locally with all data: still 51/51 and 24/24 Reasoning contracts.
+
+To rebuild the RAG knowledge base on a new machine: `python response/rag/fetch_sources.py`, then the parse, preprocess, chunk and `build_index.py` steps in `response/rag/` (see the Response architecture document).
+
+### First CI runs
+
+| Run | Result | Finding |
+|---|---|---|
+| 1 (`5cca0ce`) | Frontend ✓ · Python ✗ | Failure details were only in admin-only job logs |
+| 2 (`637d5fb`) | Frontend ✓ · Python ✗ | `check_all.py` now emits one error annotation per failed check plus the report as the job summary. Revealed a **real cross-platform bug**: the SSH detector refused to load on Linux |
+| 3 (`4d055ef`) | **Frontend ✓ · Python ✓** | Fixed |
+
+**The bug:** the SSH detector verifies `autoencoder_log_config.json` against a frozen SHA-256 before loading. Git stored the file with LF line endings and converted it to CRLF on Windows, where the digest was frozen, so any non-Windows machine failed the integrity check. The file is now marked `-text` in `.gitattributes` and stored with its exact frozen bytes; the pinned digest is unchanged. The other integrity-checked artifacts are binary and unaffected.
+
+**Follow-ups:** runners pinned to `ubuntu-24.04` (`ubuntu-latest` moves to Ubuntu 26 on 2026-10-19). GitHub warns that `actions/checkout@v4`, `setup-python@v5`, `cache@v4` and `upload-artifact@v4` target the deprecated Node.js 20 runtime; upgrade them when their Node 24 versions are confirmed.
+
+### Test hygiene
+
+- Moved `inspect_sh17_class_mapping.py` and `inspect_sh17_split_distribution.py` to `evidence/ppe_detection/tools/` (exploration scripts, not tests).
+
+---
+
+## 2026-10-10 / 11 — Correlation generalization, human verdicts, Investigator grounding, operations
+
+### Summary
+
+| Area | Before | After |
+|---|---|---|
+| Correlation | 3 hard-coded pair types; "unified" groups of 2+ events, SSH/Face/PPE only | Pairs for **any two events**; unified groups = **3+ events, any domains** |
+| Human review | Notes only on unified groups; PPE/Face stuck in "Source review" | **Verdicts on any Evidence** (confirm / override / inconclusive), audited |
+| Severity | Unchanged by humans; no group severity | Decisions **flagged and re-evaluated** on human-verified inputs; **provisional group severity** |
+| Investigator | Unified + operational + single modes; numeric checks for single SSH only | Adds **pair mode**; numeric + identity checks for **all domains and modes** |
+| Operations | No logs; checks scattered across scripts | `logs/` folder; `python check_all.py` runs every layer |
+| Test result | Several stale/failing tests unnoticed | **51/51** checks passing |
+
+### Correlation: any pair, groups of three or more
+
+- **What:** `correlation_pairs.py` returns every pair in one shape (`GET /api/v1/correlations/pairs`). The 3 dedicated matchers keep their stricter rules; the other 7 domain combinations use the Reasoning-layer contract (both abnormal, different domains, same zone, within 15 minutes; SERVER scope when both name the same server). Unified groups are connected components of 3+ events. Commit `67bdfcf`, UI `c2f8fbc`.
+- **Why:** the project is both research and an industrial prototype; correlation should not be limited to three combinations.
+- **Caveats:** group IDs hash their membership, so a group that grows gets a new ID and needs its specialist evaluation re-run. Rack-level scope is not yet resolved.
+
+### Investigator: pair mode and all-domain group context
+
+- **What:** `/api/v1/investigator/pairs/{id}/ask` for any pair; unified mode now sends every member of all five domains (previously Maintenance/Environment were dropped and only one member per domain kept); one shared provider helper. Commit `c14546b`.
+- **Fixed:** the reference check flagged pair IDs (which embed member Evidence IDs) as unknown.
+
+### Human verdicts on individual Evidence
+
+- **What:** `evidence_review.py`. Operators record CONFIRMED / OVERRIDDEN (with a human-verified status, e.g. PPE `COMPLIANT`) / INCONCLUSIVE plus a rationale, for any SSH, PPE, Face, Maintenance or Environmental Evidence. Detector output is never modified; each verdict is a hash-chained audit entry, checked by the audit-integrity endpoint. Domain operators review their own domain in their zones; viewers cannot. Commits `09113c5`, UI `5282a1c`.
+- **Effect:** an override to a non-concerning status removes the event from the pair list; an override to a concerning status makes it eligible for pairing. The Investigator receives the verdict (without rationale or reviewer identity).
+
+### Decisions after human verdicts
+
+- **What:** `decision_reevaluation.py`. A Decision whose input a human changed is flagged "re-evaluation required"; re-evaluation re-runs Decision Rules v1 on human-verified inputs (no model call) and is appended to history. A cleared input gives **no severity** (`INPUT_CLEARED_BY_HUMAN_VERDICT`), never a guessed lower level. Commit `73b6fb1`.
+- **Caveat:** escalating an event that never had a Decision does not create one yet (on roadmap).
+
+### Groups: cleared members kept, provisional severity
+
+- **What:** cleared members stay in their group, marked, so the group keeps its ID and review history; a group with fewer than two un-cleared members is dropped. `unified_severity.py` (`DCG-UNIFIED-SEVERITY-PROVISIONAL-v1`) applies Decision Rules v1 to active-concern member domains. Group disposition is verdict-aware; the queue shows "Member verdict changed" when a verdict follows the last group review. Commit `b785310`.
+- **Decision record:** group severity was previously "not implemented by design"; it was added at the operator's request and stays labelled provisional until validated against labelled scenarios.
+- **Local example:** ZONE-A (unauthorized Face + PPE + SSH) = HIGH; clearing the PPE keeps the same group at MEDIUM.
+
+### Investigator numeric and identity checks
+
+- **What:** `investigator_field_checks.py`. Labelled numeric claims for Maintenance, Environment, PPE and Face (plus existing SSH) are compared with saved fields at the claim's precision; person IDs must belong to a Face record in context; every member of pairs/groups is checked against its own record; a domain with several members is skipped as ambiguous. Commit `23fb19b`.
+- **Limit:** only explicitly labelled claims are checked; narrative and causal claims remain unverified.
+
+### Performance
+
+- **Found:** the review-decision endpoint took ~18 s, saturating the server under the queue's 5-second polling (reviews appeared stuck). Cause: a new Neo4j connection (~2 s) per Face authorization check, run several times per request.
+- **Fixed:** shared driver, Evidence loaded once per grouping. Review decision 18.5 s → 0.12 s; groups 8.3 s → 0.09 s. Commit `4812bae`.
+- **Config:** `NEO4J_URI` should use `127.0.0.1`, not `localhost`, on Windows (2.04 s → 0.00 s per connection). Applied to the local `.env`; noted in `.env.example`.
+
+### Review workflow fixes
+
+- Specialist evaluation can be run from the review form after explicit consent (`01fb563`); stale-review messages explain what to do (`5282a1c`).
+- The fake test incident `DCG-TEST-001` had leaked into the real database from an unisolated test; removed, and all backend tests now use a temporary database (`478a45e`).
+
+### Repository cleanup and test isolation — `478a45e`
+
+- Removed stray logs, an old build log, a stale `phase1/` copy and three unused frontend components; tracked `package-lock.json`; ignored build caches.
+- Reasoning contract runner removes `SCENARIO-*` test nodes from Neo4j after the suite (previously 42 test nodes had accumulated in the shared graph) and forces UTF-8 output (DeepFace's emoji crashed logged runs).
+
+### Operations: logs and full project check — `6736540`
+
+- **Logs:** the backend writes `logs/api_access.log`, `logs/backend.log`, `logs/errors.log` (rotating, git-ignored; no bodies, headers, credentials or query strings). See `logs/README.md`.
+- **One command:** `python check_all.py` runs runtime, Evidence (GPU scripts in their component environments), Reasoning, Response, Decision/integration, backend tests, frontend build and a GET-only live API test; report in `logs/checks/`. Never calls OpenAI.
+- **Stale tests fixed** (`a03772e`): PPE final-test (policy frozen after the locked evaluation) and integration service contract (Decision rules connected since `d4cb326`).
+
+### Verified (2026-10-11)
+
+`python check_all.py`: **51/51** after the private Face image `validation_known/P005` was restored by the operator — runtime 4/4, Evidence 29/29, Reasoning 24/24, Response 15/15, Decision/integration 4/4, backend 305 tests, frontend build, live API 54 GET requests with 0 server errors. Backend access log at the time: 325 requests, all 200, slowest 0.27 s.
+
+Not covered automatically: browser click-through of the dashboard, and live OpenAI Investigator answers (everything around the provider call is tested with fakes).
+
+---
+
+## Testing plan (agreed 2026-10-11)
+
+Keep every existing check; change how they are organized. Status is updated as items land.
+
+| # | Item | Why | Status |
+|---|---|---|---|
+| 1 | GitHub Actions: run the fast tests on every push | Automatic ✓/✗ per commit | **Done** 2026-10-11 (`ci.yml`; green since `4d055ef`) |
+| 2 | Move `inspect_sh17_*.py` to `evidence/ppe_detection/tools/` | Exploration scripts, not tests | **Done** 2026-10-11 |
+| 3 | Pilot: convert Reasoning graph/correlation scripts to pytest with shared Neo4j fixtures and markers (`neo4j`, `gpu`, `private_data`) | ~19,400 lines for 541 checks; 13 copies of driver/cleanup code; stops at first failure; order-dependent | **Pilot done** 2026-10-11 (SSH and maintenance ingestion); awaiting group review |
+| 4 | Browser tests (Playwright) for verdict, group review and Decision re-evaluation | Frontend has no automated tests | **Done** 2026-10-11 (5 tests, in CI) |
+| 5 | Convert remaining script tests (Evidence, Response, integration) after the pilot is reviewed | Single runner, per-test results, selectable tests | Planned |
+
+Rule for conversions: the same checks must still run — assertion counts are compared before and after.
