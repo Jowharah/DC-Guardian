@@ -87,11 +87,18 @@ def facility_brief() -> list[str]:
     return lines + [""]
 
 
-def event_line(event: dict, start: datetime) -> str:
+def event_view(event: dict, start: datetime) -> dict:
+    """What an operator sees of one event: relative time, domain, state, details."""
     when = datetime.fromisoformat(event["timestamp"].replace("Z", "+00:00"))
     minute = int((when - start).total_seconds() // 60)
     details = " · ".join(f"{k.replace('_id', '').replace('_', ' ')}: {event[k]}" for k in VISIBLE[2:] if event.get(k) is not None)
-    return f"| {event['neutral_id']} | +{minute} min ({when:%H:%M}) | {event['domain']} | {event['state']} | {details} |"
+    return {"id": event["neutral_id"], "time": f"+{minute} min ({when:%H:%M})", "minute": minute,
+            "domain": event["domain"], "state": event["state"], "details": details}
+
+
+def event_line(event: dict, start: datetime) -> str:
+    v = event_view(event, start)
+    return f"| {v['id']} | {v['time']} | {v['domain']} | {v['state']} | {v['details']} |"
 
 
 def build() -> dict:
@@ -110,9 +117,19 @@ def build() -> dict:
         start = datetime.fromisoformat(events[0]["timestamp"].replace("Z", "+00:00"))
         blind += [f"### Scenario {sid}", "", "| Event | Time | Domain | State | Details |", "|---|---|---|---|---|"]
         blind += [event_line(e, start) for e in events] + [""]
+        views = {e["neutral_id"]: event_view(e, start) for e in events}
         for left, right in candidate_pairs(scenario):
             a, b = sorted([left["neutral_id"], right["neutral_id"]])
-            rows.append({"scenario": sid, "pair": f"{a} + {b}", "event_a": a, "event_b": b,
+            va, vb = views[a], views[b]
+            others = " | ".join(f"{v['id']} {v['time']} {v['domain']} {v['state']}"
+                                for k, v in views.items() if k not in (a, b)) or "none"
+            # One self-contained row: everything needed to judge the pair, then the three columns to fill.
+            rows.append({"scenario": sid, "pair": f"{a} + {b}",
+                         "event_a": a, "a_time": va["time"], "a_domain": va["domain"], "a_state": va["state"],
+                         "a_details": va["details"],
+                         "event_b": b, "b_time": vb["time"], "b_domain": vb["domain"], "b_state": vb["state"],
+                         "b_details": vb["details"],
+                         "minutes_apart": abs(vb["minute"] - va["minute"]), "other_events_in_scenario": others,
                          "related": "", "confidence": "", "note": ""})
 
     PACK_DIR.mkdir(parents=True, exist_ok=True)
@@ -138,8 +155,10 @@ def build() -> dict:
         "- `confidence`: **1** guess · **2** fairly sure · **3** sure.",
         "- `note` (optional): your reason, especially when unsure.",
         "",
-        f"There are {len(rows)} rows in {len(scenarios)} scenarios; expect about 60–90 minutes. Events are in "
-        "`scenarios_blind.md`; event IDs in the CSV refer to it. Save the CSV (keep the columns) and send it back.",
+        f"There are {len(rows)} rows in {len(scenarios)} scenarios; expect about 60–90 minutes. Each row of "
+        "`labels.csv` shows both events in full, the minutes between them and the other alerts in the same scenario, "
+        "so you can work in Excel alone; `scenarios_blind.md` shows each scenario as a whole if you prefer. "
+        "**Make a copy of `labels.csv`, fill in the copy**, save it as CSV (keep the columns) and send it back.",
         "",
         *facility_brief(),
         "## What the alerts mean",
@@ -151,7 +170,7 @@ def build() -> dict:
     (PACK_DIR / "scenarios_blind.md").write_text(
         "\n".join(["# Scenarios (blind)", "", "Times are minutes from the first alert in the scenario.", ""] + blind),
         encoding="utf-8")
-    with open(PACK_DIR / "labels.csv", "w", newline="", encoding="utf-8") as handle:
+    with open(PACK_DIR / "labels.csv", "w", newline="", encoding="utf-8-sig") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
