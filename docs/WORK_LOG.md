@@ -6,6 +6,14 @@ Conventions: commit hashes refer to `feature/presentation-dashboard`. "Verified"
 
 ---
 
+## 2026-10-11 — Uncertainty study: dev-split disclosure
+
+- **What:** `UNCERTAINTY_REASONING.md` now states that seven dev scenarios (D06, D07, D08, D12, D13, D15, D16) were scored by hand with the Bayesian model while being written, so dev results are not independent; the test split (written unscored) is the one to cite.
+- **Why:** disclosed by the web session that wrote the scenarios; the local session could not know it from the commit history.
+- **Verified:** documentation only; no code, scenario or result changed.
+
+---
+
 ## 2026-10-11 — Repository housekeeping and shared session context
 
 ### Branch cleanup

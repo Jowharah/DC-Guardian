@@ -65,8 +65,8 @@ The probability is the plausibility of a shared incident under an expert model. 
 
 Scenarios cover true incidents (cooling cascades, intrusions followed by console attacks, tailgaters without PPE, engineers dispatched to failing drives, fire and leak responses), coincidences (internet scanners, seasonal humidity, worn drives next to unrelated visitors), two simultaneous incidents in one hall, and hard cases where either method should fail.
 
-- **dev (16):** written first and used while writing the model code.
-- **test (24):** written afterwards without scoring them.
+- **dev (16):** written first and used while writing the model code. While writing them, the author worked out the Bayesian score by hand for seven of them (D06, D07, D08, D12, D13, D15, D16) to check that they were informative cases. Dev results are therefore not independent of the model.
+- **test (24):** written afterwards without scoring them. **Cite the test split.**
 
 The knowledge base, scenarios and model code were committed (`c0b9dc3`) before the evaluation script and results (`22119f2`), and the knowledge base has not changed since. Both commits come from one working session three minutes apart, so the commit order shows only that the knowledge base was not changed after it was committed; it cannot show that no scenario was scored before that commit. Independent labelling (see Limitations) is the stronger safeguard.
 
@@ -81,7 +81,7 @@ Regenerate with `python reasoning/uncertainty/evaluate.py`; the full per-pair ta
 | Crisp rule (frozen) | 0.615 | 0.571 | 0.593 | 10 | 12 |
 | Bayesian, P ≥ 0.5 | **0.792** | **0.679** | **0.731** | 5 | 9 |
 
-On the dev split the Bayesian model also leads (F1 0.706 vs 0.647). Across all 85 pairs: 0.721 vs 0.614. The Bayesian probability ranks pairs well without any threshold: test average precision 0.829, ROC-AUC 0.838.
+On the dev split the Bayesian model also leads (F1 0.706 vs 0.647), but some dev scenarios were scored by hand while being written, so that figure is not independent evidence. Across all 85 pairs: 0.721 vs 0.614. The Bayesian probability ranks pairs well without any threshold: test average precision 0.829, ROC-AUC 0.838.
 
 **Operator view, test split (18 incidents):**
 
@@ -108,7 +108,7 @@ Correlation of either kind cuts alerts by about a third against single-domain al
 
 ## Limitations
 
-- **Author-labelled scenarios.** The same author wrote the knowledge base and the scenarios, so there is a risk of shared assumptions. The dev/test split, the commit order and the sensitivity analysis reduce but do not remove it. Independent labelling by a classmate or practitioner would strengthen the result.
+- **Author-labelled scenarios.** The same author wrote the knowledge base and the scenarios, so there is a risk of shared assumptions. Seven dev scenarios were also scored by hand while being written. Unscored test scenarios, the unchanged knowledge base and the sensitivity analysis reduce but do not remove this risk. Independent labelling by a classmate or practitioner would strengthen the result.
 - **Small sample.** 59 test pairs; a difference of a few pairs moves F1 by several points. No confidence intervals are claimed.
 - **Synthetic setting.** One three-zone topology and an assumed cooling dependency; no real multi-domain data exists for the project.
 - **Naive structure.** Conditional independence of the four factors is a simplification (time and topology interact in cascades, as shown above).
