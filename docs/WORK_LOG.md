@@ -6,6 +6,20 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — Monitoring Center summary redesign
+
+- **What:** the four total-count cards (including the redundant "Operating mode" card) became an attention-first summary (`MonitoringSummary.tsx`):
+  - **Live indicator** in the header (live / delayed / offline, from the last API answer below 500; network errors and 5xx count as failures, a 404/409 does not). Replaces "refresh every 5 seconds".
+  - **Needs attention:** abnormal detector results without a human verdict, unified groups without a current saved specialist evaluation (404 or 409 from the saved-specialists endpoint, polled every 10 s), and Decisions flagged for re-evaluation.
+  - **Abnormal detector results** (with the last-24 h count), **Correlations** (groups, pairs, groups awaiting specialists), **Saved Decisions** split HIGH/MEDIUM/LOW with the re-evaluation count.
+  - **Domain strip:** abnormal/total and time since the last record per domain; the dot goes grey after 24 h without data.
+  - Cards and domain chips filter the feed ("Showing: … · Show all"); correlation rows count as abnormal because they only link abnormal Evidence.
+- **Shared logic:** `detectorOutcomes.ts` holds the abnormal-state definition and per-record outcomes, used by both Monitoring Center and Analytics so their counts agree.
+- **Verified:** `tsc`, `npm run build`, Playwright 7 passed (new summary/filter test); screenshots at 1500 px and 420 px checked.
+- **Caveats:** display only; no new severity logic. The "not evaluated" check adds one GET per unified group every 10 s.
+
+---
+
 ## 2026-10-11 — Logo in the dashboard
 
 - **What:** the operator's logo set (`logo/`: mark, dark/light lockups, PNG sizes, favicons) is now the source of the dashboard branding. Copies served by Vite live in `presentation/frontend/public/` (favicon.ico, favicon-32.png, mark SVG, 256 px mark for touch icons, dark-background lockup).

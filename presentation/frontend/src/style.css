@@ -403,3 +403,23 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .authLockup{display:block;width:100%;max-width:320px;height:auto;margin:0 auto 4px}
 @media(max-width:800px){.investigatorExpandedShell .sidebar .brand{justify-content:center}.investigatorExpandedShell .sidebar .brandName{display:none}}
 .sidebar .brand+.subtle{margin-left:44px}
+/* Monitoring summary: live status, action cards, domain strip. */
+.headerStatus{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.liveStatus{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.06em;color:#A794B0;white-space:nowrap}
+.liveDot{width:8px;height:8px;border-radius:50%;background:#7B6A8A}
+.live-live .liveDot{background:#59C79A;box-shadow:0 0 0 3px rgba(89,199,154,.18)}.live-live{color:#D8FFF0}
+.live-delayed .liveDot{background:#E0A449}.live-delayed{color:#F4D9A6}
+.live-offline .liveDot{background:#FF6F8E}.live-offline{color:#FF9EAF}
+.summaryCard{display:flex;flex-direction:column;align-items:flex-start;text-align:left;font-weight:400;color:inherit;background:#24162F;border:1px solid #524184;cursor:pointer;min-width:0}
+.summaryCard:hover{border-color:#8392CF}.summaryCard.selected{border-color:#EC7BDD;box-shadow:0 0 0 1px #EC7BDD inset}
+.summaryCard.summaryAlert strong{color:#F7A8EC}
+.summaryDetail{display:block;margin-top:8px;font-size:12px;color:#A794B0;line-height:1.6}
+.summaryDetail .severity{font-size:11px}
+.domainStrip{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+.domainChip{display:inline-flex;align-items:center;gap:7px;background:#21142D;border:1px solid #524184;border-radius:999px;padding:7px 12px;font-weight:400;color:#F4E5F3;font-size:12px}
+.domainChip small{color:#A794B0}.domainChip.selected{border-color:#EC7BDD}
+.freshDot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.fresh-fresh{background:#59C79A}.fresh-recent{background:#E0A449}.fresh-stale{background:#6B5C78}
+.domainStripNote{font-size:11px}
+.focusChip{margin:0 0 10px;font-size:13px;color:#E3B8E0}
+.linkButton{background:none;border:0;padding:0;color:#F7A8EC;text-decoration:underline;font-weight:600;cursor:pointer}

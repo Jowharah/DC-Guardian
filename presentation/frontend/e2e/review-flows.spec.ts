@@ -103,3 +103,23 @@ test("analytics shows detector outcomes per domain with human verdicts beside th
   await expect(page.getByText(PPE_ID).first()).toBeVisible();
   await expect(page.getByText("No human verdict").first()).toBeVisible();
 });
+
+test("monitoring summary counts what needs attention and filters the feed", async ({page}) => {
+  await installMockApi(page);
+  await signIn(page);
+  await expect(page.getByRole("status").filter({hasText: /Live · updated/})).toBeVisible();
+  // Mock: PPE non-compliant, Face recognized, SSH anomaly (all without verdicts); one group not yet evaluated.
+  const attention = page.locator(".summaryCard", {hasText: "Needs attention"});
+  await expect(attention).toContainText("1 group not evaluated");
+  await expect(page.locator(".summaryCard", {hasText: "Correlations"})).toContainText("1 group");
+  await expect(page.getByText("Operating mode")).toHaveCount(0);
+
+  await attention.click();
+  await expect(page.getByText("Showing:")).toContainText("Items needing attention");
+  await expect(page.locator("button.feedRow", {hasText: "Unified correlation"})).toBeVisible();
+  await page.getByRole("button", {name: "Show all"}).click();
+  await expect(page.getByText("Showing:")).toHaveCount(0);
+
+  await page.locator(".domainChip", {hasText: "Maintenance"}).click();
+  await expect(page.locator("button.feedRow", {hasText: "Unified correlation"})).toHaveCount(0);
+});
