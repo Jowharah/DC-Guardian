@@ -1,6 +1,6 @@
 # DC-GUARDIAN — Development history and current implementation
 
-**Snapshot:** 2026-10-10, `feature/presentation-dashboard`  
+**Snapshot:** 2026-10-11, `feature/presentation-dashboard` · dated change log: [Work Log](WORK_LOG.md)  
 **Purpose:** consolidate earlier model, reasoning, response, decision, presentation, and security stages without rewriting historical validation reports.
 
 ## Architecture
@@ -60,7 +60,7 @@ React + TypeScript + Vite frontend, FastAPI backend, SQLite presentation state, 
 - **Analytics Dashboard:** domain distribution, saved severity, zone distribution, multi-domain groups, receipt-time filtering, activity counts, review/workflow charts, and click-through record drill-down.
 - **Human Review Queue:** source-review status, unified candidates, deterministic review requirements, saved Decision review requirements, and recorded human outcomes.
 - **Audit UI:** administrator-triggered local hash-chain integrity verification.
-- **AI Investigator sidebar:** currently a disabled placeholder; approved read-only tools and grounded chat are not connected.
+- **AI Investigator sidebar:** opt-in, read-only OpenAI explanations over authorized Evidence, pairs, operational pairs and unified groups, with source references and numeric/identity field checks (see [AI Investigator](AI_INVESTIGATOR.md)).
 
 ## Stage 5 — Human oversight and security
 
@@ -72,6 +72,17 @@ React + TypeScript + Vite frontend, FastAPI backend, SQLite presentation state, 
 - A recorded `NEEDS_FOLLOW_UP` remains outstanding; no outcome silently changes Evidence or unified Decision severity.
 
 **Security limitations:** SQLite audit hashes are not independently anchored; local credentials and a controlled synthetic topology are not production security controls. See [Security Assessment and Hardening](DC_Guardian_Security_Assessment_and_Hardening.md) for the earlier scoped baseline and [Remaining Roadmap](REMAINING_ROADMAP.md) for outstanding work.
+
+## Stage 6 — Generalized correlation and human verdicts (October 2026)
+
+- Pairs for any two correlated events; unified groups of three or more events across any domains.
+- Audited human verdicts (confirm / override / inconclusive) on individual Evidence in all five domains; detector output is never modified.
+- Saved Decisions are flagged and deterministically re-evaluated when a verdict changes their input; cleared inputs yield no severity.
+- Cleared group members stay marked in their group; provisional group severity (`DCG-UNIFIED-SEVERITY-PROVISIONAL-v1`).
+- Investigator pair mode and numeric/identity field checks for every domain and mode.
+- Backend log files and a one-command full project check (`python check_all.py`).
+
+Details, commits and verification: [Work Log](WORK_LOG.md).
 
 ## Demonstrated local scenario results (not universal acceptance tests)
 

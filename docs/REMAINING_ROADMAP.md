@@ -20,6 +20,10 @@
 | AI Investigator | **Implemented research prototype**; numeric/identity field checks for all domains and modes | Narrative/causal claim grounding, abstention evaluation, outbound privacy review, tool audit, prompt-injection evaluation, cost limits and production hardening; see [AI Investigator](AI_INVESTIGATOR.md) |
 | Deployment / production security | Pending | Production authentication, TLS, secrets, monitoring, dependency audit, threat modeling, penetration tests |
 
+## Testing modernization (agreed 2026-10-11)
+
+Keep every existing check; reorganize them. Tracked with status in [Work Log — Testing plan](WORK_LOG.md#testing-plan-agreed-2026-10-11): GitHub Actions for fast tests, move exploration scripts out of `tests/`, pytest pilot for Reasoning graph/correlation with shared Neo4j fixtures and markers, Playwright browser tests for key review flows, then remaining script conversions.
+
 ## Suggested order
 
 1. Full API authorization and protected artifact-access regression; browser-level end-to-end test.
