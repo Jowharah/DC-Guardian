@@ -247,6 +247,18 @@ def main() -> int:
     report = "\n".join(lines) + "\n"
     (out_dir / "report.md").write_text(report, encoding="utf-8")
     (ROOT / "logs" / "checks" / "latest.md").write_text(report, encoding="utf-8")
+    if os.environ.get("GITHUB_ACTIONS"):
+        # Readable on the run page without log access: one error annotation
+        # per failed check, and the full report as the job summary.
+        for layer, name, status, _, detail in rows:
+            if status == "FAIL":
+                tail = "; ".join((out_dir / (name.replace("/", "_").replace(":", "_") + ".log"))
+                                 .read_text(encoding="utf-8").strip().splitlines()[-6:])
+                print(f"::error title={layer}: {name}::{detail} | {tail}"[:3000].replace("\n", " "))
+        summary = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary:
+            with open(summary, "a", encoding="utf-8") as handle:
+                handle.write(report)
     print(f"\n{counts['PASS']} passed, {counts['FAIL']} failed, {counts['SKIP']} skipped")
     print(f"Report: {out_dir.relative_to(ROOT) / 'report.md'}")
     return 1 if counts["FAIL"] else 0
