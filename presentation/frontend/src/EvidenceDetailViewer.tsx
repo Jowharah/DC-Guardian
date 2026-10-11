@@ -20,6 +20,6 @@ export default function EvidenceDetailViewer({scenarioId,event}:{scenarioId:stri
   finally{setLoading(false)}
  }
  return <div className="evidenceDetail"><button type="button" className="closeIncident" onClick={()=>void toggle()} aria-expanded={open}>{open?"Hide source details":"Inspect source details"}</button>
- {open&&<div className="evidenceItem">{loading?<p>Loading authorized evidence…</p>:error?<p role="status">{error==="API request failed (403)"?"Access restricted for your role or zone.":error==="API request failed (404)"?"Detailed Evidence unavailable for this incident. Run a new controlled scenario.":error}</p>:detail?<><p className="muted">{detail.availability.replaceAll("_"," ")} · {detail.source_type}</p>{Object.entries(detail.details).map(([group,value])=><div key={group}><h5>{group.replaceAll("_"," ")}</h5><ValueView value={value}/></div>)}</>:null}</div>}
+ {open&&<div className="evidenceItem">{loading?<p>Loading authorized evidence…</p>:error?<p role="status">{error.startsWith("API request failed (403)")?"Access restricted for your role or zone.":error.startsWith("API request failed (404)")?"Detailed Evidence unavailable for this incident. Run a new controlled scenario.":error}</p>:detail?<><p className="muted">{detail.availability.replaceAll("_"," ")} · {detail.source_type}</p>{Object.entries(detail.details).map(([group,value])=><div key={group}><h5>{group.replaceAll("_"," ")}</h5><ValueView value={value}/></div>)}</>:null}</div>}
  </div>;
 }

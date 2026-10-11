@@ -6,6 +6,16 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-11 — Specialist grounding failures, verdict badge, detector-outcome analytics
+
+- **Verdict badge** (`f32b7a0`): on PPE, Face, Maintenance and Environment feed rows the human-verdict pill was a fifth grid cell and wrapped onto its own line; it now shares the status cell (as SSH rows did) and never wraps. Specialist failures in the maintenance/environment ingestion workflows and the unified endpoint are now logged to `logs/errors.log` (type and message only) instead of being swallowed.
+- **Unified specialist 503, cause found from that log:** `ValueError: Supported or partially supported assessments must cite retrieved evidence.` The Operations specialist retrieved knowledge with a generic query ("Data center operations evidence review"), got unrelated passages, answered SUPPORTED without citations, and the grounding check rejected it, which failed the whole group. Fix: a domain-specific retrieval query per specialist (`DOMAIN_QUERIES`), one retry when an answer fails the grounding check (the check is unchanged; provider errors are not retried), and a 503 detail that names the specialist. Groups stay all-or-nothing on purpose: synthesis and review assume every domain was assessed. The dashboard now shows the server's error detail instead of only "API request failed (503)".
+- **Analytics:** new "Detector outcomes by domain" panel (state counts per domain, abnormal share, human confirmed/overridden/inconclusive counts beside the detector result, drill-down), plus "Abnormal detector results" and "Human verdicts recorded" cards. Abnormal follows the Reasoning layer's states; environment uses the detector's own `anomaly_detected` flag. Display only, no severity.
+- **Verified:** backend pytest 319 passed (new `test_unified_specialist_grounding.py`, stub agents, no OpenAI); `npm run build`; Playwright 6 passed (new analytics test).
+- **Caveats:** the retry costs one extra OpenAI call when it triggers. The first two standalone maintenance events from 2026-10-11 show RESPONSE UNAVAILABLE from before logging existed; a later maintenance event completed, so the cause was likely the same intermittent grounding failure, but this is not confirmed. Single PPE and Face events still have no standalone specialist.
+
+---
+
 ## 2026-10-11 — LLM rater for the uncertainty study
 
 - **What:** ChatGPT labelled the blind pack; scored with `score_labels.py` into `reasoning/uncertainty/labelling/results/llm-chatgpt.*` (labels kept as `llm-chatgpt_labels.csv`).

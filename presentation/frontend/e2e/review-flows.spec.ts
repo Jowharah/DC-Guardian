@@ -91,3 +91,15 @@ test("a cleared input flags the Decision and re-evaluation removes its severity"
   await expect(page.getByText("original detector-based severity:")).toBeVisible();
   expect(state.requests.some(r => r.method === "POST" && r.path === `/api/v1/decisions/ssh/${SSH_ID}/reevaluate`)).toBe(true);
 });
+
+test("analytics shows detector outcomes per domain with human verdicts beside them", async ({page}) => {
+  await installMockApi(page);
+  await signIn(page);
+  await page.getByRole("button", {name: /Analytics Dashboard/}).click();
+  const panel = page.locator("section", {has: page.getByRole("heading", {name: "Detector outcomes by domain"})});
+  const ppe = panel.locator(".analyticsOutcome", {hasText: "Safety / PPE"});
+  await expect(ppe).toContainText("1 records · 1 abnormal (100%)");
+  await ppe.getByRole("button", {name: /NON COMPLIANT/}).click();
+  await expect(page.getByText(PPE_ID).first()).toBeVisible();
+  await expect(page.getByText("No human verdict").first()).toBeVisible();
+});

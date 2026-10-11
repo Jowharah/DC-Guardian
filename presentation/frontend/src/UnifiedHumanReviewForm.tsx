@@ -18,7 +18,7 @@ export default function UnifiedHumanReviewForm({id,canSubmit}:{id:string;canSubm
   if(!consent||evaluating)return;
   setEvaluating(true);setEvaluation("");
   try{await evaluateUnifiedSpecialists(id);setEvaluation("Specialist evaluation saved. Review recording unlocks within a few seconds.");setConsent(false)}
-  catch(e){setEvaluation(e instanceof Error&&e.message.includes("(403)")?"Only administrators can run the specialist evaluation.":e instanceof Error&&e.message.includes("(503)")?"Specialist evaluation unavailable: check that the OpenAI key is configured and approved knowledge is available.":e instanceof Error?e.message:"Specialist evaluation failed")}
+  catch(e){setEvaluation(e instanceof Error&&e.message.includes("(403)")?"Only administrators can run the specialist evaluation.":e instanceof Error&&e.message.includes("(503)")?"Specialist evaluation unavailable. "+e.message.replace(/^API request failed \(503\):? ?/,""):e instanceof Error?e.message:"Specialist evaluation failed")}
   finally{setEvaluating(false)}
  }
  async function submit(){

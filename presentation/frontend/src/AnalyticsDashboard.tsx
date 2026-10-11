@@ -1,7 +1,11 @@
 import {useEffect,useState} from "react";
-import {getUnifiedHumanReviews,type HumanReviewRecord} from "./api";
+import {getUnifiedHumanReviews,type HumanReviewRecord,type LatestEvidenceReview} from "./api";
 import type {Incident,PublishedSSH,PPEObservation,FaceObservation,MaintenanceEvent,EnvironmentalEvent,OperationalCorrelation,UnifiedCorrelationGroup} from "./api";
-type Props={incidents:Incident[];ssh:PublishedSSH[];ppe:PPEObservation[];face:FaceObservation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];operational:OperationalCorrelation[];unified:UnifiedCorrelationGroup[];openMonitoring:()=>void};
+type Props={incidents:Incident[];ssh:PublishedSSH[];ppe:PPEObservation[];face:FaceObservation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];operational:OperationalCorrelation[];unified:UnifiedCorrelationGroup[];verdicts?:Record<string,LatestEvidenceReview>;openMonitoring:()=>void};
+// Abnormal as the Reasoning layer defines it (correlation_rules.ABNORMAL_STATES plus the
+// physical-security states; the PPE feed reports NON_COMPLIANT); environment uses the detector's own anomaly flag. Display only.
+const ABNORMAL=new Set(["EXPLICIT_SECURITY_EVENT","HIGH_CONFIDENCE_ANOMALY","ANOMALY_CANDIDATE","AT_RISK","NON_COMPLIANT","PPE_NON_COMPLIANT","UNKNOWN_PERSON","UNAUTHORIZED"]);
+const words=(value:string)=>value.replaceAll("_"," ");
 const palette=["#8564c8","#299eaa","#e0a449","#d76e96","#6592dc"];
 function Donut({items,onSelect}:{items:{name:string;value:number}[];onSelect?:(name:string)=>void}){
  const total=items.reduce((a,b)=>a+b.value,0);
@@ -16,7 +20,7 @@ function Bars({items,onSelect}:{items:{name:string;value:number}[];onSelect?:(na
  const max=Math.max(1,...items.map(x=>x.value));
  return <div className="analyticsBars">{items.map((item,i)=><button type="button" key={item.name} className="analyticsBarRow" disabled={!onSelect||!item.value} onClick={()=>onSelect?.(item.name)}><span>{item.name}</span><div className="analyticsTrack"><div style={{width:`${item.value/max*100}%`,background:palette[i%palette.length]}}/></div><b>{item.value}</b></button>)}</div>
 }
-export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,environment,operational,unified,openMonitoring}:Props){
+export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,environment,operational,unified,verdicts={},openMonitoring}:Props){
 
  const [range,setRange]=useState("all");
  const [audit,setAudit]=useState<Record<string,HumanReviewRecord[]>>({});
@@ -44,7 +48,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
    return()=>{active=false;clearInterval(timer)};
  },[groupIds]);
 
- const [selection,setSelection]=useState<{type:"domain"|"severity"|"zone"|"correlation"|"review";value:string}|null>(null);
+ const [selection,setSelection]=useState<{type:"domain"|"severity"|"zone"|"correlation"|"review"|"outcome";value:string}|null>(null);
  const cutoff=range==="all"?-Infinity:Date.now()-({"24h":1,"7d":7,"30d":30}[range]??0)*86400000;
  const valid=(value:string|null|undefined)=>{const t=Date.parse(value??"");return Number.isFinite(t)&&t<=Date.now()&&t>=cutoff};
  const sources=[
@@ -54,6 +58,25 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
   ...maintenance.map(x=>({id:x.event_id,kind:"Maintenance",zone:x.zone_id,time:x.received_at})),
   ...environment.map(x=>({id:x.event_id,kind:"Environmental",zone:x.zone_id,time:x.received_at}))
  ].filter(x=>valid(x.time));
+ // Detector result per published record, with any recorded human verdict beside it (never replacing it).
+ const outcomeRecords=[
+  ...ssh.filter(x=>valid(x.received_at)).map(x=>({domain:"Cybersecurity",key:"ssh:"+x.event_id,id:x.event_id,zone:x.zone_id,state:x.evidence_state})),
+  ...ppe.filter(x=>valid(x.created_at)).map(x=>({domain:"Safety / PPE",key:"ppe:"+x.observation_id,id:x.observation_id,zone:x.zone_id,state:x.status})),
+  ...face.filter(x=>valid(x.created_at)).map(x=>({domain:"Physical Security",key:"face:"+x.observation_id,id:x.observation_id,zone:x.zone_id,state:x.recognition_status})),
+  ...maintenance.filter(x=>valid(x.received_at)).map(x=>({domain:"Maintenance",key:"maintenance:"+x.event_id,id:x.event_id,zone:x.zone_id,state:x.assessment.assessment})),
+  ...environment.filter(x=>valid(x.received_at)).map(x=>({domain:"Environmental",key:"environment:"+x.event_id,id:x.event_id,zone:x.zone_id,state:x.assessment.assessment,flag:x.assessment.anomaly_detected}))
+ ].map(x=>({...x,abnormal:"flag" in x?x.flag===true:ABNORMAL.has(x.state),verdict:verdicts[x.key]}));
+ const outcomeDomains=["Cybersecurity","Safety / PPE","Physical Security","Maintenance","Environmental"].map(domain=>{
+  const records=outcomeRecords.filter(x=>x.domain===domain);
+  const states=new Map<string,number>();
+  for(const r of records)states.set(r.state,(states.get(r.state)??0)+1);
+  const count=(v:string)=>records.filter(r=>r.verdict?.verdict===v).length;
+  return {domain,total:records.length,abnormal:records.filter(r=>r.abnormal).length,
+   states:[...states].sort((a,b)=>b[1]-a[1]).map(([state,value])=>({name:words(state),value,state})),
+   confirmed:count("CONFIRMED"),overridden:count("OVERRIDDEN"),inconclusive:count("INCONCLUSIVE")};
+ });
+ const abnormalTotal=outcomeDomains.reduce((a,b)=>a+b.abnormal,0);
+ const verdictTotal=outcomeRecords.filter(x=>x.verdict).length;
  const domains=["Cybersecurity","Safety / PPE","Physical Security","Maintenance","Environmental"].map(name=>({name,value:sources.filter(x=>x.kind===name).length}));
  const decisions=[...incidents.filter(x=>valid(x.received_at)).map(x=>x.decision.severity),
   ...ssh.filter(x=>valid(x.received_at)).flatMap(x=>x.decision_record?[x.decision_record.decision.severity]:[]),
@@ -107,7 +130,8 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
  selection?.type==="zone"?sources.filter(x=>x.zone===selection.value).map(x=>({id:x.id,detail:x.kind+" · "+new Date(x.time).toLocaleString()})):
  selection?.type==="severity"?decisionRows.filter(x=>x.severity===selection.value).map(x=>({id:x.id,detail:x.kind+" · "+x.severity})):
  selection?.type==="correlation"?candidates.filter(x=>x.domains.join(" + ")===selection.value).map(x=>({id:x.id,detail:x.zone_id+" · "+x.evidence.length+" Evidence records"})):
- selection?.type==="review"?(reviewRows[selection.value as keyof typeof reviewRows]??[]):[];
+ selection?.type==="review"?(reviewRows[selection.value as keyof typeof reviewRows]??[]):
+ selection?.type==="outcome"?outcomeRecords.filter(x=>x.domain+" · "+words(x.state)===selection.value).map(x=>({id:x.id,detail:x.zone+" · Detector: "+words(x.state)+(x.verdict?" · Human: "+(x.verdict.verdict==="OVERRIDDEN"?"override → "+words(x.verdict.corrected_status??""):x.verdict.verdict.toLowerCase()):" · No human verdict")})):[];
 
  const daily=new Map<string,number>();
  for(const x of sources){const day=new Date(x.time).toLocaleDateString();daily.set(day,(daily.get(day)??0)+1)}
@@ -120,7 +144,12 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
   </div>
   <p className="muted analyticsFilterNote">Filters use receipt timestamps, not declared capture times. Authorized feed limits still apply.</p>
  </section>
- <div className="stats"><div className="panel"><small>Published source Evidence</small><strong>{sourceTotal}</strong></div><div className="panel"><small>Saved severity Decisions</small><strong>{decisions.length}</strong></div><div className="panel"><small>Unified candidates</small><strong>{candidates.length}</strong></div><div className="panel"><small>Observed zones</small><strong>{zones.length}</strong></div></div>
+ <div className="stats"><div className="panel"><small>Published source Evidence</small><strong>{sourceTotal}</strong></div><div className="panel"><small>Saved severity Decisions</small><strong>{decisions.length}</strong></div><div className="panel"><small>Unified candidates</small><strong>{candidates.length}</strong></div><div className="panel"><small>Abnormal detector results</small><strong>{abnormalTotal}</strong></div><div className="panel"><small>Human verdicts recorded</small><strong>{verdictTotal}</strong></div><div className="panel"><small>Observed zones</small><strong>{zones.length}</strong></div></div>
+ <section className="panel"><h3>Detector outcomes by domain</h3><p className="muted">What each frozen detector reported, per published record. Human verdicts are counted beside the detector result and do not replace it. Not severities or incidents.</p>
+  <div className="analyticsOutcomes">{outcomeDomains.map(d=><div key={d.domain} className="analyticsOutcome"><h4>{d.domain}</h4><p className="muted">{d.total} records · {d.abnormal} abnormal{d.total?` (${Math.round(d.abnormal/d.total*100)}%)`:""}</p>
+   {d.states.length?<Bars items={d.states.map(s=>({name:s.name,value:s.value}))} onSelect={value=>setSelection({type:"outcome",value:d.domain+" · "+value})}/>:<p className="muted">No records in this range.</p>}
+   <p className="muted analyticsVerdicts">Human: {d.confirmed} confirmed · {d.overridden} overridden · {d.inconclusive} inconclusive</p></div>)}</div>
+ </section>
  <div className="analyticsGrid">
  <section className="panel"><h3>Evidence by domain</h3><p className="muted">Published source records; not incidents or Decisions.</p><Donut items={domains} onSelect={value=>setSelection({type:"domain",value})}/></section>
  <section className="panel"><h3>Saved Decision severity</h3><p className="muted">Only assigned standalone or operational Decision severities. Candidates and provisional reviews excluded.</p><Donut items={severity} onSelect={value=>setSelection({type:"severity",value})}/></section>

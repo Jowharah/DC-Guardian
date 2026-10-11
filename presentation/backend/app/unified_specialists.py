@@ -128,6 +128,35 @@ def specialist_task(name, evidence, edges):
             "or assert identity-to-PPE linkage without independent evidence. "
             "No severity or autonomous action.")
 
+# Retrieval query per specialist domain. A generic query ("Data center
+# operations evidence review") retrieved unrelated passages, so the model
+# answered without citations and the grounding check rejected it.
+DOMAIN_QUERIES = {
+    "CYBERSECURITY": "SSH authentication anomaly brute force remote access monitoring",
+    "MAINTENANCE": "drive SMART failure risk predictive maintenance",
+    "ENVIRONMENTAL": "data center temperature humidity monitoring thresholds",
+    "PHYSICAL_SECURITY": "facility physical access control monitoring",
+    "SAFETY": "personal protective equipment compliance",
+}
+
+def knowledge_query(domains):
+    return "Data center " + "; ".join(DOMAIN_QUERIES[d] for d in domains)
+
+GROUNDING_ATTEMPTS = 2
+
+def assess_grounded(name, agent, request):
+    """One retry when the answer fails the grounding check; the check itself is never relaxed."""
+    for attempt in range(1, GROUNDING_ATTEMPTS + 1):
+        try:
+            return agent.assess(request)
+        except ValueError as exc:
+            logging.getLogger("dcg.response").warning(
+                "%s specialist answer failed the grounding check (attempt %d/%d): %s",
+                name, attempt, GROUNDING_ATTEMPTS, exc)
+            if attempt == GROUNDING_ATTEMPTS:
+                raise HTTPException(503, f"{name.replace('_', ' ').title()} specialist answer failed the "
+                                         f"grounding check twice ({exc}); no result was saved. Try again.") from exc
+
 def run_agents(group, evidence):
     from response.rag.knowledge_eligibility import evaluate_knowledge_eligibility
     from response.rag.retrieve import retrieve_knowledge
@@ -154,11 +183,11 @@ def run_agents(group, evidence):
     for name, agent, domains, sources in specs:
         if not evaluate_knowledge_eligibility(domains=domains)["eligible"]:
             raise HTTPException(503, "Approved specialist knowledge unavailable")
-        knowledge = retrieve_knowledge("Data center " + name + " evidence review",
+        knowledge = retrieve_knowledge(knowledge_query(domains),
                                        domains=domains, top_k=4, ranking="controlled", abstain=False)
         if not knowledge:
             raise HTTPException(503, "Approved specialist knowledge unavailable")
-        assessment = agent.assess(SpecialistRequest(
+        assessment = assess_grounded(name, agent, SpecialistRequest(
             incident_evidence={"zone_id": group["zone_id"], "domains": domains,
                                "source_evidence": sources,
                                "contextual_links": [{"type": e["type"], "source_id": e["source_id"]} for e in group["edges"]],

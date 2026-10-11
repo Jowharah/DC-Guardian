@@ -10,7 +10,7 @@ let credentials:string|null=null;
 export function setCredentials(username:string,password:string){credentials=btoa(unescape(encodeURIComponent(username+":"+password)))}
 export function clearCredentials(){credentials=null}
 export const getCurrentUser=()=>request<{username:string;roles:string[];zones:string[]}>("/api/v1/auth/me");
-async function request<T>(url:string,options?:RequestInit):Promise<T>{const response=await fetch(url,{...options,headers:{"Accept":"application/json",...(credentials?{"Authorization":`Basic ${credentials}`} : {}),...options?.headers}});if(!response.ok)throw new Error(`API request failed (${response.status})`);return response.json() as Promise<T>}
+async function request<T>(url:string,options?:RequestInit):Promise<T>{const response=await fetch(url,{...options,headers:{"Accept":"application/json",...(credentials?{"Authorization":`Basic ${credentials}`} : {}),...options?.headers}});if(!response.ok){const body=await response.json().catch(()=>null);const detail=typeof body?.detail==="string"?`: ${body.detail}`:"";throw new Error(`API request failed (${response.status})${detail}`)}return response.json() as Promise<T>}
 export const getScenarios=()=>request<Scenario[]>("/api/v1/scenarios");
 export const runScenario=(name:string)=>request<Incident>(`/api/v1/scenarios/${encodeURIComponent(name)}/run`,{method:"POST"});
 
