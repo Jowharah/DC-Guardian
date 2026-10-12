@@ -33,8 +33,9 @@ def connect():
     return db
 
 def scope(group_id,principal):
-    if not enabled():raise HTTPException(503,"INVESTIGATOR_HISTORY_DISABLED")
+    # Authorization first, so a disabled feature never answers before access is checked.
     find_group(group_id,principal)
+    if not enabled():raise HTTPException(503,"INVESTIGATOR_HISTORY_DISABLED")
 
 def prune(db):
     days=int(local_setting("DCG_INVESTIGATOR_HISTORY_DAYS") or "7")
@@ -71,7 +72,6 @@ def clear_history(group_id:str,principal:Principal=Depends(current_principal)):
     return {"cleared":True,"group_id":group_id}
 
 def _other_scope(kind,identifier,principal):
-    if not enabled():raise HTTPException(503,"INVESTIGATOR_HISTORY_DISABLED")
     if kind=="operations":
         from presentation.backend.app.operational_decision import get_candidate
         get_candidate(identifier,principal)
@@ -81,6 +81,7 @@ def _other_scope(kind,identifier,principal):
     else:
         from presentation.backend.app.investigator_tools import single_evidence_context
         single_evidence_context(kind,identifier,principal)
+    if not enabled():raise HTTPException(503,"INVESTIGATOR_HISTORY_DISABLED")
     return kind+":"+identifier
 
 def _other_history(kind,identifier,principal):

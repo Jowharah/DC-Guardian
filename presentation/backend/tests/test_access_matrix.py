@@ -232,6 +232,8 @@ OPS = list(operations())
 def isolated(monkeypatch):
     monkeypatch.setenv("NEO4J_URI", "bolt://127.0.0.1:1")
     monkeypatch.setenv("DCG_INVESTIGATOR_ENABLED", "0")
+    # Same outcome locally and in CI, whatever the operator's .env says.
+    monkeypatch.setenv("DCG_INVESTIGATOR_HISTORY_ENABLED", "0")
     from openai import OpenAI
     def forbidden(*args, **kwargs):
         raise AssertionError("Unexpected OpenAI call")
