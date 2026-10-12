@@ -33,7 +33,7 @@ Keep every existing check; reorganize them. Tracked with status in [Work Log —
 Done since 2026-10-11: live specialist check, single-event specialists, API access matrix and policy decisions, Investigator claim checks / privacy / pseudonyms / call audit, external audit checkpoints, accessibility scan, `main` branch protection with required CI.
 
 1. **Independent labelling round** (pack in `reasoning/uncertainty/labelling/pack/`): teammates label; then re-run `evaluate.py` and `decision_v2_validation.py`. Validates both the Bayesian study and the Decision v2 group rule. Consider a severity column to validate MEDIUM vs LOW.
-2. ~~First live runs~~ (done 2026-10-12; found and fixed three issues). Follow-ups: **safety knowledge-base review** (OSHA 1910.135 chunk mis-parsed, too little PPE guidance, so the PPE specialist cannot ground its answer); measure the claim checker on a larger set of real answers.
+2. ~~First live runs~~ (done 2026-10-12; found and fixed three issues). Safety knowledge fixed 2026-10-12 (CFR section boundaries; PPE specialist now grounded). Follow-ups: recalibrate abstention on the rebuilt index; measure the claim checker on a larger set of real answers.
 3. ~~Review lifecycle~~ (done 2026-10-12, default policy `DCG-LIFECYCLE-v1`, operator-adjustable): open → in review → resolved, reopen; automatic reopen when Evidence or verdicts change; hash-chained.
 4. **Testing plan item 5** (in progress): Response agents and integration converted (49 tests); Response RAG, Reasoning and Evidence scripts remain.
 5. ~~Operations routines~~ (done 2026-10-12: backup + restore check, routine table in VALIDATION_AND_OPERATIONS, keyboard-only test). Remaining: the operator picks the backup and checkpoint locations; a manual screen-reader pass.
