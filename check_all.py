@@ -36,64 +36,41 @@ def venv_python(name: str) -> Path:
 # The integrated environment when present (local Windows), else the current
 # interpreter (CI or any other setup that installed requirements.txt).
 MAIN_PY = venv_python(".venv-dc-guardian") if venv_python(".venv-dc-guardian").exists() else Path(sys.executable)
-# Scripts that need a GPU-enabled PyTorch from their component environment.
-COMPONENT_ENV = {
-    "evidence/ppe_detection/tests/test_ppe_model_artifact.py": ".venv-ppe",
-    "evidence/ppe_detection/tests/test_ppe_runtime_pipeline.py": ".venv-ppe",
-    "evidence/ppe_detection/tests/test_ppe_final_test_artifact.py": ".venv-ppe",
-    "evidence/predictive_maintenance/tests/test_gru_dataset.py": ".venv-gru",
+# Every Evidence, Reasoning, Response and integration test is a pytest module
+# (testing plan item 5, completed 2026-10-12). Skips for missing local data, GPU
+# or Neo4j come from the markers in conftest.py, so each suite is one check here
+# and its log lists every test and skip reason. Converted files still run alone
+# with `python <file>`.
+# GPU tests run with their component interpreter (pytest is installed there too).
+GPU_SUITES = {
+    ".venv-ppe": ["evidence/ppe_detection/tests/test_ppe_model_artifact.py",
+                  "evidence/ppe_detection/tests/test_ppe_runtime_pipeline.py",
+                  "evidence/ppe_detection/tests/test_ppe_final_test_artifact.py"],
+    ".venv-gru": ["evidence/predictive_maintenance/tests/test_gru_dataset.py"],
 }
-# Scripts that need private/excluded local data, with the directory required.
-FACE_ENROLLMENT = "evidence/face_recognition/models/employee_embeddings.npz"  # private biometric artifact
 RAG_KNOWLEDGE = "response/rag/knowledge_base/chunks"  # rebuilt locally from public sources
-NEEDS_DATA = {
-    "evidence/face_recognition/tests/test_controlled_dataset.py": "evidence/face_recognition/data/controlled_faces",
-    "evidence/face_recognition/tests/test_enrollment_artifact.py": FACE_ENROLLMENT,
-    "evidence/face_recognition/tests/test_face_pipeline.py": FACE_ENROLLMENT,
-    "evidence/ppe_detection/tests/test_sh17_dataset.py": "evidence/ppe_detection/data",
-    "evidence/ppe_detection/tests/test_ppe_config.py": "evidence/ppe_detection/data/processed/sh17_yolo/dataset.yaml",
-    "response/rag/verify_response_rag.py": RAG_KNOWLEDGE,
-    "response/rag/tests/test_chunking.py": RAG_KNOWLEDGE,
-    "response/rag/tests/test_parsing.py": RAG_KNOWLEDGE,
-    "response/rag/tests/test_preprocessing.py": RAG_KNOWLEDGE,
-    "response/rag/tests/test_retrieval_contract.py": RAG_KNOWLEDGE,
-}
-
-
-def python_for(rel: str) -> Path:
-    env = COMPONENT_ENV.get(rel)
-    return venv_python(env) if env else MAIN_PY
+PYTEST = ["-m", "pytest", "-q", "-p", "no:cacheprovider", "-rs"]
 
 
 def script_checks() -> list[tuple[str, str, list[str], str | None]]:
     """(layer, name, command, skip_reason)."""
-    checks = []
-
-    def add(layer, rel):
-        py = python_for(rel)
-        reason = None
-        if not py.exists():
-            reason = f"environment {py.parent.parent.name} not found"
-        elif rel in NEEDS_DATA and not (ROOT / NEEDS_DATA[rel]).exists():
-            reason = f"local data {NEEDS_DATA[rel]} not present (excluded from Git)"
-        checks.append((layer, rel, [str(py), rel], reason))
-
-    add("Runtime", "verify_runtime.py")
-    for rel in sorted(p.relative_to(ROOT).as_posix() for p in ROOT.glob("evidence/*/tests/test_*.py")):
-        add("Evidence", rel)
-    add("Reasoning", "reasoning/run_contract_tests.py")
-    add("Reasoning", "reasoning/uncertainty/test_uncertainty_reasoning.py")
-    add("Reasoning", "reasoning/uncertainty/labelling/test_labelling_pack.py")
-    add("Response", "response/rag/verify_response_rag.py")
-    for rel in sorted(p.relative_to(ROOT).as_posix() for p in ROOT.glob("response/*/tests/test_*.py")):
-        if not rel.startswith(PYTEST_DIRS):
-            add("Response", rel)
+    checks = [("Runtime", "verify_runtime.py", [str(MAIN_PY), "verify_runtime.py"], None)]
+    checks.append(("Evidence", "evidence tests (pytest)", [str(MAIN_PY), *PYTEST, "evidence"], None))
+    for env, files in GPU_SUITES.items():
+        py = venv_python(env)
+        checks.append(("Evidence", f"evidence GPU tests (pytest, {env})", [str(py), *PYTEST, *files],
+                       None if py.exists() else f"environment {env} not found"))
+    # Reasoning contracts run in dependency order through their runner (each one via pytest).
+    checks.append(("Reasoning", "reasoning/run_contract_tests.py", [str(MAIN_PY), "reasoning/run_contract_tests.py"], None))
+    checks.append(("Reasoning", "uncertainty and labelling tests (pytest)", [str(MAIN_PY), *PYTEST, "reasoning/uncertainty"], None))
+    checks.append(("Response", "response/rag/verify_response_rag.py", [str(MAIN_PY), "response/rag/verify_response_rag.py"],
+                   None if (ROOT / RAG_KNOWLEDGE).exists() else f"local data {RAG_KNOWLEDGE} not present (excluded from Git)"))
+    checks.append(("Response", "response RAG tests (pytest)", [str(MAIN_PY), *PYTEST, "response/rag/tests"], None))
+    for layer, name, folder in PYTEST_SUITES:
+        checks.append((layer, name, [str(MAIN_PY), *PYTEST, folder], None))
     return checks
 
 
-# Folders converted to pytest (testing plan item 5): one check each, per-test results
-# in the log. Their files still run alone with `python <file>`.
-PYTEST_DIRS = ("response/agents/tests", "integration/tests")
 PYTEST_SUITES = (("Response", "response agent tests (pytest)", "response/agents/tests"),
                  ("Decision/Integration", "decision and integration tests (pytest)", "integration/tests"))
 
@@ -215,9 +192,6 @@ def main() -> int:
 
     neo4j_skip = neo4j_reachable()
     checks = script_checks()
-    for layer, name, folder in PYTEST_SUITES:
-        # Tests needing Neo4j skip themselves (with a reason) when it is not reachable.
-        checks.append((layer, name, [str(MAIN_PY), "-m", "pytest", folder, "-q", "-p", "no:cacheprovider", "-rs"], None))
     checks.append(("Presentation", "presentation backend tests (pytest)",
                    [str(MAIN_PY), "-m", "pytest", "presentation/backend/tests", "-q", "-p", "no:cacheprovider"], None))
     npm = shutil.which("npm") or shutil.which("npm.cmd")

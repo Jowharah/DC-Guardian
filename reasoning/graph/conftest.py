@@ -2,9 +2,9 @@
 
 - `neo4j_driver`: one driver per test session; tests are skipped (with the
   reason) when Neo4j is unreachable.
-- `cleanup_graph(...)`: removes a contract's own nodes before and after it
+- `cleanup_graph(...)` (graph_test_support.py): removes a contract's own nodes before and after it
   runs, pass or fail, so contract data never accumulates in the shared graph.
-- `single(driver, cypher, **params)`: run a read query and return one record.
+- `single(driver, cypher, **params)` (graph_test_support.py): run a read query and return one record.
 """
 import sys
 from pathlib import Path
@@ -32,16 +32,6 @@ def neo4j_driver():
     driver.close()
 
 
-def single(driver, cypher, **params):
-    with driver.session(database=NEO4J_DATABASE, default_access_mode="READ") as session:
-        return session.run(cypher, **params).single()
-
-
-def cleanup_graph(driver, *, scenarios=(), assets=(), source_ips=()):
-    """Delete this contract's events and test-only nodes. Topology is never touched."""
-    with driver.session(database=NEO4J_DATABASE) as session:
-        session.run("MATCH (e:Event) WHERE e.scenario_id IN $ids DETACH DELETE e", ids=list(scenarios)).consume()
-        session.run("MATCH (a:Asset) WHERE a.asset_id IN $ids DETACH DELETE a", ids=list(assets)).consume()
-        # A source IP is removed only when no remaining event refers to it.
-        session.run("MATCH (ip:SourceIP) WHERE ip.address IN $ips AND NOT (ip)--() DELETE ip",
-                    ips=list(source_ips)).consume()
+# Helpers live in graph_test_support.py: a module named conftest would clash with
+# the repository-root conftest.py when imported by name.
+from graph_test_support import cleanup_graph, single  # noqa: E402,F401

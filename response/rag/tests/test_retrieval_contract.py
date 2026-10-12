@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import pytest  # noqa: E402
+
+pytestmark = [pytest.mark.private_data('response/rag/knowledge_base/chunks')]
+
+
 import sys
 from pathlib import Path
 
@@ -60,6 +65,10 @@ def main() -> None:
             f"{row['rank']}. {row['document_id']} "
             f"score={row['score']:.4f} pages={row['pages']}"
         )
+
+
+def test_retrieval_contract_contract():
+    main()
 
 
 if __name__ == "__main__":

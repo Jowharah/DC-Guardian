@@ -1,553 +1,562 @@
-﻿from pathlib import Path
-import json
-import sys
+﻿
+import pytest  # noqa: E402
 
-from jsonschema import (
-    Draft202012Validator,
-    FormatChecker,
-)
+def test_maintenance_event_adapter_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
+    from pathlib import Path
+    import json
+    import sys
 
-
-# ============================================================
-# Project paths
-# ============================================================
-
-PROJECT_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[1]
-)
+    from jsonschema import (
+        Draft202012Validator,
+        FormatChecker,
+    )
 
 
-ADAPTER_DIR = (
-    PROJECT_ROOT
-    / "reasoning"
-    / "adapters"
-)
+    # ============================================================
+    # Project paths
+    # ============================================================
+
+    PROJECT_ROOT = (
+        Path(__file__)
+        .resolve()
+        .parents[1]
+    )
 
 
-if str(
-    ADAPTER_DIR
-) not in sys.path:
+    ADAPTER_DIR = (
+        PROJECT_ROOT
+        / "reasoning"
+        / "adapters"
+    )
 
-    sys.path.insert(
-        0,
-        str(
-            ADAPTER_DIR
+
+    if str(
+        ADAPTER_DIR
+    ) not in sys.path:
+
+        sys.path.insert(
+            0,
+            str(
+                ADAPTER_DIR
+            )
         )
+
+
+    from maintenance_event_adapter import (
+        adapt_maintenance_assessment,
     )
 
 
-from maintenance_event_adapter import (
-    adapt_maintenance_assessment,
-)
-
-
-SCHEMA_FILE = (
-    PROJECT_ROOT
-    / "shared"
-    / "schemas"
-    / "event_schema.json"
-)
-
-
-# ============================================================
-# Schema
-# ============================================================
-
-with open(
-    SCHEMA_FILE,
-    "r",
-    encoding="utf-8",
-) as file:
-
-    schema = json.load(
-        file
+    SCHEMA_FILE = (
+        PROJECT_ROOT
+        / "shared"
+        / "schemas"
+        / "event_schema.json"
     )
 
 
-validator = Draft202012Validator(
-    schema,
-    format_checker=FormatChecker(),
-)
+    # ============================================================
+    # Schema
+    # ============================================================
+
+    with open(
+        SCHEMA_FILE,
+        "r",
+        encoding="utf-8",
+    ) as file:
+
+        schema = json.load(
+            file
+        )
 
 
-# ============================================================
-# Representative Evidence layer assessment
-# ============================================================
+    validator = Draft202012Validator(
+        schema,
+        format_checker=FormatChecker(),
+    )
 
-def build_maintenance_assessment(
-    *,
-    serial_number,
-    timestamp,
-    assessment,
-    probability,
-):
 
-    return {
-        "domain":
-            "MAINTENANCE",
+    # ============================================================
+    # Representative Evidence layer assessment
+    # ============================================================
 
-        "event_type":
-            "STORAGE_FAILURE_RISK_ASSESSMENT",
+    def build_maintenance_assessment(
+        *,
+        serial_number,
+        timestamp,
+        assessment,
+        probability,
+    ):
 
-        "model_name":
-            "DC_Guardian_Temporal_RF_v2",
+        return {
+            "domain":
+                "MAINTENANCE",
 
-        "asset_type":
-            "HARD_DRIVE",
+            "event_type":
+                "STORAGE_FAILURE_RISK_ASSESSMENT",
 
-        "serial_number":
-            serial_number,
+            "model_name":
+                "DC_Guardian_Temporal_RF_v2",
 
-        "observation_timestamp":
-            timestamp,
+            "asset_type":
+                "HARD_DRIVE",
 
-        "assessment":
-            assessment,
+            "serial_number":
+                serial_number,
 
-        "failure_probability":
-            probability,
+            "observation_timestamp":
+                timestamp,
 
-        "operating_threshold":
-            0.45,
+            "assessment":
+                assessment,
 
-        "failure_horizon_days":
-            7,
+            "failure_probability":
+                probability,
 
-        "evidence": {
-            "smart_5_raw":
-                20.0,
+            "operating_threshold":
+                0.45,
 
-            "smart_198_raw":
-                2.0,
+            "failure_horizon_days":
+                7,
 
-            "smart_194_raw":
-                35.0,
+            "evidence": {
+                "smart_5_raw":
+                    20.0,
 
-            "smart_5_delta_7":
-                20.0,
+                "smart_198_raw":
+                    2.0,
 
-            "smart_198_delta_7":
-                2.0,
+                "smart_194_raw":
+                    35.0,
 
-            "temperature_7obs_mean":
-                33.8571428571,
+                "smart_5_delta_7":
+                    20.0,
+
+                "smart_198_delta_7":
+                    2.0,
+
+                "temperature_7obs_mean":
+                    33.8571428571,
+            },
+        }
+
+
+    # ============================================================
+    # Cases
+    # ============================================================
+
+    test_cases = [
+        {
+            "name":
+                "AT_RISK",
+
+            "assessment":
+                build_maintenance_assessment(
+                    serial_number=
+                        "DRV-MAINT-001",
+
+                    timestamp=
+                        "2026-09-16T14:00:00Z",
+
+                    assessment=
+                        "AT_RISK",
+
+                    probability=
+                        0.714008,
+                ),
+
+            "expected_anomaly":
+                True,
         },
-    }
+
+        {
+            "name":
+                "NORMAL",
+
+            "assessment":
+                build_maintenance_assessment(
+                    serial_number=
+                        "DRV-MAINT-002",
+
+                    timestamp=
+                        "2026-09-16T14:05:00Z",
+
+                    assessment=
+                        "NORMAL",
+
+                    probability=
+                        0.120000,
+                ),
+
+            "expected_anomaly":
+                False,
+        },
+    ]
 
 
-# ============================================================
-# Cases
-# ============================================================
+    # ============================================================
+    # Execute
+    # ============================================================
 
-test_cases = [
-    {
-        "name":
-            "AT_RISK",
+    print(
+        "\n============================================"
+    )
 
-        "assessment":
-            build_maintenance_assessment(
-                serial_number=
-                    "DRV-MAINT-001",
+    print(
+        "MAINTENANCE REASONING LAYER ADAPTER TEST"
+    )
 
-                timestamp=
-                    "2026-09-16T14:00:00Z",
-
-                assessment=
-                    "AT_RISK",
-
-                probability=
-                    0.714008,
-            ),
-
-        "expected_anomaly":
-            True,
-    },
-
-    {
-        "name":
-            "NORMAL",
-
-        "assessment":
-            build_maintenance_assessment(
-                serial_number=
-                    "DRV-MAINT-002",
-
-                timestamp=
-                    "2026-09-16T14:05:00Z",
-
-                assessment=
-                    "NORMAL",
-
-                probability=
-                    0.120000,
-            ),
-
-        "expected_anomaly":
-            False,
-    },
-]
-
-
-# ============================================================
-# Execute
-# ============================================================
-
-print(
-    "\n============================================"
-)
-
-print(
-    "MAINTENANCE REASONING LAYER ADAPTER TEST"
-)
-
-print(
-    "============================================"
-)
-
-
-passed = 0
-
-
-for index, test_case in enumerate(
-    test_cases,
-    start=1,
-):
-
-    assessment = (
-        test_case[
-            "assessment"
-        ]
+    print(
+        "============================================"
     )
 
 
-    event_id = (
-        f"EVT-MAINT-STATE-TEST-{index:03d}"
-    )
+    passed = 0
 
 
-    common_event = (
-        adapt_maintenance_assessment(
-            assessment,
+    for index, test_case in enumerate(
+        test_cases,
+        start=1,
+    ):
 
-            dataset_name=
-                "DC-Guardian Reasoning layer "
-                "Controlled Contract Test",
-
-            source_type=
-                "CONTROLLED_TEST",
-
-            event_id=
-                event_id,
+        assessment = (
+            test_case[
+                "assessment"
+            ]
         )
-    )
 
 
-    # ========================================================
-    # JSON Schema
-    # ========================================================
-
-    errors = sorted(
-        validator.iter_errors(
-            common_event
-        ),
-        key=lambda error: list(
-            error.absolute_path
-        ),
-    )
+        event_id = (
+            f"EVT-MAINT-STATE-TEST-{index:03d}"
+        )
 
 
-    if errors:
+        common_event = (
+            adapt_maintenance_assessment(
+                assessment,
+
+                dataset_name=
+                    "DC-Guardian Reasoning layer "
+                    "Controlled Contract Test",
+
+                source_type=
+                    "CONTROLLED_TEST",
+
+                event_id=
+                    event_id,
+            )
+        )
+
+
+        # ========================================================
+        # JSON Schema
+        # ========================================================
+
+        errors = sorted(
+            validator.iter_errors(
+                common_event
+            ),
+            key=lambda error: list(
+                error.absolute_path
+            ),
+        )
+
+
+        if errors:
+
+            print(
+                f"\nFAIL: "
+                f"{test_case['name']}"
+            )
+
+            for error in errors:
+
+                location = ".".join(
+                    str(item)
+                    for item
+                    in error.absolute_path
+                )
+
+                if not location:
+
+                    location = (
+                        "<root>"
+                    )
+
+                print(
+                    f"  Field: {location}"
+                )
+
+                print(
+                    f"  Error: {error.message}"
+                )
+
+            continue
+
+
+        # ========================================================
+        # Semantic contract
+        # ========================================================
+
+        assert (
+            common_event[
+                "domain"
+            ]
+            == "MAINTENANCE"
+        )
+
+
+        assert (
+            common_event[
+                "event_type"
+            ]
+            == "STORAGE_FAILURE_RISK_ASSESSMENT"
+        )
+
+
+        assert (
+            common_event[
+                "assessment"
+            ][
+                "state"
+            ]
+            == test_case[
+                "name"
+            ]
+        )
+
+
+        assert (
+            common_event[
+                "assessment"
+            ][
+                "score"
+            ]
+            == assessment[
+                "failure_probability"
+            ]
+        )
+
+
+        assert (
+            common_event[
+                "assessment"
+            ][
+                "anomaly_detected"
+            ]
+            is test_case[
+                "expected_anomaly"
+            ]
+        )
+
+
+        assert (
+            common_event[
+                "entities"
+            ][
+                "asset_id"
+            ]
+            == assessment[
+                "serial_number"
+            ]
+        )
+
+
+        assert (
+            common_event[
+                "evidence"
+            ][
+                "failure_horizon_days"
+            ]
+            == 7
+        )
+
+
+        assert (
+            common_event[
+                "evidence"
+            ][
+                "operating_threshold"
+            ]
+            == 0.45
+        )
+
+
+        # ========================================================
+        # No invented topology
+        # ========================================================
+
+        assert (
+            common_event[
+                "entities"
+            ][
+                "server_id"
+            ]
+            is None
+        )
+
+
+        assert (
+            common_event[
+                "entities"
+            ][
+                "equipment_id"
+            ]
+            is None
+        )
+
+
+        assert (
+            common_event[
+                "location"
+            ][
+                "data_center_id"
+            ]
+            is None
+        )
+
+
+        assert (
+            common_event[
+                "location"
+            ][
+                "zone_id"
+            ]
+            is None
+        )
+
+
+        assert (
+            common_event[
+                "location"
+            ][
+                "rack_id"
+            ]
+            is None
+        )
+
+
+        assert (
+            common_event[
+                "provenance"
+            ][
+                "synthetic_mapping"
+            ]
+            is False
+        )
+
 
         print(
-            f"\nFAIL: "
+            f"\nPASS: "
             f"{test_case['name']}"
         )
 
-        for error in errors:
 
-            location = ".".join(
-                str(item)
-                for item
-                in error.absolute_path
-            )
-
-            if not location:
-
-                location = (
-                    "<root>"
-                )
-
-            print(
-                f"  Field: {location}"
-            )
-
-            print(
-                f"  Error: {error.message}"
-            )
-
-        continue
+        print(
+            "  Event ID:",
+            common_event[
+                "event_id"
+            ]
+        )
 
 
-    # ========================================================
-    # Semantic contract
-    # ========================================================
+        print(
+            "  Asset:",
+            common_event[
+                "entities"
+            ][
+                "asset_id"
+            ]
+        )
 
-    assert (
-        common_event[
-            "domain"
-        ]
-        == "MAINTENANCE"
+
+        print(
+            "  Score:",
+            common_event[
+                "assessment"
+            ][
+                "score"
+            ]
+        )
+
+
+        print(
+            "  Anomaly detected:",
+            common_event[
+                "assessment"
+            ][
+                "anomaly_detected"
+            ]
+        )
+
+
+        passed += 1
+
+
+    # ============================================================
+    # Final
+    # ============================================================
+
+    print(
+        "\n============================================"
     )
 
-
-    assert (
-        common_event[
-            "event_type"
-        ]
-        == "STORAGE_FAILURE_RISK_ASSESSMENT"
+    print(
+        "TEST SUMMARY"
     )
 
-
-    assert (
-        common_event[
-            "assessment"
-        ][
-            "state"
-        ]
-        == test_case[
-            "name"
-        ]
-    )
-
-
-    assert (
-        common_event[
-            "assessment"
-        ][
-            "score"
-        ]
-        == assessment[
-            "failure_probability"
-        ]
-    )
-
-
-    assert (
-        common_event[
-            "assessment"
-        ][
-            "anomaly_detected"
-        ]
-        is test_case[
-            "expected_anomaly"
-        ]
-    )
-
-
-    assert (
-        common_event[
-            "entities"
-        ][
-            "asset_id"
-        ]
-        == assessment[
-            "serial_number"
-        ]
-    )
-
-
-    assert (
-        common_event[
-            "evidence"
-        ][
-            "failure_horizon_days"
-        ]
-        == 7
-    )
-
-
-    assert (
-        common_event[
-            "evidence"
-        ][
-            "operating_threshold"
-        ]
-        == 0.45
-    )
-
-
-    # ========================================================
-    # No invented topology
-    # ========================================================
-
-    assert (
-        common_event[
-            "entities"
-        ][
-            "server_id"
-        ]
-        is None
-    )
-
-
-    assert (
-        common_event[
-            "entities"
-        ][
-            "equipment_id"
-        ]
-        is None
-    )
-
-
-    assert (
-        common_event[
-            "location"
-        ][
-            "data_center_id"
-        ]
-        is None
-    )
-
-
-    assert (
-        common_event[
-            "location"
-        ][
-            "zone_id"
-        ]
-        is None
-    )
-
-
-    assert (
-        common_event[
-            "location"
-        ][
-            "rack_id"
-        ]
-        is None
-    )
-
-
-    assert (
-        common_event[
-            "provenance"
-        ][
-            "synthetic_mapping"
-        ]
-        is False
+    print(
+        "============================================"
     )
 
 
     print(
-        f"\nPASS: "
-        f"{test_case['name']}"
+        f"Passed: "
+        f"{passed}/{len(test_cases)}"
+    )
+
+
+    if passed != len(
+        test_cases
+    ):
+
+        raise SystemExit(
+            "One or more maintenance adapter "
+            "tests failed."
+        )
+
+
+    print(
+        "\nPASS: Maintenance states map "
+        "to DC-Guardian schema v1.0."
     )
 
 
     print(
-        "  Event ID:",
-        common_event[
-            "event_id"
-        ]
+        "PASS: Drive serial preserved "
+        "as asset identity."
     )
 
 
     print(
-        "  Asset:",
-        common_event[
-            "entities"
-        ][
-            "asset_id"
-        ]
+        "PASS: Adapter introduced no "
+        "synthetic topology."
     )
 
 
     print(
-        "  Score:",
-        common_event[
-            "assessment"
-        ][
-            "score"
-        ]
+        "\n============================================"
     )
-
 
     print(
-        "  Anomaly detected:",
-        common_event[
-            "assessment"
-        ][
-            "anomaly_detected"
-        ]
+        "MAINTENANCE REASONING LAYER ADAPTER CONTRACT PASSED"
+    )
+
+    print(
+        "============================================"
     )
 
 
-    passed += 1
-
-
-# ============================================================
-# Final
-# ============================================================
-
-print(
-    "\n============================================"
-)
-
-print(
-    "TEST SUMMARY"
-)
-
-print(
-    "============================================"
-)
-
-
-print(
-    f"Passed: "
-    f"{passed}/{len(test_cases)}"
-)
-
-
-if passed != len(
-    test_cases
-):
-
-    raise SystemExit(
-        "One or more maintenance adapter "
-        "tests failed."
-    )
-
-
-print(
-    "\nPASS: Maintenance states map "
-    "to DC-Guardian schema v1.0."
-)
-
-
-print(
-    "PASS: Drive serial preserved "
-    "as asset identity."
-)
-
-
-print(
-    "PASS: Adapter introduced no "
-    "synthetic topology."
-)
-
-
-print(
-    "\n============================================"
-)
-
-print(
-    "MAINTENANCE REASONING LAYER ADAPTER CONTRACT PASSED"
-)
-
-print(
-    "============================================"
-)
+if __name__ == "__main__":
+    test_maintenance_event_adapter_contract()

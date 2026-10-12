@@ -16,355 +16,362 @@ Also verifies:
     - repeated ingestion is idempotent
 """
 
-from pathlib import Path
-import sys
+import pytest  # noqa: E402
+
+pytestmark = [pytest.mark.neo4j]
+
+def test_face_event_ingestion_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
+
+    from pathlib import Path
+    import sys
 
 
-# ============================================================
-# Project paths
-# ============================================================
+    # ============================================================
+    # Project paths
+    # ============================================================
 
-PROJECT_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[2]
-)
+    PROJECT_ROOT = (
+        Path(__file__)
+        .resolve()
+        .parents[2]
+    )
 
 
-for directory in [
-    PROJECT_ROOT,
-    PROJECT_ROOT / "reasoning" / "adapters",
-    PROJECT_ROOT / "reasoning" / "topology",
-    PROJECT_ROOT / "reasoning" / "graph",
-]:
+    for directory in [
+        PROJECT_ROOT,
+        PROJECT_ROOT / "reasoning" / "adapters",
+        PROJECT_ROOT / "reasoning" / "topology",
+        PROJECT_ROOT / "reasoning" / "graph",
+    ]:
 
-    if str(directory) not in sys.path:
+        if str(directory) not in sys.path:
 
-        sys.path.insert(
-            0,
-            str(directory)
+            sys.path.insert(
+                0,
+                str(directory)
+            )
+
+
+    # ============================================================
+    # Imports
+    # ============================================================
+
+    from face_event_adapter import (
+        adapt_face_assessment,
+    )
+
+    from topology_mapper import (
+        map_face_event_to_scenario,
+    )
+
+    from ingest_event import (
+        create_driver,
+        ingest_face_event,
+        NEO4J_DATABASE,
+    )
+
+
+    # ============================================================
+    # Controlled assessment builders
+    # ============================================================
+
+    def make_recognized_assessment(
+        person_id,
+        *,
+        distance=0.25,
+    ):
+
+        return {
+            "domain":
+                "PHYSICAL_SECURITY",
+
+            "event_type":
+                "FACE_IDENTIFICATION_ASSESSMENT",
+
+            "image":
+                f"{person_id}_graph_test.jpg",
+
+            "model_name":
+                "ArcFace",
+
+            "detector_backend":
+                "retinaface",
+
+            "distance_metric":
+                "cosine",
+
+            "threshold":
+                0.50,
+
+            "threshold_source":
+                "validation_only",
+
+            "configuration_frozen":
+                True,
+
+            "person_id":
+                person_id,
+
+            "recognition_status":
+                "RECOGNIZED",
+
+            "face_detected":
+                True,
+
+            "face_count":
+                1,
+
+            "distance":
+                distance,
+
+            "similarity":
+                1.0 - distance,
+
+            "nearest_employee_id":
+                person_id,
+
+            "face_confidence":
+                1.0,
+
+            "facial_area":
+                None,
+
+            "latency_ms":
+                100.0,
+        }
+
+
+    def make_unknown_assessment():
+
+        return {
+            "domain":
+                "PHYSICAL_SECURITY",
+
+            "event_type":
+                "FACE_IDENTIFICATION_ASSESSMENT",
+
+            "image":
+                "UNKNOWN_graph_test.jpg",
+
+            "model_name":
+                "ArcFace",
+
+            "detector_backend":
+                "retinaface",
+
+            "distance_metric":
+                "cosine",
+
+            "threshold":
+                0.50,
+
+            "threshold_source":
+                "validation_only",
+
+            "configuration_frozen":
+                True,
+
+            "person_id":
+                "UNKNOWN",
+
+            "recognition_status":
+                "UNKNOWN",
+
+            "face_detected":
+                True,
+
+            "face_count":
+                1,
+
+            "distance":
+                0.80,
+
+            "similarity":
+                0.20,
+
+            "nearest_employee_id":
+                "P001",
+
+            "face_confidence":
+                1.0,
+
+            "facial_area":
+                None,
+
+            "latency_ms":
+                100.0,
+        }
+
+
+    # ============================================================
+    # Event preparation helper
+    # ============================================================
+
+    def prepare_event(
+        assessment,
+        *,
+        event_id,
+        scenario_id,
+        timestamp,
+    ):
+
+        normalized = adapt_face_assessment(
+            assessment,
+
+            dataset_name=
+                "DC-Guardian Controlled Face Dataset v1",
+
+            source_type=
+                "CONTROLLED_TEST",
+
+            event_id=
+                event_id,
+
+            timestamp=
+                timestamp,
         )
 
 
-# ============================================================
-# Imports
-# ============================================================
+        mapped = map_face_event_to_scenario(
+            normalized,
 
-from face_event_adapter import (
-    adapt_face_assessment,
-)
+            scenario_id=
+                scenario_id,
 
-from topology_mapper import (
-    map_face_event_to_scenario,
-)
+            scenario_timestamp=
+                timestamp,
 
-from ingest_event import (
-    create_driver,
-    ingest_face_event,
-    NEO4J_DATABASE,
-)
+            camera_id=
+                "CAM-B-01",
+        )
 
 
-# ============================================================
-# Controlled assessment builders
-# ============================================================
-
-def make_recognized_assessment(
-    person_id,
-    *,
-    distance=0.25,
-):
-
-    return {
-        "domain":
-            "PHYSICAL_SECURITY",
-
-        "event_type":
-            "FACE_IDENTIFICATION_ASSESSMENT",
-
-        "image":
-            f"{person_id}_graph_test.jpg",
-
-        "model_name":
-            "ArcFace",
-
-        "detector_backend":
-            "retinaface",
-
-        "distance_metric":
-            "cosine",
-
-        "threshold":
-            0.50,
-
-        "threshold_source":
-            "validation_only",
-
-        "configuration_frozen":
-            True,
-
-        "person_id":
-            person_id,
-
-        "recognition_status":
-            "RECOGNIZED",
-
-        "face_detected":
-            True,
-
-        "face_count":
-            1,
-
-        "distance":
-            distance,
-
-        "similarity":
-            1.0 - distance,
-
-        "nearest_employee_id":
-            person_id,
-
-        "face_confidence":
-            1.0,
-
-        "facial_area":
-            None,
-
-        "latency_ms":
-            100.0,
-    }
+        return mapped
 
 
-def make_unknown_assessment():
+    # ============================================================
+    # Controlled events
+    # ============================================================
 
-    return {
-        "domain":
-            "PHYSICAL_SECURITY",
-
-        "event_type":
-            "FACE_IDENTIFICATION_ASSESSMENT",
-
-        "image":
-            "UNKNOWN_graph_test.jpg",
-
-        "model_name":
-            "ArcFace",
-
-        "detector_backend":
-            "retinaface",
-
-        "distance_metric":
-            "cosine",
-
-        "threshold":
-            0.50,
-
-        "threshold_source":
-            "validation_only",
-
-        "configuration_frozen":
-            True,
-
-        "person_id":
-            "UNKNOWN",
-
-        "recognition_status":
-            "UNKNOWN",
-
-        "face_detected":
-            True,
-
-        "face_count":
-            1,
-
-        "distance":
-            0.80,
-
-        "similarity":
-            0.20,
-
-        "nearest_employee_id":
-            "P001",
-
-        "face_confidence":
-            1.0,
-
-        "facial_area":
-            None,
-
-        "latency_ms":
-            100.0,
-    }
-
-
-# ============================================================
-# Event preparation helper
-# ============================================================
-
-def prepare_event(
-    assessment,
-    *,
-    event_id,
-    scenario_id,
-    timestamp,
-):
-
-    normalized = adapt_face_assessment(
-        assessment,
-
-        dataset_name=
-            "DC-Guardian Controlled Face Dataset v1",
-
-        source_type=
-            "CONTROLLED_TEST",
+    p001_event = prepare_event(
+        make_recognized_assessment(
+            "P001"
+        ),
 
         event_id=
-            event_id,
-
-        timestamp=
-            timestamp,
-    )
-
-
-    mapped = map_face_event_to_scenario(
-        normalized,
+            "EVT-FACE-GRAPH-P001",
 
         scenario_id=
-            scenario_id,
+            "SCENARIO-FACE-GRAPH-P001",
 
-        scenario_timestamp=
-            timestamp,
-
-        camera_id=
-            "CAM-B-01",
+        timestamp=
+            "2026-09-24T15:00:00Z",
     )
 
 
-    return mapped
+    p003_event = prepare_event(
+        make_recognized_assessment(
+            "P003"
+        ),
+
+        event_id=
+            "EVT-FACE-GRAPH-P003",
+
+        scenario_id=
+            "SCENARIO-FACE-GRAPH-P003",
+
+        timestamp=
+            "2026-09-24T15:01:00Z",
+    )
 
 
-# ============================================================
-# Controlled events
-# ============================================================
+    p004_event = prepare_event(
+        make_recognized_assessment(
+            "P004"
+        ),
 
-p001_event = prepare_event(
-    make_recognized_assessment(
-        "P001"
-    ),
+        event_id=
+            "EVT-FACE-GRAPH-P004",
 
-    event_id=
-        "EVT-FACE-GRAPH-P001",
+        scenario_id=
+            "SCENARIO-FACE-GRAPH-P004",
 
-    scenario_id=
-        "SCENARIO-FACE-GRAPH-P001",
-
-    timestamp=
-        "2026-09-24T15:00:00Z",
-)
+        timestamp=
+            "2026-09-24T15:02:00Z",
+    )
 
 
-p003_event = prepare_event(
-    make_recognized_assessment(
-        "P003"
-    ),
+    unknown_event = prepare_event(
+        make_unknown_assessment(),
 
-    event_id=
-        "EVT-FACE-GRAPH-P003",
+        event_id=
+            "EVT-FACE-GRAPH-UNKNOWN",
 
-    scenario_id=
-        "SCENARIO-FACE-GRAPH-P003",
+        scenario_id=
+            "SCENARIO-FACE-GRAPH-UNKNOWN",
 
-    timestamp=
-        "2026-09-24T15:01:00Z",
-)
+        timestamp=
+            "2026-09-24T15:03:00Z",
+    )
 
-
-p004_event = prepare_event(
-    make_recognized_assessment(
-        "P004"
-    ),
-
-    event_id=
-        "EVT-FACE-GRAPH-P004",
-
-    scenario_id=
-        "SCENARIO-FACE-GRAPH-P004",
-
-    timestamp=
-        "2026-09-24T15:02:00Z",
-)
-
-
-unknown_event = prepare_event(
-    make_unknown_assessment(),
-
-    event_id=
-        "EVT-FACE-GRAPH-UNKNOWN",
-
-    scenario_id=
-        "SCENARIO-FACE-GRAPH-UNKNOWN",
-
-    timestamp=
-        "2026-09-24T15:03:00Z",
-)
-
-
-print(
-    "\n============================================"
-)
-print(
-    "DC-GUARDIAN FACE EVENT INGESTION"
-)
-print(
-    "============================================"
-)
-
-
-# ============================================================
-# Neo4j
-# ============================================================
-
-driver = create_driver()
-
-
-try:
 
     print(
-        "PASS: Connected to Neo4j."
+        "\n============================================"
+    )
+    print(
+        "DC-GUARDIAN FACE EVENT INGESTION"
+    )
+    print(
+        "============================================"
     )
 
 
-    # ========================================================
-    # Clear previous test Event artifacts only
-    #
-    # Do NOT delete Person/Camera/topology nodes.
-    # ========================================================
+    # ============================================================
+    # Neo4j
+    # ============================================================
 
-    event_ids = [
-        p001_event[
-            "event_id"
-        ],
-
-        p003_event[
-            "event_id"
-        ],
-
-        p004_event[
-            "event_id"
-        ],
-
-        unknown_event[
-            "event_id"
-        ],
-    ]
+    driver = create_driver()
 
 
-    with driver.session(
-        database=NEO4J_DATABASE
-    ) as session:
+    try:
 
-        session.run(
-            """
+        print(
+            "PASS: Connected to Neo4j."
+        )
+
+
+        # ========================================================
+        # Clear previous test Event artifacts only
+        #
+        # Do NOT delete Person/Camera/topology nodes.
+        # ========================================================
+
+        event_ids = [
+            p001_event[
+                "event_id"
+            ],
+
+            p003_event[
+                "event_id"
+            ],
+
+            p004_event[
+                "event_id"
+            ],
+
+            unknown_event[
+                "event_id"
+            ],
+        ]
+
+
+        with driver.session(
+            database=NEO4J_DATABASE
+        ) as session:
+
+            session.run(
+                """
             MATCH (event:Event)
 
             WHERE event.event_id
@@ -373,225 +380,225 @@ try:
             DETACH DELETE event
             """,
 
-            event_ids=
-                event_ids,
-        ).consume()
+                event_ids=
+                    event_ids,
+            ).consume()
 
 
-    print(
-        "PASS: Previous Face test artifacts cleared."
-    )
+        print(
+            "PASS: Previous Face test artifacts cleared."
+        )
 
 
-    # ========================================================
-    # P001 -> AUTHORIZED
-    # ========================================================
+        # ========================================================
+        # P001 -> AUTHORIZED
+        # ========================================================
 
-    p001_result = ingest_face_event(
-        p001_event,
-        driver,
-    )
-
-
-    assert (
-        p001_result[
-            "person_id"
-        ]
-        == "P001"
-    )
-
-    assert (
-        p001_result[
-            "camera_id"
-        ]
-        == "CAM-B-01"
-    )
-
-    assert (
-        p001_result[
-            "zone_id"
-        ]
-        == "ZONE-B"
-    )
-
-    assert (
-        p001_result[
-            "access_point_id"
-        ]
-        == "DOOR-B"
-    )
-
-    assert (
-        p001_result[
-            "authorization_status"
-        ]
-        == "AUTHORIZED"
-    )
+        p001_result = ingest_face_event(
+            p001_event,
+            driver,
+        )
 
 
-    print(
-        "PASS: P001 Face event ingested."
-    )
+        assert (
+            p001_result[
+                "person_id"
+            ]
+            == "P001"
+        )
 
-    print(
-        "PASS: P001 @ ZONE-B -> AUTHORIZED."
-    )
+        assert (
+            p001_result[
+                "camera_id"
+            ]
+            == "CAM-B-01"
+        )
 
+        assert (
+            p001_result[
+                "zone_id"
+            ]
+            == "ZONE-B"
+        )
 
-    # ========================================================
-    # P003 -> UNAUTHORIZED
-    # ========================================================
+        assert (
+            p001_result[
+                "access_point_id"
+            ]
+            == "DOOR-B"
+        )
 
-    p003_result = ingest_face_event(
-        p003_event,
-        driver,
-    )
-
-
-    assert (
-        p003_result[
-            "person_id"
-        ]
-        == "P003"
-    )
-
-    assert (
-        p003_result[
-            "authorization_status"
-        ]
-        == "UNAUTHORIZED"
-    )
-
-
-    print(
-        "PASS: P003 Face event ingested."
-    )
-
-    print(
-        "PASS: P003 @ ZONE-B -> UNAUTHORIZED."
-    )
+        assert (
+            p001_result[
+                "authorization_status"
+            ]
+            == "AUTHORIZED"
+        )
 
 
-    # ========================================================
-    # P004 -> AUTHORIZATION_UNKNOWN
-    #
-    # P004 is enrolled in Face Recognition but is not
-    # represented in the current synthetic topology.
-    # ========================================================
+        print(
+            "PASS: P001 Face event ingested."
+        )
 
-    p004_result = ingest_face_event(
-        p004_event,
-        driver,
-    )
+        print(
+            "PASS: P001 @ ZONE-B -> AUTHORIZED."
+        )
 
 
-    assert (
-        p004_result[
-            "person_id"
-        ]
-        == "P004"
-    )
+        # ========================================================
+        # P003 -> UNAUTHORIZED
+        # ========================================================
 
-    assert (
-        p004_result[
-            "authorization_status"
-        ]
-        == "AUTHORIZATION_UNKNOWN"
-    )
+        p003_result = ingest_face_event(
+            p003_event,
+            driver,
+        )
 
 
-    print(
-        "PASS: P004 Face event ingested."
-    )
+        assert (
+            p003_result[
+                "person_id"
+            ]
+            == "P003"
+        )
 
-    print(
-        "PASS: P004 missing topology identity -> "
-        "AUTHORIZATION_UNKNOWN."
-    )
-
-
-    # ========================================================
-    # UNKNOWN -> NOT_APPLICABLE
-    # ========================================================
-
-    unknown_result = ingest_face_event(
-        unknown_event,
-        driver,
-    )
+        assert (
+            p003_result[
+                "authorization_status"
+            ]
+            == "UNAUTHORIZED"
+        )
 
 
-    assert (
-        unknown_result[
-            "person_id"
-        ]
-        == "UNKNOWN"
-    )
+        print(
+            "PASS: P003 Face event ingested."
+        )
 
-    assert (
-        unknown_result[
-            "state"
-        ]
-        == "UNKNOWN_PERSON"
-    )
-
-    assert (
-        unknown_result[
-            "authorization_status"
-        ]
-        == "NOT_APPLICABLE"
-    )
+        print(
+            "PASS: P003 @ ZONE-B -> UNAUTHORIZED."
+        )
 
 
-    print(
-        "PASS: UNKNOWN Face event ingested."
-    )
+        # ========================================================
+        # P004 -> AUTHORIZATION_UNKNOWN
+        #
+        # P004 is enrolled in Face Recognition but is not
+        # represented in the current synthetic topology.
+        # ========================================================
 
-    print(
-        "PASS: UNKNOWN authorization -> "
-        "NOT_APPLICABLE."
-    )
-
-
-    # ========================================================
-    # Idempotency
-    # ========================================================
-
-    repeated = ingest_face_event(
-        p001_event,
-        driver,
-    )
+        p004_result = ingest_face_event(
+            p004_event,
+            driver,
+        )
 
 
-    assert (
-        repeated[
-            "event_id"
-        ]
-        == p001_result[
-            "event_id"
-        ]
-    )
+        assert (
+            p004_result[
+                "person_id"
+            ]
+            == "P004"
+        )
+
+        assert (
+            p004_result[
+                "authorization_status"
+            ]
+            == "AUTHORIZATION_UNKNOWN"
+        )
 
 
-    print(
-        "PASS: Repeated Face ingestion completed."
-    )
+        print(
+            "PASS: P004 Face event ingested."
+        )
+
+        print(
+            "PASS: P004 missing topology identity -> "
+            "AUTHORIZATION_UNKNOWN."
+        )
 
 
-    # ========================================================
-    # Graph verification
-    # ========================================================
+        # ========================================================
+        # UNKNOWN -> NOT_APPLICABLE
+        # ========================================================
 
-    with driver.session(
-        database=NEO4J_DATABASE
-    ) as session:
+        unknown_result = ingest_face_event(
+            unknown_event,
+            driver,
+        )
 
 
-        # ====================================================
-        # Event -> Camera
-        # ====================================================
+        assert (
+            unknown_result[
+                "person_id"
+            ]
+            == "UNKNOWN"
+        )
 
-        record = session.run(
-            """
+        assert (
+            unknown_result[
+                "state"
+            ]
+            == "UNKNOWN_PERSON"
+        )
+
+        assert (
+            unknown_result[
+                "authorization_status"
+            ]
+            == "NOT_APPLICABLE"
+        )
+
+
+        print(
+            "PASS: UNKNOWN Face event ingested."
+        )
+
+        print(
+            "PASS: UNKNOWN authorization -> "
+            "NOT_APPLICABLE."
+        )
+
+
+        # ========================================================
+        # Idempotency
+        # ========================================================
+
+        repeated = ingest_face_event(
+            p001_event,
+            driver,
+        )
+
+
+        assert (
+            repeated[
+                "event_id"
+            ]
+            == p001_result[
+                "event_id"
+            ]
+        )
+
+
+        print(
+            "PASS: Repeated Face ingestion completed."
+        )
+
+
+        # ========================================================
+        # Graph verification
+        # ========================================================
+
+        with driver.session(
+            database=NEO4J_DATABASE
+        ) as session:
+
+
+            # ====================================================
+            # Event -> Camera
+            # ====================================================
+
+            record = session.run(
+                """
             MATCH
                 (event:Event {
                     event_id: $event_id
@@ -606,33 +613,33 @@ try:
                     AS relationship_count
             """,
 
-            event_id=
-                p001_event[
-                    "event_id"
-                ],
-        ).single()
+                event_id=
+                    p001_event[
+                        "event_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "relationship_count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "relationship_count"
+                ]
+                == 1
+            )
 
 
-        print(
-            "PASS: Event -> OBSERVED_BY -> Camera "
-            "relationship verified."
-        )
+            print(
+                "PASS: Event -> OBSERVED_BY -> Camera "
+                "relationship verified."
+            )
 
 
-        # ====================================================
-        # Existing recognized Person relationship
-        # ====================================================
+            # ====================================================
+            # Existing recognized Person relationship
+            # ====================================================
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (event:Event {
                     event_id: $event_id
@@ -647,33 +654,33 @@ try:
                     AS relationship_count
             """,
 
-            event_id=
-                p001_event[
-                    "event_id"
-                ],
-        ).single()
+                event_id=
+                    p001_event[
+                        "event_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "relationship_count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "relationship_count"
+                ]
+                == 1
+            )
 
 
-        print(
-            "PASS: Recognized Event -> Person "
-            "relationship verified."
-        )
+            print(
+                "PASS: Recognized Event -> Person "
+                "relationship verified."
+            )
 
 
-        # ====================================================
-        # P003 is also a real topology Person
-        # ====================================================
+            # ====================================================
+            # P003 is also a real topology Person
+            # ====================================================
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (event:Event {
                     event_id: $event_id
@@ -688,32 +695,32 @@ try:
                     AS person_count
             """,
 
-            event_id=
-                p003_event[
-                    "event_id"
-                ],
-        ).single()
+                event_id=
+                    p003_event[
+                        "event_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "person_count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "person_count"
+                ]
+                == 1
+            )
 
 
-        print(
-            "PASS: P003 identity graph link preserved."
-        )
+            print(
+                "PASS: P003 identity graph link preserved."
+            )
 
 
-        # ====================================================
-        # P004 must NOT be invented as a Person node
-        # ====================================================
+            # ====================================================
+            # P004 must NOT be invented as a Person node
+            # ====================================================
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             OPTIONAL MATCH (person:Person {
                 person_id: "P004"
             })
@@ -722,19 +729,19 @@ try:
                 count(person)
                     AS person_count
             """
-        ).single()
+            ).single()
 
 
-        assert (
-            record[
-                "person_count"
-            ]
-            == 0
-        )
+            assert (
+                record[
+                    "person_count"
+                ]
+                == 0
+            )
 
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH (event:Event {
                 event_id: $event_id
             })
@@ -747,33 +754,33 @@ try:
                     AS identifies_count
             """,
 
-            event_id=
-                p004_event[
-                    "event_id"
-                ],
-        ).single()
+                event_id=
+                    p004_event[
+                        "event_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "identifies_count"
-            ]
-            == 0
-        )
+            assert (
+                record[
+                    "identifies_count"
+                ]
+                == 0
+            )
 
 
-        print(
-            "PASS: Missing P004 topology identity "
-            "was not invented."
-        )
+            print(
+                "PASS: Missing P004 topology identity "
+                "was not invented."
+            )
 
 
-        # ====================================================
-        # UNKNOWN must NOT become Person node
-        # ====================================================
+            # ====================================================
+            # UNKNOWN must NOT become Person node
+            # ====================================================
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             OPTIONAL MATCH (person:Person {
                 person_id: "UNKNOWN"
             })
@@ -782,19 +789,19 @@ try:
                 count(person)
                     AS person_count
             """
-        ).single()
+            ).single()
 
 
-        assert (
-            record[
-                "person_count"
-            ]
-            == 0
-        )
+            assert (
+                record[
+                    "person_count"
+                ]
+                == 0
+            )
 
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH (event:Event {
                 event_id: $event_id
             })
@@ -807,37 +814,37 @@ try:
                     AS identifies_count
             """,
 
-            event_id=
-                unknown_event[
-                    "event_id"
-                ],
-        ).single()
+                event_id=
+                    unknown_event[
+                        "event_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "identifies_count"
-            ]
-            == 0
-        )
+            assert (
+                record[
+                    "identifies_count"
+                ]
+                == 0
+            )
 
 
-        print(
-            "PASS: No Person:UNKNOWN node created."
-        )
+            print(
+                "PASS: No Person:UNKNOWN node created."
+            )
 
-        print(
-            "PASS: UNKNOWN event has no IDENTIFIES "
-            "relationship."
-        )
+            print(
+                "PASS: UNKNOWN event has no IDENTIFIES "
+                "relationship."
+            )
 
 
-        # ====================================================
-        # Camera topology reused
-        # ====================================================
+            # ====================================================
+            # Camera topology reused
+            # ====================================================
 
-        context = session.run(
-            """
+            context = session.run(
+                """
             MATCH
                 (event:Event {
                     event_id: $event_id
@@ -872,33 +879,33 @@ try:
                     AS access_point_id
             """,
 
-            event_id=
-                p001_event[
-                    "event_id"
-                ],
-        ).single()
+                event_id=
+                    p001_event[
+                        "event_id"
+                    ],
+            ).single()
 
 
-        if context is None:
+            if context is None:
 
-            raise AssertionError(
-                "Face observation physical context "
-                "not found."
+                raise AssertionError(
+                    "Face observation physical context "
+                    "not found."
+                )
+
+
+            print(
+                "PASS: Existing Camera -> Zone / "
+                "AccessPoint topology reused."
             )
 
 
-        print(
-            "PASS: Existing Camera -> Zone / "
-            "AccessPoint topology reused."
-        )
+            # ====================================================
+            # Authorization relationships remain graph-derived
+            # ====================================================
 
-
-        # ====================================================
-        # Authorization relationships remain graph-derived
-        # ====================================================
-
-        authorized = session.run(
-            """
+            authorized = session.run(
+                """
             MATCH
                 (person:Person {
                     person_id: "P001"
@@ -912,19 +919,19 @@ try:
                 count(zone)
                     AS count
             """
-        ).single()
+            ).single()
 
 
-        assert (
-            authorized[
-                "count"
-            ]
-            == 1
-        )
+            assert (
+                authorized[
+                    "count"
+                ]
+                == 1
+            )
 
 
-        unauthorized = session.run(
-            """
+            unauthorized = session.run(
+                """
             MATCH (person:Person {
                 person_id: "P003"
             })
@@ -942,29 +949,29 @@ try:
                 count(r)
                     AS count
             """
-        ).single()
+            ).single()
 
 
-        assert (
-            unauthorized[
-                "count"
-            ]
-            == 0
-        )
+            assert (
+                unauthorized[
+                    "count"
+                ]
+                == 0
+            )
 
 
-        print(
-            "PASS: Authorization remains "
-            "graph-derived."
-        )
+            print(
+                "PASS: Authorization remains "
+                "graph-derived."
+            )
 
 
-        # ====================================================
-        # Event/relationship idempotency
-        # ====================================================
+            # ====================================================
+            # Event/relationship idempotency
+            # ====================================================
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH (event:Event {
                 event_id: $event_id
             })
@@ -994,201 +1001,205 @@ try:
                     AS identifies_count
             """,
 
-            event_id=
-                p001_event[
-                    "event_id"
-                ],
-        ).single()
+                event_id=
+                    p001_event[
+                        "event_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "event_count"
-            ]
-            == 1
+            assert (
+                record[
+                    "event_count"
+                ]
+                == 1
+            )
+
+            assert (
+                record[
+                    "observed_count"
+                ]
+                == 1
+            )
+
+            assert (
+                record[
+                    "identifies_count"
+                ]
+                == 1
+            )
+
+
+            print(
+                "PASS: Face Event and relationships "
+                "are idempotent."
+            )
+
+
+        # ========================================================
+        # Display
+        # ========================================================
+
+        print(
+            "\n============================================"
         )
-
-        assert (
-            record[
-                "observed_count"
-            ]
-            == 1
+        print(
+            "FACE -> PHYSICAL / AUTHORIZATION CONTEXT"
         )
-
-        assert (
-            record[
-                "identifies_count"
-            ]
-            == 1
+        print(
+            "============================================"
         )
 
 
         print(
-            "PASS: Face Event and relationships "
-            "are idempotent."
+            "P001:"
+        )
+        print(
+            "  Camera: CAM-B-01"
+        )
+        print(
+            "  Zone: ZONE-B"
+        )
+        print(
+            "  Authorization:",
+            p001_result[
+                "authorization_status"
+            ],
         )
 
 
-    # ========================================================
-    # Display
-    # ========================================================
-
-    print(
-        "\n============================================"
-    )
-    print(
-        "FACE -> PHYSICAL / AUTHORIZATION CONTEXT"
-    )
-    print(
-        "============================================"
-    )
-
-
-    print(
-        "P001:"
-    )
-    print(
-        "  Camera: CAM-B-01"
-    )
-    print(
-        "  Zone: ZONE-B"
-    )
-    print(
-        "  Authorization:",
-        p001_result[
-            "authorization_status"
-        ],
-    )
+        print(
+            "\nP003:"
+        )
+        print(
+            "  Camera: CAM-B-01"
+        )
+        print(
+            "  Zone: ZONE-B"
+        )
+        print(
+            "  Authorization:",
+            p003_result[
+                "authorization_status"
+            ],
+        )
 
 
-    print(
-        "\nP003:"
-    )
-    print(
-        "  Camera: CAM-B-01"
-    )
-    print(
-        "  Zone: ZONE-B"
-    )
-    print(
-        "  Authorization:",
-        p003_result[
-            "authorization_status"
-        ],
-    )
+        print(
+            "\nP004:"
+        )
+        print(
+            "  Recognized by Face model"
+        )
+        print(
+            "  Person topology node: absent"
+        )
+        print(
+            "  Authorization:",
+            p004_result[
+                "authorization_status"
+            ],
+        )
 
 
-    print(
-        "\nP004:"
-    )
-    print(
-        "  Recognized by Face model"
-    )
-    print(
-        "  Person topology node: absent"
-    )
-    print(
-        "  Authorization:",
-        p004_result[
-            "authorization_status"
-        ],
-    )
+        print(
+            "\nUNKNOWN:"
+        )
+        print(
+            "  Camera: CAM-B-01"
+        )
+        print(
+            "  Zone: ZONE-B"
+        )
+        print(
+            "  Person node: none"
+        )
+        print(
+            "  Authorization:",
+            unknown_result[
+                "authorization_status"
+            ],
+        )
 
 
-    print(
-        "\nUNKNOWN:"
-    )
-    print(
-        "  Camera: CAM-B-01"
-    )
-    print(
-        "  Zone: ZONE-B"
-    )
-    print(
-        "  Person node: none"
-    )
-    print(
-        "  Authorization:",
-        unknown_result[
-            "authorization_status"
-        ],
-    )
+        # ========================================================
+        # Final
+        # ========================================================
+
+        print(
+            "\n============================================"
+        )
+        print(
+            "FACE EVENT INGESTION CONTRACT SUMMARY"
+        )
+        print(
+            "============================================"
+        )
+
+        print(
+            "PASS: Recognized Face ingestion."
+        )
+
+        print(
+            "PASS: Unknown Face ingestion."
+        )
+
+        print(
+            "PASS: Event -> Camera observation."
+        )
+
+        print(
+            "PASS: Existing Person identity links."
+        )
+
+        print(
+            "PASS: No synthetic UNKNOWN Person."
+        )
+
+        print(
+            "PASS: No synthetic P004 Person."
+        )
+
+        print(
+            "PASS: AUTHORIZED distinction."
+        )
+
+        print(
+            "PASS: UNAUTHORIZED distinction."
+        )
+
+        print(
+            "PASS: AUTHORIZATION_UNKNOWN distinction."
+        )
+
+        print(
+            "PASS: NOT_APPLICABLE distinction."
+        )
+
+        print(
+            "PASS: Graph topology reused."
+        )
+
+        print(
+            "PASS: Ingestion idempotent."
+        )
 
 
-    # ========================================================
-    # Final
-    # ========================================================
-
-    print(
-        "\n============================================"
-    )
-    print(
-        "FACE EVENT INGESTION CONTRACT SUMMARY"
-    )
-    print(
-        "============================================"
-    )
-
-    print(
-        "PASS: Recognized Face ingestion."
-    )
-
-    print(
-        "PASS: Unknown Face ingestion."
-    )
-
-    print(
-        "PASS: Event -> Camera observation."
-    )
-
-    print(
-        "PASS: Existing Person identity links."
-    )
-
-    print(
-        "PASS: No synthetic UNKNOWN Person."
-    )
-
-    print(
-        "PASS: No synthetic P004 Person."
-    )
-
-    print(
-        "PASS: AUTHORIZED distinction."
-    )
-
-    print(
-        "PASS: UNAUTHORIZED distinction."
-    )
-
-    print(
-        "PASS: AUTHORIZATION_UNKNOWN distinction."
-    )
-
-    print(
-        "PASS: NOT_APPLICABLE distinction."
-    )
-
-    print(
-        "PASS: Graph topology reused."
-    )
-
-    print(
-        "PASS: Ingestion idempotent."
-    )
+        print(
+            "\n============================================"
+        )
+        print(
+            "DC-GUARDIAN FACE EVENT INGESTION PASSED"
+        )
+        print(
+            "============================================"
+        )
 
 
-    print(
-        "\n============================================"
-    )
-    print(
-        "DC-GUARDIAN FACE EVENT INGESTION PASSED"
-    )
-    print(
-        "============================================"
-    )
+    finally:
+
+        driver.close()
 
 
-finally:
-
-    driver.close()
+if __name__ == "__main__":
+    test_face_event_ingestion_contract()

@@ -43,9 +43,9 @@ python check_all.py              # every layer, ~3 min; report in logs/checks/la
 python check_all.py --only <x>   # checks whose name contains <x>
 ```
 
-- Locally all **44** checks run (including the Playwright browser tests); converted folders count as one check each, with per-test results in their log. A fresh clone or CI skips GPU, private-data and RAG-knowledge-base checks with a stated reason; CI (`.github/workflows/ci.yml`) runs the rest on every push.
+- Locally all **14** checks run: one pytest suite per layer (each log lists every test and skip reason), the GPU suites in `.venv-ppe`/`.venv-gru`, the ordered Reasoning runner, the frontend build and Playwright, and a live API smoke test. A fresh clone or CI skips GPU, private-data and RAG-knowledge-base checks with a stated reason; CI (`.github/workflows/ci.yml`) runs the rest on every push.
 - Narrower runs: `python -m pytest presentation/backend/tests -q`, `python reasoning/run_contract_tests.py` (needs Neo4j; removes its `SCENARIO-*` test nodes afterwards), `npm run build` and `npm run test:e2e` (Playwright browser tests, mocked API, local Edge) in `presentation/frontend`.
-- **pytest:** backend, `response/agents/tests`, `integration/tests` and the Reasoning graph pilot (`reasoning/graph/conftest.py`). Converted files keep a `main()` so `python <file>` still works. Markers in `pytest.ini`: `neo4j`, `gpu`, `private_data` (tests needing Neo4j skip themselves when it is down). The remaining Evidence, Reasoning and RAG tests are still **scripts** (`python <file>`); convert them in the same style, keeping the same checks (compare counts before and after).
+- **Everything is pytest** (2026-10-12; see [`docs/TESTING.md`](docs/TESTING.md)). Markers `private_data(*paths)`, `gpu`, `neo4j` (`pytest.ini`, enforced by the root `conftest.py`) skip with a reason instead of failing. Every test file still runs alone with `python <file>`. Reasoning contracts must run in order: use `reasoning/run_contract_tests.py`. New tests: one behaviour per `test_` function, fixtures for setup, and the graph cleanup helpers in `reasoning/graph/graph_test_support.py`.
 - CI gates on Bandit (medium/high), pip-audit and `npm audit` (high). Annotate a reviewed-safe Bandit finding with `# nosec <code>: <reason>`; never suppress without a reason.
 - Backend runtime logs: `logs/errors.log` (start here), `logs/api_access.log`, `logs/backend.log`.
 
@@ -64,6 +64,7 @@ python check_all.py --only <x>   # checks whose name contains <x>
 
 - `docs/WORK_LOG.md`: dated changes and the testing plan
 - `docs/README.md`: documentation index
+- `docs/TESTING.md`: test layout, markers, how to run, how the scripts were converted
 - `docs/PRODUCTION_READINESS.md`: deployment design, threat model, security review scope
 - `docs/DEVELOPMENT_WORKFLOW.md`: PR workflow, `main` ruleset, reading CI, GitHub CLI and PC setup
 - `docs/AI_INVESTIGATOR.md`: Investigator, verdicts, field checks, group severity

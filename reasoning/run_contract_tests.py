@@ -3,7 +3,9 @@ DC-Guardian Reasoning
 Consolidated Contract Test Runner
 
 Runs Reasoning contracts in dependency order and stops
-immediately on the first failure.
+immediately on the first failure. Every contract is a pytest module
+(testing plan item 5, 2026-10-12); this runner keeps their order, since some
+correlation-store contracts use scenarios created by the contract before them.
 
 The same Python interpreter used to launch this script is
 used for every child test.
@@ -70,7 +72,7 @@ CONTRACTS = [
         "ADAPTERS",
         "SSH Adapter",
         [
-            "reasoning/test_ssh_event_adapter.py"
+            "-m", "pytest", "reasoning/test_ssh_event_adapter.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -78,7 +80,7 @@ CONTRACTS = [
         "ADAPTERS",
         "Maintenance Adapter",
         [
-            "reasoning/test_maintenance_event_adapter.py"
+            "-m", "pytest", "reasoning/test_maintenance_event_adapter.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -86,7 +88,7 @@ CONTRACTS = [
         "ADAPTERS",
         "Environmental Adapter",
         [
-            "reasoning/test_environmental_event_adapter.py"
+            "-m", "pytest", "reasoning/test_environmental_event_adapter.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -94,7 +96,7 @@ CONTRACTS = [
         "ADAPTERS",
         "Face Adapter",
         [
-            "reasoning/test_face_event_adapter.py"
+            "-m", "pytest", "reasoning/test_face_event_adapter.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -102,7 +104,7 @@ CONTRACTS = [
         "ADAPTERS",
         "PPE Adapter",
         [
-            "reasoning/test_ppe_event_adapter.py"
+            "-m", "pytest", "reasoning/test_ppe_event_adapter.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -114,7 +116,7 @@ CONTRACTS = [
         "TOPOLOGY",
         "SSH Topology",
         [
-            "reasoning/topology/test_topology_mapper.py"
+            "-m", "pytest", "reasoning/topology/test_topology_mapper.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -122,7 +124,7 @@ CONTRACTS = [
         "TOPOLOGY",
         "Maintenance Topology",
         [
-            "reasoning/topology/test_maintenance_topology_mapper.py"
+            "-m", "pytest", "reasoning/topology/test_maintenance_topology_mapper.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -130,7 +132,7 @@ CONTRACTS = [
         "TOPOLOGY",
         "Environmental Topology",
         [
-            "reasoning/topology/test_environmental_topology_mapper.py"
+            "-m", "pytest", "reasoning/topology/test_environmental_topology_mapper.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -138,7 +140,7 @@ CONTRACTS = [
         "TOPOLOGY",
         "Face Topology",
         [
-            "reasoning/topology/test_face_topology_mapper.py"
+            "-m", "pytest", "reasoning/topology/test_face_topology_mapper.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -146,7 +148,7 @@ CONTRACTS = [
         "TOPOLOGY",
         "PPE Topology",
         [
-            "reasoning/topology/test_ppe_topology_mapper.py"
+            "-m", "pytest", "reasoning/topology/test_ppe_topology_mapper.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -174,7 +176,7 @@ CONTRACTS = [
         "GRAPH",
         "Environmental Event Ingestion",
         [
-            "reasoning/graph/test_environmental_event_ingestion.py"
+            "-m", "pytest", "reasoning/graph/test_environmental_event_ingestion.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -182,7 +184,7 @@ CONTRACTS = [
         "GRAPH",
         "Face Event Ingestion",
         [
-            "reasoning/graph/test_face_event_ingestion.py"
+            "-m", "pytest", "reasoning/graph/test_face_event_ingestion.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -190,7 +192,7 @@ CONTRACTS = [
         "GRAPH",
         "PPE Event Ingestion",
         [
-            "reasoning/graph/test_ppe_event_ingestion.py"
+            "-m", "pytest", "reasoning/graph/test_ppe_event_ingestion.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -202,7 +204,7 @@ CONTRACTS = [
         "CORRELATION",
         "Pairwise Correlation",
         [
-            "reasoning/correlation/test_correlation_engine.py"
+            "-m", "pytest", "reasoning/correlation/test_correlation_engine.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -210,7 +212,7 @@ CONTRACTS = [
         "CORRELATION",
         "Pairwise Persistence",
         [
-            "reasoning/correlation/test_correlation_store.py"
+            "-m", "pytest", "reasoning/correlation/test_correlation_store.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -218,7 +220,7 @@ CONTRACTS = [
         "CORRELATION",
         "Three-Domain Correlation",
         [
-            "reasoning/correlation/test_three_domain_correlation.py"
+            "-m", "pytest", "reasoning/correlation/test_three_domain_correlation.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -226,7 +228,7 @@ CONTRACTS = [
         "CORRELATION",
         "Three-Domain Persistence",
         [
-            "reasoning/correlation/test_three_domain_correlation_store.py"
+            "-m", "pytest", "reasoning/correlation/test_three_domain_correlation_store.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -234,7 +236,7 @@ CONTRACTS = [
         "CORRELATION",
         "Face + Cyber Correlation",
         [
-            "reasoning/correlation/test_face_cyber_correlation.py"
+            "-m", "pytest", "reasoning/correlation/test_face_cyber_correlation.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -242,7 +244,7 @@ CONTRACTS = [
         "CORRELATION",
         "Face + Cyber Persistence",
         [
-            "reasoning/correlation/test_face_cyber_correlation_store.py"
+            "-m", "pytest", "reasoning/correlation/test_face_cyber_correlation_store.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -250,7 +252,7 @@ CONTRACTS = [
         "CORRELATION",
         "PPE + Face Correlation",
         [
-            "reasoning/correlation/test_ppe_face_correlation.py"
+            "-m", "pytest", "reasoning/correlation/test_ppe_face_correlation.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 
@@ -258,7 +260,7 @@ CONTRACTS = [
         "CORRELATION",
         "PPE + Face Persistence",
         [
-            "reasoning/correlation/test_ppe_face_correlation_store.py"
+            "-m", "pytest", "reasoning/correlation/test_ppe_face_correlation_store.py", "-q", "-p", "no:cacheprovider", "-rs"
         ],
     ),
 

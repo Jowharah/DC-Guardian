@@ -7,6 +7,11 @@ Run after parse_sources.py from the repository root:
 
 from __future__ import annotations
 
+import pytest  # noqa: E402
+
+pytestmark = [pytest.mark.private_data('response/rag/knowledge_base/chunks')]
+
+
 import json
 from pathlib import Path
 
@@ -121,6 +126,10 @@ def main() -> None:
         f"{len(locked_ids)}/{len(active_ids)}"
     )
     print("=" * 60)
+
+
+def test_parsing_contract():
+    main()
 
 
 if __name__ == "__main__":

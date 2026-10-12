@@ -6,6 +6,32 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Testing plan item 5 completed: every test under pytest
+
+- **What (operator request):** the remaining 55 script tests are pytest modules: 27 Evidence (4 GPU), 6 RAG and 22 Reasoning, including the labelling pack. Each straight-line script body moved unchanged into a `test_<name>_contract()` function; scripts with a `main()` got a test that calls it; a `__main__` guard keeps `python <file>` working; multi-line string lines were not re-indented.
+- **Infrastructure:**
+  - The root `conftest.py` turns the markers `private_data(*paths)`, `gpu` and `neo4j` into skips with reasons.
+  - `pytest.ini`: `--import-mode=importlib`, `pythonpath = .` (duplicate test file names across Evidence folders).
+  - pytest 9.1.1 installed in `.venv-ppe`, `.venv-gru` and `.venv-face`.
+  - The Reasoning graph helpers moved to `graph_test_support.py`: `from conftest import ...` would now resolve to the root conftest.
+  - `reasoning/run_contract_tests.py` runs every contract with pytest, in the same dependency order.
+  - `check_all.py` has one check per suite: **14 checks** (was 44; same tests).
+- **A trap that was caught:** six scripts ran their checks inside `if __name__ == "__main__":`. Wrapped in a function, those checks would not have run under pytest, yet the test would have passed. The guards are now unconditional.
+- **Equivalence:**
+  - identical `assert`/`raise` counts per file (889 / 133 across the 55 files);
+  - identical `PASS` output as a script and under pytest for 55/55 files (GPU files in their component environments).
+- **Verified:** `check_all.py` 14/14:
+  - Evidence 23 + 4 GPU;
+  - Reasoning 24 contracts + 16;
+  - RAG 10;
+  - agents 37;
+  - integration 12;
+  - backend 400;
+  - Playwright 14.
+- **Remaining (optional):** splitting the 55 module-level files into one test per check.
+
+---
+
 ## 2026-10-12 — Backup folder
 
 - **Operator choice:** `C:\Users\Aljawharah\Documents\DC-Guardian Backup`. New setting `DCG_BACKUP_DIR` (in `.env`, documented in `.env.example`) gives `backup create` a default of `<dir>\backups` and `audit_checkpoint write` a default of `<dir>\checkpoints`; both still accept `--out-dir`.
@@ -545,6 +571,6 @@ Keep every existing check; change how they are organized. Status is updated as i
 | 2 | Move `inspect_sh17_*.py` to `evidence/ppe_detection/tools/` | Exploration scripts, not tests | **Done** 2026-10-11 |
 | 3 | Pilot: convert Reasoning graph/correlation scripts to pytest with shared Neo4j fixtures and markers (`neo4j`, `gpu`, `private_data`) | ~19,400 lines for 541 checks; 13 copies of driver/cleanup code; stops at first failure; order-dependent | **Pilot done** 2026-10-11 (SSH and maintenance ingestion); awaiting group review |
 | 4 | Browser tests (Playwright) for verdict, group review and Decision re-evaluation | Frontend has no automated tests | **Done** 2026-10-11 (5 tests, in CI); 8 tests since (analytics outcomes, monitoring summary, v2 Decisions) |
-| 5 | Convert remaining script tests (Evidence, Response, integration) after the pilot is reviewed | Single runner, per-test results, selectable tests | **In progress** 2026-10-12: Response agents (8 files, 37 tests) and integration (4 files, 12 tests) done; Response RAG (6), Reasoning (18), Evidence (27) remain |
+| 5 | Convert remaining script tests (Evidence, Response, integration) after the pilot is reviewed | Single runner, per-test results, selectable tests | **Done** 2026-10-12: every test runs under pytest (agents and integration one test per check; 55 Evidence/RAG/Reasoning files module-level, shown equivalent); see `docs/TESTING.md` |
 
 Rule for conversions: the same checks must still run — assertion counts are compared before and after.

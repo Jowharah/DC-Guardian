@@ -1,113 +1,105 @@
-﻿from pathlib import Path
-import json
-import sys
+﻿
+import pytest  # noqa: E402
 
-from jsonschema import (
-    Draft202012Validator,
-    FormatChecker,
-)
+def test_environmental_event_adapter_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
+    from pathlib import Path
+    import json
+    import sys
 
-
-PROJECT_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[1]
-)
-
-
-ADAPTER_DIR = (
-    PROJECT_ROOT
-    / "reasoning"
-    / "adapters"
-)
-
-
-if str(ADAPTER_DIR) not in sys.path:
-
-    sys.path.insert(
-        0,
-        str(ADAPTER_DIR)
+    from jsonschema import (
+        Draft202012Validator,
+        FormatChecker,
     )
 
 
-from environmental_event_adapter import (
-    adapt_environmental_assessment,
-)
+    PROJECT_ROOT = (
+        Path(__file__)
+        .resolve()
+        .parents[1]
+    )
 
 
-SCHEMA_FILE = (
-    PROJECT_ROOT
-    / "shared"
-    / "schemas"
-    / "event_schema.json"
-)
+    ADAPTER_DIR = (
+        PROJECT_ROOT
+        / "reasoning"
+        / "adapters"
+    )
 
 
-with open(
-    SCHEMA_FILE,
-    "r",
-    encoding="utf-8",
-) as file:
+    if str(ADAPTER_DIR) not in sys.path:
 
-    schema = json.load(file)
-
-
-validator = Draft202012Validator(
-    schema,
-    format_checker=FormatChecker(),
-)
+        sys.path.insert(
+            0,
+            str(ADAPTER_DIR)
+        )
 
 
-def build_assessment(
-    *,
-    source_class,
-    source_id,
-    source_asset_type,
-):
+    from environmental_event_adapter import (
+        adapt_environmental_assessment,
+    )
 
-    return {
-        "domain":
-            "ENVIRONMENTAL",
 
-        "event_type":
-            "ENVIRONMENTAL_CONDITION_ASSESSMENT",
+    SCHEMA_FILE = (
+        PROJECT_ROOT
+        / "shared"
+        / "schemas"
+        / "event_schema.json"
+    )
 
-        "component":
-            "environmental_detector",
 
-        "component_version":
-            "1.0",
+    with open(
+        SCHEMA_FILE,
+        "r",
+        encoding="utf-8",
+    ) as file:
 
-        "source_class":
-            source_class,
+        schema = json.load(file)
 
-        "source_id":
-            source_id,
 
-        "source_asset_type":
-            source_asset_type,
+    validator = Draft202012Validator(
+        schema,
+        format_checker=FormatChecker(),
+    )
 
-        "observation_timestamp":
-            "2026-09-18T12:03:00Z",
 
-        "assessment":
-            "HIGH_TEMPERATURE",
+    def build_assessment(
+        *,
+        source_class,
+        source_id,
+        source_asset_type,
+    ):
 
-        "anomaly_detected":
-            True,
+        return {
+            "domain":
+                "ENVIRONMENTAL",
 
-        "measurements": {
-            "temperature_c":
-                42.5,
+            "event_type":
+                "ENVIRONMENTAL_CONDITION_ASSESSMENT",
 
-            "humidity_pct":
-                48.0,
-        },
+            "component":
+                "environmental_detector",
 
-        "evidence": {
-            "triggered_conditions": [
-                "HIGH_TEMPERATURE"
-            ],
+            "component_version":
+                "1.0",
+
+            "source_class":
+                source_class,
+
+            "source_id":
+                source_id,
+
+            "source_asset_type":
+                source_asset_type,
+
+            "observation_timestamp":
+                "2026-09-18T12:03:00Z",
+
+            "assessment":
+                "HIGH_TEMPERATURE",
+
+            "anomaly_detected":
+                True,
 
             "measurements": {
                 "temperature_c":
@@ -117,285 +109,302 @@ def build_assessment(
                     48.0,
             },
 
-            "thresholds": {
-                "temperature_high_c":
-                    35.0,
+            "evidence": {
+                "triggered_conditions": [
+                    "HIGH_TEMPERATURE"
+                ],
+
+                "measurements": {
+                    "temperature_c":
+                        42.5,
+
+                    "humidity_pct":
+                        48.0,
+                },
+
+                "thresholds": {
+                    "temperature_high_c":
+                        35.0,
+                },
             },
-        },
-    }
+        }
 
 
-cases = [
-    (
-        "SENSOR",
-        build_assessment(
-            source_class=
-                "ENVIRONMENTAL_SENSOR",
+    cases = [
+        (
+            "SENSOR",
+            build_assessment(
+                source_class=
+                    "ENVIRONMENTAL_SENSOR",
 
-            source_id=
-                "SEN-B-01",
+                source_id=
+                    "SEN-B-01",
 
-            source_asset_type=
-                "ENVIRONMENTAL_SENSOR",
+                source_asset_type=
+                    "ENVIRONMENTAL_SENSOR",
+            ),
         ),
-    ),
 
-    (
-        "HARD_DRIVE",
-        build_assessment(
-            source_class=
-                "HARDWARE_TELEMETRY",
+        (
+            "HARD_DRIVE",
+            build_assessment(
+                source_class=
+                    "HARDWARE_TELEMETRY",
 
-            source_id=
-                "DRV-ENV-001",
+                source_id=
+                    "DRV-ENV-001",
 
-            source_asset_type=
-                "HARD_DRIVE",
+                source_asset_type=
+                    "HARD_DRIVE",
+            ),
         ),
-    ),
 
-    (
-        "SERVER",
-        build_assessment(
-            source_class=
-                "HARDWARE_TELEMETRY",
+        (
+            "SERVER",
+            build_assessment(
+                source_class=
+                    "HARDWARE_TELEMETRY",
 
-            source_id=
-                "SRV-B1-01",
+                source_id=
+                    "SRV-B1-01",
 
-            source_asset_type=
-                "SERVER",
+                source_asset_type=
+                    "SERVER",
+            ),
         ),
-    ),
 
-    (
-        "COOLING_SYSTEM",
-        build_assessment(
-            source_class=
-                "HARDWARE_TELEMETRY",
+        (
+            "COOLING_SYSTEM",
+            build_assessment(
+                source_class=
+                    "HARDWARE_TELEMETRY",
 
-            source_id=
-                "CHILLER-C1",
+                source_id=
+                    "CHILLER-C1",
 
-            source_asset_type=
-                "COOLING_SYSTEM",
+                source_asset_type=
+                    "COOLING_SYSTEM",
+            ),
         ),
-    ),
-]
+    ]
 
 
-print(
-    "\n============================================"
-)
-print(
-    "DC-GUARDIAN ENVIRONMENTAL ADAPTER TEST"
-)
-print(
-    "============================================"
-)
+    print(
+        "\n============================================"
+    )
+    print(
+        "DC-GUARDIAN ENVIRONMENTAL ADAPTER TEST"
+    )
+    print(
+        "============================================"
+    )
 
 
-passed = 0
+    passed = 0
 
 
-for index, (
-    name,
-    assessment,
-) in enumerate(
-    cases,
-    start=1,
-):
-
-    event = adapt_environmental_assessment(
+    for index, (
+        name,
         assessment,
+    ) in enumerate(
+        cases,
+        start=1,
+    ):
 
-        dataset_name=
-            "DC-Guardian Environmental "
-            "Contract Test",
+        event = adapt_environmental_assessment(
+            assessment,
 
-        source_type=
-            "CONTROLLED_TEST",
+            dataset_name=
+                "DC-Guardian Environmental "
+                "Contract Test",
 
-        event_id=
-            f"EVT-ENV-TEST-{index:03d}",
-    )
+            source_type=
+                "CONTROLLED_TEST",
 
-
-    errors = list(
-        validator.iter_errors(
-            event
-        )
-    )
-
-
-    if errors:
-
-        print(
-            f"\nFAIL: {name}"
+            event_id=
+                f"EVT-ENV-TEST-{index:03d}",
         )
 
-        for error in errors:
+
+        errors = list(
+            validator.iter_errors(
+                event
+            )
+        )
+
+
+        if errors:
+
             print(
-                error.message
+                f"\nFAIL: {name}"
             )
 
-        continue
+            for error in errors:
+                print(
+                    error.message
+                )
+
+            continue
 
 
-    assert (
-        event["domain"]
-        == "ENVIRONMENTAL"
+        assert (
+            event["domain"]
+            == "ENVIRONMENTAL"
+        )
+
+        assert (
+            event[
+                "assessment"
+            ][
+                "state"
+            ]
+            == "HIGH_TEMPERATURE"
+        )
+
+        assert (
+            event[
+                "provenance"
+            ][
+                "synthetic_mapping"
+            ]
+            is False
+        )
+
+
+        if name == "SENSOR":
+
+            assert (
+                event[
+                    "entities"
+                ][
+                    "sensor_id"
+                ]
+                == "SEN-B-01"
+            )
+
+            assert (
+                event[
+                    "entities"
+                ][
+                    "asset_id"
+                ]
+                is None
+            )
+
+
+        elif name == "HARD_DRIVE":
+
+            assert (
+                event[
+                    "entities"
+                ][
+                    "asset_id"
+                ]
+                == "DRV-ENV-001"
+            )
+
+            assert (
+                event[
+                    "entities"
+                ][
+                    "server_id"
+                ]
+                is None
+            )
+
+
+        elif name == "SERVER":
+
+            assert (
+                event[
+                    "entities"
+                ][
+                    "asset_id"
+                ]
+                == "SRV-B1-01"
+            )
+
+            assert (
+                event[
+                    "entities"
+                ][
+                    "server_id"
+                ]
+                == "SRV-B1-01"
+            )
+
+
+        elif name == "COOLING_SYSTEM":
+
+            assert (
+                event[
+                    "entities"
+                ][
+                    "equipment_id"
+                ]
+                == "CHILLER-C1"
+            )
+
+
+        print(
+            f"PASS: {name}"
+        )
+
+
+        passed += 1
+
+
+    print(
+        "\n============================================"
+    )
+    print(
+        "TEST SUMMARY"
+    )
+    print(
+        "============================================"
     )
 
-    assert (
-        event[
-            "assessment"
-        ][
-            "state"
-        ]
-        == "HIGH_TEMPERATURE"
-    )
-
-    assert (
-        event[
-            "provenance"
-        ][
-            "synthetic_mapping"
-        ]
-        is False
+    print(
+        f"Passed: {passed}/{len(cases)}"
     )
 
 
-    if name == "SENSOR":
+    if passed != len(cases):
 
-        assert (
-            event[
-                "entities"
-            ][
-                "sensor_id"
-            ]
-            == "SEN-B-01"
-        )
-
-        assert (
-            event[
-                "entities"
-            ][
-                "asset_id"
-            ]
-            is None
-        )
-
-
-    elif name == "HARD_DRIVE":
-
-        assert (
-            event[
-                "entities"
-            ][
-                "asset_id"
-            ]
-            == "DRV-ENV-001"
-        )
-
-        assert (
-            event[
-                "entities"
-            ][
-                "server_id"
-            ]
-            is None
-        )
-
-
-    elif name == "SERVER":
-
-        assert (
-            event[
-                "entities"
-            ][
-                "asset_id"
-            ]
-            == "SRV-B1-01"
-        )
-
-        assert (
-            event[
-                "entities"
-            ][
-                "server_id"
-            ]
-            == "SRV-B1-01"
-        )
-
-
-    elif name == "COOLING_SYSTEM":
-
-        assert (
-            event[
-                "entities"
-            ][
-                "equipment_id"
-            ]
-            == "CHILLER-C1"
+        raise SystemExit(
+            "Environmental adapter "
+            "contract failed."
         )
 
 
     print(
-        f"PASS: {name}"
+        "\nPASS: Sensor identity preserved."
+    )
+
+    print(
+        "PASS: Hardware identity preserved."
+    )
+
+    print(
+        "PASS: Source provenance preserved."
+    )
+
+    print(
+        "PASS: No synthetic topology introduced."
     )
 
 
-    passed += 1
-
-
-print(
-    "\n============================================"
-)
-print(
-    "TEST SUMMARY"
-)
-print(
-    "============================================"
-)
-
-print(
-    f"Passed: {passed}/{len(cases)}"
-)
-
-
-if passed != len(cases):
-
-    raise SystemExit(
-        "Environmental adapter "
-        "contract failed."
+    print(
+        "\n============================================"
+    )
+    print(
+        "ENVIRONMENTAL REASONING LAYER ADAPTER "
+        "CONTRACT PASSED"
+    )
+    print(
+        "============================================"
     )
 
 
-print(
-    "\nPASS: Sensor identity preserved."
-)
-
-print(
-    "PASS: Hardware identity preserved."
-)
-
-print(
-    "PASS: Source provenance preserved."
-)
-
-print(
-    "PASS: No synthetic topology introduced."
-)
-
-
-print(
-    "\n============================================"
-)
-print(
-    "ENVIRONMENTAL REASONING LAYER ADAPTER "
-    "CONTRACT PASSED"
-)
-print(
-    "============================================"
-)
+if __name__ == "__main__":
+    test_environmental_event_adapter_contract()

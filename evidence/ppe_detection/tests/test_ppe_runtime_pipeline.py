@@ -6,326 +6,337 @@ Uses development-validation images only.
 Does not access the locked final-test manifest.
 """
 
-from pathlib import Path
+import pytest  # noqa: E402
 
-from evidence.ppe_detection.src.ppe_pipeline import (
-    PPECompliancePipeline,
-)
+pytestmark = [pytest.mark.gpu]
 
+def test_ppe_runtime_pipeline_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+    from pathlib import Path
 
-PPE_ROOT = (
-    PROJECT_ROOT
-    / "evidence"
-    / "ppe_detection"
-)
-
-RAW_IMAGE_DIR = (
-    PPE_ROOT
-    / "data"
-    / "raw"
-    / "SH17"
-    / "images"
-)
-
-VALIDATION_MANIFEST = (
-    PPE_ROOT
-    / "data"
-    / "processed"
-    / "sh17_yolo"
-    / "validation_files.txt"
-)
-
-
-print(
-    "\n============================================"
-)
-print(
-    "DC-GUARDIAN PPE RUNTIME PIPELINE TEST"
-)
-print(
-    "============================================"
-)
-
-
-pipeline = PPECompliancePipeline()
-
-
-print(
-    "PASS: Frozen PPE detector loaded."
-)
-
-
-validation_names = [
-    line.strip()
-    for line
-    in VALIDATION_MANIFEST.read_text(
-        encoding="utf-8"
-    ).splitlines()
-    if line.strip()
-]
-
-
-if len(validation_names) != 810:
-    raise AssertionError(
-        "Development-validation population changed."
+    from evidence.ppe_detection.src.ppe_pipeline import (
+        PPECompliancePipeline,
     )
 
 
-print(
-    "PASS: Development validation population loaded."
-)
+    PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
-print(
-    "PASS: Locked final-test manifest not accessed."
-)
+    PPE_ROOT = (
+        PROJECT_ROOT
+        / "evidence"
+        / "ppe_detection"
+    )
 
+    RAW_IMAGE_DIR = (
+        PPE_ROOT
+        / "data"
+        / "raw"
+        / "SH17"
+        / "images"
+    )
 
-# Use several development images rather than relying on
-# one arbitrary frame.
-sample_names = validation_names[
-    :10
-]
-
-
-valid_statuses = {
-    "COMPLIANT",
-    "NON_COMPLIANT",
-    "NO_PERSON",
-}
-
-
-status_counts = {
-    status: 0
-    for status
-    in valid_statuses
-}
-
-
-for image_name in sample_names:
-
-    image_path = (
-        RAW_IMAGE_DIR
-        / image_name
+    VALIDATION_MANIFEST = (
+        PPE_ROOT
+        / "data"
+        / "processed"
+        / "sh17_yolo"
+        / "validation_files.txt"
     )
 
 
-    assessment = pipeline.assess(
-        image_path
+    print(
+        "\n============================================"
+    )
+    print(
+        "DC-GUARDIAN PPE RUNTIME PIPELINE TEST"
+    )
+    print(
+        "============================================"
     )
 
 
-    status = assessment[
-        "overall_status"
+    pipeline = PPECompliancePipeline()
+
+
+    print(
+        "PASS: Frozen PPE detector loaded."
+    )
+
+
+    validation_names = [
+        line.strip()
+        for line
+        in VALIDATION_MANIFEST.read_text(
+            encoding="utf-8"
+        ).splitlines()
+        if line.strip()
     ]
 
 
-    if status not in valid_statuses:
+    if len(validation_names) != 810:
         raise AssertionError(
-            f"Unexpected PPE status: {status}"
+            "Development-validation population changed."
         )
 
 
-    status_counts[
-        status
-    ] += 1
-
-
-    if (
-        assessment[
-            "domain"
-        ]
-        != "PHYSICAL_SECURITY"
-    ):
-        raise AssertionError(
-            "PPE runtime domain changed."
-        )
-
-
-    if (
-        assessment[
-            "event_type"
-        ]
-        != "PPE_COMPLIANCE_ASSESSMENT"
-    ):
-        raise AssertionError(
-            "PPE runtime event type changed."
-        )
-
-
-    if (
-        assessment[
-            "detector_configuration_frozen"
-        ]
-        is not True
-    ):
-        raise AssertionError(
-            "Frozen detector flag missing."
-        )
-
-    # ============================================================
-    # Verify frozen runtime configuration
-    # ============================================================
-
-    if (
-        assessment[
-            "policy_frozen"
-        ]
-        is not True
-    ):
-        raise AssertionError(
-            "Frozen PPE policy flag missing."
-        )
-
-
-    assert (
-        assessment[
-            "confidence_threshold"
-        ]
-        == 0.25
+    print(
+        "PASS: Development validation population loaded."
     )
 
-    assert (
-        assessment[
-            "iou_threshold"
-        ]
-        == 0.70
-    )
-
-    assert (
-        assessment[
-            "association_minimum_containment"
-        ]
-        == 0.50
+    print(
+        "PASS: Locked final-test manifest not accessed."
     )
 
 
-    if (
-        assessment[
+    # Use several development images rather than relying on
+    # one arbitrary frame.
+    sample_names = validation_names[
+        :10
+    ]
+
+
+    valid_statuses = {
+        "COMPLIANT",
+        "NON_COMPLIANT",
+        "NO_PERSON",
+    }
+
+
+    status_counts = {
+        status: 0
+        for status
+        in valid_statuses
+    }
+
+
+    for image_name in sample_names:
+
+        image_path = (
+            RAW_IMAGE_DIR
+            / image_name
+        )
+
+
+        assessment = pipeline.assess(
+            image_path
+        )
+
+
+        status = assessment[
+            "overall_status"
+        ]
+
+
+        if status not in valid_statuses:
+            raise AssertionError(
+                f"Unexpected PPE status: {status}"
+            )
+
+
+        status_counts[
+            status
+        ] += 1
+
+
+        if (
+            assessment[
+                "domain"
+            ]
+            != "PHYSICAL_SECURITY"
+        ):
+            raise AssertionError(
+                "PPE runtime domain changed."
+            )
+
+
+        if (
+            assessment[
+                "event_type"
+            ]
+            != "PPE_COMPLIANCE_ASSESSMENT"
+        ):
+            raise AssertionError(
+                "PPE runtime event type changed."
+            )
+
+
+        if (
+            assessment[
+                "detector_configuration_frozen"
+            ]
+            is not True
+        ):
+            raise AssertionError(
+                "Frozen detector flag missing."
+            )
+
+        # ============================================================
+        # Verify frozen runtime configuration
+        # ============================================================
+
+        if (
+            assessment[
+                "policy_frozen"
+            ]
+            is not True
+        ):
+            raise AssertionError(
+                "Frozen PPE policy flag missing."
+            )
+
+
+        assert (
+            assessment[
+                "confidence_threshold"
+            ]
+            == 0.25
+        )
+
+        assert (
+            assessment[
+                "iou_threshold"
+            ]
+            == 0.70
+        )
+
+        assert (
+            assessment[
+                "association_minimum_containment"
+            ]
+            == 0.50
+        )
+
+
+        if (
+            assessment[
+                "latency_ms"
+            ]
+            <= 0
+        ):
+            raise AssertionError(
+                "Runtime latency not recorded."
+            )
+
+
+        if assessment[
             "latency_ms"
-        ]
-        <= 0
-    ):
-        raise AssertionError(
-            "Runtime latency not recorded."
+        ] <= 0:
+
+            raise AssertionError(
+                "Runtime latency not recorded."
+            )
+
+
+        print()
+
+        print(
+            image_name
+        )
+
+        print(
+            "  Persons:",
+            assessment[
+                "person_count"
+            ],
+        )
+
+        print(
+            "  Status:",
+            status,
+        )
+
+        print(
+            "  Detections:",
+            len(
+                assessment[
+                    "detections"
+                ]
+            ),
+        )
+
+        print(
+            "  Unassigned:",
+            len(
+                assessment[
+                    "unassigned_detections"
+                ]
+            ),
+        )
+
+        print(
+            "  Latency:",
+            f"{assessment['latency_ms']:.2f} ms",
         )
 
 
-    if assessment[
-        "latency_ms"
-    ] <= 0:
+    print(
+        "\n============================================"
+    )
+    print(
+        "PPE RUNTIME DIAGNOSTIC SUMMARY"
+    )
+    print(
+        "============================================"
+    )
 
-        raise AssertionError(
-            "Runtime latency not recorded."
+    for status in [
+        "COMPLIANT",
+        "NON_COMPLIANT",
+        "NO_PERSON",
+    ]:
+
+        print(
+            f"{status}: "
+            f"{status_counts[status]}"
         )
 
 
-    print()
-
     print(
-        image_name
+        "\nPASS: Frozen detector used."
     )
 
     print(
-        "  Persons:",
-        assessment[
-            "person_count"
-        ],
+        "PASS: Development validation only."
     )
 
     print(
-        "  Status:",
-        status,
+        "PASS: Structured PPE assessments produced."
     )
 
     print(
-        "  Detections:",
-        len(
-            assessment[
-                "detections"
-            ]
-        ),
+        "PASS: Runtime latency recorded."
     )
 
     print(
-        "  Unassigned:",
-        len(
-            assessment[
-                "unassigned_detections"
-            ]
-        ),
+        "PASS: Frozen confidence threshold = 0.25."
     )
 
     print(
-        "  Latency:",
-        f"{assessment['latency_ms']:.2f} ms",
+        "PASS: Frozen IoU threshold = 0.70."
     )
-
-
-print(
-    "\n============================================"
-)
-print(
-    "PPE RUNTIME DIAGNOSTIC SUMMARY"
-)
-print(
-    "============================================"
-)
-
-for status in [
-    "COMPLIANT",
-    "NON_COMPLIANT",
-    "NO_PERSON",
-]:
 
     print(
-        f"{status}: "
-        f"{status_counts[status]}"
+        "PASS: Frozen association containment = 0.50."
+    )
+
+    print(
+        "PASS: PPE-POLICY-v1 remains frozen."
     )
 
 
-print(
-    "\nPASS: Frozen detector used."
-)
+    print(
+        "\n============================================"
+    )
 
-print(
-    "PASS: Development validation only."
-)
+    print(
+        "PPE RUNTIME PIPELINE CONTRACT PASSED"
+    )
 
-print(
-    "PASS: Structured PPE assessments produced."
-)
-
-print(
-    "PASS: Runtime latency recorded."
-)
-
-print(
-    "PASS: Frozen confidence threshold = 0.25."
-)
-
-print(
-    "PASS: Frozen IoU threshold = 0.70."
-)
-
-print(
-    "PASS: Frozen association containment = 0.50."
-)
-
-print(
-    "PASS: PPE-POLICY-v1 remains frozen."
-)
+    print(
+        "============================================"
+    )
 
 
-print(
-    "\n============================================"
-)
-
-print(
-    "PPE RUNTIME PIPELINE CONTRACT PASSED"
-)
-
-print(
-    "============================================"
-)
+if __name__ == "__main__":
+    test_ppe_runtime_pipeline_contract()

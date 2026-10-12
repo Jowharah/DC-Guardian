@@ -56,7 +56,7 @@ gh run download <run-id> -n check-report      # full check_all.py report and per
 - A check that passes locally but fails in CI usually depends on local settings (`.env`, private data, GPU). Tests must pin any setting they rely on. Example (2026-10-12): Investigator history endpoints answered "disabled" before checking access, which only showed in CI because the local `.env` enabled history.
 - Old failed runs stay in the GitHub history. What matters is the newest commit on `main` and the checks on an open pull request.
 
-Run everything locally before pushing: `python check_all.py` (see [Validation and Operations](VALIDATION_AND_OPERATIONS.md)).
+Run everything locally before pushing: `python check_all.py` (see [Validation and Operations](VALIDATION_AND_OPERATIONS.md)). Test layout, markers and single-suite commands: [Testing](TESTING.md).
 
 ## 4. One-time setup on the operator's PC
 

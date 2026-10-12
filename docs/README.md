@@ -11,6 +11,7 @@ Working on the repository with Claude Code: see [`CLAUDE.md`](../CLAUDE.md) at t
 
 ## Existing reference documents
 
+- [Testing](TESTING.md) — what each test suite covers, markers and automatic skips, commands, how the script tests were converted to pytest and shown to be equivalent, how to write new tests.
 - [Production Readiness](PRODUCTION_READINESS.md) — what must change before real data or multiple users: target deployment, decisions to make, STRIDE threat model with existing controls and gaps, scope for the independent security review.
 - [Development Workflow](DEVELOPMENT_WORKFLOW.md) — how changes reach `main` (protected branch, pull requests, merge commits), reading CI failures, GitHub CLI, and the operator PC setup (Kaspersky certificate fix for Node tools and `claude rc`).
 - [Uncertainty Reasoning](UNCERTAINTY_REASONING.md) — Bayesian cross-domain correlation, expert knowledge base, labelled scenarios and evaluation against the crisp rule.

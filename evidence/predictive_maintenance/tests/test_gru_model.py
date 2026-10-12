@@ -3,182 +3,191 @@ DC-Guardian Predictive Maintenance
 GRU Model Contract Test
 """
 
-import torch
+import pytest  # noqa: E402
 
-from evidence.predictive_maintenance.src.gru.config import (
-    GRU_BATCH_SIZE,
-    GRU_INPUT_SIZE,
-    GRU_SEQUENCE_LENGTH,
-)
+def test_gru_model_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
 
-from evidence.predictive_maintenance.src.gru.model import (
-    MaintenanceGRU,
-)
+    import torch
 
-
-print(
-    "\n============================================"
-)
-print(
-    "DC-GUARDIAN GRU MODEL TEST"
-)
-print(
-    "============================================"
-)
-
-
-device = torch.device(
-    "cuda"
-    if torch.cuda.is_available()
-    else "cpu"
-)
-
-
-print(
-    "Device:",
-    device
-)
-
-
-model = MaintenanceGRU().to(
-    device
-)
-
-
-# ============================================================
-# Small synthetic batch
-# ============================================================
-
-TEST_BATCH_SIZE = 16
-
-
-x = torch.randn(
-    TEST_BATCH_SIZE,
-    GRU_SEQUENCE_LENGTH,
-    GRU_INPUT_SIZE,
-    dtype=torch.float32,
-    device=device,
-)
-
-
-with torch.no_grad():
-
-    logits = model(
-        x
+    from evidence.predictive_maintenance.src.gru.config import (
+        GRU_BATCH_SIZE,
+        GRU_INPUT_SIZE,
+        GRU_SEQUENCE_LENGTH,
     )
 
-
-assert logits.shape == (
-    TEST_BATCH_SIZE,
-)
-
-
-assert torch.isfinite(
-    logits
-).all()
-
-
-print(
-    "PASS: GRU forward pass."
-)
-
-print(
-    "PASS: Input shape accepted:",
-    tuple(
-        x.shape
+    from evidence.predictive_maintenance.src.gru.model import (
+        MaintenanceGRU,
     )
-)
 
-print(
-    "PASS: Output shape:",
-    tuple(
-        logits.shape
-    )
-)
-
-
-# ============================================================
-# Probability conversion
-# ============================================================
-
-probabilities = torch.sigmoid(
-    logits
-)
-
-
-assert torch.all(
-    probabilities >= 0
-)
-
-assert torch.all(
-    probabilities <= 1
-)
-
-
-print(
-    "PASS: Logits convert to valid probabilities."
-)
-
-
-# ============================================================
-# GPU contract
-# ============================================================
-
-if torch.cuda.is_available():
-
-    assert next(
-        model.parameters()
-    ).is_cuda
 
     print(
-        "PASS: Model runs on CUDA."
+        "\n============================================"
+    )
+    print(
+        "DC-GUARDIAN GRU MODEL TEST"
+    )
+    print(
+        "============================================"
+    )
+
+
+    device = torch.device(
+        "cuda"
+        if torch.cuda.is_available()
+        else "cpu"
+    )
+
+
+    print(
+        "Device:",
+        device
+    )
+
+
+    model = MaintenanceGRU().to(
+        device
+    )
+
+
+    # ============================================================
+    # Small synthetic batch
+    # ============================================================
+
+    TEST_BATCH_SIZE = 16
+
+
+    x = torch.randn(
+        TEST_BATCH_SIZE,
+        GRU_SEQUENCE_LENGTH,
+        GRU_INPUT_SIZE,
+        dtype=torch.float32,
+        device=device,
+    )
+
+
+    with torch.no_grad():
+
+        logits = model(
+            x
+        )
+
+
+    assert logits.shape == (
+        TEST_BATCH_SIZE,
+    )
+
+
+    assert torch.isfinite(
+        logits
+    ).all()
+
+
+    print(
+        "PASS: GRU forward pass."
     )
 
     print(
-        "GPU:",
-        torch.cuda.get_device_name(0)
+        "PASS: Input shape accepted:",
+        tuple(
+            x.shape
+        )
     )
-
-else:
 
     print(
-        "WARNING: CUDA unavailable; "
-        "model is running on CPU."
+        "PASS: Output shape:",
+        tuple(
+            logits.shape
+        )
     )
 
 
-# ============================================================
-# Parameter count
-# ============================================================
+    # ============================================================
+    # Probability conversion
+    # ============================================================
 
-parameter_count = sum(
-    parameter.numel()
-    for parameter in model.parameters()
-)
-
-
-print(
-    "Trainable parameters:",
-    f"{parameter_count:,}"
-)
+    probabilities = torch.sigmoid(
+        logits
+    )
 
 
-assert parameter_count > 0
+    assert torch.all(
+        probabilities >= 0
+    )
 
-assert parameter_count < 1_000_000
+    assert torch.all(
+        probabilities <= 1
+    )
 
 
-print(
-    "PASS: GRU remains compact."
-)
+    print(
+        "PASS: Logits convert to valid probabilities."
+    )
 
 
-print(
-    "\n============================================"
-)
-print(
-    "GRU MODEL CONTRACT PASSED"
-)
-print(
-    "============================================"
-)
+    # ============================================================
+    # GPU contract
+    # ============================================================
+
+    if torch.cuda.is_available():
+
+        assert next(
+            model.parameters()
+        ).is_cuda
+
+        print(
+            "PASS: Model runs on CUDA."
+        )
+
+        print(
+            "GPU:",
+            torch.cuda.get_device_name(0)
+        )
+
+    else:
+
+        print(
+            "WARNING: CUDA unavailable; "
+            "model is running on CPU."
+        )
+
+
+    # ============================================================
+    # Parameter count
+    # ============================================================
+
+    parameter_count = sum(
+        parameter.numel()
+        for parameter in model.parameters()
+    )
+
+
+    print(
+        "Trainable parameters:",
+        f"{parameter_count:,}"
+    )
+
+
+    assert parameter_count > 0
+
+    assert parameter_count < 1_000_000
+
+
+    print(
+        "PASS: GRU remains compact."
+    )
+
+
+    print(
+        "\n============================================"
+    )
+    print(
+        "GRU MODEL CONTRACT PASSED"
+    )
+    print(
+        "============================================"
+    )
+
+
+if __name__ == "__main__":
+    test_gru_model_contract()

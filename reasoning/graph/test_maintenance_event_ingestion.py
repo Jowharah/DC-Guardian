@@ -8,7 +8,7 @@ including its test-only drive, are removed afterwards.
 """
 import pytest
 
-from conftest import cleanup_graph, single
+from graph_test_support import cleanup_graph, single
 from ingest_event import ingest_maintenance_event
 from maintenance_event_adapter import adapt_maintenance_assessment
 from topology_mapper import map_maintenance_event_to_scenario

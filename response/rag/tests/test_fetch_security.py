@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import pytest  # noqa: E402
+
+
 from pathlib import Path
 import sys
 
@@ -72,6 +75,10 @@ def main():
     print("=" * 60)
     print("DC-GUARDIAN RAG SOURCE FETCH SECURITY CONTRACT PASSED")
     print("=" * 60)
+
+
+def test_fetch_security_contract():
+    main()
 
 
 if __name__ == "__main__":
