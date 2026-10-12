@@ -6,6 +6,30 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Post-generation overclaim judge (measured)
+
+- **What:** `investigator_judge.py`. After every Investigator answer, a short structured call reads only the pseudonymized answer text and quotes sentences that state presence, a cause (including which inputs drove a model) or PPE absence as fact.
+  - Its findings are added to `claim_checks.model_judge`, and a flag raises the status to VIOLATION; the panel lists them as "Model check".
+  - Invented quotes are dropped. A failure is shown as UNAVAILABLE and never blocks the answer.
+  - Settings in `.env.example`: `DCG_INVESTIGATOR_JUDGE_ENABLED`, `DCG_INVESTIGATOR_JUDGE_MODEL`. The same file now also documents the rate limit and pseudonym key.
+- **Measurement** (`presentation/backend/validation/judge_eval.py`; per-answer output local; summaries in `results/judge_{design,test}.md`):
+
+  | Split | Answers | Overclaims | Caught | False alarms |
+  |---|---:|---:|---:|---:|
+  | Design (dev + holdout; instructions refined: v1 → v2 → v3) | 40 | 4 | v1 3/4, v3 **4/4** | v1 11/36, v3 **1/36** |
+  | **Test** (round-2, blind labels, frozen v3, scored once) | 40 | 5 | **4/5** | **1/35** |
+
+  - Missed: a presence claim ("in the area covered by ZONE-A").
+  - False alarm: a factually wrong "second worker was wearing a vest" read as an absence claim.
+- **Verified:** backend pytest 399 passed (new `test_investigator_judge.py` with a fake client: flag raises status, judge sees only the pseudonymized answer, invented quotes dropped, failure never blocks, can be disabled); Playwright 14 passed.
+- **Caveats:**
+  - Author labels and small samples.
+  - One extra model call per answer (cost; covered by the rate limit).
+  - Calls to the judge are not separate rows in the call audit: its status is folded into the answer's `claim_status`.
+  - Confirm with labels from teammates.
+
+---
+
 ## 2026-10-12 — Investigator instructions: presence and causation (measured, no effect)
 
 - **What:** the Investigator instructions now give exact wording for presence ("recognized in an image from a camera declared in ZONE-X"; never present, standing, inside or on site; no room names the context lacks). They forbid stating causes ("model assessed elevated failure risk; reported SMART values include …", never "failing because of"), and say temperature, cooling and HVAC causes were not assessed.

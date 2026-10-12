@@ -45,6 +45,7 @@ def fake_openai(monkeypatch):
     FakeClient.sent, FakeClient.fail = [], False
     monkeypatch.setattr(openai, "OpenAI", FakeClient)
     monkeypatch.setenv("DCG_INVESTIGATOR_ENABLED", "1")
+    monkeypatch.setenv("DCG_INVESTIGATOR_JUDGE_ENABLED", "0")  # judge calls are tested in test_investigator_judge.py
     monkeypatch.setenv("OPENAI_API_KEY", "test-key-not-real")
     monkeypatch.setattr(investigator_tools, "single_evidence_context", lambda kind, eid, p: json.loads(json.dumps(FACE_CONTEXT)))
     return FakeClient
