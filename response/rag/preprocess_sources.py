@@ -3,6 +3,9 @@ Conservatively preprocess parsed DC-GUARDIAN RAG records.
 
 This stage removes repeated PDF header/footer lines, repairs clear
 alphabetic line-break hyphenation, and preserves page/source provenance.
+For CFR sections (OSHA-1910-*), whose official PDFs are whole printed pages,
+it keeps only the document's own section: from its heading to the next
+section's heading. Text is cut, never rewritten; the cut is recorded.
 It does not chunk, summarize, translate, or semantically rewrite content.
 """
 
@@ -35,6 +38,50 @@ def load_jsonl(path: Path) -> list[dict]:
             for line in handle
             if line.strip()
         ]
+
+
+# "§ 1910.135 Head protection." -- section number, a space, then a title word.
+# Page headers ("§ 1910.135" + line break) and cross-references
+# ("§ 1910.134 and ...", "§ 1910.269 for ...") do not match. The section sign
+# may arrive as U+FFFD from the PDF text layer.
+CFR_HEADING = re.compile(r"[\u00a7\ufffd]\s*1910\.(\d+[a-z]?) +(?:\[|[A-Z][a-z])")
+
+
+def cfr_section(document_id: str) -> str | None:
+    match = re.fullmatch(r"OSHA-1910-(\d+[a-z]?)", document_id)
+    return match.group(1) if match else None
+
+
+def trim_to_cfr_section(records: list[dict], section: str) -> list[tuple[dict, int, int]]:
+    """(record, characters cut before, characters cut after) for the pages kept.
+
+    Pages before the section's heading and after the next section's heading are
+    dropped; the boundary pages are cut at the headings. If the heading is not
+    found, nothing is trimmed (the document is kept whole).
+    """
+    found = False
+    for record in records:
+        if any(m.group(1) == section for m in CFR_HEADING.finditer(record["text"])):
+            found = True
+            break
+    if not found:
+        return [(record, 0, 0) for record in records]
+    kept, inside = [], False
+    for record in records:
+        text = record["text"]
+        start = 0
+        if not inside:
+            heading = next((m for m in CFR_HEADING.finditer(text) if m.group(1) == section), None)
+            if heading is None:
+                continue
+            inside, start = True, heading.start()
+        end = next((m.start() for m in CFR_HEADING.finditer(text, start + 1) if m.group(1) != section), None)
+        output = dict(record)
+        output["text"] = text[start:end] if end is not None else text[start:]
+        kept.append((output, start, len(text) - end if end is not None else 0))
+        if end is not None:
+            break
+    return kept
 
 
 def normalize_line(line: str) -> str:
@@ -213,6 +260,16 @@ def main() -> None:
                 cleaned_records.append(output)
                 removed_total += removed
                 dehyphenated_total += dehyphenated
+
+            section = cfr_section(document_id)
+            if section:
+                trimmed = trim_to_cfr_section(cleaned_records, section)
+                for record, before, after in trimmed:
+                    record["text"] = record["text"].strip()
+                    record["preprocessing"]["cfr_section"] = f"1910.{section}"
+                    record["preprocessing"]["cfr_chars_cut_before"] = before
+                    record["preprocessing"]["cfr_chars_cut_after"] = after
+                cleaned_records = [record for record, _, _ in trimmed]
 
             output_path = CLEAN_DIR / f"{document_id}.jsonl"
             with output_path.open("w", encoding="utf-8") as handle:

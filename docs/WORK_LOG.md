@@ -6,6 +6,37 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Safety knowledge: CFR section boundaries (PPE specialist fixed)
+
+- **Cause:** the approved OSHA sources are official GovInfo PDFs of whole printed CFR pages, so each document also held its neighbours: 1910.135 (head protection) began with the end of 1910.134 (respirators), 1910.132 with the end of 1910.131, and 1910.137 repeated the 1910.135/136 text. Neighbouring text dominated the chunk embeddings, so PPE searches returned respirator, lockout and electrical-glove passages and the PPE specialist could not cite support.
+- **Fix:** `preprocess_sources.py` trims each `OSHA-1910-*` document to its own section, from the heading `§ 1910.NNN Title` to the next section's heading. Page headers and cross-references are not treated as headings; text is cut, never rewritten; the cut is recorded per page (`cfr_section`, `cfr_chars_cut_before/after`). No source was added or changed; only the five OSHA documents' derived files differ.
+- **Rebuild** (knowledge base and index are local, not in Git), from the repository root:
+  ```
+  PYTHONPATH=. python response/rag/preprocess_sources.py
+  PYTHONPATH=. python response/rag/chunk_sources.py
+  PYTHONPATH=. python response/rag/build_index.py
+  ```
+  Without `PYTHONPATH` the chunk and index steps fail with `No module named 'response'`.
+- **Results:**
+  - The index drops from 260 to 255 chunks (duplicates removed).
+  - Safety searches now return OSHA 1910.132 (general PPE requirements, hazard assessment) and 1910.135 (protective helmets).
+  - Retrieval evaluation (same settings as the saved report: controlled ranking, abstention on, 18 frozen cases):
+
+    | Measure | Before | After |
+    |---|---:|---:|
+    | MRR | 0.461 | 0.618 |
+    | hit@1 | 0.353 | 0.588 |
+    | recall@5 | 0.510 | 0.608 |
+    | Negative cases | 0.5 | 0.5 |
+
+  - Live PPE specialist (operator-approved) on both non-compliant images: PARTIALLY_SUPPORTED, citing OSHA 1910.132/135, keeping "non-detection is not proof of absence" and the human override separate.
+- **Verified:** new `response/rag/tests/test_cfr_sections.py` (pytest and script); all RAG checks pass.
+- **Caveats:**
+  - Abstention recalibrated on the rebuilt index (`calibrate_abstention.py`, development set): the threshold is unchanged at 0.5922, and the 12 development cases are still classified 6/6/0/0.
+  - OSHA 1910 has no specific high-visibility vest rule; vest guidance rests on the general PPE duty in 1910.132.
+
+---
+
 ## 2026-10-12 — Production readiness design and HTTP hardening
 
 - **Design:** `docs/PRODUCTION_READINESS.md`:
