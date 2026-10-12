@@ -6,6 +6,15 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Accessibility scan (axe-core)
+
+- **What:** `@axe-core/playwright` 4.10.2 (dev dependency, pinned; `npm audit` clean) and `e2e/accessibility.spec.ts`: WCAG 2.1 A/AA scan of sign-in, Monitoring Center, group detail, single-event detail (verdict and specialist panels), Analytics, Review Queue and Scenario Lab; any violation fails with its element.
+- **Found and fixed:** colour contrast only: white on the HIGH severity pill was 4.44:1 and on RECOGNIZED 4.14:1 (minimum 4.5:1); backgrounds darkened to `#C93360` (5.09:1) and `#287D5C` (5.03:1). The scan's flow also exposed an interaction bug: clicking a single event while a correlation group was open did not show its verdict and specialist panels; single-event rows now close open correlation views.
+- **Verified:** Playwright 11 passed (in CI with the other browser tests).
+- **Limits:** automated scans catch only part of accessibility problems; keyboard-only use and screen-reader wording still need a manual review.
+
+---
+
 ## 2026-10-12 — Investigator pseudonyms for usernames, IPs and person IDs
 
 - **Operator decision:** mask all three before anything leaves for OpenAI.

@@ -4,7 +4,7 @@
 
 | Feature | Status | Remaining work |
 |---|---|---|
-| Severity colors and dashboard consistency | Implemented; targeted UI checks performed | Broader accessibility, contrast, responsive regression |
+| Severity colors and dashboard consistency | Implemented; **automated WCAG 2.1 A/AA scan (axe-core) of every main screen in the Playwright suite, zero violations** (2026-10-12) | Manual keyboard and screen-reader review; responsive regression |
 | Live-time synthetic events | Partial / controlled validators available | End-to-end time provenance and live simulation verification |
 | SSH raw logs, usernames and source IPs | Detector Evidence and metadata implemented | Decide governed raw-log retention policy; currently raw logs intentionally not retained |
 | PPE image upload and annotated detections | Implemented and demonstrated | Protected artifact-access and detector/association regression |
