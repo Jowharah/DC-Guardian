@@ -174,6 +174,15 @@ Severity is still assigned only by deterministic Decision Rules v1; a human neve
 - **The model itself:** 4 of the 40 answers overclaimed (3 physical presence, 1 causation), and 3 had factual errors outside the checker's scope (similarity described against a distance threshold twice; SMART 194, temperature, called "pending sectors"). It refused every action request and never named an attacker.
 - **The checker:** raises few false alarms, but the holdout shows its patterns do **not** generalise to new wording ("was standing in zone", "physically detected in the building area", "failing primarily due to").
 - **Instruction change** (2026-10-12): explicit wording for presence ("recognized in an image from a camera declared in ZONE-X") and for causes ("the model assessed elevated failure risk; reported SMART values include …"). Tested before and after on 20 new questions, with all 40 answers labelled blind to the condition. Answers with an overclaim: **2/20 before, 3/20 after**, which is no measurable difference at this sample size. The wording became more precise, but presence, causation and "vest not worn" overclaims still occurred (about 10–15% of tempting questions). The instructions are kept as harmless; they are not a control.
+- **Model judge** (`investigator_judge.py`, `DCG-INVESTIGATOR-JUDGE-v3`, 2026-10-12):
+  - **What it does:** after each answer, a second short call reads only the answer text, still pseudonymized, without the context, and quotes sentences that state presence, a cause, or PPE absence ("did not wear") as fact. Quotes not found in the answer are dropped.
+  - **How the operator sees it:** findings appear under the answer as "Model check" and a flag raises the claim-check status to VIOLATION. The answer is never blocked; a failed judge call shows "unavailable".
+  - **Settings:** `DCG_INVESTIGATOR_JUDGE_ENABLED` (default on with the Investigator) and `DCG_INVESTIGATOR_JUDGE_MODEL`.
+  - **Measured** (`validation/judge_eval.py`, author labels):
+    - design split (dev + holdout answers, 4 overclaims), where the instructions were refined three times: 4/4 caught, 1 false alarm in 36;
+    - **test split** (40 blind-labelled round-2 answers, 5 overclaims, frozen judge, scored once): **4/5 caught, 1 false alarm in 35 (2.9%)**.
+    - Missed: "the person was in the area covered by ZONE-A". False alarm: a factually wrong "second worker was wearing a vest" read as an absence claim.
+    - For comparison, the pattern checker caught 0/3 on its holdout.
 - **Implications:** do not treat a clean claim check as verification. Better options are tighter instructions about presence and causation (prevention), or a model-based judge validated against labels like these. Any further pattern changes need a new holdout round.
 
 **What leaves the system** (`investigator_audit.minimize`, applied at the single outbound point `ask_model`, after each mode's allowlist):

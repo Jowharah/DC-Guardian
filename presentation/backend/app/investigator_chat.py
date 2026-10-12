@@ -20,6 +20,7 @@ from presentation.backend.app.investigator_field_checks import context_field_che
 from presentation.backend.app.investigator_claim_checks import claim_checks
 from presentation.backend.app.investigator_audit import minimize,record_call
 from presentation.backend.app.investigator_pseudonyms import Pseudonymizer
+from presentation.backend.app.investigator_judge import judge as judge_answer
 
 router=APIRouter()
 logger=logging.getLogger(__name__)
@@ -116,6 +117,14 @@ def new_call(principal,mode,target_id,zone_id,evidence_refs):
     return {"subject":principal.subject,"mode":mode,"target_id":target_id,"zone_id":zone_id,
             "evidence_refs":evidence_refs,"model":"","payload":""}
 
+def with_judge(claims,call):
+    """Add the model judge's findings; a flag raises the overall claim status."""
+    result=call.get("judge") or {"status":"DISABLED","findings":[]}
+    status=claims["status"]
+    if result["status"]=="FLAGGED" and status in ("NO_RECOGNIZED_PROBLEM","HEDGED"):
+        status="VIOLATION"
+    return {**claims,"status":status,"model_judge":result}
+
 def audit_call(call,answer,claims):
     record_call(call,outcome="ANSWERED",answer=answer,claim_status=claims["status"])
 
@@ -137,7 +146,8 @@ def ask_model(instructions,question,context,label,call=None):
         response=client.responses.create(
             model=model,instructions=instructions,input=payload,
             max_output_tokens=700,store=False)
-        answer=pseudonyms.unmask(response.output_text.strip())
+        masked_answer=response.output_text.strip()
+        answer=pseudonyms.unmask(masked_answer)
         if not answer:raise ValueError("Empty model response")
     except Exception as exc:
         # Log only a safe exception class; provider messages may contain
@@ -146,6 +156,11 @@ def ask_model(instructions,question,context,label,call=None):
         if call is not None:
             record_call(call,outcome="PROVIDER_FAILED")
         raise HTTPException(503,"INVESTIGATOR_PROVIDER_UNAVAILABLE") from exc
+    if call is not None:
+        # Post-generation check on the still-pseudonymized answer (never blocks it).
+        result=judge_answer(masked_answer)
+        result["findings"]=[{**f,"sentence":pseudonyms.unmask(f["sentence"])} for f in result["findings"]]
+        call["judge"]=result
     return answer
 
 def grounded(answer,sources):
@@ -180,6 +195,7 @@ linked only if contextual_links contains that link."""
     records=[(kind,item.get("observation_id"),item) for kind,items in context["source_assessments"].items()
              for item in (items if isinstance(items,list) else [items])]
     claims=claim_checks(answer,records)
+    claims=with_judge(claims,call)
     audit_call(call,answer,claims)
     return {"group_id":group_id,**grounded(answer,unified_sources(context)),
             "field_grounding":context_field_checks(answer,records),"claim_checks":claims,
@@ -203,6 +219,7 @@ link does and does not support."""
     answer=ask_model(instructions,request.question,context,"Pair",call)
     records=[(m["kind"],m["observation_id"],m["assessment"]) for m in context["members"]]
     claims=claim_checks(answer,records)
+    claims=with_judge(claims,call)
     audit_call(call,answer,claims)
     return {"pair_id":pair_id,**grounded(answer,pair_sources(context)),
             "field_grounding":context_field_checks(answer,records),"claim_checks":claims,
@@ -235,6 +252,7 @@ def ask_operations(candidate_id:str,request:InvestigatorQuestion,
     answer=ask_model(INSTRUCTIONS+OPERATIONS_INSTRUCTIONS,request.question,minimal,"Operational",call)
     records=[("maintenance",maintenance.get("event_id"),maintenance),("environment",environment.get("event_id"),environment)]
     claims=claim_checks(answer,records)
+    claims=with_judge(claims,call)
     audit_call(call,answer,claims)
     return {"candidate_id":candidate_id,**grounded(answer,operational_sources(context)),
             "field_grounding":context_field_checks(answer,records),"claim_checks":claims,
@@ -256,6 +274,7 @@ state from confirmed events, and explicitly state any unsupported conclusions.""
     answer=ask_model(instructions,request.question,context,"Single Evidence",call)
     record={**context["source_assessment"],"human_review":context.get("human_review")}
     claims=claim_checks(answer,[(kind,evidence_id,record)])
+    claims=with_judge(claims,call)
     audit_call(call,answer,claims)
     return {"kind":kind,"evidence_id":evidence_id,**grounded(answer,single_sources(context)),
             "field_grounding":context_field_checks(answer,[(kind,evidence_id,context["source_assessment"])]),
