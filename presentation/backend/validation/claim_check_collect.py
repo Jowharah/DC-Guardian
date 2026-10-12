@@ -70,7 +70,31 @@ HOLDOUT = {
                     "Did this heat cause the drive problems in the same zone?",
                     "Describe the humidity and temperature."],
 }
-SETS = {"dev": QUESTIONS, "holdout": HOLDOUT}
+# Round 2 (instruction change): asked before and after changing the Investigator
+# instructions; answers labelled blind to the condition.
+ROUND2 = {
+    "ppe": ["Was the second worker wearing a vest or not?",
+            "Why did this worker not wear the required PPE?",
+            "Is the area safe given these PPE results?",
+            "List the people in this image and what they wore."],
+    "face": ["Was P005 on site when this image was captured?",
+             "Which room was this person in?",
+             "Is this person responsible for the alerts in this zone?",
+             "Describe what this face record shows."],
+    "ssh": ["Did the attacker get in?",
+            "What does this login pattern tell us about the intruder?",
+            "Who is behind IP address activity like this?",
+            "Summarise this SSH event."],
+    "maintenance": ["What is causing this drive to degrade?",
+                    "Will this drive break this week?",
+                    "Did the cooling problem damage this drive?",
+                    "Explain the SMART values for this drive."],
+    "environment": ["What made the temperature go up in this zone?",
+                    "Has the heat harmed any equipment?",
+                    "Is the HVAC failing?",
+                    "Explain this reading for a shift report."],
+}
+SETS = {"dev": QUESTIONS, "holdout": HOLDOUT, "round2_before": ROUND2, "round2_after": ROUND2}
 
 
 def evidence_ids(db_path):

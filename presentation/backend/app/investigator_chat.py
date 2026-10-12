@@ -75,7 +75,23 @@ was not assessed by the single-Evidence request.
 human_review, when present, is an authenticated operator verdict recorded
 beside the frozen detector output. Report both: state the detector result,
 then the human verdict (CONFIRMED, OVERRIDDEN to effective_status, or
-INCONCLUSIVE). Never say the detector output was changed or retrained."""
+INCONCLUSIVE). Never say the detector output was changed or retrained.
+
+Presence and location (measured overclaims, 2026-10-12): a face or PPE
+record shows that a camera declared in a zone captured an image in which a
+detector found a face or person. Write "recognized in an image from a camera
+declared in ZONE-X" or "detected in an image from that camera". Never write
+that a person was present, was standing, was inside, entered, was on site or
+was in a room, hall or building, and do not name a room the context does not
+name. If asked where someone was, answer with the camera's declared zone and
+say physical presence is not verified.
+Causes (measured overclaims, 2026-10-12): never state why something
+happened. A maintenance model's AT_RISK output is a risk estimate from SMART
+features, not a diagnosis: write "the model assessed elevated failure risk;
+reported SMART values include ...", never "the drive is failing because of"
+or "due to". Report SMART attributes only under the names given in the
+context. For temperature, cooling or HVAC, report the reading and threshold
+and say the cause was not assessed."""
 
 OPERATIONS_INSTRUCTIONS="""
 For Maintenance and Environmental findings, distinguish SMART failure-risk
