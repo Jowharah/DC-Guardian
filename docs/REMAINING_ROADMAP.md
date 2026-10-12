@@ -28,16 +28,16 @@
 
 Keep every existing check; reorganize them. Tracked with status in [Work Log — Testing plan](WORK_LOG.md#testing-plan-agreed-2026-10-11): GitHub Actions for fast tests, move exploration scripts out of `tests/`, pytest pilot for Reasoning graph/correlation with shared Neo4j fixtures and markers, Playwright browser tests for key review flows, then remaining script conversions.
 
-## Suggested order (refreshed 2026-10-11)
+## Suggested order (refreshed 2026-10-12)
 
-1. **Independent labelling round** (pack ready in `reasoning/uncertainty/labelling/pack/`): it now validates two things at once, the Bayesian correlation study and the Decision v2 group rule. Then re-run `evaluate.py` and `decision_v2_validation.py` on those labels.
-2. **Live checks of today's changes:** restart the backend, re-run the specialists on the operator-cleared group (sends Evidence to OpenAI; operator consent), confirm `logs/errors.log` is clean.
-3. ~~Single-event specialists~~ (done 2026-10-11).
-4. ~~API authorization matrix~~ (done 2026-10-11; policy decisions applied 2026-10-12).
-5. Testing plan item 5: convert the remaining script tests after the pytest pilot is reviewed; branch protection on `main` (CI required).
-6. ~~AI Investigator claim checks, privacy review, call audit~~ (done 2026-10-11; next: measure the claim checker on real answers).
-7. Review lifecycle, audit external checkpoint, failure/recovery; dashboard accessibility.
-8. Production deployment design and independent security review.
+Done since 2026-10-11: live specialist check, single-event specialists, API access matrix and policy decisions, Investigator claim checks / privacy / pseudonyms / call audit, external audit checkpoints, accessibility scan, `main` branch protection with required CI.
+
+1. **Independent labelling round** (pack in `reasoning/uncertainty/labelling/pack/`): teammates label; then re-run `evaluate.py` and `decision_v2_validation.py`. Validates both the Bayesian study and the Decision v2 group rule. Consider a severity column to validate MEDIUM vs LOW.
+2. **First live runs** (operator consent, sends Evidence to OpenAI): a single-event specialist and Investigator questions, to check pseudonyms, claim checks and the call audit on real answers; then measure the claim checker (precision/recall) on a set of real answers.
+3. **Review lifecycle** (needs an operator policy): investigation states (e.g. open, in review, resolved), who may close and reopen, and how it relates to verdicts and Decisions.
+4. **Testing plan item 5:** convert the remaining script tests to pytest after the group reviews the pilot.
+5. **Operations routines:** where and how often audit checkpoints are written; backup and recovery of the SQLite store and Neo4j; manual keyboard / screen-reader review.
+6. **Production deployment design and independent security review** (authentication beyond local HTTP Basic, TLS, secrets, monitoring, threat model, penetration test).
 
 ## Acceptance rules
 
