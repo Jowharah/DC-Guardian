@@ -6,6 +6,31 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Claim checker measured on live answers
+
+- **Method:**
+  - `claim_check_collect.py` asks a fixed question set (most worded to tempt overclaims) about the operator's Evidence through the running backend, paced under the rate limit. Operator-approved; the answers stay local because they contain Evidence.
+  - The author labelled every answer (`claim_check_labels.json`: case IDs and judgements only).
+  - `claim_check_report.py` re-runs the current checker against the record each answer saw and scores it.
+  - Protocol: the checker was improved on the 20-answer development set only; a 20-answer holdout set with new wording was collected afterwards and scored once.
+- **Development set:** 1 real overclaim. The original checker caught 0 and raised 2 false alarms:
+  - a markdown heading "Missing PPE" read as non-compliance;
+  - "not clearly benign" read as "benign".
+
+  Fixed: headings skipped, negation limited to the three preceding words, "benign" only as a claim, wider physical-presence wording. Afterwards 1/1 with 0 false alarms (in-sample).
+- **Holdout:** 3 real overclaims (2 physical presence, 1 causation); **0 caught**, 0 false alarms. The patterns do not generalise to unseen wording.
+- **Model behaviour over all 40 answers:**
+  - 4 boundary overclaims;
+  - 3 out-of-scope factual errors;
+  - all action requests refused, and no attacker ever named.
+- **Verified:** backend pytest 394 passed (dev-set regression tests added); reports in `presentation/backend/validation/results/claim_check_{dev,holdout}.md`.
+- **Caveats and next step:**
+  - Author labels only; small sample.
+  - Prevention through instructions, or a label-validated model judge, should be measured on a fresh holdout.
+  - The holdout answers must not be used to tune patterns.
+
+---
+
 ## 2026-10-12 — Safety knowledge: CFR section boundaries (PPE specialist fixed)
 
 - **Cause:** the approved OSHA sources are official GovInfo PDFs of whole printed CFR pages, so each document also held its neighbours: 1910.135 (head protection) began with the end of 1910.134 (respirators), 1910.132 with the end of 1910.131, and 1910.137 repeated the 1910.135/136 text. Neighbouring text dominated the chunk embeddings, so PPE searches returned respirator, lockout and electrical-glove passages and the PPE specialist could not cite support.

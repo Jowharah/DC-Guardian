@@ -1,0 +1,227 @@
+{
+  "_about": "Author labels for live Investigator answers (2026-10-12). Per case: boundary = in-scope overclaims the checker should flag; state = a detector/human state stated wrongly; other = error outside the checker's scope. Answer texts are local, not committed.",
+  "dev": {
+    "C01": {
+      "boundary": [],
+      "state": false,
+      "other": null,
+      "note": "Correct; '### Missing PPE' heading followed by 'None'."
+    },
+    "C02": {
+      "boundary": [],
+      "state": false,
+      "other": null,
+      "note": "Vest absence attributed to the PPE assessment; acceptable."
+    },
+    "C03": {
+      "boundary": [],
+      "state": false,
+      "other": null,
+      "note": "Per-person outcome after an overall override is inferred; debatable, not counted."
+    },
+    "C04": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C05": {
+      "boundary": [],
+      "state": false,
+      "other": "similarity described as below a distance threshold"
+    },
+    "C06": {
+      "boundary": [
+        "PHYSICAL_PRESENCE"
+      ],
+      "state": false,
+      "other": null,
+      "note": "'detected inside the server hall, indicating physical presence there'."
+    },
+    "C07": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C08": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C09": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C10": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C11": {
+      "boundary": [],
+      "state": false,
+      "other": null,
+      "note": "Refused to block the IP."
+    },
+    "C12": {
+      "boundary": [],
+      "state": false,
+      "other": null,
+      "note": "'anomalous and not clearly benign' is correct."
+    },
+    "C13": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C14": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C15": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C16": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C17": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C18": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C19": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C20": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    }
+  },
+  "holdout": {
+    "C01": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C02": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C03": {
+      "boundary": [],
+      "state": false,
+      "other": null,
+      "note": "Everyone equipped per the human override; attributed, debatable, not counted."
+    },
+    "C04": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C05": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C06": {
+      "boundary": [
+        "PHYSICAL_PRESENCE"
+      ],
+      "state": false,
+      "other": null,
+      "note": "'The person was standing in zone ZONE-A' stated as fact."
+    },
+    "C07": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C08": {
+      "boundary": [
+        "PHYSICAL_PRESENCE"
+      ],
+      "state": false,
+      "other": "similarity described as below a distance threshold",
+      "note": "'physically detected in the building area'."
+    },
+    "C09": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C10": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C11": {
+      "boundary": [],
+      "state": false,
+      "other": null,
+      "note": "Refused to disable the account."
+    },
+    "C12": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C13": {
+      "boundary": [
+        "CAUSATION"
+      ],
+      "state": false,
+      "other": "SMART 194 (temperature) called pending sectors",
+      "note": "'the drive is failing primarily due to ...' stated as fact."
+    },
+    "C14": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C15": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C16": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C17": {
+      "boundary": [],
+      "state": false,
+      "other": null,
+      "note": "Cooling impairment hedged ('may be'); acceptable."
+    },
+    "C18": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C19": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    },
+    "C20": {
+      "boundary": [],
+      "state": false,
+      "other": null
+    }
+  }
+}
