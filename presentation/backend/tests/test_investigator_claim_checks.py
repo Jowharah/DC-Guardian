@@ -68,3 +68,26 @@ def test_per_person_ppe_statuses_are_not_mismatches():
     result = claim_checks(answer, [record])
     assert result["status"] == "NO_RECOGNIZED_PROBLEM", result["checks"]
     assert result["summary"]["state_matches"] == 2
+
+
+# Development-set fixes (live answers, 2026-10-12); wording paraphrased, no Evidence.
+SSH_REC = ("ssh", "S1", {"evidence_state": "HIGH_CONFIDENCE_ANOMALY", "human_review": None})
+PPE_OK = ("ppe", "P3", {"overall_status": "COMPLIANT", "human_review": None, "people": [{"status": "COMPLIANT"}]})
+FACE_REC = ("face", "F2", {"recognition_status": "RECOGNIZED", "human_review": None})
+
+
+def test_markdown_heading_is_not_a_claim():
+    assert claim_checks("### Missing PPE\n- None; all required items were detected.", [PPE_OK])["status"] == "NO_RECOGNIZED_PROBLEM"
+
+
+def test_negated_benign_is_not_a_benign_claim():
+    answer = ("This activity is anomalous and not clearly benign. "
+              "More context would be needed for a definitive judgment on its benign nature.")
+    assert claim_checks(answer, [SSH_REC])["status"] == "NO_RECOGNIZED_PROBLEM"
+    assert claim_checks("This SSH activity looks benign.", [SSH_REC])["status"] == "MISMATCH"
+
+
+def test_presence_wording_from_live_answers_is_flagged():
+    answer = "The face was detected inside the server hall, indicating physical presence there."
+    assert claim_checks(answer, [FACE_REC])["status"] == "VIOLATION"
+    assert claim_checks("Recognition does not confirm physical presence.", [FACE_REC])["status"] == "NO_RECOGNIZED_PROBLEM"

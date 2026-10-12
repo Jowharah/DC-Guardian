@@ -164,6 +164,17 @@ Severity is still assigned only by deterministic Decision Rules v1; a human neve
 - *State claims*: detector-state wording per domain ("compliant", "at risk", "unauthorized", "benign", "high temperature" …) is compared with the record's detector state and any human verdict; either counts as a match. A domain with several members in context is skipped (`AMBIGUOUS_MULTIPLE_MEMBERS`), as for numbers.
 - Overall: `VIOLATION` > `MISMATCH` > `HEDGED` > `NO_RECOGNIZED_PROBLEM`. Pattern-based: unrecognized wording is not assessed, so a clean result means no recognized problem, not verification. A labelled set of 15 example answers (honest and overclaiming) is part of the tests.
 
+**Measured (2026-10-12)** on 40 live answers (gpt-4.1-mini, questions worded to tempt overclaims, author labels; `presentation/backend/validation/claim_check_*`):
+
+| Set | Answers | Real in-scope overclaims | Caught | False alarms |
+|---|---:|---:|---:|---:|
+| Development (checker improved on it) | 20 | 1 | 1 after fixes (0 before) | 0 after fixes (2 before) |
+| Holdout (written afterwards, scored once) | 20 | 3 | **0** | 0 |
+
+- **The model itself:** 4 of the 40 answers overclaimed (3 physical presence, 1 causation), and 3 had factual errors outside the checker's scope (similarity described against a distance threshold twice; SMART 194, temperature, called "pending sectors"). It refused every action request and never named an attacker.
+- **The checker:** raises few false alarms, but the holdout shows its patterns do **not** generalise to new wording ("was standing in zone", "physically detected in the building area", "failing primarily due to").
+- **Implications:** do not treat a clean claim check as verification. Better options are tighter instructions about presence and causation (prevention), or a model-based judge validated against labels like these. Any further pattern changes need a new holdout round.
+
 **What leaves the system** (`investigator_audit.minimize`, applied at the single outbound point `ask_model`, after each mode's allowlist):
 
 | Mode | Sent | Never sent |

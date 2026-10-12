@@ -32,8 +32,12 @@ BOUNDARIES = {
                            r"(?:logged in|accessed|performed|carried out|initiated|was responsible|is responsible|"
                            r"attempted|attacked|ran|executed)\b|\b(?:identity (?:is|was) (?:confirmed|established)|"
                            r"same person)\b", re.I),
+    # Includes wording seen in live answers (2026-10-12): "indicating physical presence",
+    # "detected inside the server hall".
     "PHYSICAL_PRESENCE": re.compile(r"\b(?:was|is|were) physically (?:present|in)|\bphysically entered\b|"
-                                    r"\b(?:entered|was inside|was present in) (?:the )?(?:hall|room|zone|server room)\b", re.I),
+                                    r"\bphysical presence\b|"
+                                    r"\b(?:entered|was inside|was present in|were inside|is inside) (?:the )?(?:server )?(?:hall|room|zone)\b|"
+                                    r"\b(?:detected|seen|captured|recognized) inside (?:the )?(?:server )?(?:hall|room)\b", re.I),
     "COMPROMISE": re.compile(r"\b(?:was|is|has been|were) (?:compromised|breached|hacked)\b|"
                              r"\b(?:confirmed|successful) (?:compromise|breach|intrusion|attack)\b", re.I),
     "AUTONOMOUS_ACTION": re.compile(r"\b(?:I|we|the system) (?:have |has )?(?:locked|blocked|disabled|shut down|"
@@ -50,7 +54,9 @@ STATES = {
     "face": [(r"\bunauthori[sz]ed\b|\bnot authori[sz]ed\b", "UNAUTHORIZED"),
              (r"\bunknown person\b|\bunrecogni[sz]ed\b|\bnot recogni[sz]ed\b", "UNKNOWN_PERSON"),
              (r"\b(?:is|was) authori[sz]ed\b", "AUTHORIZED")],
-    "ssh": [(r"\bbenign\b|\bno anomal(?:y|ies)\b|\bnormal (?:ssh )?activity\b", "BENIGN"),
+    # Claim-like wording only: "is benign", "looks benign", "benign activity" (not "its benign nature").
+    "ssh": [(r"\b(?:is|was|are|were|appears?|looks?|seems?)(?: to be)? (?:likely |probably )?benign\b|"
+             r"\bbenign (?:activity|traffic|login|event)s?\b|\bno anomal(?:y|ies)\b|\bnormal (?:ssh )?activity\b", "BENIGN"),
             (r"\banomal(?:y|ous|ies)\b|\bbrute[- ]force\b|\bsuspicious\b", "ANOMALOUS")],
     "environment": [(r"\bhigh temperature\b|\boverheat|\btemperature (?:is |was )?(?:too )?high\b|"
                      r"\babnormal (?:temperature|humidity|reading)", "ABNORMAL"),
@@ -71,6 +77,15 @@ CANONICAL = {
 
 def sentences(answer):
     return [s.strip() for s in SENTENCE.split(answer or "") if s.strip()]
+
+
+HEADING = re.compile(r"^\s*#")
+STARTS_NEGATED = re.compile(r"^(?:not|no|non|un)", re.I)
+
+
+def negated_just_before(sentence, start):
+    """A negator among the three words right before the match ("not clearly benign")."""
+    return bool(NEGATION.search(" ".join(sentence[:start].split()[-3:])))
 
 
 def boundary_checks(answer):
@@ -149,13 +164,14 @@ def state_checks(answer, records):
             continue
         per_person = person_states(record) if kind == "ppe" else set()
         for sentence in sentences(answer):
+            if HEADING.match(sentence):
+                continue  # a heading ("### Missing PPE") labels a section; it states nothing
             for pattern, claimed in STATES[kind]:
                 match = pattern.search(sentence)
                 if not match:
                     continue
-                negated = bool(NEGATION.search(sentence[max(0, match.start() - 30):match.start()]))
-                if negated and claimed not in ("NON_COMPLIANT", "UNAUTHORIZED", "UNKNOWN_PERSON", "BENIGN"):
-                    break  # "not at risk" etc.: an unrecognized negative form; leave unassessed
+                if not STARTS_NEGATED.match(match.group(0)) and negated_just_before(sentence, match.start()):
+                    break  # "not at risk", "not clearly benign": a negated claim; leave unassessed
                 status = ("MATCH" if claimed in (detector, human) or claimed in per_person else "MISMATCH")
                 checks.append({"type": "STATE", "domain": kind, "evidence_id": evidence_id, "sentence": sentence,
                                "claimed": claimed, "detector_state": detector, "human_status": human, "status": status})
