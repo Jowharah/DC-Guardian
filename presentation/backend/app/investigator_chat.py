@@ -19,6 +19,7 @@ from presentation.backend.app.investigator_grounding import check_answer_referen
 from presentation.backend.app.investigator_field_checks import context_field_checks
 from presentation.backend.app.investigator_claim_checks import claim_checks
 from presentation.backend.app.investigator_audit import minimize,record_call
+from presentation.backend.app.investigator_pseudonyms import Pseudonymizer
 
 router=APIRouter()
 logger=logging.getLogger(__name__)
@@ -83,6 +84,10 @@ assessment, not verified hardware damage. Correlation in a zone/time window
 does not establish causation or root cause. A saved operational Decision may
 have its own deterministic severity; do not reassign or transfer it."""
 
+PSEUDONYM_NOTE="""
+Identifiers of the form USER-…, IP-… and PERSON-… are pseudonyms for usernames,
+IP addresses and person IDs. Use them verbatim; never guess the real values."""
+
 def require_enabled():
     # Called only after authorization and source retrieval have succeeded.
     if local_setting("DCG_INVESTIGATOR_ENABLED")!="1":
@@ -102,8 +107,12 @@ def ask_model(instructions,question,context,label,call=None):
     require_enabled()
     model=local_setting("DCG_INVESTIGATOR_MODEL") or "gpt-4.1-mini"
     # Single outbound choke point: the mode allowlists ran already; minimize()
-    # strips biometric, identity and credential fields as a backstop.
-    payload=json.dumps({"question":question,"authorized_context":minimize(context)},ensure_ascii=False)
+    # strips biometric, identity and credential fields as a backstop, and
+    # usernames, IPs and person IDs leave only as keyed pseudonyms (mapped back below).
+    pseudonyms=Pseudonymizer()
+    masked_context=pseudonyms.mask(minimize(context))
+    payload=json.dumps({"question":pseudonyms.text(question),"authorized_context":masked_context},ensure_ascii=False)
+    instructions=instructions+PSEUDONYM_NOTE
     if call is not None:
         call.update(model=model,payload=payload)
     try:
@@ -112,7 +121,7 @@ def ask_model(instructions,question,context,label,call=None):
         response=client.responses.create(
             model=model,instructions=instructions,input=payload,
             max_output_tokens=700,store=False)
-        answer=response.output_text.strip()
+        answer=pseudonyms.unmask(response.output_text.strip())
         if not answer:raise ValueError("Empty model response")
     except Exception as exc:
         # Log only a safe exception class; provider messages may contain

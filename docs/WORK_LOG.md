@@ -6,6 +6,15 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Investigator pseudonyms for usernames, IPs and person IDs
+
+- **Operator decision:** mask all three before anything leaves for OpenAI.
+- **What:** `investigator_pseudonyms.py`, applied in `ask_model` after `minimize`: keyed HMAC pseudonyms (`USER-`, `IP-`, `PERSON-` + 10 hex), stable across calls; IPv4 addresses and person IDs inside free text and the operator's question are masked too; the answer is mapped back locally; the model is told to use pseudonyms verbatim. Key: `DCG_PSEUDONYM_SALT` or `presentation/backend/data/.investigator_pseudonym_key` (created on first use, not committed).
+- **Verified:** backend pytest 372 passed; the privacy tests now assert no person ID, IP or username in the payload (Face and SSH), identical pseudonyms across calls, and real values restored in the operator's answer.
+- **Caveat:** usernames inside free text are masked only once the same username appears in a username field of the context.
+
+---
+
 ## 2026-10-12 — Access policy decisions applied
 
 - **Operator decisions:** (1) maintenance and environment feeds require `maintenance:detail` / `environment:detail`, like the other domains (they were readable by every role in its zones); (2) each domain's operator uploads its own domain: maintenance/environment validation needs the domain's detail permission and SSH log validation, processing, publication and pipeline steps need `ssh:detail` (all previously `scenario:execute`, administrators only). Declaring controlled metadata (SSH controlled time, image capture declarations) stays administrator-only.

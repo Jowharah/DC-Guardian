@@ -1,6 +1,7 @@
 """Outbound Investigator payload minimization and the hash-chained call audit (fake OpenAI client)."""
 import hashlib
 import json
+import re
 
 import pytest
 from fastapi import HTTPException
@@ -32,7 +33,10 @@ class FakeClient:
         FakeClient.sent.append(kwargs)
         if FakeClient.fail:
             raise RuntimeError("provider down")
-        return type("R", (), {"output_text": "P005 is recognized; the record does not establish presence."})()
+        # Like the real model, the answer can only use the identifiers it was sent.
+        tokens = re.findall(r"(?:PERSON|IP|USER)-[0-9A-F]{10}", kwargs["input"])
+        text = " ".join(dict.fromkeys(tokens)) + " is recognized; the record does not establish presence."
+        return type("R", (), {"output_text": text})()
 
 
 @pytest.fixture
@@ -57,9 +61,27 @@ def test_outbound_payload_has_no_biometric_or_reviewer_fields(fake_openai):
     text = json.dumps(payload)
     for denied in ("facial_area", "left_eye", "embedding", "reviewer", "rationale", "should-not-leave", "private note"):
         assert denied not in text, denied
-    assert payload["authorized_context"]["source_assessment"]["assessment"]["person_id"] == "P005"
+    # Person IDs leave only as keyed pseudonyms; the operator sees the real ID again.
+    assert "P005" not in text
+    assert re.fullmatch(r"PERSON-[0-9A-F]{10}", payload["authorized_context"]["source_assessment"]["assessment"]["person_id"])
+    assert result["answer"].startswith("P005 ")
     assert sent["store"] is False
     assert result["claim_checks"]["status"] == "NO_RECOGNIZED_PROBLEM"
+
+
+def test_ssh_usernames_and_ips_leave_only_as_stable_pseudonyms(fake_openai, monkeypatch):
+    ssh = {"kind": "ssh", "evidence_id": "S1", "zone_id": "ZONE-A", "human_review": None, "restrictions": {},
+           "source_assessment": {"event_id": "S1", "source_ip": "203.0.113.50", "usernames": ["alice", "root"],
+                                 "evidence_state": "HIGH_CONFIDENCE_ANOMALY", "note": "seen from 203.0.113.50"}}
+    monkeypatch.setattr(investigator_tools, "single_evidence_context", lambda kind, eid, p: json.loads(json.dumps(ssh)))
+    question = "Why did 203.0.113.50 try alice?"
+    first = chat.ask_single_evidence("ssh", "S1", chat.InvestigatorQuestion(question=question), ADMIN)
+    chat.ask_single_evidence("ssh", "S1", chat.InvestigatorQuestion(question=question), ADMIN)
+    sent = [s["input"] for s in fake_openai.sent]
+    for value in ("203.0.113.50", "alice", '"root"'):
+        assert value not in sent[0], value
+    assert sent[0] == sent[1]  # stable pseudonyms across calls
+    assert "203.0.113.50" in first["answer"] and "alice" in first["answer"]
 
 
 def test_every_call_is_audited_with_the_exact_payload_hash(fake_openai):
