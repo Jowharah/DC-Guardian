@@ -10,7 +10,8 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 - **What:** the operator created a repository ruleset on `main`: block deletion and force pushes; require a pull request (0 approvals, merge commits only); require both CI jobs to pass with the branch up to date. GitHub CLI 2.102.0 installed (portable, user folder, checksum-verified) and signed in, so pull requests are opened with `gh pr create`.
 - **Why:** CI results were advisory; a failing change could still land on `main`.
-- **Verified:** `gh api repos/{owner}/{repo}/rules/branches/main` lists the four rules; this entry was merged through the first protected pull request.
+- **Verified:** `gh api repos/{owner}/{repo}/rules/branches/main` lists the four rules; this entry was merged through the first protected pull request (#4), which GitHub blocked until both checks passed.
+- **CI on `main` had been red** since the Investigator audit merge (`a5592b4`) without anyone noticing, which is exactly what the ruleset now prevents. Two causes, both fixed in #4: Bandit B608 on the audit INSERT (constant placeholders, annotated with the reason), and Investigator history endpoints answering 503 "history disabled" before checking access, which the access matrix caught only in CI (local `.env` enables history). Authorization now runs first; the matrix pins the flag.
 - **Also:** Kaspersky intercepts HTTPS; Node-based tools trust its root via the user variable `NODE_EXTRA_CA_CERTS` (fixes `claude rc` and the Playwright browser download).
 
 ---
