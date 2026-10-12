@@ -6,6 +6,20 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Backup routine and keyboard accessibility
+
+- **Backup** (`presentation/backend/app/backup.py`, `create` / `verify`): consistent online copy of the database and ingestion state, retained images, read-only Neo4j export, manifest with hashes, table counts and audit-chain heads. Refuses a location inside the data folder. `verify` checks hashes, SQLite integrity and every audit chain, on a scratch copy (the store helpers create missing tables on connect, which first changed the backup after hashing; caught by the test).
+- **Routine** documented in `VALIDATION_AND_OPERATIONS.md`:
+  - daily backup and restore check;
+  - checkpoints to separate media;
+  - weekly checkpoint verification;
+  - restore steps.
+- **Trial on real data:** 27 tables, 65 nodes / 69 relationships, four chains PASS, 29 MB; verify PASS; trial copy deleted.
+- **Keyboard:** form controls and disclosures had no visible focus indicator; they now have one. New `e2e/keyboard.spec.ts`: keyboard-only sign-in, feed, event and investigation controls.
+- **Verified:** backend pytest 386 passed (new `test_backup.py`); Playwright 13 passed.
+
+---
+
 ## 2026-10-12 — Testing plan item 5: first conversion batch
 
 - **What:** `response/agents/tests` (8 files) and `integration/tests` (4 files) converted from scripts to pytest: one test function per original check (37 and 12 tests, the same count of checks as before, compared file by file); each file keeps a `main()` so `python <file>` still prints its PASSED banner. `pytest.ini` registers the markers `neo4j`, `gpu`, `private_data`; the real PPE/Face Reasoning test is marked `neo4j` and skips with a reason when Neo4j is down.
