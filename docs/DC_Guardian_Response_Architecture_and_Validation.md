@@ -50,7 +50,7 @@ Verified foundation:
 - 13/13 parsing contract passed.
 - 13/13 preprocessing/provenance contract passed.
 - 13/13 chunking contract passed.
-- 260 active retrieval chunks.
+- 255 active retrieval chunks (260 before 2026-10-12, when OSHA documents were trimmed to their own CFR section; see 3.1.2).
 - Local embedding model: `sentence-transformers/all-MiniLM-L6-v2`.
 - Embedding dimension: 384.
 - Retrieval operates locally/offline after model acquisition.
@@ -89,6 +89,26 @@ For the selected controlled-ranking baseline:
 
 Top-3 is the current evidence-depth candidate because Top-5 provided only a modest recall gain while introducing substantially more retrieval noise.
 
+The table above is the original evaluation (corpus of 260 chunks), kept as the record of how the ranking policy was selected.
+
+#### Re-evaluation after the CFR section fix (2026-10-12)
+
+The official OSHA PDFs are whole printed CFR pages, so each OSHA document also held parts of its neighbouring sections. For example, 1910.135 began with respirator text from 1910.134, and 1910.137 repeated 1910.135/136. Preprocessing now keeps each OSHA document's own section; no source was added or reworded (see `docs/WORK_LOG.md`). This leaves 255 chunks. The same 18 frozen cases were re-run for all four experiments, without retuning either the cases or the abstention threshold:
+
+| Experiment | Ranking policy | Hit@1 | Recall@3 | Precision@3 | Recall@5 | Precision@5 | MRR | No-source case |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| v1 | Raw cosine ranking | 94.12% | 90.20% | 83.33% | 96.08% | 75.49% | 0.9706 | 1/2 |
+| v2 | Maximum document diversity | 94.12% | 96.08% | 50.98% | 98.04% | 39.41% | 0.9706 | 0/2 |
+| v3 | **Controlled diversity (selected)** | **94.12%** | **96.08%** | **71.57%** | 96.08% | 47.55% | **0.9706** | 0/2 |
+| v4 | Controlled + cosine abstention | 58.82% | 60.78% | 39.22% | 60.78% | 25.98% | 0.6176 | 1/2 |
+
+- **Selected policy:** controlled diversity stays the selected policy. Against the original evaluation, Recall@3 rose from 90.20% to 96.08%, Precision@3 from 65.69% to 71.57%, and MRR from 0.8725 to 0.9706. Hit Rate@3 is 100% (every case with an expected source finds one in the top 3), and domain-filter and provenance correctness stay at 100%.
+- **Where the gain comes from:** mainly the PPE and electrical-PPE cases (RAG-EVAL-004, -008, -013), which now rank OSHA 1910.132/135/137 first.
+- **Remaining weak cases:** RAG-EVAL-006 (heat plus drive risk, three expected documents: Recall@3 0.33), and RAG-EVAL-017 (the right source is ranked second).
+- **No-source case:** RAG-EVAL-016 has no approved source and is still answered by nearest-neighbour retrieval under controlled ranking. Deterministic knowledge eligibility (3.1.3), not cosine abstention, handles it.
+- **Abstention:** recalibrated on the rebuilt index with its development cases. The threshold is unchanged (0.5922) and still separates those cases perfectly, but on the frozen set it still costs a third of the valid retrievals. It stays experimental and is not the default.
+- **Caveats:** 18 cases written by the project author; the OSHA fix was prompted by a live PPE-specialist failure, not by these cases, but three of them test exactly the documents it changed. The reports are local, rebuildable artifacts (`response/rag/evaluation/retrieval_evaluation_report.json`, one run per configuration).
+
 ### 3.1.3 Abstention and Knowledge Eligibility
 
 A development-only calibration experiment produced a cosine threshold of 0.5922 with perfect separation on its calibration cases. When applied unchanged to the frozen retrieval evaluation, however, valid retrieval performance degraded substantially. Therefore cosine-score abstention is retained only as an experimental mechanism and is **not the production default**.
@@ -125,7 +145,7 @@ Verified result:
 
 ```text
 RAG sources:            13
-RAG chunks:             260
+RAG chunks:             255
 Embedding model:        sentence-transformers/all-MiniLM-L6-v2
 Selected ranking:       CONTROLLED
 Default evidence depth: TOP-3
