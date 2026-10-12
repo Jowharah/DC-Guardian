@@ -63,7 +63,7 @@ def record_call(call, *, outcome, answer=None, claim_status=None):
         previous = db.execute("SELECT entry_hash FROM investigator_audit ORDER BY rowid DESC LIMIT 1").fetchone()
         entry["previous_hash"] = previous[0] if previous else "GENESIS"
         entry["entry_hash"] = hashlib.sha256(json.dumps(entry, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-        db.execute("INSERT INTO investigator_audit VALUES (" + ",".join("?" * len(FIELDS)) + ")",
+        db.execute("INSERT INTO investigator_audit VALUES (" + ",".join("?" * len(FIELDS)) + ")",  # nosec B608: constant placeholders; values are bound parameters
                    tuple(entry[f] for f in FIELDS))
     return entry
 
