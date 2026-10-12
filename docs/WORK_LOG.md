@@ -6,6 +6,15 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Backup folder
+
+- **Operator choice:** `C:\Users\Aljawharah\Documents\DC-Guardian Backup`. New setting `DCG_BACKUP_DIR` (in `.env`, documented in `.env.example`) gives `backup create` a default of `<dir>\backups` and `audit_checkpoint write` a default of `<dir>\checkpoints`; both still accept `--out-dir`.
+- **First run:** backup (with the ingestion state) and checkpoint written; `backup verify` PASS, `audit_checkpoint verify` PASS (all four chains); 29 MB.
+- **Verified:** backup and checkpoint tests 11 passed (new default-location test).
+- **Caveat:** checkpoints on the same disk as the database are weaker against replacement than on a second drive.
+
+---
+
 ## 2026-10-12 — Post-generation overclaim judge (measured)
 
 - **What:** `investigator_judge.py`. After every Investigator answer, a short structured call reads only the pseudonymized answer text and quotes sentences that state presence, a cause (including which inputs drove a model) or PPE absence as fact.

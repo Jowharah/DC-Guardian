@@ -65,6 +65,19 @@ Browser demonstrations included live OpenAI responses for unified, operational, 
 
 ## Operations routine (2026-10-12)
 
+**Backup folder** (operator choice): `C:\Users\Aljawharah\Documents\DC-Guardian Backup`, set as `DCG_BACKUP_DIR` in `.env`.
+- Backups go to `backups\` and checkpoints to `checkpoints\`, so `--out-dir` can be left out.
+- First backup and checkpoint written and verified 2026-10-12: 28 tables, 65 nodes / 69 relationships, four chains PASS, 29 MB.
+- Moving `checkpoints\` to a second drive (USB, OneDrive) makes the checkpoints stronger evidence against database replacement.
+
+Short form:
+
+```powershell
+python -m presentation.backend.app.backup create --state C:\Users\Aljawharah\Documents\dcg-private\ingestion_state.sqlite3
+python -m presentation.backend.app.backup verify --backup "<folder printed by create>"
+python -m presentation.backend.app.audit_checkpoint write
+```
+
 | When | Do | Command |
 |---|---|---|
 | Daily, and before any reset or upgrade | Back up the local data to encrypted storage outside the repository | `python -m presentation.backend.app.backup create --out-dir <encrypted folder> --state <path to ingestion_state.sqlite3>` |
