@@ -6,6 +6,20 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Investigation lifecycle
+
+- **What:** `investigation_lifecycle.py` (policy `DCG-LIFECYCLE-v1`, the default chosen on the operator's go-ahead) and `LifecyclePanel.tsx` in the group and single-event detail.
+  - States: open → in review → resolved; reopen.
+  - Resolving: assigned reviewer or administrator, with a resolution, rationale and acknowledgment.
+  - A resolved subject is reported reopened when its Evidence or human verdicts change.
+  - Transitions are a fourth hash chain (audit integrity, checkpoints, dev reset); they never change Evidence, verdicts, Decisions or severity.
+- **Also:** the shared chain verifier now reports the failing record by each chain's own ID field (it assumed `audit_id`).
+- **Verified:**
+  - backend pytest 381 passed (new `test_investigation_lifecycle.py`: full cycle, invalid transitions, assignee/administrator rule, required fields, other domains refused, automatic reopen, tampering blocks transitions);
+  - Playwright 12 passed (new lifecycle flow; accessibility scans include the panel).
+
+---
+
 ## 2026-10-12 — First live runs (operator-approved)
 
 - **Runs** (sends Evidence to OpenAI; approved by the operator): single-event specialists on a non-compliant PPE image and an at-risk drive; Investigator questions on a Face, SSH, maintenance and PPE record, worded to provoke overclaims (presence, compromise, causation).

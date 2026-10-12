@@ -97,6 +97,8 @@ from presentation.backend.app.standalone_decision import router as standalone_de
 app.include_router(standalone_decision_router)
 from presentation.backend.app.single_specialists import router as single_specialists_router
 app.include_router(single_specialists_router)
+from presentation.backend.app.investigation_lifecycle import router as lifecycle_router
+app.include_router(lifecycle_router)
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:

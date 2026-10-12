@@ -23,9 +23,9 @@ def verify_records(rows,fields=FIELDS):
         calculated=hashlib.sha256(json.dumps(record,sort_keys=True,separators=(",",":")).encode()).hexdigest()
         checked+=1
         if record["previous_hash"]!=previous:
-            return {"status":"FAILED","checked":checked,"reason":"PREVIOUS_HASH_MISMATCH","audit_id":record["audit_id"]}
+            return {"status":"FAILED","checked":checked,"reason":"PREVIOUS_HASH_MISMATCH","audit_id":record[fields[0]]}
         if recorded!=calculated:
-            return {"status":"FAILED","checked":checked,"reason":"ENTRY_HASH_MISMATCH","audit_id":record["audit_id"]}
+            return {"status":"FAILED","checked":checked,"reason":"ENTRY_HASH_MISMATCH","audit_id":record[fields[0]]}
         previous=recorded
     return {"status":"PASS","checked":checked,"head_hash":previous,
             "limitation":"No trusted external checkpoint; deletion of trailing records or replacement of the database cannot be detected."}
