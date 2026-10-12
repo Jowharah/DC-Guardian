@@ -63,9 +63,17 @@ def test_viewer_cannot_read_ssh_feed(setup,monkeypatch):
     monkeypatch.setenv("DCG_LOCAL_ROLE","viewer")
     assert client.get(PATHS[0],auth=AUTH).status_code==403
 
+# Operator decision 2026-10-12: maintenance/environment feeds need their detail
+# permission, like the other domains (they were readable by every role before).
 @pytest.mark.parametrize("path",PATHS[1:])
-def test_viewer_read_is_zone_filtered(setup,monkeypatch,path):
-    monkeypatch.setenv("DCG_LOCAL_ROLE","viewer")
+@pytest.mark.parametrize("role",["viewer","security_operator","safety_operator"])
+def test_roles_without_detail_cannot_read_operations_feeds(setup,monkeypatch,path,role):
+    monkeypatch.setenv("DCG_LOCAL_ROLE",role)
+    assert client.get(path,auth=AUTH).status_code==403
+
+@pytest.mark.parametrize("path",PATHS[1:])
+def test_operations_engineer_read_is_zone_filtered(setup,monkeypatch,path):
+    monkeypatch.setenv("DCG_LOCAL_ROLE","operations_engineer")
     response=client.get(path,auth=AUTH)
     assert response.status_code==200
     assert [x["zone_id"] for x in response.json()]==["ZONE-A"]

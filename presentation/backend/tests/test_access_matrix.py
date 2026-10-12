@@ -62,25 +62,25 @@ POLICY = {
     ("GET", "/api/v1/access/employees"): ADMIN,
     ("POST", "/api/v1/access/employees"): ADMIN,
     ("POST", "/api/v1/access/employees/{person_id}/zones"): ADMIN,
-    # Domain feeds. Maintenance and environment feeds are readable by every role in
-    # its zones (deliberate, test_domain_feed_http_rbac); the others need detail.
+    # Domain feeds: each needs its domain's detail permission (operator decision
+    # 2026-10-12; maintenance/environment were open to every role before).
     ("GET", "/api/v1/ssh/published"): SECURITY,
     ("GET", "/api/v1/ppe/observations"): SAFETY,
     ("GET", "/api/v1/face/observations"): SAFETY,
-    ("GET", "/api/v1/maintenance/events"): ANY,
-    ("GET", "/api/v1/environment/events"): ANY,
+    ("GET", "/api/v1/maintenance/events"): OPERATIONS,
+    ("GET", "/api/v1/environment/events"): OPERATIONS,
     # Filtered by the caller's detail permissions inside the handler.
     ("GET", "/api/v1/correlations/pairs"): ANY,
     ("GET", "/api/v1/decisions/standalone"): ANY,
     ("GET", "/api/v1/evidence-reviews"): ANY,
-    # Uploads: PPE/Face by safety operators; the rest need scenario:execute.
+    # Uploads: each domain's operator uploads its own domain (operator decision 2026-10-12).
     ("POST", "/api/v1/ppe/validate-image"): SAFETY,
     ("POST", "/api/v1/face/validate-image"): SAFETY,
-    ("POST", "/api/v1/maintenance/validate"): ADMIN,
-    ("POST", "/api/v1/environment/validate"): ADMIN,
-    ("POST", "/api/v1/ssh/validate-log"): ADMIN,
-    ("POST", "/api/v1/ssh/process-log"): ADMIN,
-    ("POST", "/api/v1/ssh/publish"): ADMIN,
+    ("POST", "/api/v1/maintenance/validate"): OPERATIONS,
+    ("POST", "/api/v1/environment/validate"): OPERATIONS,
+    ("POST", "/api/v1/ssh/validate-log"): SECURITY,
+    ("POST", "/api/v1/ssh/process-log"): SECURITY,
+    ("POST", "/api/v1/ssh/publish"): SECURITY,
     # Single records.
     ("GET", "/api/v1/ppe/observations/{observation_id}"): SAFETY,
     ("GET", "/api/v1/ppe/observations/{observation_id}/image"): SAFETY,
@@ -170,6 +170,8 @@ BODIES = {
     ("POST", "/api/v1/ssh/publish"): {"preview_id": "SSH-PREVIEW-" + "A" * 32, "indices": [0]},
 }
 PATH_VALUES = {"person_id": "P999"}
+# Real zone/server for body fields, so zone checks pass and the permission check is what is tested.
+FIELD_VALUES = {"zone_id": "ZONE-A", "server_id": "SRV-A1-01"}
 
 SPEC = app.openapi()
 
@@ -190,7 +192,7 @@ def example(schema):
         return schema["const"]
     kind = schema.get("type")
     if kind == "object":
-        return {k: example(v) for k, v in schema.get("properties", {}).items() if k in schema.get("required", [])}
+        return {k: FIELD_VALUES.get(k, example(v)) for k, v in schema.get("properties", {}).items() if k in schema.get("required", [])}
     return {"array": [], "integer": 1, "number": 0.5, "boolean": True}.get(kind, "X" * max(schema.get("minLength", 1), 20))
 
 
@@ -208,7 +210,7 @@ def request_for(method, template):
             if field.get("format") == "binary" or field.get("contentMediaType"):
                 files[name] = ("probe.bin", b"probe", "application/octet-stream")
             elif name in schema.get("required", []):
-                data[name] = str(example(field))
+                data[name] = str(FIELD_VALUES.get(name, example(field)))
         return {"files": files or None, "data": data}
     return {}
 

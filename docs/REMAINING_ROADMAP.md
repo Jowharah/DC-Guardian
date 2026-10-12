@@ -11,7 +11,7 @@
 | Face recognition Evidence and zone authorization | Implemented and demonstrated | Enrollment privacy, zone access and identity-review hardening |
 | SMART measurements and server health history | Implemented and demonstrated | Longitudinal reliability, edge cases and UI tests |
 | Environmental measurements and trends | Implemented and demonstrated | Sensor data validation, temporal handling and UI tests |
-| RBAC-protected Evidence artifact access | **Access matrix test** (2026-10-11) covers all 99 operations × every role (401 without credentials, 403 exactly where a permission is missing); zone isolation with real records in the domain RBAC tests | Operator decisions on two policy differences (below); multi-user integration testing |
+| RBAC-protected Evidence artifact access | **Access matrix test** (2026-10-11) covers all 99 operations × every role (401 without credentials, 403 exactly where a permission is missing); zone isolation with real records in the domain RBAC tests | Multi-user integration testing |
 | Analytics and interactive drill-down | Implemented; detector outcomes per domain with human verdicts, Decision severity from one shared per-row rule; Playwright test | Additional chart and filter regression |
 | Monitoring Center summary | Implemented 2026-10-11: live/delayed/offline status, Needs attention, abnormal results, correlations, Decisions by level, domain freshness strip, card filters; Playwright test | Accessibility review |
 | Human Review Queue and saved outcomes | Implemented and locally demonstrated | Multi-review lifecycle policy and investigation resolution contract |
@@ -33,7 +33,7 @@ Keep every existing check; reorganize them. Tracked with status in [Work Log —
 1. **Independent labelling round** (pack ready in `reasoning/uncertainty/labelling/pack/`): it now validates two things at once, the Bayesian correlation study and the Decision v2 group rule. Then re-run `evaluate.py` and `decision_v2_validation.py` on those labels.
 2. **Live checks of today's changes:** restart the backend, re-run the specialists on the operator-cleared group (sends Evidence to OpenAI; operator consent), confirm `logs/errors.log` is clean.
 3. ~~Single-event specialists~~ (done 2026-10-11).
-4. ~~API authorization matrix~~ (done 2026-10-11; two policy questions open: who may read maintenance/environment feeds, who may upload PPE/Face images).
+4. ~~API authorization matrix~~ (done 2026-10-11; policy decisions applied 2026-10-12).
 5. Testing plan item 5: convert the remaining script tests after the pytest pilot is reviewed; branch protection on `main` (CI required).
 6. ~~AI Investigator claim checks, privacy review, call audit~~ (done 2026-10-11; next: measure the claim checker on real answers).
 7. Review lifecycle, audit external checkpoint, failure/recovery; dashboard accessibility.

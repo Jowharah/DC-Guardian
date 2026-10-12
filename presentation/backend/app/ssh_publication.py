@@ -64,7 +64,7 @@ class PublishRequest(BaseModel):
 @router.post("/api/v1/ssh/publish")
 def publish(payload: PublishRequest, principal: Principal = Depends(current_principal)):
     authorize(principal, Permission.SSH_DETAIL)
-    authorize(principal, Permission.SCENARIO_EXECUTE)
+    authorize(principal, Permission.SSH_DETAIL)  # domain operator (operator decision 2026-10-12)
     if len(payload.indices)!=len(set(payload.indices)):
         raise HTTPException(422,"Duplicate assessment indices")
     with connect() as conn:
@@ -74,7 +74,7 @@ def publish(payload: PublishRequest, principal: Principal = Depends(current_prin
             raise HTTPException(404,"Validation preview not found")
         created,owner,zone,server,encoded = row
         authorize(principal, Permission.SSH_DETAIL, zone)
-        authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+        authorize(principal, Permission.SSH_DETAIL, zone)  # domain operator (operator decision 2026-10-12)
         if owner!=principal.subject:
             raise HTTPException(403,"Only the validating operator can publish")
         if datetime.now(timezone.utc)-datetime.fromisoformat(created)>TTL:
@@ -160,7 +160,7 @@ def run_pipeline(event_id: str, principal: Principal = Depends(current_principal
         raise HTTPException(404, "Published SSH evidence not found")
     zone, server, encoded = row
     authorize(principal, Permission.SSH_DETAIL, zone)
-    authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+    authorize(principal, Permission.SSH_DETAIL, zone)  # domain operator (operator decision 2026-10-12)
     from reasoning.adapters.ssh_event_adapter import adapt_ssh_assessment
     from reasoning.topology.topology_mapper import load_topology, build_server_index
     assessment = json.loads(encoded)
@@ -216,7 +216,7 @@ def ingest_graph(event_id: str, principal: Principal = Depends(current_principal
         raise HTTPException(404, "Published SSH evidence not found")
     zone, server, encoded = row
     authorize(principal, Permission.SSH_DETAIL, zone)
-    authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+    authorize(principal, Permission.SSH_DETAIL, zone)  # domain operator (operator decision 2026-10-12)
     from presentation.backend.app.ssh_graph_ingestion import ingest_published_ssh
     try:
         ingested = ingest_published_ssh(event_id, json.loads(encoded), server, zone)
@@ -241,7 +241,7 @@ def check_correlation(event_id: str, principal: Principal = Depends(current_prin
         raise HTTPException(404,"Published SSH evidence not found")
     zone,server,encoded=row
     authorize(principal, Permission.SSH_DETAIL, zone)
-    authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+    authorize(principal, Permission.SSH_DETAIL, zone)  # domain operator (operator decision 2026-10-12)
     from presentation.backend.app.ssh_graph_ingestion import prepare_mapped_ssh
     from presentation.backend.app.ssh_correlation import check_ssh_correlations
     mapped=prepare_mapped_ssh(event_id,json.loads(encoded),server,zone)
@@ -272,7 +272,7 @@ def specialist_response(event_id: str, principal: Principal = Depends(current_pr
         raise HTTPException(404,"Published SSH evidence not found")
     zone,server,encoded=row
     authorize(principal, Permission.SSH_DETAIL, zone)
-    authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+    authorize(principal, Permission.SSH_DETAIL, zone)  # domain operator (operator decision 2026-10-12)
     from presentation.backend.app.ssh_graph_ingestion import prepare_mapped_ssh
     from presentation.backend.app.ssh_response import assess_standalone_ssh
     assessment=json.loads(encoded)
@@ -309,7 +309,7 @@ def standalone_decision(event_id: str, principal: Principal = Depends(current_pr
         raise HTTPException(404,"Published SSH evidence not found")
     zone,server,encoded=row
     authorize(principal, Permission.SSH_DETAIL, zone)
-    authorize(principal, Permission.SCENARIO_EXECUTE, zone)
+    authorize(principal, Permission.SSH_DETAIL, zone)  # domain operator (operator decision 2026-10-12)
     from presentation.backend.app.ssh_graph_ingestion import prepare_mapped_ssh
     from presentation.backend.app.ssh_correlation import check_ssh_correlations
     from presentation.backend.app.ssh_response import assess_standalone_ssh
