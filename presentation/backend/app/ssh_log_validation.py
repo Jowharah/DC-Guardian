@@ -22,7 +22,7 @@ async def validate_ssh_log(
     principal: Principal = Depends(current_principal),
 ):
     authorize(principal, Permission.SSH_DETAIL, zone_id)
-    authorize(principal, Permission.SCENARIO_EXECUTE, zone_id)
+    authorize(principal, Permission.SSH_DETAIL, zone_id)  # domain operator (operator decision 2026-10-12)
     topology = next((z for z in topology_options() if z["zone_id"] == zone_id), None)
     if topology is None or server_id not in topology["servers"]:
         raise HTTPException(422, "Server does not belong to selected zone")

@@ -6,6 +6,14 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Access policy decisions applied
+
+- **Operator decisions:** (1) maintenance and environment feeds require `maintenance:detail` / `environment:detail`, like the other domains (they were readable by every role in its zones); (2) each domain's operator uploads its own domain: maintenance/environment validation needs the domain's detail permission and SSH log validation, processing, publication and pipeline steps need `ssh:detail` (all previously `scenario:execute`, administrators only). Declaring controlled metadata (SSH controlled time, image capture declarations) stays administrator-only.
+- **Tests:** `test_domain_feed_http_rbac` now asserts 403 for viewer/security/safety on those feeds and zone filtering for operations engineers; the access matrix encodes the new policy and now sends a real zone/server in request bodies (the dummy zone had made some uploads fail the zone check instead of the permission check).
+- **Verified:** backend pytest 371 passed.
+
+---
+
 ## 2026-10-11 — External audit checkpoints
 
 - **What:** `audit_checkpoint.py` (CLI `write` / `verify`): records each audit chain's length and head hash (group reviews, Evidence verdicts, Investigator calls) in a JSON file stored outside the data folder, optionally HMAC-signed with `DCG_CHECKPOINT_KEY`. `verify` checks each chain is intact and still holds the checkpointed record at the checkpointed position.

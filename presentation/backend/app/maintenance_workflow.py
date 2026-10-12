@@ -121,7 +121,7 @@ async def validate(
     file:UploadFile=File(...),zone_id:str=Form(...),server_id:str=Form(...),
     publish:bool=Form(False),principal:Principal=Depends(current_principal)):
     authorize(principal,Permission.INCIDENT_READ,zone_id)
-    authorize(principal,Permission.SCENARIO_EXECUTE,zone_id)
+    authorize(principal,Permission.MAINTENANCE_DETAIL,zone_id)  # domain operator uploads (2026-10-12)
     options=next((z for z in topology_options() if z["zone_id"]==zone_id),None)
     if options is None or server_id not in options["servers"]:
         raise HTTPException(422,"Invalid zone/server")
@@ -171,7 +171,7 @@ async def validate(
 
 @router.get("/api/v1/maintenance/events")
 def list_events(principal:Principal=Depends(current_principal)):
-    authorize(principal,Permission.INCIDENT_READ)
+    authorize(principal,Permission.MAINTENANCE_DETAIL)  # detail permission required (2026-10-12)
     with db() as conn:
         rows=conn.execute("""SELECT event_id,received_at,zone_id,server_id,assessment_json,
             history_json,workflow_json FROM maintenance_evidence ORDER BY received_at DESC LIMIT 200""").fetchall()

@@ -143,7 +143,7 @@ def process_sensor_batch(rows,zone,sensor,publish):
 async def validate(file:UploadFile=File(...),zone_id:str=Form(...),sensor_id:str=Form(...),
                    publish:bool=Form(True),principal:Principal=Depends(current_principal)):
     authorize(principal,Permission.INCIDENT_READ,zone_id)
-    authorize(principal,Permission.SCENARIO_EXECUTE,zone_id)
+    authorize(principal,Permission.ENVIRONMENT_DETAIL,zone_id)  # domain operator uploads (2026-10-12)
     options=next((x for x in topology_options() if x["zone_id"]==zone_id),None)
     if options is None or sensor_id not in options["sensors"]:
         raise HTTPException(422,"Sensor is not in selected zone")
@@ -184,7 +184,7 @@ async def validate(file:UploadFile=File(...),zone_id:str=Form(...),sensor_id:str
 
 @router.get("/api/v1/environment/events")
 def list_events(principal:Principal=Depends(current_principal)):
-    authorize(principal,Permission.INCIDENT_READ)
+    authorize(principal,Permission.ENVIRONMENT_DETAIL)  # detail permission required (2026-10-12)
     with db() as conn:
         batches=conn.execute("""SELECT batch_id,received_at,zone_id,sensor_id,
           assessment_json,history_json,workflow_json,event_ids_json FROM environmental_batches
