@@ -6,6 +6,21 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — First live runs (operator-approved)
+
+- **Runs** (sends Evidence to OpenAI; approved by the operator): single-event specialists on a non-compliant PPE image and an at-risk drive; Investigator questions on a Face, SSH, maintenance and PPE record, worded to provoke overclaims (presence, compromise, causation).
+- **What worked:** the maintenance specialist (PARTIALLY_SUPPORTED, cited); all Investigator answers stayed within bounds (compromise and causation explicitly negated); numbers matched saved detector fields (6 matched, 0 mismatched); usernames, IPs and person IDs were sent as pseudonyms (per-install key created) and shown restored to the operator; all calls recorded in the Investigator audit, chain PASS.
+- **Found and fixed:**
+  1. Single-Evidence Face context lacked the zone-authorization result, so the Investigator could not say whether P005 was allowed; it is now included (re-run: answer states UNAUTHORIZED from the access graph).
+  2. Claim checks flagged a per-person PPE status ("Person 0: COMPLIANT") as a mismatch against the overall NON_COMPLIANT status, and read "Missing PPE: none" as non-compliance; per-person statuses now count, negated "missing" lines are ignored (re-run: 5 matches, 0 mismatches).
+  3. Safety retrieval wording reached lockout/tagout and electrical gloves; it now reaches OSHA 1910.132.
+- **Open:**
+  - **PPE specialist still fails grounding.** The approved safety knowledge is thin: OSHA 1910.132 has 2 chunks, and the one 1910.135 (head protection) chunk is mostly respirator text, apparently a parsing issue. The model claims support but cannot cite, so the check correctly refuses. Needs a knowledge-base source review (re-parse 1910.135, consider further approved PPE sources); not changed here.
+  - **Claim checker gap:** a Face answer misdescribed similarity versus a distance threshold, and the claim checker did not catch it. It is an input for measuring the claim checker.
+- **Verified:** backend pytest 374 passed (new tests for both fixes); live re-runs as above.
+
+---
+
 ## 2026-10-12 — Development workflow guide
 
 - **What:** `docs/DEVELOPMENT_WORKFLOW.md`: the pull-request workflow, the `main` ruleset and why each setting, the two CI jobs and how to read a failure, the GitHub CLI install and login, and the Kaspersky certificate fix for Node tools (`claude rc`, Playwright). Linked from `docs/README.md` and `CLAUDE.md`.

@@ -43,7 +43,7 @@ BOUNDARIES = {
 
 # Domain -> list of (pattern, canonical state). Order matters: negative forms first.
 STATES = {
-    "ppe": [(r"\bnon[- ]?compliant\b|\bnot compliant\b|\bmissing (?:required )?(?:ppe|vest|helmet)", "NON_COMPLIANT"),
+    "ppe": [(r"\bnon[- ]?compliant\b|\bnot compliant\b|\bmissing (?:required )?(?:ppe|vest|helmet)s?\b(?!\W*(?:none|nothing|n/a)\b)", "NON_COMPLIANT"),
             (r"\bcompliant\b|\bfully equipped\b", "COMPLIANT")],
     "maintenance": [(r"\bat[- ]risk\b|\blikely to fail\b", "AT_RISK"),
                     (r"\b(?:drive|disk) (?:is |was )?(?:healthy|normal)\b|\bhealthy drive\b", "HEALTHY")],
@@ -116,6 +116,24 @@ def record_states(kind, record):
     return canon.get(detector or ""), canon.get(human or "")
 
 
+def person_states(record):
+    """Per-person PPE statuses: a sentence about one worker may state that worker's status."""
+    people = _find_list(record, "people") or []
+    return {CANONICAL["ppe"].get(p.get("status") or "") for p in people if isinstance(p, dict)} - {None}
+
+
+def _find_list(record, key, depth=0):
+    if not isinstance(record, dict) or depth > 4:
+        return None
+    if isinstance(record.get(key), list):
+        return record[key]
+    for value in record.values():
+        found = _find_list(value, key, depth + 1)
+        if found is not None:
+            return found
+    return None
+
+
 def state_checks(answer, records):
     by_kind, skipped, checks = {}, [], []
     for kind, evidence_id, record in records:
@@ -129,6 +147,7 @@ def state_checks(answer, records):
         detector, human = record_states(kind, record)
         if detector is None and human is None:
             continue
+        per_person = person_states(record) if kind == "ppe" else set()
         for sentence in sentences(answer):
             for pattern, claimed in STATES[kind]:
                 match = pattern.search(sentence)
@@ -137,7 +156,7 @@ def state_checks(answer, records):
                 negated = bool(NEGATION.search(sentence[max(0, match.start() - 30):match.start()]))
                 if negated and claimed not in ("NON_COMPLIANT", "UNAUTHORIZED", "UNKNOWN_PERSON", "BENIGN"):
                     break  # "not at risk" etc.: an unrecognized negative form; leave unassessed
-                status = ("MATCH" if claimed in (detector, human) else "MISMATCH")
+                status = ("MATCH" if claimed in (detector, human) or claimed in per_person else "MISMATCH")
                 checks.append({"type": "STATE", "domain": kind, "evidence_id": evidence_id, "sentence": sentence,
                                "claimed": claimed, "detector_state": detector, "human_status": human, "status": status})
                 break  # first (most specific) pattern per sentence

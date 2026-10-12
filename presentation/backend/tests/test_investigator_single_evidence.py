@@ -35,3 +35,13 @@ def test_provider_disabled(monkeypatch):
     with pytest.raises(HTTPException) as exc:
         chat.ask_single_evidence("ppe","P1",chat.InvestigatorQuestion(question="Explain this evidence"),ADMIN)
     assert exc.value.status_code==503
+
+def test_single_face_context_includes_zone_authorization(monkeypatch):
+    """Live run 2026-10-12: without it the Investigator could not say whether P005 was allowed."""
+    from presentation.backend.app import face_image_validation
+    monkeypatch.setattr(face_image_validation,"face_detail",lambda eid,p:{
+        "observation_id":eid,"zone_id":"ZONE-A","assessment":{"recognition_status":"RECOGNIZED","person_id":"P005"}})
+    monkeypatch.setattr(face_image_validation,"face_authorization",lambda eid,p:{
+        "status":"UNAUTHORIZED","source":"NEO4J_READ_ONLY","reason":"NO_ZONE_ACCESS_RELATIONSHIP"})
+    result=tools.single_evidence_context("face","F1",ADMIN)
+    assert result["source_assessment"]["zone_authorization"]["status"]=="UNAUTHORIZED"

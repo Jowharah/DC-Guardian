@@ -136,7 +136,9 @@ DOMAIN_QUERIES = {
     "MAINTENANCE": "drive SMART failure risk predictive maintenance",
     "ENVIRONMENTAL": "data center temperature humidity monitoring thresholds",
     "PHYSICAL_SECURITY": "facility physical access control monitoring",
-    "SAFETY": "personal protective equipment compliance",
+    # Wording that reaches OSHA 1910.132/135 (PPE use, head protection); a short
+    # phrase retrieved lockout/tagout and electrical gloves instead (live run 2026-10-12).
+    "SAFETY": "personal protective equipment hazard assessment; head protection protective helmets; employer shall ensure employees use appropriate PPE",
 }
 
 def knowledge_query(domains):
