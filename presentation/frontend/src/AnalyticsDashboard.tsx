@@ -1,7 +1,7 @@
 import {useEffect,useState} from "react";
 import {getUnifiedHumanReviews,type HumanReviewRecord,type LatestEvidenceReview} from "./api";
 import type {Incident,PublishedSSH,PPEObservation,FaceObservation,MaintenanceEvent,EnvironmentalEvent,OperationalCorrelation,UnifiedCorrelationGroup} from "./api";
-type Props={incidents:Incident[];ssh:PublishedSSH[];ppe:PPEObservation[];face:FaceObservation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];operational:OperationalCorrelation[];unified:UnifiedCorrelationGroup[];verdicts?:Record<string,LatestEvidenceReview>;decisions?:DecisionRow[];openMonitoring:()=>void};
+type Props={incidents:Incident[];ssh:PublishedSSH[];ppe:PPEObservation[];face:FaceObservation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];operational:OperationalCorrelation[];unified:UnifiedCorrelationGroup[];verdicts?:Record<string,LatestEvidenceReview>;decisions?:DecisionRow[];openMonitoring:()=>void;openEvent?:(id:string)=>void};
 import {DOMAINS,outcomeRecords as buildOutcomes} from "./detectorOutcomes";
 import type {DecisionRow} from "./App";
 const words=(value:string)=>value.replaceAll("_"," ");
@@ -19,7 +19,7 @@ function Bars({items,onSelect}:{items:{name:string;value:number}[];onSelect?:(na
  const max=Math.max(1,...items.map(x=>x.value));
  return <div className="analyticsBars">{items.map((item,i)=><button type="button" key={item.name} className="analyticsBarRow" disabled={!onSelect||!item.value} onClick={()=>onSelect?.(item.name)}><span>{item.name}</span><div className="analyticsTrack"><div style={{width:`${item.value/max*100}%`,background:palette[i%palette.length]}}/></div><b>{item.value}</b></button>)}</div>
 }
-export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,environment,operational,unified,verdicts={},decisions:allDecisions=[],openMonitoring}:Props){
+export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,environment,operational,unified,verdicts={},decisions:allDecisions=[],openMonitoring,openEvent}:Props){
 
  const [range,setRange]=useState("all");
  const [audit,setAudit]=useState<Record<string,HumanReviewRecord[]>>({});
@@ -146,8 +146,8 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
  <section className="panel"><h3>Evidence receipt activity</h3><p className="muted">Published Evidence by local receipt date.</p>{timeline.length?<Bars items={timeline}/>:<p className="muted">No Evidence received in this range.</p>}</section>
  </div>
  {selection&&<section className="panel analyticsDrilldown" aria-live="polite"><div className="analyticsFilterHeader"><div><h3>{selection.value}</h3><p className="muted">{selection.type.toUpperCase()} · {detailRows.length} matching authorized records</p></div><button type="button" className="analyticsClear" onClick={()=>setSelection(null)}>Clear selection</button></div>
- <ul>{detailRows.map(x=><li key={x.id}><code>{x.id}</code><span>{x.detail}</span></li>)}</ul>
- <p className="muted">Source identifiers and statuses are read-only. Open Monitoring Center to inspect the original Evidence.</p>
+ <ul>{detailRows.map(x=><li key={x.id}>{openEvent?<button type="button" className="linkButton analyticsEventLink" onClick={()=>openEvent(x.id)} title="Open this record in the Monitoring Center"><code>{x.id}</code></button>:<code>{x.id}</code>}<span>{x.detail}</span></li>)}</ul>
+ <p className="muted">Select an identifier to open that record in the Monitoring Center. Identifiers and statuses are read-only.</p>
  <button type="button" onClick={openMonitoring}>Open Monitoring Center</button></section>}
  <p className="muted">Read-only analytics from authorized feed APIs, refreshed with Monitoring Center every five seconds. Feed limits and RBAC may affect totals. No inference of identity, causation or unified severity.</p>
  <button type="button" onClick={openMonitoring}>Open Monitoring Center</button>

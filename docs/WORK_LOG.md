@@ -6,6 +6,17 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Open a listed record in the Monitoring Center
+
+- **Why (operator request):** Analytics drill-down lists and Review Queue items showed record IDs, but the only way to reach the record was a generic "Open Monitoring Center" button and a search through the feed.
+- **What:** `openInMonitoring(id)` in `App.tsx` finds the record by its ID in any feed (PPE, Face, SSH, maintenance, environment, unified group, pair, operational, physical, Face + SSH, pipeline incident). It switches to the Monitoring Center, clears feed filters, opens the record and scrolls to the investigation view.
+  - Every Analytics drill-down ID is now a link.
+  - Every Review Queue item has "View in Monitoring Center".
+  - The PPE and Face detail panels now show the record ID.
+- **Verified:** Playwright 14 passed (new test: Analytics → PPE record, Review Queue → unified group; accessibility scans pass).
+
+---
+
 ## 2026-10-12 — RAG retrieval re-evaluation (all four experiments)
 
 - **Why:** the Response document still reported the retrieval experiments on the 260-chunk corpus from before the CFR section fix; only the abstention configuration had been re-run.

@@ -5,9 +5,9 @@ import {useEffect,useState} from "react";
 import {getUnifiedReviewDecision,getUnifiedHumanReviews,getLatestEvidenceReviews,type HumanReviewRecord,type UnifiedReviewDecision,type LatestEvidenceReview,type InvestigatorSingleKind,type MaintenanceEvent,type EnvironmentalEvent} from "./api";
 import type {PPEObservation,FaceObservation,UnifiedCorrelationGroup,PublishedSSH,OperationalCorrelation} from "./api";
 
-type Props={ppe:PPEObservation[];face:FaceObservation[];unified:UnifiedCorrelationGroup[];ssh:PublishedSSH[];operational:OperationalCorrelation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];openMonitoring:()=>void};
+type Props={ppe:PPEObservation[];face:FaceObservation[];unified:UnifiedCorrelationGroup[];ssh:PublishedSSH[];operational:OperationalCorrelation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];openMonitoring:()=>void;openEvent?:(id:string)=>void};
 type QueueItem={id:string;kind:string;zone:string;received:string;state:string;note:string;evidenceKind?:InvestigatorSingleKind};
-export default function HumanReviewQueue({ppe,face,unified,ssh,operational,maintenance,environment,openMonitoring}:Props){
+export default function HumanReviewQueue({ppe,face,unified,ssh,operational,maintenance,environment,openMonitoring,openEvent}:Props){
  const [filter,setFilter]=useState("ALL");
  const [selectedGroup,setSelectedGroup]=useState<string|null>(null);
  const [selectedEvidence,setSelectedEvidence]=useState<{kind:InvestigatorSingleKind;id:string}|null>(null);
@@ -91,6 +91,7 @@ export default function HumanReviewQueue({ppe,face,unified,ssh,operational,maint
    <p className="reviewRecordNote">{x.note}</p>
    {x.kind==="UNIFIED"&&<button type="button" className="reviewOpenButton" onClick={()=>{setSelectedEvidence(null);setSelectedGroup(x.id)}}>{selectedGroup===x.id?"Selected for review":"Open review & audit history"}</button>}
    {x.evidenceKind&&<button type="button" className="reviewOpenButton" onClick={()=>{setSelectedGroup(null);setSelectedEvidence({kind:x.evidenceKind!,id:x.id})}}>{selectedEvidence?.id===x.id?"Selected for review":"Review Evidence & record verdict"}</button>}
+   {openEvent&&<button type="button" className="reviewOpenButton reviewMonitorLink" onClick={()=>openEvent(x.id)}>View in Monitoring Center</button>}
    <div className="reviewRecordFooter"><span>Received</span><time dateTime={x.received}>{x.received?new Date(x.received).toLocaleString():"Unavailable"}</time></div>
   </article>)}</div>}
  </section>

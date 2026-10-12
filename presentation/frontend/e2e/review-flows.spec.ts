@@ -181,3 +181,20 @@ test("an investigation moves from open to in review to resolved, and can be reop
   await panel.getByRole("button", {name: "Reopen"}).click();
   await expect(panel.getByText("REOPENED", {exact: true})).toBeVisible();
 });
+
+test("a record listed in Analytics or the Review Queue opens in the Monitoring Center", async ({page}) => {
+  await installMockApi(page);
+  await signIn(page);
+  await page.getByRole("button", {name: /Analytics Dashboard/}).click();
+  const ppeOutcomes = page.locator(".analyticsOutcome", {hasText: "Safety / PPE"});
+  await ppeOutcomes.getByRole("button", {name: /NON COMPLIANT/}).click();
+  await page.locator(".analyticsDrilldown").getByRole("button", {name: PPE_ID}).click();
+  await expect(page.getByText("DC-GUARDIAN / MONITORING CENTER")).toBeVisible();
+  await expect(page.getByRole("region", {name: "Investigation state"})).toBeVisible();
+  await expect(page.locator("#investigation")).toContainText(PPE_ID);
+
+  await page.getByRole("button", {name: /Human Review Queue/}).click();
+  const group = page.locator("article.reviewRecord", {hasText: GROUP_ID});
+  await group.getByRole("button", {name: "View in Monitoring Center"}).click();
+  await expect(page.getByText(/Unified Multi-Domain Correlation Candidate/)).toBeVisible();
+});

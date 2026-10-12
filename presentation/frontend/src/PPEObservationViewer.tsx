@@ -20,7 +20,7 @@ export default function PPEObservationViewer({id}:{id:string}){
  },[id]);
  // The detail endpoint carries the detector status in assessment.overall_status (no top-level status).
  const detectorStatus=detail?.assessment?.overall_status??detail?.status??"UNKNOWN";
- return <section className="panel ppeLab"><h3>Stored PPE image observation</h3><p className="muted">PPE-only model inference · not a pipeline incident · no Decision severity assigned.</p>
+ return <section className="panel ppeLab"><h3>Stored PPE image observation</h3><p className="muted"><code>{id}</code></p><p className="muted">PPE-only model inference · not a pipeline incident · no Decision severity assigned.</p>
  {error?<p role="alert">{error}</p>:!detail||!url?<p>Loading authorized image…</p>:<>
   {human?.source==="HUMAN_OVERRIDE"?<p><b>{(human.effective_status??"").replaceAll("_"," ")} · human verified</b> by {human.reviewer} · detector reported {detectorStatus.replaceAll("_"," ")} · {detail.zone_id} · {new Date(detail.created_at).toLocaleString()}</p>:<p><b>{detectorStatus.replaceAll("_"," ")}</b> · {detail.zone_id} · {new Date(detail.created_at).toLocaleString()} · {human?(human.verdict==="CONFIRMED"?"human confirmed":"human review inconclusive"):detail.review_status}</p>}{human?.source==="HUMAN_OVERRIDE"&&<p className="muted">Boxes and per-person results below are the frozen detector output; the human verdict is recorded beside them, not written into them.</p>}
   <label><input type="checkbox" checked={annotations} onChange={e=>setAnnotations(e.target.checked)}/> Show YOLO annotations</label>
