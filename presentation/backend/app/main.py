@@ -48,6 +48,9 @@ app = FastAPI(
 from presentation.backend.app.logging_setup import configure as configure_logging,request_logging
 configure_logging()
 app.middleware("http")(request_logging)
+# Headers on every response and a per-user limit on OpenAI-backed calls (docs/PRODUCTION_READINESS.md).
+from presentation.backend.app.http_hardening import hardening_middleware
+app.middleware("http")(hardening_middleware)
 
 app.include_router(ppe_image_router)
 app.include_router(face_image_router)

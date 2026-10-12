@@ -6,6 +6,25 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Production readiness design and HTTP hardening
+
+- **Design:** `docs/PRODUCTION_READINESS.md`:
+  - where the prototype stands, area by area;
+  - the target deployment and five decisions for the operator (identity, database, images, OpenAI, hosting);
+  - a STRIDE threat model, mapping each threat to existing controls and gaps;
+  - the scope and exit criteria for the independent security review;
+  - the order of work before real data.
+- **Hardening in place** (`http_hardening.py`):
+  - security headers on every response (nosniff, no framing, no referrer, opener isolation, permissions policy);
+  - `Cache-Control: no-store` on API responses;
+  - a per-user limit on OpenAI-backed calls (`DCG_OPENAI_CALLS_PER_MINUTE`, default 10).
+  - Only calls that pass authentication and authorization count. The first version counted before login, which would have let anyone use up another user's quota with a forged name; the access matrix exposed it.
+- **Checked:** no secrets or keys in tracked files.
+- **Verified:** backend pytest 391 passed (new `test_http_hardening.py`).
+- **Not done (needs the operator, or an outside party):** the five decisions; the independent security review itself.
+
+---
+
 ## 2026-10-12 — Backup routine and keyboard accessibility
 
 - **Backup** (`presentation/backend/app/backup.py`, `create` / `verify`): consistent online copy of the database and ingestion state, retained images, read-only Neo4j export, manifest with hashes, table counts and audit-chain heads. Refuses a location inside the data folder. `verify` checks hashes, SQLite integrity and every audit chain, on a scratch copy (the store helpers create missing tables on connect, which first changed the backup after hashing; caught by the test).

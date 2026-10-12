@@ -11,6 +11,7 @@ Working on the repository with Claude Code: see [`CLAUDE.md`](../CLAUDE.md) at t
 
 ## Existing reference documents
 
+- [Production Readiness](PRODUCTION_READINESS.md) — what must change before real data or multiple users: target deployment, decisions to make, STRIDE threat model with existing controls and gaps, scope for the independent security review.
 - [Development Workflow](DEVELOPMENT_WORKFLOW.md) — how changes reach `main` (protected branch, pull requests, merge commits), reading CI failures, GitHub CLI, and the operator PC setup (Kaspersky certificate fix for Node tools and `claude rc`).
 - [Uncertainty Reasoning](UNCERTAINTY_REASONING.md) — Bayesian cross-domain correlation, expert knowledge base, labelled scenarios and evaluation against the crisp rule.
 - [Response Architecture and Validation](DC_Guardian_Response_Architecture_and_Validation.md) — approved RAG, grounded specialist reasoning, evaluation methodology, and earlier Response contracts.

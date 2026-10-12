@@ -237,6 +237,8 @@ def isolated(monkeypatch):
     monkeypatch.setenv("DCG_INVESTIGATOR_ENABLED", "0")
     # Same outcome locally and in CI, whatever the operator's .env says.
     monkeypatch.setenv("DCG_INVESTIGATOR_HISTORY_ENABLED", "0")
+    # Many OpenAI-backed calls in one test; the rate limit has its own tests.
+    monkeypatch.setenv("DCG_OPENAI_CALLS_PER_MINUTE", "100000")
     from openai import OpenAI
     def forbidden(*args, **kwargs):
         raise AssertionError("Unexpected OpenAI call")

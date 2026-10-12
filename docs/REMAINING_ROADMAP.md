@@ -37,7 +37,7 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
 3. ~~Review lifecycle~~ (done 2026-10-12, default policy `DCG-LIFECYCLE-v1`, operator-adjustable): open → in review → resolved, reopen; automatic reopen when Evidence or verdicts change; hash-chained.
 4. **Testing plan item 5** (in progress): Response agents and integration converted (49 tests); Response RAG, Reasoning and Evidence scripts remain.
 5. ~~Operations routines~~ (done 2026-10-12: backup + restore check, routine table in VALIDATION_AND_OPERATIONS, keyboard-only test). Remaining: the operator picks the backup and checkpoint locations; a manual screen-reader pass.
-6. **Production deployment design and independent security review** (authentication beyond local HTTP Basic, TLS, secrets, monitoring, threat model, penetration test).
+6. **Production readiness** (design done 2026-10-12, [Production Readiness](PRODUCTION_READINESS.md)): the operator decides identity provider, database, image storage and whether real Evidence may go to OpenAI; then OIDC, PostgreSQL/object storage, containers behind a TLS proxy, and the **independent security review** (scope in the document). Security headers and the OpenAI rate limit are in place.
 
 ## Acceptance rules
 
