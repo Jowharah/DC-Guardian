@@ -430,3 +430,4 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .lifecycle-open,.lifecycle-reopened,.lifecycle-reopened_evidence_changed{background:#7A4A12;color:#fff}.lifecycle-in_review{background:#3E4FA0;color:#fff}.lifecycle-resolved{background:#287D5C;color:#fff}
 /* Visible keyboard focus for every form control and disclosure (keyboard review 2026-10-12). */
 input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #8392CF;outline-offset:2px}
+.analyticsEventLink{text-align:left}.analyticsEventLink code{text-decoration:underline;cursor:pointer}
