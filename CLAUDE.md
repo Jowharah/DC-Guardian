@@ -64,6 +64,7 @@ python check_all.py --only <x>   # checks whose name contains <x>
 
 - `docs/WORK_LOG.md`: dated changes and the testing plan
 - `docs/README.md`: documentation index
+- `docs/PRODUCTION_READINESS.md`: deployment design, threat model, security review scope
 - `docs/DEVELOPMENT_WORKFLOW.md`: PR workflow, `main` ruleset, reading CI, GitHub CLI and PC setup
 - `docs/AI_INVESTIGATOR.md`: Investigator, verdicts, field checks, group severity
 - `docs/REMAINING_ROADMAP.md`: open work and acceptance rules

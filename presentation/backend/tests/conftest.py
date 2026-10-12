@@ -19,6 +19,9 @@ def isolated_presentation_storage(tmp_path, monkeypatch):
     # test's fake (or a real connection) carry over into another test.
     from presentation.backend.app import face_zone_authorization
     monkeypatch.setattr(face_zone_authorization, "_driver", None)
+    # The OpenAI-call rate limiter is per process; each test starts with an empty window.
+    from presentation.backend.app import http_hardening
+    http_hardening.reset()
 
 @pytest.fixture(autouse=True)
 def authorized_legacy_test(request):
