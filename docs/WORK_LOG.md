@@ -6,6 +6,15 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Testing plan item 5: first conversion batch
+
+- **What:** `response/agents/tests` (8 files) and `integration/tests` (4 files) converted from scripts to pytest: one test function per original check (37 and 12 tests, the same count of checks as before, compared file by file); each file keeps a `main()` so `python <file>` still prints its PASSED banner. `pytest.ini` registers the markers `neo4j`, `gpu`, `private_data`; the real PPE/Face Reasoning test is marked `neo4j` and skips with a reason when Neo4j is down.
+- **check_all:** the two folders run as pytest suites (one check each, test counts in the summary), so the total is **44 checks** (was 54; the same checks, grouped).
+- **Verified:** both folders pass under pytest and as scripts; `check_all.py` 44/44.
+- **Remaining:** Response RAG (6, need the local knowledge base), Reasoning (18, Neo4j; follow the graph pilot's fixtures and cleanup), Evidence (27, several need GPU or private data).
+
+---
+
 ## 2026-10-12 — Investigation lifecycle
 
 - **What:** `investigation_lifecycle.py` (policy `DCG-LIFECYCLE-v1`, the default chosen on the operator's go-ahead) and `LifecyclePanel.tsx` in the group and single-event detail.
@@ -383,6 +392,6 @@ Keep every existing check; change how they are organized. Status is updated as i
 | 2 | Move `inspect_sh17_*.py` to `evidence/ppe_detection/tools/` | Exploration scripts, not tests | **Done** 2026-10-11 |
 | 3 | Pilot: convert Reasoning graph/correlation scripts to pytest with shared Neo4j fixtures and markers (`neo4j`, `gpu`, `private_data`) | ~19,400 lines for 541 checks; 13 copies of driver/cleanup code; stops at first failure; order-dependent | **Pilot done** 2026-10-11 (SSH and maintenance ingestion); awaiting group review |
 | 4 | Browser tests (Playwright) for verdict, group review and Decision re-evaluation | Frontend has no automated tests | **Done** 2026-10-11 (5 tests, in CI); 8 tests since (analytics outcomes, monitoring summary, v2 Decisions) |
-| 5 | Convert remaining script tests (Evidence, Response, integration) after the pilot is reviewed | Single runner, per-test results, selectable tests | Planned |
+| 5 | Convert remaining script tests (Evidence, Response, integration) after the pilot is reviewed | Single runner, per-test results, selectable tests | **In progress** 2026-10-12: Response agents (8 files, 37 tests) and integration (4 files, 12 tests) done; Response RAG (6), Reasoning (18), Evidence (27) remain |
 
 Rule for conversions: the same checks must still run — assertion counts are compared before and after.

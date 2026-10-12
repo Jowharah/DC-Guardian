@@ -56,9 +56,11 @@ class SafeCyberProvider:
         }
 
 
-def main():
-    specialist = CybersecuritySpecialist(SafeCyberProvider())
-    result = specialist.assess(
+import pytest  # noqa: E402
+
+
+def test_ssh_anomaly_stays_evidence_not_a_confirmed_attack():
+    result = CybersecuritySpecialist(SafeCyberProvider()).assess(
         SpecialistRequest(
             incident_evidence={
                 "domain": "CYBERSECURITY",
@@ -73,31 +75,23 @@ def main():
             domains=("CYBERSECURITY",),
         )
     )
-    if result["grounding_status"] != "SUPPORTED":
-        raise AssertionError("Expected SUPPORTED result.")
-    text = " ".join(
-        [result["assessment"]]
-        + result["supported_findings"]
-        + result["limitations"]
-    ).lower()
-    if "not proof" not in text and "does not establish" not in text:
-        raise AssertionError("Attack/compromise boundary was not preserved.")
+    assert result["grounding_status"] == "SUPPORTED"
+    text = " ".join([result["assessment"]] + result["supported_findings"] + result["limitations"]).lower()
+    assert "not proof" in text or "does not establish" in text, "Attack/compromise boundary was not preserved."
+
+
+def test_unsupported_domain_is_rejected():
+    with pytest.raises(ValueError):
+        CybersecuritySpecialist(SafeCyberProvider()).assess(
+            SpecialistRequest(incident_evidence={}, retrieved_evidence=[],
+                              task="Invalid domain test.", domains=("MAINTENANCE",)))
+
+
+def main():
+    test_ssh_anomaly_stays_evidence_not_a_confirmed_attack()
     print("PASS: SSH anomaly remains evidence, not a confirmed attack.")
-
-    try:
-        specialist.assess(
-            SpecialistRequest(
-                incident_evidence={},
-                retrieved_evidence=[],
-                task="Invalid domain test.",
-                domains=("MAINTENANCE",),
-            )
-        )
-    except ValueError:
-        print("PASS: Unsupported specialist domain rejected.")
-    else:
-        raise AssertionError("Cybersecurity specialist accepted MAINTENANCE.")
-
+    test_unsupported_domain_is_rejected()
+    print("PASS: Unsupported specialist domain rejected.")
     print("=" * 60)
     print("DC-GUARDIAN SPECIALIST AGENTS CYBERSECURITY SPECIALIST CONTRACT PASSED")
     print("=" * 60)
@@ -105,4 +99,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

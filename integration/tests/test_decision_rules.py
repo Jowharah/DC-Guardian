@@ -21,46 +21,43 @@ def case(domains, *, auth=None, grounding="SUPPORTED", boundaries=None):
     }
 
 
-def main():
-    physical = decide(case(
-        ["PHYSICAL_SECURITY", "SAFETY"], auth="UNAUTHORIZED",
-        boundaries={"identity_link_established": False},
-    ))
+def test_unauthorized_physical_safety_is_medium_human_review():
+    physical = decide(case(["PHYSICAL_SECURITY", "SAFETY"], auth="UNAUTHORIZED",
+                           boundaries={"identity_link_established": False}))
     assert physical["severity"] == "MEDIUM"
     assert not physical["autonomous_action_allowed"]
-    print("PASS: Unauthorized Physical/Safety evidence -> MEDIUM human review.")
 
-    operations = decide(case(
-        ["ENVIRONMENTAL", "MAINTENANCE"],
-        boundaries={
-            "causal_relationship_established": False,
-            "root_cause_established": False,
-        },
-    ))
+
+def test_correlated_operational_risk_is_medium():
+    operations = decide(case(["ENVIRONMENTAL", "MAINTENANCE"],
+                             boundaries={"causal_relationship_established": False, "root_cause_established": False}))
     assert operations["severity"] == "MEDIUM"
-    print("PASS: Correlated operational risk -> MEDIUM human review.")
 
-    multi = decide(case(
-        ["CYBERSECURITY", "ENVIRONMENTAL", "MAINTENANCE"],
-        boundaries={
-            "confirmed_compromise": False,
-            "causal_relationship_established": False,
-            "root_cause_established": False,
-        },
-    ))
+
+def test_three_domains_are_high_without_promoting_compromise():
+    multi = decide(case(["CYBERSECURITY", "ENVIRONMENTAL", "MAINTENANCE"],
+                        boundaries={"confirmed_compromise": False, "causal_relationship_established": False,
+                                    "root_cause_established": False}))
     assert multi["severity"] == "HIGH"
     assert multi["escalation_required"]
     assert not multi["protected_boundaries"]["confirmed_compromise"]
+
+
+def test_insufficient_grounding_requires_evidence_review():
+    insufficient = decide(case(["CYBERSECURITY"], grounding="INSUFFICIENT", boundaries={"confirmed_compromise": False}))
+    assert insufficient["incident_status"] == "EVIDENCE_REVIEW_REQUIRED"
+
+
+def main():
+    test_unauthorized_physical_safety_is_medium_human_review()
+    print("PASS: Unauthorized Physical/Safety evidence -> MEDIUM human review.")
+    test_correlated_operational_risk_is_medium()
+    print("PASS: Correlated operational risk -> MEDIUM human review.")
+    test_three_domains_are_high_without_promoting_compromise()
     print("PASS: Three-domain correlated risk -> HIGH review/escalation.")
     print("PASS: HIGH severity does not promote compromise or causation.")
-
-    insufficient = decide(case(
-        ["CYBERSECURITY"], grounding="INSUFFICIENT",
-        boundaries={"confirmed_compromise": False},
-    ))
-    assert insufficient["incident_status"] == "EVIDENCE_REVIEW_REQUIRED"
+    test_insufficient_grounding_requires_evidence_review()
     print("PASS: Insufficient grounding -> evidence review required.")
-
     print("=" * 60)
     print("DC-GUARDIAN DETERMINISTIC DECISION CONTRACT PASSED")
     print("=" * 60)
@@ -68,4 +65,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

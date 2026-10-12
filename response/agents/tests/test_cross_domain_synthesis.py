@@ -79,27 +79,26 @@ class UnsafeFakeSynthesizer(SafeFakeSynthesizer):
         return result
 
 
+import pytest  # noqa: E402
+
+TASK = "Synthesize the validated specialist findings."
+
+
+def test_valid_cross_domain_synthesis_is_accepted():
+    result = cross_domain_synthesize(provider=SafeFakeSynthesizer(), findings=[CYBER, OPS], task=TASK)
+    assert result["grounding_status"] == "SUPPORTED"
+
+
+def test_unestablished_causal_claim_is_rejected():
+    with pytest.raises(ValueError):
+        cross_domain_synthesize(provider=UnsafeFakeSynthesizer(), findings=[CYBER, OPS], task=TASK)
+
+
 def main():
-    result = cross_domain_synthesize(
-        provider=SafeFakeSynthesizer(),
-        findings=[CYBER, OPS],
-        task="Synthesize the validated specialist findings.",
-    )
-    if result["grounding_status"] != "SUPPORTED":
-        raise AssertionError("Safe synthesis was rejected.")
+    test_valid_cross_domain_synthesis_is_accepted()
     print("PASS: Valid cross-domain synthesis accepted.")
-
-    try:
-        cross_domain_synthesize(
-            provider=UnsafeFakeSynthesizer(),
-            findings=[CYBER, OPS],
-            task="Synthesize the validated specialist findings.",
-        )
-    except ValueError:
-        print("PASS: Unestablished causal claim rejected.")
-    else:
-        raise AssertionError("Unsafe causal promotion was accepted.")
-
+    test_unestablished_causal_claim_is_rejected()
+    print("PASS: Unestablished causal claim rejected.")
     print("=" * 60)
     print("DC-GUARDIAN CROSS-DOMAIN SYNTHESIS CONTRACT PASSED")
     print("=" * 60)
@@ -107,4 +106,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
