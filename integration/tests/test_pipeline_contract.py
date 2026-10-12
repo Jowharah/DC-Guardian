@@ -62,26 +62,30 @@ def response_runner(payload):
     }
 
 
+def pipeline():
+    return run_dc_guardian_scenario(scenario=ppe_face_scenario(), evidence_runner=evidence_runner,
+                                    reasoning_runner=reasoning_runner, response_runner=response_runner).to_dict()
+
+
+def test_every_layer_is_present():
+    data = pipeline()
+    assert data["evidence"]["layer"] == "EVIDENCE"
+    assert data["reasoning"]["layer"] == "REASONING"
+    assert data["response"]["layer"] == "RESPONSE"
+
+
+def test_physical_safety_route_is_preserved():
+    assert pipeline()["response"]["specialists"] == ["physical_safety"]
+
+
+def test_face_ppe_identity_boundary_is_preserved():
+    assert not pipeline()["response"]["identity_link_established"]
+
+
 def main():
-    result = run_dc_guardian_scenario(
-        scenario=ppe_face_scenario(),
-        evidence_runner=evidence_runner,
-        reasoning_runner=reasoning_runner,
-        response_runner=response_runner,
-    )
-    data = result.to_dict()
-
-    if data["evidence"]["layer"] != "EVIDENCE":
-        raise AssertionError("Evidence layer missing.")
-    if data["reasoning"]["layer"] != "REASONING":
-        raise AssertionError("Reasoning layer missing.")
-    if data["response"]["layer"] != "RESPONSE":
-        raise AssertionError("Response layer missing.")
-    if data["response"]["specialists"] != ["physical_safety"]:
-        raise AssertionError("Physical/Safety route was not preserved.")
-    if data["response"]["identity_link_established"]:
-        raise AssertionError("Unsupported Face/PPE identity link was introduced.")
-
+    test_every_layer_is_present()
+    test_physical_safety_route_is_preserved()
+    test_face_ppe_identity_boundary_is_preserved()
     print("=" * 60)
     print("DC-GUARDIAN CONNECTED PIPELINE CONTRACT")
     print("EVIDENCE -> REASONING -> RESPONSE")

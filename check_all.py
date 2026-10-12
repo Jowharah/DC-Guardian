@@ -86,11 +86,16 @@ def script_checks() -> list[tuple[str, str, list[str], str | None]]:
     add("Reasoning", "reasoning/uncertainty/labelling/test_labelling_pack.py")
     add("Response", "response/rag/verify_response_rag.py")
     for rel in sorted(p.relative_to(ROOT).as_posix() for p in ROOT.glob("response/*/tests/test_*.py")):
-        add("Response", rel)
-    for rel in ("integration/tests/test_decision_rules.py", "integration/tests/test_pipeline_contract.py",
-                "integration/tests/test_service_contract.py", "integration/tests/test_real_ppe_face_reasoning.py"):
-        add("Decision/Integration", rel)
+        if not rel.startswith(PYTEST_DIRS):
+            add("Response", rel)
     return checks
+
+
+# Folders converted to pytest (testing plan item 5): one check each, per-test results
+# in the log. Their files still run alone with `python <file>`.
+PYTEST_DIRS = ("response/agents/tests", "integration/tests")
+PYTEST_SUITES = (("Response", "response agent tests (pytest)", "response/agents/tests"),
+                 ("Decision/Integration", "decision and integration tests (pytest)", "integration/tests"))
 
 
 def run(command: list[str], cwd: Path, timeout: int) -> tuple[int, str, float]:
@@ -210,6 +215,9 @@ def main() -> int:
 
     neo4j_skip = neo4j_reachable()
     checks = script_checks()
+    for layer, name, folder in PYTEST_SUITES:
+        # Tests needing Neo4j skip themselves (with a reason) when it is not reachable.
+        checks.append((layer, name, [str(MAIN_PY), "-m", "pytest", folder, "-q", "-p", "no:cacheprovider", "-rs"], None))
     checks.append(("Presentation", "presentation backend tests (pytest)",
                    [str(MAIN_PY), "-m", "pytest", "presentation/backend/tests", "-q", "-p", "no:cacheprovider"], None))
     npm = shutil.which("npm") or shutil.which("npm.cmd")
@@ -228,7 +236,7 @@ def main() -> int:
     for layer, name, command, skip in checks:
         if args.only and args.only.lower() not in name.lower():
             continue
-        if skip is None and name in ("reasoning/run_contract_tests.py", "integration/tests/test_real_ppe_face_reasoning.py"):
+        if skip is None and name == "reasoning/run_contract_tests.py":
             skip = neo4j_skip
         if skip:
             record(layer, name, "SKIP", 0.0, skip)

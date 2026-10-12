@@ -94,49 +94,42 @@ class HallucinatedCitationProvider:
         }
 
 
+import pytest  # noqa: E402
+
+
+def run(provider, incident, evidence, task):
+    return grounded_reason(provider=provider, incident_evidence=incident, retrieved_evidence=evidence, task=task)
+
+
+def test_valid_grounded_assessment_is_accepted():
+    result = run(ValidFakeProvider(), {"authorization": "UNAUTHORIZED"}, EVIDENCE, "Assess the access concern.")
+    assert result["grounding_status"] == "SUPPORTED"
+
+
+def test_partially_supported_assessment_is_accepted():
+    result = run(PartialFakeProvider(), {"authorization": "UNAUTHORIZED"}, EVIDENCE, "Assess the access concern.")
+    assert result["grounding_status"] == "PARTIALLY_SUPPORTED"
+
+
+def test_insufficient_assessment_is_accepted():
+    result = run(InsufficientFakeProvider(), {"authorization": "UNKNOWN"}, [], "Determine unsupported internal policy.")
+    assert result["grounding_status"] == "INSUFFICIENT"
+
+
+def test_hallucinated_citation_is_rejected():
+    with pytest.raises(ValueError):
+        run(HallucinatedCitationProvider(), {"authorization": "UNAUTHORIZED"}, EVIDENCE, "Assess the access concern.")
+
+
 def main():
-    result = grounded_reason(
-        provider=ValidFakeProvider(),
-        incident_evidence={"authorization": "UNAUTHORIZED"},
-        retrieved_evidence=EVIDENCE,
-        task="Assess the access concern.",
-    )
-    if result["grounding_status"] != "SUPPORTED":
-        raise AssertionError("Valid grounded result was rejected.")
+    test_valid_grounded_assessment_is_accepted()
     print("PASS: Valid grounded assessment.")
-
-    partial = grounded_reason(
-        provider=PartialFakeProvider(),
-        incident_evidence={"authorization": "UNAUTHORIZED"},
-        retrieved_evidence=EVIDENCE,
-        task="Assess the access concern.",
-    )
-    if partial["grounding_status"] != "PARTIALLY_SUPPORTED":
-        raise AssertionError("Partial grounding status failed.")
+    test_partially_supported_assessment_is_accepted()
     print("PASS: Partially supported assessment.")
-
-    insufficient = grounded_reason(
-        provider=InsufficientFakeProvider(),
-        incident_evidence={"authorization": "UNKNOWN"},
-        retrieved_evidence=[],
-        task="Determine unsupported internal policy.",
-    )
-    if insufficient["grounding_status"] != "INSUFFICIENT":
-        raise AssertionError("Insufficient grounding status failed.")
+    test_insufficient_assessment_is_accepted()
     print("PASS: Insufficient assessment.")
-
-    try:
-        grounded_reason(
-            provider=HallucinatedCitationProvider(),
-            incident_evidence={"authorization": "UNAUTHORIZED"},
-            retrieved_evidence=EVIDENCE,
-            task="Assess the access concern.",
-        )
-    except ValueError:
-        print("PASS: Hallucinated citation rejected.")
-    else:
-        raise AssertionError("Hallucinated citation was accepted.")
-
+    test_hallucinated_citation_is_rejected()
+    print("PASS: Hallucinated citation rejected.")
     print("=" * 60)
     print("DC-GUARDIAN GROUNDED REASONING GROUNDED REASONING CONTRACT PASSED")
     print("=" * 60)
@@ -144,4 +137,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

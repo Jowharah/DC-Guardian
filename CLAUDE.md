@@ -43,9 +43,9 @@ python check_all.py              # every layer, ~3 min; report in logs/checks/la
 python check_all.py --only <x>   # checks whose name contains <x>
 ```
 
-- Locally all **54** checks run (including the Playwright browser tests). A fresh clone or CI skips GPU, private-data and RAG-knowledge-base checks with a stated reason; CI (`.github/workflows/ci.yml`) runs the rest on every push.
+- Locally all **44** checks run (including the Playwright browser tests); converted folders count as one check each, with per-test results in their log. A fresh clone or CI skips GPU, private-data and RAG-knowledge-base checks with a stated reason; CI (`.github/workflows/ci.yml`) runs the rest on every push.
 - Narrower runs: `python -m pytest presentation/backend/tests -q`, `python reasoning/run_contract_tests.py` (needs Neo4j; removes its `SCENARIO-*` test nodes afterwards), `npm run build` and `npm run test:e2e` (Playwright browser tests, mocked API, local Edge) in `presentation/frontend`.
-- Most Evidence, Reasoning, Response and integration tests are **scripts** (run with `python <file>`). The pytest pilot (`reasoning/graph/conftest.py`, SSH and maintenance ingestion) shows the target style: shared fixtures, per-test results, cleanup of the test's own graph nodes. New Reasoning graph tests should follow it.
+- **pytest:** backend, `response/agents/tests`, `integration/tests` and the Reasoning graph pilot (`reasoning/graph/conftest.py`). Converted files keep a `main()` so `python <file>` still works. Markers in `pytest.ini`: `neo4j`, `gpu`, `private_data` (tests needing Neo4j skip themselves when it is down). The remaining Evidence, Reasoning and RAG tests are still **scripts** (`python <file>`); convert them in the same style, keeping the same checks (compare counts before and after).
 - CI gates on Bandit (medium/high), pip-audit and `npm audit` (high). Annotate a reviewed-safe Bandit finding with `# nosec <code>: <reason>`; never suppress without a reason.
 - Backend runtime logs: `logs/errors.log` (start here), `logs/api_access.log`, `logs/backend.log`.
 

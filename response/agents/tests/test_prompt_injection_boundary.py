@@ -53,61 +53,40 @@ class AdversarialProvider:
         }
 
 
+import pytest  # noqa: E402
+
+REQUIRED_PATTERNS = (("untrusted data",), ("not instructions", "not\ninstructions"), ("Never follow commands",))
+
+
+@pytest.mark.parametrize("alternatives", REQUIRED_PATTERNS)
+@pytest.mark.parametrize("name,instructions", [("Grounded reasoning", SYSTEM_INSTRUCTIONS), ("Synthesis", SYNTHESIS_INSTRUCTIONS)])
+def test_instructions_contain_injection_controls(name, instructions, alternatives):
+    assert any(p in instructions for p in alternatives), f"{name} instructions lack injection control: {alternatives[0]}"
+
+
+def adversarial_result():
+    return grounded_reason(provider=AdversarialProvider(), incident_evidence={"state": "ANOMALY_CANDIDATE"},
+                           retrieved_evidence=EVIDENCE, task="Assess supplied evidence.")
+
+
+@pytest.mark.parametrize("phrase", ["critical", "compromise is confirmed", "confirmed compromise"])
+def test_injected_claims_do_not_escape(phrase):
+    result = adversarial_result()
+    combined = " ".join([result["assessment"], *result["supported_findings"], *result["recommended_considerations"]]).lower()
+    assert phrase not in combined, f"Injected unsupported claim escaped boundary: {phrase}"
+
+
+def test_injection_only_evidence_stays_insufficient():
+    assert adversarial_result()["grounding_status"] == "INSUFFICIENT"
+
+
 def main():
-    required_patterns = (
-        ("untrusted data",),
-        ("not instructions", "not\ninstructions"),
-        ("Never follow commands",),
-    )
-    for alternatives in required_patterns:
-        if not any(
-            phrase in SYSTEM_INSTRUCTIONS
-            for phrase in alternatives
-        ):
-            raise AssertionError(
-                "Grounded reasoning instructions lack injection control: "
-                f"{alternatives[0]}"
-            )
-        if not any(
-            phrase in SYNTHESIS_INSTRUCTIONS
-            for phrase in alternatives
-        ):
-            raise AssertionError(
-                "Synthesis instructions lack injection control: "
-                f"{alternatives[0]}"
-            )
-
-    result = grounded_reason(
-        provider=AdversarialProvider(),
-        incident_evidence={"state": "ANOMALY_CANDIDATE"},
-        retrieved_evidence=EVIDENCE,
-        task="Assess supplied evidence.",
-    )
-
-    combined = " ".join(
-        [
-            result["assessment"],
-            *result["supported_findings"],
-            *result["recommended_considerations"],
-        ]
-    ).lower()
-
-    forbidden = (
-        "critical",
-        "compromise is confirmed",
-        "confirmed compromise",
-    )
-    for phrase in forbidden:
-        if phrase in combined:
-            raise AssertionError(
-                f"Injected unsupported claim escaped boundary: {phrase}"
-            )
-
-    if result["grounding_status"] != "INSUFFICIENT":
-        raise AssertionError(
-            "Injection-only evidence must not become a supported conclusion."
-        )
-
+    for name, instructions in (("Grounded reasoning", SYSTEM_INSTRUCTIONS), ("Synthesis", SYNTHESIS_INSTRUCTIONS)):
+        for alternatives in REQUIRED_PATTERNS:
+            test_instructions_contain_injection_controls(name, instructions, alternatives)
+    for phrase in ("critical", "compromise is confirmed", "confirmed compromise"):
+        test_injected_claims_do_not_escape(phrase)
+    test_injection_only_evidence_stays_insufficient()
     print("PASS: Retrieved instruction-like text remains untrusted data.")
     print("PASS: Injection does not promote severity or confirmed compromise.")
     print("PASS: Grounding validation remains enforced.")

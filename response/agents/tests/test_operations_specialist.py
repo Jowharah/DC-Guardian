@@ -58,25 +58,18 @@ class SafeOperationsProvider:
         }
 
 
-def main():
-    specialist = OperationsSpecialist(SafeOperationsProvider())
-    result = specialist.assess(
+import pytest  # noqa: E402
+
+
+def test_correlation_does_not_imply_causation():
+    result = OperationsSpecialist(SafeOperationsProvider()).assess(
         SpecialistRequest(
             incident_evidence={
                 "correlation_type": "ENVIRONMENTAL_MAINTENANCE",
                 "domains": ["MAINTENANCE", "ENVIRONMENTAL"],
-                "maintenance": {
-                    "assessment": "AT_RISK",
-                    "failure_probability": 0.61,
-                    "operating_threshold": 0.45,
-                    "failure_horizon_days": 7,
-                    "asset_id": "DRV-TEST-001",
-                },
-                "environmental": {
-                    "state": "HIGH_TEMPERATURE",
-                    "temperature_c": 34.0,
-                    "zone_id": "ZONE-B",
-                },
+                "maintenance": {"assessment": "AT_RISK", "failure_probability": 0.61, "operating_threshold": 0.45,
+                                "failure_horizon_days": 7, "asset_id": "DRV-TEST-001"},
+                "environmental": {"state": "HIGH_TEMPERATURE", "temperature_c": 34.0, "zone_id": "ZONE-B"},
                 "shared_scope": "ZONE",
                 "shared_entity": "ZONE-B",
             },
@@ -85,33 +78,25 @@ def main():
             domains=("MAINTENANCE", "ENVIRONMENTAL"),
         )
     )
-    if result["grounding_status"] != "SUPPORTED":
-        raise AssertionError("Expected SUPPORTED result.")
-    joined = " ".join(
-        [result["assessment"]]
-        + result["supported_findings"]
-        + result["limitations"]
-    ).lower()
-    if "does not establish" not in joined and "does not" not in joined:
-        raise AssertionError("Correlation/causation boundary was not preserved.")
+    assert result["grounding_status"] == "SUPPORTED"
+    joined = " ".join([result["assessment"]] + result["supported_findings"] + result["limitations"]).lower()
+    assert "does not establish" in joined or "does not" in joined, "Correlation/causation boundary was not preserved."
+
+
+@pytest.mark.parametrize("invalid", ["CYBERSECURITY", "PHYSICAL_SECURITY", "SAFETY"])
+def test_unsupported_domains_are_rejected(invalid):
+    with pytest.raises(ValueError):
+        OperationsSpecialist(SafeOperationsProvider()).assess(
+            SpecialistRequest(incident_evidence={}, retrieved_evidence=[],
+                              task="Invalid domain test.", domains=(invalid,)))
+
+
+def main():
+    test_correlation_does_not_imply_causation()
     print("PASS: Maintenance/environment correlation does not imply causation.")
-
     for invalid in ("CYBERSECURITY", "PHYSICAL_SECURITY", "SAFETY"):
-        try:
-            specialist.assess(
-                SpecialistRequest(
-                    incident_evidence={},
-                    retrieved_evidence=[],
-                    task="Invalid domain test.",
-                    domains=(invalid,),
-                )
-            )
-        except ValueError:
-            pass
-        else:
-            raise AssertionError(f"Operations specialist accepted {invalid}.")
+        test_unsupported_domains_are_rejected(invalid)
     print("PASS: Unsupported specialist domains rejected.")
-
     print("=" * 60)
     print("DC-GUARDIAN SPECIALIST AGENTS OPERATIONS SPECIALIST CONTRACT PASSED")
     print("=" * 60)
@@ -119,4 +104,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -13,19 +13,40 @@ from integration.runners.real_ppe_face_reasoning import (  # noqa: E402
 )
 
 
-def main():
-    result = run_real_ppe_face_reasoning(
-        scenario_id="INTEGRATION-REAL-PPE-FACE-001"
-    )
-    if result["shared_scope"] != "ZONE":
-        raise AssertionError("Expected truthful ZONE scope.")
-    if result["shared_entity"] != "ZONE-B":
-        raise AssertionError("Expected shared ZONE-B context.")
-    if result["authorization_status"] != "UNAUTHORIZED":
-        raise AssertionError("Expected graph-derived UNAUTHORIZED status.")
-    if result["identity_link_established"]:
-        raise AssertionError("PPE/Face identity must remain unestablished.")
+import pytest  # noqa: E402
 
+# Needs Neo4j (real ingestion and graph authorization), like the Reasoning contracts.
+pytestmark = pytest.mark.neo4j
+
+
+@pytest.fixture(scope="module")
+def result():
+    from reasoning.graph.ingest_event import create_driver
+    try:
+        create_driver().close()
+    except Exception as exc:  # noqa: BLE001 - any connection failure means "not available"
+        pytest.skip(f"Neo4j not reachable: {type(exc).__name__}")
+    return run_real_ppe_face_reasoning(scenario_id="INTEGRATION-REAL-PPE-FACE-001")
+
+
+def test_scope_is_the_truthful_shared_zone(result):
+    assert result["shared_scope"] == "ZONE"
+    assert result["shared_entity"] == "ZONE-B"
+
+
+def test_authorization_comes_from_the_graph(result):
+    assert result["authorization_status"] == "UNAUTHORIZED"
+
+
+def test_identity_link_stays_unestablished(result):
+    assert not result["identity_link_established"]
+
+
+def main():
+    data = run_real_ppe_face_reasoning(scenario_id="INTEGRATION-REAL-PPE-FACE-001")
+    test_scope_is_the_truthful_shared_zone(data)
+    test_authorization_comes_from_the_graph(data)
+    test_identity_link_stays_unestablished(data)
     print("=" * 60)
     print("DC-GUARDIAN REAL REASONING VERTICAL SLICE")
     print("EVIDENCE -> REASONING")

@@ -35,7 +35,7 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
 1. **Independent labelling round** (pack in `reasoning/uncertainty/labelling/pack/`): teammates label; then re-run `evaluate.py` and `decision_v2_validation.py`. Validates both the Bayesian study and the Decision v2 group rule. Consider a severity column to validate MEDIUM vs LOW.
 2. ~~First live runs~~ (done 2026-10-12; found and fixed three issues). Follow-ups: **safety knowledge-base review** (OSHA 1910.135 chunk mis-parsed, too little PPE guidance, so the PPE specialist cannot ground its answer); measure the claim checker on a larger set of real answers.
 3. ~~Review lifecycle~~ (done 2026-10-12, default policy `DCG-LIFECYCLE-v1`, operator-adjustable): open → in review → resolved, reopen; automatic reopen when Evidence or verdicts change; hash-chained.
-4. **Testing plan item 5:** convert the remaining script tests to pytest after the group reviews the pilot.
+4. **Testing plan item 5** (in progress): Response agents and integration converted (49 tests); Response RAG, Reasoning and Evidence scripts remain.
 5. **Operations routines:** where and how often audit checkpoints are written; backup and recovery of the SQLite store and Neo4j; manual keyboard / screen-reader review.
 6. **Production deployment design and independent security review** (authentication beyond local HTTP Basic, TLS, secrets, monitoring, threat model, penetration test).
 

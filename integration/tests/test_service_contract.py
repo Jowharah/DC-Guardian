@@ -38,39 +38,35 @@ def fake_response(reasoning):
     }
 
 
-def main():
-    fake_config = {
-        "reasoning_runner": fake_reasoning,
-        "response_runner": fake_response,
-    }
+def service_result():
+    fake_config = {"reasoning_runner": fake_reasoning, "response_runner": fake_response}
     with patch("integration.service.get_scenario", return_value=fake_config):
-        result = run_integrated_scenario(
-            "ppe_face",
-            scenario_id="SERVICE-CONTRACT-001",
-        )
+        return run_integrated_scenario("ppe_face", scenario_id="SERVICE-CONTRACT-001")
 
-    if not isinstance(result, PipelineResult):
-        raise AssertionError("Service did not return PipelineResult.")
+
+def test_service_returns_a_pipeline_result_with_every_trace():
+    result = service_result()
+    assert isinstance(result, PipelineResult)
     data = result.to_dict()
-    if data["evidence"]["layer"] != "EVIDENCE":
-        raise AssertionError("Evidence trace missing.")
-    if data["reasoning"]["layer"] != "REASONING":
-        raise AssertionError("Reasoning trace missing.")
-    if data["response"]["layer"] != "RESPONSE":
-        raise AssertionError("Response trace missing.")
-    # The service applies deterministic Decision Rules v1 (since d4cb326).
-    decision = data["decision"]
-    if decision.get("policy_version") != "DCG-DECISION-v1":
-        raise AssertionError("Deterministic Decision Rules v1 not applied.")
-    if decision["autonomous_action_allowed"] is not False:
-        raise AssertionError("Autonomous action must never be allowed.")
-    if decision["severity"] not in ("LOW", "MEDIUM", "HIGH"):
-        raise AssertionError("Decision severity missing.")
-    if decision["protected_boundaries"]["identity_link_established"] is not False:
-        raise AssertionError("Identity link must not be inferred.")
+    assert data["evidence"]["layer"] == "EVIDENCE"
+    assert data["reasoning"]["layer"] == "REASONING"
+    assert data["response"]["layer"] == "RESPONSE"
 
+
+def test_decision_rules_v1_applied_without_autonomous_action():
+    # The service applies deterministic Decision Rules v1 (since d4cb326).
+    decision = service_result().to_dict()["decision"]
+    assert decision.get("policy_version") == "DCG-DECISION-v1"
+    assert decision["autonomous_action_allowed"] is False
+    assert decision["severity"] in ("LOW", "MEDIUM", "HIGH")
+    assert decision["protected_boundaries"]["identity_link_established"] is False
+
+
+def main():
+    test_service_returns_a_pipeline_result_with_every_trace()
     print("PASS: Reusable scenario service returns unified PipelineResult.")
     print("PASS: Evidence, Reasoning, and Response traces preserved.")
+    test_decision_rules_v1_applied_without_autonomous_action()
     print("PASS: Deterministic Decision Rules v1 applied; no autonomous action.")
     print("=" * 60)
     print("DC-GUARDIAN INTEGRATION SERVICE CONTRACT PASSED")
