@@ -32,7 +32,7 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
   - Live PPE specialist (operator-approved) on both non-compliant images: PARTIALLY_SUPPORTED, citing OSHA 1910.132/135, keeping "non-detection is not proof of absence" and the human override separate.
 - **Verified:** new `response/rag/tests/test_cfr_sections.py` (pytest and script); all RAG checks pass.
 - **Caveats:**
-  - The abstention threshold was calibrated on the old index; recalibrate (`calibrate_abstention.py`) before relying on abstention.
+  - Abstention recalibrated on the rebuilt index (`calibrate_abstention.py`, development set): the threshold is unchanged at 0.5922, and the 12 development cases are still classified 6/6/0/0.
   - OSHA 1910 has no specific high-visibility vest rule; vest guidance rests on the general PPE duty in 1910.132.
 
 ---
