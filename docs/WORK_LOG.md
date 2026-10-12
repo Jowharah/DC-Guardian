@@ -6,6 +6,15 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — `main` branch protection and GitHub CLI
+
+- **What:** the operator created a repository ruleset on `main`: block deletion and force pushes; require a pull request (0 approvals, merge commits only); require both CI jobs to pass with the branch up to date. GitHub CLI 2.102.0 installed (portable, user folder, checksum-verified) and signed in, so pull requests are opened with `gh pr create`.
+- **Why:** CI results were advisory; a failing change could still land on `main`.
+- **Verified:** `gh api repos/{owner}/{repo}/rules/branches/main` lists the four rules; this entry was merged through the first protected pull request.
+- **Also:** Kaspersky intercepts HTTPS; Node-based tools trust its root via the user variable `NODE_EXTRA_CA_CERTS` (fixes `claude rc` and the Playwright browser download).
+
+---
+
 ## 2026-10-12 — Accessibility scan (axe-core)
 
 - **What:** `@axe-core/playwright` 4.10.2 (dev dependency, pinned; `npm audit` clean) and `e2e/accessibility.spec.ts`: WCAG 2.1 A/AA scan of sign-in, Monitoring Center, group detail, single-event detail (verdict and specialist panels), Analytics, Review Queue and Scenario Lab; any violation fails with its element.

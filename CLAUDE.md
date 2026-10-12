@@ -52,6 +52,7 @@ python check_all.py --only <x>   # checks whose name contains <x>
 ## Conventions
 
 - **Work on a short-lived branch from `main`** (`feat/<topic>`, `fix/<topic>`, `docs/<topic>`, `test/<topic>`), push it, and open a pull request into `main`. CI must be green; the operator reviews and merges with **Create a merge commit** (never squash or rebase: the docs cite commit hashes). Delete the branch after merging.
+- **`main` is protected** (repository ruleset, 2026-10-12): no direct pushes, no force pushes or deletion; a pull request with both CI jobs green (Python layers; Frontend type-check, build and browser tests) and up to date with `main`; merge commits only; 0 approvals required (single maintainer). Open PRs with the GitHub CLI: `gh pr create --base main`; merge with `gh pr merge --merge --delete-branch` only when the operator says so.
 - **Record every change in `docs/WORK_LOG.md`:** what, why, commit, how verified, caveats. Update the testing-plan status there when items land.
 - Update the relevant doc (`docs/README.md` indexes them) when behaviour or contracts change.
 - Commit messages: `type(scope): summary` (`feat`, `fix`, `test`, `docs`, `ci`, `perf`, `chore`, `ui`), with a body explaining why.
