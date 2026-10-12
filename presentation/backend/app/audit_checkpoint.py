@@ -1,6 +1,6 @@
 """External checkpoints for the three local audit hash chains.
 
-The chains (unified group reviews, Evidence verdicts, Investigator calls) detect
+The chains (unified group reviews, Evidence verdicts, Investigator calls, lifecycle transitions) detect
 an edited record, but not deletion of the newest records or replacement of the
 whole database. A checkpoint records each chain's length and head hash in a
 small JSON file the operator keeps OUTSIDE the database folder (another drive,
@@ -34,7 +34,9 @@ def chains():
     from presentation.backend.app.investigator_audit import FIELDS as INVESTIGATOR_FIELDS, connect as investigator_connect
     from presentation.backend.app.human_review_audit import connect as review_connect
     from presentation.backend.app.evidence_review import connect as evidence_connect
+    from presentation.backend.app.investigation_lifecycle import FIELDS as LIFECYCLE_FIELDS, connect as lifecycle_connect
     return {"unified_reviews": (review_connect, "human_review_audit", REVIEW_FIELDS),
+            "lifecycle_transitions": (lifecycle_connect, "investigation_lifecycle", LIFECYCLE_FIELDS),
             "evidence_verdicts": (evidence_connect, "evidence_review_audit", EVIDENCE_FIELDS),
             "investigator_calls": (investigator_connect, "investigator_audit", INVESTIGATOR_FIELDS)}
 

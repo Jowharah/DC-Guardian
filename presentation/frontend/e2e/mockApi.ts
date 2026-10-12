@@ -23,6 +23,7 @@ export type MockState = {
   groupReviews: Record<string, unknown>[];
   specialistsEvaluated: boolean;
   singleSpecialist: boolean;
+  lifecycle: {state: string; assignee: string | null; resolution: string | null; transitions: Record<string, unknown>[]};
   sshInputOverridden: boolean;
   sshReevaluated: boolean;
   requests: {method: string; path: string; body: unknown}[];
@@ -108,7 +109,7 @@ function effective(records: Verdict[]) {
 }
 
 export async function installMockApi(page: Page): Promise<MockState> {
-  const state: MockState = {verdicts: [], groupReviews: [], specialistsEvaluated: false, singleSpecialist: false,
+  const state: MockState = {verdicts: [], groupReviews: [], specialistsEvaluated: false, singleSpecialist: false, lifecycle: {state: "OPEN", assignee: null, resolution: null, transitions: []},
     sshInputOverridden: false, sshReevaluated: false, requests: []};
   const json = (route: Route, body: unknown, status = 200) =>
     route.fulfill({status, contentType: "application/json", body: JSON.stringify(body)});
@@ -182,6 +183,17 @@ export async function installMockApi(page: Page): Promise<MockState> {
       return json(route, {kind: "ppe", evidence_id: PPE_ID, zone_id: "ZONE-B", evaluated_at: NOW, evidence_changed_since: false,
         decision_severity: null, specialists: {physical_security: {specialist_id: "physical_security", assessment: "Synthetic single-event assessment.",
           grounding_status: "SUPPORTED", supported_findings: ["Vest not detected."], recommended_considerations: [], limitations: [], citations: []}}});
+    }
+    if (path === `/api/v1/lifecycle/ppe/${PPE_ID}` || path === `/api/v1/lifecycle/ppe/${PPE_ID}/transitions`) {
+      if (method === "POST") {
+        const body = request.postDataJSON() as {action: string; resolution: string | null; rationale: string};
+        const to = {START_REVIEW: "IN_REVIEW", RESOLVE: "RESOLVED", REOPEN: "REOPENED"}[body.action] ?? state.lifecycle.state;
+        state.lifecycle = {state: to, assignee: "test-operator", resolution: body.action === "RESOLVE" ? body.resolution : null,
+          transitions: [...state.lifecycle.transitions, {recorded_at: NOW, actor: "test-operator", action: body.action,
+            from_state: state.lifecycle.state, to_state: to, assignee: "test-operator", resolution: body.resolution, rationale: body.rationale}]};
+      }
+      return json(route, {subject_type: "ppe", subject_id: PPE_ID, policy_version: "DCG-LIFECYCLE-v1", ...state.lifecycle,
+        note: "Lifecycle state only; Evidence, verdicts, Decisions and severity are unchanged."});
     }
     if (path === "/api/v1/decisions/standalone") {
       return json(route, [{kind: "ppe", evidence_id: PPE_ID, zone_id: "ZONE-B", decision: {incident_status: "REVIEW_REQUIRED", severity: "LOW",

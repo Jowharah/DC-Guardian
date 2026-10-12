@@ -102,7 +102,9 @@ def audit_integrity(principal:Principal=Depends(current_principal)):
         unified=verify_database(db)
         evidence=verify_evidence_database(db)
     investigator=verify_investigator()
+    from presentation.backend.app.investigation_lifecycle import verify as verify_lifecycle
+    lifecycle=verify_lifecycle()
     # Top-level fields keep describing the unified chain for existing clients;
     # the overall status fails if any chain fails.
-    return {**unified,"status":"PASS" if unified["status"]==evidence["status"]==investigator["status"]=="PASS" else "FAILED",
-            "unified_chain":unified,"evidence_chain":evidence,"investigator_chain":investigator}
+    return {**unified,"status":"PASS" if unified["status"]==evidence["status"]==investigator["status"]==lifecycle["status"]=="PASS" else "FAILED",
+            "unified_chain":unified,"evidence_chain":evidence,"investigator_chain":investigator,"lifecycle_chain":lifecycle}

@@ -160,3 +160,24 @@ test("a single event's specialist evaluation needs consent and is saved", async 
   expect(post?.body).toMatchObject({acknowledgment: true});
   await expect(panel.getByRole("button", {name: "Re-run specialist evaluation"})).toBeDisabled();
 });
+
+test("an investigation moves from open to in review to resolved, and can be reopened", async ({page}) => {
+  await installMockApi(page);
+  await signIn(page);
+  await page.locator("button.feedRow", {hasText: PPE_ID}).click();
+  const panel = page.getByRole("region", {name: "Investigation state"});
+  await expect(panel.getByText("OPEN", {exact: true})).toBeVisible();
+  await panel.getByRole("button", {name: "Start review"}).click();
+  await expect(panel.getByText("IN REVIEW", {exact: true})).toBeVisible();
+  const resolve = panel.getByRole("button", {name: "Resolve"});
+  await panel.getByLabel("Resolution", {exact: true}).selectOption("FALSE_POSITIVE");
+  await panel.getByLabel("Rationale", {exact: true}).fill("Vest visible on the second camera angle.");
+  await expect(resolve).toBeDisabled();
+  await panel.getByText("I confirm this resolution is my own review.").click();
+  await resolve.click();
+  await expect(panel.getByText("RESOLVED", {exact: true})).toBeVisible();
+  await expect(panel.getByText(/false positive/).first()).toBeVisible();
+  await panel.getByLabel("Reason to reopen").fill("New footage shows the vest was removed.");
+  await panel.getByRole("button", {name: "Reopen"}).click();
+  await expect(panel.getByText("REOPENED", {exact: true})).toBeVisible();
+});

@@ -92,6 +92,9 @@ POLICY = {
     ("GET", "/api/v1/evidence/{kind}/{event_id}/graph"): KIND,
     ("GET", "/api/v1/evidence-reviews/{kind}/{evidence_id}"): KIND,
     ("POST", "/api/v1/evidence-reviews/{kind}/{evidence_id}"): KIND,
+    # Investigation lifecycle: {subject_type} is a group or an Evidence kind (not expanded here).
+    ("GET", "/api/v1/lifecycle/{subject_type}/{subject_id}"): LOOKUP,
+    ("POST", "/api/v1/lifecycle/{subject_type}/{subject_id}/transitions"): LOOKUP,
     ("GET", "/api/v1/evidence/{kind}/{evidence_id}/specialist"): KIND,
     ("POST", "/api/v1/evidence/{kind}/{evidence_id}/specialist"): KIND,  # then scenario:execute after lookup
     # SSH pipeline steps.

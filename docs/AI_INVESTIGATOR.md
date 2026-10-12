@@ -140,6 +140,22 @@ Severity is still assigned only by deterministic Decision Rules v1; a human neve
 - If a human clears an input, no rule applies: the new Decision has `severity: null` and status `INPUT_CLEARED_BY_HUMAN_VERDICT`, not a guessed lower severity. Reversing the override raises the flag again; re-evaluation restores the rule result.
 - The PPE+Face review disposition uses a human PPE override (`ppe_status_source: HUMAN_OVERRIDE`). Scenario-run incidents use synthetic events and are not re-evaluated.
 
+### Investigation lifecycle (2026-10-12, policy `DCG-LIFECYCLE-v1`)
+
+`investigation_lifecycle.py`; `GET /api/v1/lifecycle/{group|kind}/{id}`, `POST …/transitions`; the "Investigation state" panel in the group and single-event detail.
+
+| From | Action | To | Who / requires |
+|---|---|---|---|
+| OPEN (no record yet), REOPENED, REOPENED_EVIDENCE_CHANGED | START_REVIEW | IN_REVIEW | Anyone allowed to review the subject; becomes the assigned reviewer |
+| IN_REVIEW | RESOLVE | RESOLVED | The assigned reviewer or an administrator; resolution (no finding, false positive, handled outside the system, duplicate), rationale ≥ 15 characters, acknowledgment |
+| RESOLVED | REOPEN | REOPENED | Anyone allowed to review the subject; rationale ≥ 15 characters |
+
+- **Who may review:** unified groups need all member domains plus `scenario:execute` (administrators), as group reviews do; a single Evidence record needs its domain's detail permission in its zone, as verdicts do.
+- **Automatic reopening:** each transition stores a fingerprint of the Evidence and human verdicts. A resolved subject whose fingerprint has changed is shown as `REOPENED_EVIDENCE_CHANGED` (computed when read; no record is altered).
+- **Unchanged by any transition:** detector output, verdicts, Decisions and severity.
+- **Audit:** transitions form a fourth hash chain, verified by `/api/v1/reviews/audit-integrity` and included in external checkpoints.
+- **Status:** this is a default policy chosen on the operator's go-ahead; adjust it as a new policy version.
+
 ### Claim checks, outbound privacy and call audit (2026-10-11)
 
 **Claim checks** (`investigator_claim_checks.py`, returned as `claim_checks` by every mode and shown under each answer). Sentence-level and deterministic, beside the existing numeric/person-ID field checks:

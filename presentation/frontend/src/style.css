@@ -425,3 +425,6 @@ button.analyticsBarRow{width:100%;padding:6px;border:1px solid transparent;borde
 .linkButton{background:none;border:0;padding:0;color:#F7A8EC;text-decoration:underline;font-weight:600;cursor:pointer}
 .sshFeedStatuses .severity:not(.humanVerdictBadge){white-space:normal;overflow-wrap:anywhere;text-align:center;width:auto;max-width:100%}
 .consentLine{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:13px;color:#E3B8E0}.staleNote{color:#F4D9A6}
+.lifecycleForm{display:grid;gap:10px;margin:10px 0}.lifecycleForm label{display:grid;gap:6px;font-size:13px;color:#E3B8E0}
+.lifecycleForm textarea,.lifecycleForm select{background:#160C20;border:1px solid #524184;border-radius:8px;color:#F4E5F3;padding:8px}
+.lifecycle-open,.lifecycle-reopened,.lifecycle-reopened_evidence_changed{background:#7A4A12;color:#fff}.lifecycle-in_review{background:#3E4FA0;color:#fff}.lifecycle-resolved{background:#287D5C;color:#fff}
