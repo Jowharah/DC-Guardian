@@ -63,6 +63,39 @@ Browser demonstrations included live OpenAI responses for unified, operational, 
 
 `python check_all.py`: **54 passed, 0 failed, 0 skipped** — backend pytest 372 (including the 99-operation access matrix, claim checks, privacy/pseudonym and audit-checkpoint tests), frontend build, Playwright 11 browser tests (including the WCAG A/AA scans), live API GET smoke test with 0 server errors. Report: `logs/checks/20261012-090248/report.md` (local, not committed). Previous run (2026-10-11, after Decision Rules v2): 54/54 with 327 backend and 8 browser tests.
 
+## Operations routine (2026-10-12)
+
+| When | Do | Command |
+|---|---|---|
+| Daily, and before any reset or upgrade | Back up the local data to encrypted storage outside the repository | `python -m presentation.backend.app.backup create --out-dir <encrypted folder> --state <path to ingestion_state.sqlite3>` |
+| After each backup | Check that it could be restored | `python -m presentation.backend.app.backup verify --backup <folder>` |
+| Daily, and after each review session | Write an audit checkpoint to separate media the database operator cannot change | `python -m presentation.backend.app.audit_checkpoint write --out-dir <other media>` |
+| Weekly | Verify against the latest checkpoint | `python -m presentation.backend.app.audit_checkpoint verify --file <checkpoint.json>` |
+| Before a demo or after a change | Full check | `python check_all.py` |
+
+**What a backup contains** (`presentation/backend/app/backup.py`):
+- a consistent copy of the presentation database, made with SQLite's online backup, so the backend can keep running;
+- the ingestion state, when given;
+- retained PPE and Face images;
+- a read-only export of the Neo4j graph (`graph.jsonl`);
+- a manifest with SHA-256 hashes, row counts and the audit chains' head hashes.
+
+`verify` checks the hashes, runs SQLite's integrity check and verifies every audit chain inside the copy, on a scratch copy so the backup stays unchanged.
+
+A trial on the operator's data (2026-10-12) produced 27 tables, a 65-node / 69-relationship graph export and four PASS chains, 29 MB in total; verify PASS.
+
+**Restore** (stop the backend and ingestion first):
+1. Keep the current `incidents.sqlite3` aside.
+2. Copy `presentation.sqlite3` back as `presentation/backend/data/incidents.sqlite3`, and the image folders beside it.
+3. For the graph, prefer `neo4j-admin database dump` / `load` with Neo4j stopped; `graph.jsonl` is the fallback record.
+4. Run `check_all.py` and the audit-integrity check.
+
+Backups contain private Evidence, including face images: keep them encrypted, never commit them, and delete old ones on a retention schedule the operator sets.
+
+**Keyboard and screen-reader review:**
+- automated: `e2e/keyboard.spec.ts` (sign-in, feed, opening an event and the investigation controls with the keyboard alone, with a visible focus indicator) and `e2e/accessibility.spec.ts` (WCAG A/AA);
+- still manual: a pass with a screen reader (NVDA or Narrator) through the Monitoring Center, Review Queue and an investigation.
+
 ## Audit checkpoints — 2026-10-11
 
 The audit chains detect edited records; a checkpoint also detects deleted recent records and a replaced database. Keep checkpoint files **outside** `presentation/backend/data/` (the tool refuses otherwise), on media or in a place the database operator cannot alter:

@@ -36,7 +36,7 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
 2. ~~First live runs~~ (done 2026-10-12; found and fixed three issues). Follow-ups: **safety knowledge-base review** (OSHA 1910.135 chunk mis-parsed, too little PPE guidance, so the PPE specialist cannot ground its answer); measure the claim checker on a larger set of real answers.
 3. ~~Review lifecycle~~ (done 2026-10-12, default policy `DCG-LIFECYCLE-v1`, operator-adjustable): open → in review → resolved, reopen; automatic reopen when Evidence or verdicts change; hash-chained.
 4. **Testing plan item 5** (in progress): Response agents and integration converted (49 tests); Response RAG, Reasoning and Evidence scripts remain.
-5. **Operations routines:** where and how often audit checkpoints are written; backup and recovery of the SQLite store and Neo4j; manual keyboard / screen-reader review.
+5. ~~Operations routines~~ (done 2026-10-12: backup + restore check, routine table in VALIDATION_AND_OPERATIONS, keyboard-only test). Remaining: the operator picks the backup and checkpoint locations; a manual screen-reader pass.
 6. **Production deployment design and independent security review** (authentication beyond local HTTP Basic, TLS, secrets, monitoring, threat model, penetration test).
 
 ## Acceptance rules
