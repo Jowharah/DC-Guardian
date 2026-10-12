@@ -112,10 +112,14 @@ def verify(checkpoint):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = parser.add_subparsers(dest="command", required=True)
-    w = sub.add_parser("write"); w.add_argument("--out-dir", required=True)
+    from presentation.backend.app.backup import default_dir
+    w = sub.add_parser("write"); w.add_argument("--out-dir", default=default_dir("checkpoints"),
+                                                help="default: <DCG_BACKUP_DIR>/checkpoints")
     v = sub.add_parser("verify"); v.add_argument("--file", required=True)
     args = parser.parse_args(argv)
     if args.command == "write":
+        if not args.out_dir:
+            parser.error("give --out-dir or set DCG_BACKUP_DIR")
         path, checkpoint = write(args.out_dir)
         print(f"Checkpoint written: {path}")
         print(json.dumps(checkpoint["chains"], indent=2))
