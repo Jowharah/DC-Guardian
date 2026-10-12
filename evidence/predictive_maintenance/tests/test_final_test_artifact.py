@@ -5,212 +5,221 @@ Final Holdout Artifact Contract
 Protects the immutable 2026 Q1 evaluation artifact.
 """
 
-import json
+import pytest  # noqa: E402
 
-from evidence.predictive_maintenance.src.config import (
-    FINAL_Q1_DETECTED_FAILED_DRIVES,
-    FINAL_Q1_DRIVE_RECALL,
-    FINAL_Q1_FAILED_DRIVES,
-    FINAL_Q1_MEDIAN_LEAD_TIME_DAYS,
-    FINAL_Q1_POSITIVE_ROWS,
-    FINAL_Q1_PR_AUC,
-    FINAL_Q1_ROC_AUC,
-    FINAL_Q1_ROWS,
-    FINAL_Q1_SEVEN_DAY_WARNINGS,
-    FINAL_TEST_PERIOD,
-    PROCESSED_DATA_DIR,
-    RF_OPERATING_THRESHOLD,
-)
+def test_final_test_artifact_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
 
+    import json
 
-RESULT_FILE = (
-    PROCESSED_DATA_DIR
-    / "results"
-    / "temporal_rf_v2_final_test.json"
-)
+    from evidence.predictive_maintenance.src.config import (
+        FINAL_Q1_DETECTED_FAILED_DRIVES,
+        FINAL_Q1_DRIVE_RECALL,
+        FINAL_Q1_FAILED_DRIVES,
+        FINAL_Q1_MEDIAN_LEAD_TIME_DAYS,
+        FINAL_Q1_POSITIVE_ROWS,
+        FINAL_Q1_PR_AUC,
+        FINAL_Q1_ROC_AUC,
+        FINAL_Q1_ROWS,
+        FINAL_Q1_SEVEN_DAY_WARNINGS,
+        FINAL_TEST_PERIOD,
+        PROCESSED_DATA_DIR,
+        RF_OPERATING_THRESHOLD,
+    )
 
 
-print(
-    "\n============================================"
-)
-print(
-    "DC-GUARDIAN FINAL TEST ARTIFACT TEST"
-)
-print(
-    "============================================"
-)
+    RESULT_FILE = (
+        PROCESSED_DATA_DIR
+        / "results"
+        / "temporal_rf_v2_final_test.json"
+    )
 
 
-assert RESULT_FILE.exists()
-
-with open(
-    RESULT_FILE,
-    "r",
-    encoding="utf-8",
-) as file:
-
-    result = json.load(file)
-
-
-# ============================================================
-# Final-test identity
-# ============================================================
-
-assert (
-    result["result_type"]
-    == "FINAL_HOLDOUT_TEST"
-)
-
-assert (
-    result["test_period"]
-    == FINAL_TEST_PERIOD
-)
-
-assert (
-    result["model"]
-    == "DC_Guardian_Temporal_RF_v2"
-)
+    print(
+        "\n============================================"
+    )
+    print(
+        "DC-GUARDIAN FINAL TEST ARTIFACT TEST"
+    )
+    print(
+        "============================================"
+    )
 
 
-print(
-    "PASS: Final holdout identity."
-)
+    assert RESULT_FILE.exists()
+
+    with open(
+        RESULT_FILE,
+        "r",
+        encoding="utf-8",
+    ) as file:
+
+        result = json.load(file)
 
 
-# ============================================================
-# No test-set adaptation
-# ============================================================
+    # ============================================================
+    # Final-test identity
+    # ============================================================
 
-assert (
-    result["model_refit_on_test"]
-    is False
-)
+    assert (
+        result["result_type"]
+        == "FINAL_HOLDOUT_TEST"
+    )
 
-assert (
-    result["threshold_selected_on_test"]
-    is False
-)
+    assert (
+        result["test_period"]
+        == FINAL_TEST_PERIOD
+    )
 
-assert (
-    result["operating_threshold"]
-    == RF_OPERATING_THRESHOLD
-)
-
-
-print(
-    "PASS: No final-test fitting or threshold selection."
-)
+    assert (
+        result["model"]
+        == "DC_Guardian_Temporal_RF_v2"
+    )
 
 
-# ============================================================
-# Population
-# ============================================================
-
-assert (
-    result["test_rows"]
-    == FINAL_Q1_ROWS
-)
-
-assert (
-    result["positive_rows"]
-    == FINAL_Q1_POSITIVE_ROWS
-)
-
-assert (
-    result["total_failed_drives"]
-    == FINAL_Q1_FAILED_DRIVES
-)
+    print(
+        "PASS: Final holdout identity."
+    )
 
 
-print(
-    "PASS: Final-test population preserved."
-)
+    # ============================================================
+    # No test-set adaptation
+    # ============================================================
+
+    assert (
+        result["model_refit_on_test"]
+        is False
+    )
+
+    assert (
+        result["threshold_selected_on_test"]
+        is False
+    )
+
+    assert (
+        result["operating_threshold"]
+        == RF_OPERATING_THRESHOLD
+    )
 
 
-# ============================================================
-# Ranking metrics
-# ============================================================
-
-assert abs(
-    result["pr_auc"]
-    - FINAL_Q1_PR_AUC
-) < 1e-6
-
-assert abs(
-    result["roc_auc"]
-    - FINAL_Q1_ROC_AUC
-) < 1e-6
+    print(
+        "PASS: No final-test fitting or threshold selection."
+    )
 
 
-print(
-    "PASS: Final ranking metrics preserved."
-)
+    # ============================================================
+    # Population
+    # ============================================================
+
+    assert (
+        result["test_rows"]
+        == FINAL_Q1_ROWS
+    )
+
+    assert (
+        result["positive_rows"]
+        == FINAL_Q1_POSITIVE_ROWS
+    )
+
+    assert (
+        result["total_failed_drives"]
+        == FINAL_Q1_FAILED_DRIVES
+    )
 
 
-# ============================================================
-# Operational metrics
-# ============================================================
-
-assert (
-    result["detected_failed_drives"]
-    == FINAL_Q1_DETECTED_FAILED_DRIVES
-)
-
-assert abs(
-    result["drive_recall"]
-    - FINAL_Q1_DRIVE_RECALL
-) < 1e-6
-
-assert (
-    result["median_first_warning_days"]
-    == FINAL_Q1_MEDIAN_LEAD_TIME_DAYS
-)
-
-assert (
-    result["seven_day_warnings"]
-    == FINAL_Q1_SEVEN_DAY_WARNINGS
-)
+    print(
+        "PASS: Final-test population preserved."
+    )
 
 
-print(
-    "PASS: Final operational metrics preserved."
-)
+    # ============================================================
+    # Ranking metrics
+    # ============================================================
+
+    assert abs(
+        result["pr_auc"]
+        - FINAL_Q1_PR_AUC
+    ) < 1e-6
+
+    assert abs(
+        result["roc_auc"]
+        - FINAL_Q1_ROC_AUC
+    ) < 1e-6
 
 
-# ============================================================
-# Confusion-matrix integrity
-# ============================================================
-
-matrix = result[
-    "confusion_matrix"
-]
-
-assert (
-    matrix["tn"]
-    + matrix["fp"]
-    + matrix["fn"]
-    + matrix["tp"]
-    == FINAL_Q1_ROWS
-)
-
-assert (
-    matrix["tp"]
-    + matrix["fn"]
-    == FINAL_Q1_POSITIVE_ROWS
-)
+    print(
+        "PASS: Final ranking metrics preserved."
+    )
 
 
-print(
-    "PASS: Confusion matrix reconciles."
-)
+    # ============================================================
+    # Operational metrics
+    # ============================================================
+
+    assert (
+        result["detected_failed_drives"]
+        == FINAL_Q1_DETECTED_FAILED_DRIVES
+    )
+
+    assert abs(
+        result["drive_recall"]
+        - FINAL_Q1_DRIVE_RECALL
+    ) < 1e-6
+
+    assert (
+        result["median_first_warning_days"]
+        == FINAL_Q1_MEDIAN_LEAD_TIME_DAYS
+    )
+
+    assert (
+        result["seven_day_warnings"]
+        == FINAL_Q1_SEVEN_DAY_WARNINGS
+    )
 
 
-print(
-    "\n============================================"
-)
-print(
-    "FINAL TEST ARTIFACT CONTRACT PASSED"
-)
-print(
-    "============================================"
-)
+    print(
+        "PASS: Final operational metrics preserved."
+    )
+
+
+    # ============================================================
+    # Confusion-matrix integrity
+    # ============================================================
+
+    matrix = result[
+        "confusion_matrix"
+    ]
+
+    assert (
+        matrix["tn"]
+        + matrix["fp"]
+        + matrix["fn"]
+        + matrix["tp"]
+        == FINAL_Q1_ROWS
+    )
+
+    assert (
+        matrix["tp"]
+        + matrix["fn"]
+        == FINAL_Q1_POSITIVE_ROWS
+    )
+
+
+    print(
+        "PASS: Confusion matrix reconciles."
+    )
+
+
+    print(
+        "\n============================================"
+    )
+    print(
+        "FINAL TEST ARTIFACT CONTRACT PASSED"
+    )
+    print(
+        "============================================"
+    )
+
+
+if __name__ == "__main__":
+    test_final_test_artifact_contract()

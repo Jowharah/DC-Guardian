@@ -1,117 +1,124 @@
-﻿from pathlib import Path
-import sys
+﻿
+import pytest  # noqa: E402
+
+pytestmark = [pytest.mark.neo4j]
+
+def test_correlation_store_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
+    from pathlib import Path
+    import sys
 
 
-PROJECT_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[2]
-)
-
-
-for directory in [
-    PROJECT_ROOT / "reasoning" / "graph",
-    PROJECT_ROOT / "reasoning" / "correlation",
-]:
-
-    if str(directory) not in sys.path:
-
-        sys.path.insert(
-            0,
-            str(directory)
-        )
-
-
-from ingest_event import (
-    create_driver,
-    NEO4J_DATABASE,
-)
-
-from correlation_engine import (
-    find_cross_domain_correlations,
-)
-
-from correlation_store import (
-    persist_correlation,
-)
-
-
-SCENARIO_ID = (
-    "SCENARIO-CORR-001"
-)
-
-
-print(
-    "\n============================================"
-)
-print(
-    "DC-GUARDIAN CORRELATION STORE TEST"
-)
-print(
-    "============================================"
-)
-
-
-driver = create_driver()
-
-
-try:
-
-    print(
-        "PASS: Connected to Neo4j."
+    PROJECT_ROOT = (
+        Path(__file__)
+        .resolve()
+        .parents[2]
     )
 
 
-    # ========================================================
-    # Discover correlation from existing controlled scenario
-    # ========================================================
+    for directory in [
+        PROJECT_ROOT / "reasoning" / "graph",
+        PROJECT_ROOT / "reasoning" / "correlation",
+    ]:
 
-    correlations = (
-        find_cross_domain_correlations(
-            driver,
+        if str(directory) not in sys.path:
 
-            scenario_id=
-                SCENARIO_ID,
+            sys.path.insert(
+                0,
+                str(directory)
+            )
 
-            window_minutes=
-                15,
-        )
+
+    from ingest_event import (
+        create_driver,
+        NEO4J_DATABASE,
+    )
+
+    from correlation_engine import (
+        find_cross_domain_correlations,
+    )
+
+    from correlation_store import (
+        persist_correlation,
     )
 
 
-    if len(
-        correlations
-    ) != 1:
-
-        raise AssertionError(
-            "Expected exactly one correlation "
-            f"for {SCENARIO_ID}; "
-            f"found {len(correlations)}."
-        )
-
-
-    correlation = (
-        correlations[0]
+    SCENARIO_ID = (
+        "SCENARIO-CORR-001"
     )
 
 
     print(
-        "PASS: Correlation rediscovered."
+        "\n============================================"
+    )
+    print(
+        "DC-GUARDIAN CORRELATION STORE TEST"
+    )
+    print(
+        "============================================"
     )
 
 
-    # ========================================================
-    # Remove previous persisted correlation only
-    #
-    # Events remain untouched.
-    # ========================================================
+    driver = create_driver()
 
-    with driver.session(
-        database=NEO4J_DATABASE
-    ) as session:
 
-        session.run(
-            """
+    try:
+
+        print(
+            "PASS: Connected to Neo4j."
+        )
+
+
+        # ========================================================
+        # Discover correlation from existing controlled scenario
+        # ========================================================
+
+        correlations = (
+            find_cross_domain_correlations(
+                driver,
+
+                scenario_id=
+                    SCENARIO_ID,
+
+                window_minutes=
+                    15,
+            )
+        )
+
+
+        if len(
+            correlations
+        ) != 1:
+
+            raise AssertionError(
+                "Expected exactly one correlation "
+                f"for {SCENARIO_ID}; "
+                f"found {len(correlations)}."
+            )
+
+
+        correlation = (
+            correlations[0]
+        )
+
+
+        print(
+            "PASS: Correlation rediscovered."
+        )
+
+
+        # ========================================================
+        # Remove previous persisted correlation only
+        #
+        # Events remain untouched.
+        # ========================================================
+
+        with driver.session(
+            database=NEO4J_DATABASE
+        ) as session:
+
+            session.run(
+                """
             MATCH (c:Correlation {
                 scenario_id: $scenario_id
             })
@@ -119,114 +126,114 @@ try:
             DETACH DELETE c
             """,
 
-            scenario_id=
-                SCENARIO_ID,
-        ).consume()
+                scenario_id=
+                    SCENARIO_ID,
+            ).consume()
 
 
-    print(
-        "PASS: Previous test correlation cleared."
-    )
+        print(
+            "PASS: Previous test correlation cleared."
+        )
 
 
-    # ========================================================
-    # Persist
-    # ========================================================
+        # ========================================================
+        # Persist
+        # ========================================================
 
-    result = persist_correlation(
-        correlation,
-        driver,
-    )
-
-
-    print(
-        "PASS: Correlation persisted."
-    )
+        result = persist_correlation(
+            correlation,
+            driver,
+        )
 
 
-    assert (
-        result[
-            "correlation_type"
-        ]
-        == "CORRELATED_INFRASTRUCTURE_RISK"
-    )
+        print(
+            "PASS: Correlation persisted."
+        )
 
 
-    assert (
-        result[
-            "scope"
-        ]
-        == "SERVER"
-    )
+        assert (
+            result[
+                "correlation_type"
+            ]
+            == "CORRELATED_INFRASTRUCTURE_RISK"
+        )
 
 
-    assert (
-        result[
-            "shared_entity_id"
-        ]
-        == "SRV-B1-01"
-    )
+        assert (
+            result[
+                "scope"
+            ]
+            == "SERVER"
+        )
 
 
-    assert (
-        result[
-            "event_count"
-        ]
-        == 2
-    )
+        assert (
+            result[
+                "shared_entity_id"
+            ]
+            == "SRV-B1-01"
+        )
 
 
-    assert set(
-        result[
-            "domains"
-        ]
-    ) == {
-        "CYBERSECURITY",
-        "MAINTENANCE",
-    }
+        assert (
+            result[
+                "event_count"
+            ]
+            == 2
+        )
 
 
-    # ========================================================
-    # Persist same correlation again
-    # ========================================================
-
-    second_result = persist_correlation(
-        correlation,
-        driver,
-    )
-
-
-    assert (
-        second_result[
-            "correlation_id"
-        ]
-        == result[
-            "correlation_id"
-        ]
-    )
+        assert set(
+            result[
+                "domains"
+            ]
+        ) == {
+            "CYBERSECURITY",
+            "MAINTENANCE",
+        }
 
 
-    print(
-        "PASS: Repeated persistence "
-        "uses same correlation ID."
-    )
+        # ========================================================
+        # Persist same correlation again
+        # ========================================================
+
+        second_result = persist_correlation(
+            correlation,
+            driver,
+        )
 
 
-    # ========================================================
-    # Verify graph
-    # ========================================================
+        assert (
+            second_result[
+                "correlation_id"
+            ]
+            == result[
+                "correlation_id"
+            ]
+        )
 
-    with driver.session(
-        database=NEO4J_DATABASE
-    ) as session:
+
+        print(
+            "PASS: Repeated persistence "
+            "uses same correlation ID."
+        )
 
 
-        # ----------------------------------------------------
-        # Correlation node
-        # ----------------------------------------------------
+        # ========================================================
+        # Verify graph
+        # ========================================================
 
-        record = session.run(
-            """
+        with driver.session(
+            database=NEO4J_DATABASE
+        ) as session:
+
+
+            # ----------------------------------------------------
+            # Correlation node
+            # ----------------------------------------------------
+
+            record = session.run(
+                """
             MATCH (c:Correlation {
                 correlation_id: $correlation_id
             })
@@ -251,49 +258,49 @@ try:
                     AS domains
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "count"
+                ]
+                == 1
+            )
 
 
-        assert (
-            record[
-                "scope"
-            ]
-            == "SERVER"
-        )
+            assert (
+                record[
+                    "scope"
+                ]
+                == "SERVER"
+            )
 
 
-        assert (
-            record[
-                "shared_entity_id"
-            ]
-            == "SRV-B1-01"
-        )
+            assert (
+                record[
+                    "shared_entity_id"
+                ]
+                == "SRV-B1-01"
+            )
 
 
-        print(
-            "PASS: Correlation node "
-            "is idempotent."
-        )
+            print(
+                "PASS: Correlation node "
+                "is idempotent."
+            )
 
 
-        # ----------------------------------------------------
-        # Contributing events
-        # ----------------------------------------------------
+            # ----------------------------------------------------
+            # Contributing events
+            # ----------------------------------------------------
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (e:Event)
                 -[r:CONTRIBUTES_TO]->
@@ -316,43 +323,43 @@ try:
                     AS event_ids
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "relationship_count"
-            ]
-            == 2
-        )
+            assert (
+                record[
+                    "relationship_count"
+                ]
+                == 2
+            )
 
 
-        assert set(
-            record[
-                "domains"
-            ]
-        ) == {
-            "CYBERSECURITY",
-            "MAINTENANCE",
-        }
+            assert set(
+                record[
+                    "domains"
+                ]
+            ) == {
+                "CYBERSECURITY",
+                "MAINTENANCE",
+            }
 
 
-        print(
-            "PASS: Two contributing "
-            "events linked."
-        )
+            print(
+                "PASS: Two contributing "
+                "events linked."
+            )
 
 
-        # ----------------------------------------------------
-        # Infrastructure concern
-        # ----------------------------------------------------
+            # ----------------------------------------------------
+            # Infrastructure concern
+            # ----------------------------------------------------
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (c:Correlation {
                     correlation_id: $correlation_id
@@ -370,43 +377,43 @@ try:
                     AS server_ids
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "relationship_count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "relationship_count"
+                ]
+                == 1
+            )
 
 
-        assert (
-            record[
-                "server_ids"
-            ]
-            == [
-                "SRV-B1-01"
-            ]
-        )
+            assert (
+                record[
+                    "server_ids"
+                ]
+                == [
+                    "SRV-B1-01"
+                ]
+            )
 
 
-        print(
-            "PASS: Correlation CONCERNS "
-            "shared server."
-        )
+            print(
+                "PASS: Correlation CONCERNS "
+                "shared server."
+            )
 
 
-        # ----------------------------------------------------
-        # Full explainable path
-        # ----------------------------------------------------
+            # ----------------------------------------------------
+            # Full explainable path
+            # ----------------------------------------------------
 
-        context = session.run(
-            """
+            context = session.run(
+                """
             MATCH
                 (cyber:Event {
                     domain: "CYBERSECURITY"
@@ -441,42 +448,124 @@ try:
                     AS server_id
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        if context is None:
+            if context is None:
 
-            raise AssertionError(
-                "Explainable correlation "
-                "graph path not found."
+                raise AssertionError(
+                    "Explainable correlation "
+                    "graph path not found."
+                )
+
+
+            assert (
+                context[
+                    "cyber_state"
+                ]
+                == "HIGH_CONFIDENCE_ANOMALY"
             )
 
 
-        assert (
-            context[
-                "cyber_state"
-            ]
-            == "HIGH_CONFIDENCE_ANOMALY"
+            assert (
+                context[
+                    "maintenance_state"
+                ]
+                == "AT_RISK"
+            )
+
+
+            assert (
+                context[
+                    "server_id"
+                ]
+                == "SRV-B1-01"
+            )
+
+
+            print(
+                "\n============================================"
+            )
+            print(
+                "PERSISTED CORRELATION CONTEXT"
+            )
+            print(
+                "============================================"
+            )
+
+
+            print(
+                "Type:",
+                context[
+                    "correlation_type"
+                ]
+            )
+
+
+            print(
+                "Scope:",
+                context[
+                    "scope"
+                ]
+            )
+
+
+            print(
+                "Cyber state:",
+                context[
+                    "cyber_state"
+                ]
+            )
+
+
+            print(
+                "Maintenance state:",
+                context[
+                    "maintenance_state"
+                ]
+            )
+
+
+            print(
+                "Shared server:",
+                context[
+                    "server_id"
+                ]
+            )
+
+
+        print(
+            "\n============================================"
+        )
+        print(
+            "CORRELATION STORE CONTRACT SUMMARY"
+        )
+        print(
+            "============================================"
         )
 
-
-        assert (
-            context[
-                "maintenance_state"
-            ]
-            == "AT_RISK"
+        print(
+            "PASS: Deterministic correlation ID."
         )
 
+        print(
+            "PASS: Correlation persistence idempotent."
+        )
 
-        assert (
-            context[
-                "server_id"
-            ]
-            == "SRV-B1-01"
+        print(
+            "PASS: Event evidence preserved."
+        )
+
+        print(
+            "PASS: Infrastructure context preserved."
+        )
+
+        print(
+            "PASS: Explainable graph path available."
         )
 
 
@@ -484,95 +573,17 @@ try:
             "\n============================================"
         )
         print(
-            "PERSISTED CORRELATION CONTEXT"
+            "DC-GUARDIAN CORRELATION STORE PASSED"
         )
         print(
             "============================================"
         )
 
 
-        print(
-            "Type:",
-            context[
-                "correlation_type"
-            ]
-        )
+    finally:
+
+        driver.close()
 
 
-        print(
-            "Scope:",
-            context[
-                "scope"
-            ]
-        )
-
-
-        print(
-            "Cyber state:",
-            context[
-                "cyber_state"
-            ]
-        )
-
-
-        print(
-            "Maintenance state:",
-            context[
-                "maintenance_state"
-            ]
-        )
-
-
-        print(
-            "Shared server:",
-            context[
-                "server_id"
-            ]
-        )
-
-
-    print(
-        "\n============================================"
-    )
-    print(
-        "CORRELATION STORE CONTRACT SUMMARY"
-    )
-    print(
-        "============================================"
-    )
-
-    print(
-        "PASS: Deterministic correlation ID."
-    )
-
-    print(
-        "PASS: Correlation persistence idempotent."
-    )
-
-    print(
-        "PASS: Event evidence preserved."
-    )
-
-    print(
-        "PASS: Infrastructure context preserved."
-    )
-
-    print(
-        "PASS: Explainable graph path available."
-    )
-
-
-    print(
-        "\n============================================"
-    )
-    print(
-        "DC-GUARDIAN CORRELATION STORE PASSED"
-    )
-    print(
-        "============================================"
-    )
-
-
-finally:
-
-    driver.close()
+if __name__ == "__main__":
+    test_correlation_store_contract()

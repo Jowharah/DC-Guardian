@@ -4,6 +4,11 @@ Contract checks for conservatively preprocessed RAG records.
 
 from __future__ import annotations
 
+import pytest  # noqa: E402
+
+pytestmark = [pytest.mark.private_data('response/rag/knowledge_base/chunks')]
+
+
 import json
 from pathlib import Path
 
@@ -92,6 +97,10 @@ def main() -> None:
         f"{len(ids)}/{len(ids)}"
     )
     print("=" * 60)
+
+
+def test_preprocessing_contract():
+    main()
 
 
 if __name__ == "__main__":

@@ -1,224 +1,231 @@
-﻿from pathlib import Path
-import sys
+﻿
+import pytest  # noqa: E402
+
+pytestmark = [pytest.mark.neo4j]
+
+def test_three_domain_correlation_store_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
+    from pathlib import Path
+    import sys
 
 
-# ============================================================
-# Project paths
-# ============================================================
+    # ============================================================
+    # Project paths
+    # ============================================================
 
-PROJECT_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[2]
-)
-
-
-for directory in [
-    PROJECT_ROOT,
-    PROJECT_ROOT / "reasoning" / "graph",
-    PROJECT_ROOT / "reasoning" / "correlation",
-]:
-
-    if str(directory) not in sys.path:
-
-        sys.path.insert(
-            0,
-            str(directory)
-        )
-
-
-# ============================================================
-# Imports
-# ============================================================
-
-from ingest_event import (
-    create_driver,
-    NEO4J_DATABASE,
-)
-
-from correlation_engine import (
-    find_cross_domain_correlations,
-    find_multi_domain_correlations,
-)
-
-from correlation_store import (
-    persist_correlation,
-)
-
-
-# ============================================================
-# Scenario
-#
-# This test expects test_three_domain_correlation.py to have
-# created the three controlled events first.
-# ============================================================
-
-SCENARIO_ID = (
-    "SCENARIO-CORR-3D-001"
-)
-
-
-print(
-    "\n============================================"
-)
-print(
-    "DC-GUARDIAN THREE-DOMAIN CORRELATION STORE"
-)
-print(
-    "============================================"
-)
-
-
-driver = create_driver()
-
-
-try:
-
-    print(
-        "PASS: Connected to Neo4j."
+    PROJECT_ROOT = (
+        Path(__file__)
+        .resolve()
+        .parents[2]
     )
 
 
-    # ========================================================
-    # Rediscover the three-domain correlation
-    # ========================================================
+    for directory in [
+        PROJECT_ROOT,
+        PROJECT_ROOT / "reasoning" / "graph",
+        PROJECT_ROOT / "reasoning" / "correlation",
+    ]:
 
-    correlations = (
-        find_multi_domain_correlations(
-            driver,
+        if str(directory) not in sys.path:
 
-            scenario_id=
-                SCENARIO_ID,
+            sys.path.insert(
+                0,
+                str(directory)
+            )
 
-            window_minutes=
-                15,
 
-            minimum_domains=
-                3,
-        )
+    # ============================================================
+    # Imports
+    # ============================================================
+
+    from ingest_event import (
+        create_driver,
+        NEO4J_DATABASE,
+    )
+
+    from correlation_engine import (
+        find_cross_domain_correlations,
+        find_multi_domain_correlations,
+    )
+
+    from correlation_store import (
+        persist_correlation,
     )
 
 
-    if len(
-        correlations
-    ) != 1:
-
-        raise AssertionError(
-            "Expected exactly one "
-            "three-domain correlation; "
-            f"found {len(correlations)}."
-        )
-
-
-    correlation = (
-        correlations[0]
-    )
-
-
-    assert (
-        correlation[
-            "scope"
-        ]
-        == "ZONE"
-    )
-
-
-    assert (
-        correlation[
-            "shared_entity_id"
-        ]
-        == "ZONE-B"
-    )
-
-
-    assert (
-        correlation[
-            "domain_count"
-        ]
-        == 3
-    )
-
-
-    assert (
-        correlation[
-            "event_count"
-        ]
-        == 3
-    )
-
-
-    assert set(
-        correlation[
-            "domains"
-        ]
-    ) == {
-        "CYBERSECURITY",
-        "ENVIRONMENTAL",
-        "MAINTENANCE",
-    }
-
-
-    print(
-        "PASS: Three-domain correlation rediscovered."
-    )
-
-    print(
-        "PASS: Common scope = ZONE-B."
-    )
-
-
-    # ========================================================
-    # Confirm independent environmental evidence
-    # ========================================================
-
-    environmental_events = [
-        event
-        for event
-        in correlation[
-            "events"
-        ]
-        if event[
-            "domain"
-        ] == "ENVIRONMENTAL"
-    ]
-
-
-    assert (
-        len(
-            environmental_events
-        )
-        == 1
-    )
-
-
-    assert (
-        environmental_events[
-            0
-        ][
-            "evidence_independence"
-        ]
-        == "INDEPENDENT"
-    )
-
-
-    print(
-        "PASS: Independent environmental "
-        "evidence preserved."
-    )
-
-
-    # ========================================================
-    # Remove previous persisted correlation for this scenario
+    # ============================================================
+    # Scenario
     #
-    # Contributing Events are deliberately preserved.
-    # ========================================================
+    # This test expects test_three_domain_correlation.py to have
+    # created the three controlled events first.
+    # ============================================================
 
-    with driver.session(
-        database=NEO4J_DATABASE
-    ) as session:
+    SCENARIO_ID = (
+        "SCENARIO-CORR-3D-001"
+    )
 
-        session.run(
-            """
+
+    print(
+        "\n============================================"
+    )
+    print(
+        "DC-GUARDIAN THREE-DOMAIN CORRELATION STORE"
+    )
+    print(
+        "============================================"
+    )
+
+
+    driver = create_driver()
+
+
+    try:
+
+        print(
+            "PASS: Connected to Neo4j."
+        )
+
+
+        # ========================================================
+        # Rediscover the three-domain correlation
+        # ========================================================
+
+        correlations = (
+            find_multi_domain_correlations(
+                driver,
+
+                scenario_id=
+                    SCENARIO_ID,
+
+                window_minutes=
+                    15,
+
+                minimum_domains=
+                    3,
+            )
+        )
+
+
+        if len(
+            correlations
+        ) != 1:
+
+            raise AssertionError(
+                "Expected exactly one "
+                "three-domain correlation; "
+                f"found {len(correlations)}."
+            )
+
+
+        correlation = (
+            correlations[0]
+        )
+
+
+        assert (
+            correlation[
+                "scope"
+            ]
+            == "ZONE"
+        )
+
+
+        assert (
+            correlation[
+                "shared_entity_id"
+            ]
+            == "ZONE-B"
+        )
+
+
+        assert (
+            correlation[
+                "domain_count"
+            ]
+            == 3
+        )
+
+
+        assert (
+            correlation[
+                "event_count"
+            ]
+            == 3
+        )
+
+
+        assert set(
+            correlation[
+                "domains"
+            ]
+        ) == {
+            "CYBERSECURITY",
+            "ENVIRONMENTAL",
+            "MAINTENANCE",
+        }
+
+
+        print(
+            "PASS: Three-domain correlation rediscovered."
+        )
+
+        print(
+            "PASS: Common scope = ZONE-B."
+        )
+
+
+        # ========================================================
+        # Confirm independent environmental evidence
+        # ========================================================
+
+        environmental_events = [
+            event
+            for event
+            in correlation[
+                "events"
+            ]
+            if event[
+                "domain"
+            ] == "ENVIRONMENTAL"
+        ]
+
+
+        assert (
+            len(
+                environmental_events
+            )
+            == 1
+        )
+
+
+        assert (
+            environmental_events[
+                0
+            ][
+                "evidence_independence"
+            ]
+            == "INDEPENDENT"
+        )
+
+
+        print(
+            "PASS: Independent environmental "
+            "evidence preserved."
+        )
+
+
+        # ========================================================
+        # Remove previous persisted correlation for this scenario
+        #
+        # Contributing Events are deliberately preserved.
+        # ========================================================
+
+        with driver.session(
+            database=NEO4J_DATABASE
+        ) as session:
+
+            session.run(
+                """
             MATCH (c:Correlation {
                 scenario_id: $scenario_id
             })
@@ -226,116 +233,116 @@ try:
             DETACH DELETE c
             """,
 
-            scenario_id=
-                SCENARIO_ID,
-        ).consume()
+                scenario_id=
+                    SCENARIO_ID,
+            ).consume()
 
 
-    print(
-        "PASS: Previous persisted "
-        "three-domain correlation cleared."
-    )
+        print(
+            "PASS: Previous persisted "
+            "three-domain correlation cleared."
+        )
 
 
-    # ========================================================
-    # Persist
-    # ========================================================
+        # ========================================================
+        # Persist
+        # ========================================================
 
-    result = persist_correlation(
-        correlation,
-        driver,
-    )
-
-
-    assert (
-        result[
-            "correlation_type"
-        ]
-        == "CORRELATED_INFRASTRUCTURE_RISK"
-    )
+        result = persist_correlation(
+            correlation,
+            driver,
+        )
 
 
-    assert (
-        result[
-            "scope"
-        ]
-        == "ZONE"
-    )
+        assert (
+            result[
+                "correlation_type"
+            ]
+            == "CORRELATED_INFRASTRUCTURE_RISK"
+        )
 
 
-    assert (
-        result[
-            "shared_entity_id"
-        ]
-        == "ZONE-B"
-    )
+        assert (
+            result[
+                "scope"
+            ]
+            == "ZONE"
+        )
 
 
-    assert (
-        result[
-            "event_count"
-        ]
-        == 3
-    )
+        assert (
+            result[
+                "shared_entity_id"
+            ]
+            == "ZONE-B"
+        )
 
 
-    assert set(
-        result[
-            "domains"
-        ]
-    ) == {
-        "CYBERSECURITY",
-        "ENVIRONMENTAL",
-        "MAINTENANCE",
-    }
+        assert (
+            result[
+                "event_count"
+            ]
+            == 3
+        )
 
 
-    print(
-        "PASS: Three-domain correlation persisted."
-    )
+        assert set(
+            result[
+                "domains"
+            ]
+        ) == {
+            "CYBERSECURITY",
+            "ENVIRONMENTAL",
+            "MAINTENANCE",
+        }
 
 
-    # ========================================================
-    # Repeated persistence
-    # ========================================================
-
-    second_result = persist_correlation(
-        correlation,
-        driver,
-    )
+        print(
+            "PASS: Three-domain correlation persisted."
+        )
 
 
-    assert (
-        second_result[
-            "correlation_id"
-        ]
-        == result[
-            "correlation_id"
-        ]
-    )
+        # ========================================================
+        # Repeated persistence
+        # ========================================================
+
+        second_result = persist_correlation(
+            correlation,
+            driver,
+        )
 
 
-    print(
-        "PASS: Repeated persistence "
-        "uses deterministic correlation ID."
-    )
+        assert (
+            second_result[
+                "correlation_id"
+            ]
+            == result[
+                "correlation_id"
+            ]
+        )
 
 
-    # ========================================================
-    # Verify graph
-    # ========================================================
-
-    with driver.session(
-        database=NEO4J_DATABASE
-    ) as session:
+        print(
+            "PASS: Repeated persistence "
+            "uses deterministic correlation ID."
+        )
 
 
-        # ====================================================
-        # Correlation node
-        # ====================================================
+        # ========================================================
+        # Verify graph
+        # ========================================================
 
-        record = session.run(
-            """
+        with driver.session(
+            database=NEO4J_DATABASE
+        ) as session:
+
+
+            # ====================================================
+            # Correlation node
+            # ====================================================
+
+            record = session.run(
+                """
             MATCH (c:Correlation {
                 correlation_id:
                     $correlation_id
@@ -364,68 +371,68 @@ try:
                     AS domains
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "correlation_count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "correlation_count"
+                ]
+                == 1
+            )
 
 
-        assert (
-            record[
-                "scope"
-            ]
-            == "ZONE"
-        )
+            assert (
+                record[
+                    "scope"
+                ]
+                == "ZONE"
+            )
 
 
-        assert (
-            record[
-                "shared_entity_id"
-            ]
-            == "ZONE-B"
-        )
+            assert (
+                record[
+                    "shared_entity_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            record[
-                "event_count"
-            ]
-            == 3
-        )
+            assert (
+                record[
+                    "event_count"
+                ]
+                == 3
+            )
 
 
-        assert set(
-            record[
-                "domains"
-            ]
-        ) == {
-            "CYBERSECURITY",
-            "ENVIRONMENTAL",
-            "MAINTENANCE",
-        }
+            assert set(
+                record[
+                    "domains"
+                ]
+            ) == {
+                "CYBERSECURITY",
+                "ENVIRONMENTAL",
+                "MAINTENANCE",
+            }
 
 
-        print(
-            "PASS: Three-domain Correlation "
-            "node is idempotent."
-        )
+            print(
+                "PASS: Three-domain Correlation "
+                "node is idempotent."
+            )
 
 
-        # ====================================================
-        # Exactly three contributing events
-        # ====================================================
+            # ====================================================
+            # Exactly three contributing events
+            # ====================================================
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (e:Event)
                 -[r:CONTRIBUTES_TO]->
@@ -454,52 +461,52 @@ try:
                     AS event_ids
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "relationship_count"
-            ]
-            == 3
-        )
+            assert (
+                record[
+                    "relationship_count"
+                ]
+                == 3
+            )
 
 
-        assert (
-            record[
-                "event_count"
-            ]
-            == 3
-        )
+            assert (
+                record[
+                    "event_count"
+                ]
+                == 3
+            )
 
 
-        assert set(
-            record[
-                "domains"
-            ]
-        ) == {
-            "CYBERSECURITY",
-            "ENVIRONMENTAL",
-            "MAINTENANCE",
-        }
+            assert set(
+                record[
+                    "domains"
+                ]
+            ) == {
+                "CYBERSECURITY",
+                "ENVIRONMENTAL",
+                "MAINTENANCE",
+            }
 
 
-        print(
-            "PASS: Three contributing "
-            "events linked."
-        )
+            print(
+                "PASS: Three contributing "
+                "events linked."
+            )
 
 
-        # ====================================================
-        # Correlation must concern ZONE-B
-        # ====================================================
+            # ====================================================
+            # Correlation must concern ZONE-B
+            # ====================================================
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (c:Correlation {
                     correlation_id:
@@ -518,42 +525,42 @@ try:
                     AS zone_ids
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "relationship_count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "relationship_count"
+                ]
+                == 1
+            )
 
 
-        assert (
-            record[
-                "zone_ids"
-            ]
-            == [
-                "ZONE-B"
-            ]
-        )
+            assert (
+                record[
+                    "zone_ids"
+                ]
+                == [
+                    "ZONE-B"
+                ]
+            )
 
 
-        print(
-            "PASS: Correlation CONCERNS ZONE-B."
-        )
+            print(
+                "PASS: Correlation CONCERNS ZONE-B."
+            )
 
 
-        # ====================================================
-        # Explainable three-domain graph path
-        # ====================================================
+            # ====================================================
+            # Explainable three-domain graph path
+            # ====================================================
 
-        context = session.run(
-            """
+            context = session.run(
+                """
             MATCH
                 (cyber:Event {
                     domain:
@@ -614,170 +621,289 @@ try:
                     AS zone_id
             """,
 
-            correlation_id=
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
+
+
+            if context is None:
+
+                raise AssertionError(
+                    "Explainable three-domain "
+                    "correlation path not found."
+                )
+
+
+            assert (
+                context[
+                    "cyber_state"
+                ]
+                == "HIGH_CONFIDENCE_ANOMALY"
+            )
+
+
+            assert (
+                context[
+                    "environmental_state"
+                ]
+                == "HIGH_TEMPERATURE"
+            )
+
+
+            assert (
+                context[
+                    "environmental_source_class"
+                ]
+                == "ENVIRONMENTAL_SENSOR"
+            )
+
+
+            assert abs(
+                context[
+                    "temperature_c"
+                ]
+                - 42.5
+            ) < 1e-9
+
+
+            assert (
+                context[
+                    "maintenance_state"
+                ]
+                == "AT_RISK"
+            )
+
+
+            assert abs(
+                context[
+                    "failure_probability"
+                ]
+                - 0.714008
+            ) < 1e-9
+
+
+            assert (
+                context[
+                    "zone_id"
+                ]
+                == "ZONE-B"
+            )
+
+
+            print(
+                "PASS: Explainable three-domain "
+                "graph path verified."
+            )
+
+
+            # ====================================================
+            # Stronger cyber-maintenance server context
+            #
+            # The persisted correlation concerns ZONE-B because
+            # that is the strongest scope shared by all 3 domains.
+            #
+            # But the original events must still expose the
+            # stronger server relationship.
+            # ====================================================
+
+            pairwise = (
+                find_cross_domain_correlations(
+                    driver,
+
+                    scenario_id=
+                        SCENARIO_ID,
+
+                    window_minutes=
+                        15,
+                )
+            )
+
+
+            cyber_maintenance = None
+
+
+            for item in pairwise:
+
+                domains = {
+                    event[
+                        "domain"
+                    ]
+                    for event
+                    in item[
+                        "events"
+                    ]
+                }
+
+
+                if domains == {
+                    "CYBERSECURITY",
+                    "MAINTENANCE",
+                }:
+
+                    cyber_maintenance = item
+                    break
+
+
+            if cyber_maintenance is None:
+
+                raise AssertionError(
+                    "Supporting cybersecurity-maintenance "
+                    "relationship not found."
+                )
+
+
+            assert (
+                cyber_maintenance[
+                    "scope"
+                ]
+                == "SERVER"
+            )
+
+
+            assert (
+                cyber_maintenance[
+                    "shared_entity_id"
+                ]
+                == "SRV-B1-01"
+            )
+
+
+            print(
+                "PASS: Stronger cyber-maintenance "
+                "SERVER context remains discoverable."
+            )
+
+
+            # ====================================================
+            # Display
+            # ====================================================
+
+            print(
+                "\n============================================"
+            )
+            print(
+                "PERSISTED THREE-DOMAIN CONTEXT"
+            )
+            print(
+                "============================================"
+            )
+
+
+            print(
+                "Correlation ID:",
                 result[
                     "correlation_id"
+                ]
+            )
+
+
+            print(
+                "Type:",
+                context[
+                    "correlation_type"
+                ]
+            )
+
+
+            print(
+                "Scope:",
+                context[
+                    "scope"
+                ]
+            )
+
+
+            print(
+                "Zone:",
+                context[
+                    "zone_id"
+                ]
+            )
+
+
+            print(
+                "\nCybersecurity:"
+            )
+
+            print(
+                "  State:",
+                context[
+                    "cyber_state"
+                ]
+            )
+
+
+            print(
+                "\nEnvironmental:"
+            )
+
+            print(
+                "  State:",
+                context[
+                    "environmental_state"
+                ]
+            )
+
+            print(
+                "  Source:",
+                context[
+                    "environmental_source_class"
+                ]
+            )
+
+            print(
+                "  Temperature:",
+                context[
+                    "temperature_c"
                 ],
-        ).single()
-
-
-        if context is None:
-
-            raise AssertionError(
-                "Explainable three-domain "
-                "correlation path not found."
+                "C"
             )
 
 
-        assert (
-            context[
-                "cyber_state"
-            ]
-            == "HIGH_CONFIDENCE_ANOMALY"
-        )
-
-
-        assert (
-            context[
-                "environmental_state"
-            ]
-            == "HIGH_TEMPERATURE"
-        )
-
-
-        assert (
-            context[
-                "environmental_source_class"
-            ]
-            == "ENVIRONMENTAL_SENSOR"
-        )
-
-
-        assert abs(
-            context[
-                "temperature_c"
-            ]
-            - 42.5
-        ) < 1e-9
-
-
-        assert (
-            context[
-                "maintenance_state"
-            ]
-            == "AT_RISK"
-        )
-
-
-        assert abs(
-            context[
-                "failure_probability"
-            ]
-            - 0.714008
-        ) < 1e-9
-
-
-        assert (
-            context[
-                "zone_id"
-            ]
-            == "ZONE-B"
-        )
-
-
-        print(
-            "PASS: Explainable three-domain "
-            "graph path verified."
-        )
-
-
-        # ====================================================
-        # Stronger cyber-maintenance server context
-        #
-        # The persisted correlation concerns ZONE-B because
-        # that is the strongest scope shared by all 3 domains.
-        #
-        # But the original events must still expose the
-        # stronger server relationship.
-        # ====================================================
-
-        pairwise = (
-            find_cross_domain_correlations(
-                driver,
-
-                scenario_id=
-                    SCENARIO_ID,
-
-                window_minutes=
-                    15,
+            print(
+                "\nMaintenance:"
             )
-        )
 
-
-        cyber_maintenance = None
-
-
-        for item in pairwise:
-
-            domains = {
-                event[
-                    "domain"
+            print(
+                "  State:",
+                context[
+                    "maintenance_state"
                 ]
-                for event
-                in item[
-                    "events"
+            )
+
+            print(
+                "  Failure probability:",
+                context[
+                    "failure_probability"
                 ]
-            }
-
-
-            if domains == {
-                "CYBERSECURITY",
-                "MAINTENANCE",
-            }:
-
-                cyber_maintenance = item
-                break
-
-
-        if cyber_maintenance is None:
-
-            raise AssertionError(
-                "Supporting cybersecurity-maintenance "
-                "relationship not found."
             )
 
 
-        assert (
-            cyber_maintenance[
-                "scope"
-            ]
-            == "SERVER"
-        )
+            print(
+                "\nSupporting topology:"
+            )
+
+            print(
+                "  Cyber + Maintenance -> "
+                "SRV-B1-01"
+            )
+
+            print(
+                "  All three domains -> ZONE-B"
+            )
 
 
-        assert (
-            cyber_maintenance[
-                "shared_entity_id"
-            ]
-            == "SRV-B1-01"
-        )
-
-
-        print(
-            "PASS: Stronger cyber-maintenance "
-            "SERVER context remains discoverable."
-        )
-
-
-        # ====================================================
-        # Display
-        # ====================================================
+        # ========================================================
+        # Final
+        # ========================================================
 
         print(
             "\n============================================"
         )
         print(
-            "PERSISTED THREE-DOMAIN CONTEXT"
+            "THREE-DOMAIN STORE CONTRACT SUMMARY"
         )
         print(
             "============================================"
@@ -785,169 +911,54 @@ try:
 
 
         print(
-            "Correlation ID:",
-            result[
-                "correlation_id"
-            ]
+            "PASS: Three-domain correlation persisted."
+        )
+
+        print(
+            "PASS: Deterministic ID preserved."
+        )
+
+        print(
+            "PASS: Three event relationships preserved."
+        )
+
+        print(
+            "PASS: Three domains preserved."
+        )
+
+        print(
+            "PASS: ZONE-level concern preserved."
+        )
+
+        print(
+            "PASS: Independent sensor evidence preserved."
+        )
+
+        print(
+            "PASS: Stronger pairwise server context preserved."
+        )
+
+        print(
+            "PASS: Explainable graph path available."
         )
 
 
         print(
-            "Type:",
-            context[
-                "correlation_type"
-            ]
+            "\n============================================"
         )
-
-
         print(
-            "Scope:",
-            context[
-                "scope"
-            ]
+            "DC-GUARDIAN THREE-DOMAIN "
+            "CORRELATION STORE PASSED"
         )
-
-
         print(
-            "Zone:",
-            context[
-                "zone_id"
-            ]
+            "============================================"
         )
 
 
-        print(
-            "\nCybersecurity:"
-        )
+    finally:
 
-        print(
-            "  State:",
-            context[
-                "cyber_state"
-            ]
-        )
+        driver.close()
 
 
-        print(
-            "\nEnvironmental:"
-        )
-
-        print(
-            "  State:",
-            context[
-                "environmental_state"
-            ]
-        )
-
-        print(
-            "  Source:",
-            context[
-                "environmental_source_class"
-            ]
-        )
-
-        print(
-            "  Temperature:",
-            context[
-                "temperature_c"
-            ],
-            "C"
-        )
-
-
-        print(
-            "\nMaintenance:"
-        )
-
-        print(
-            "  State:",
-            context[
-                "maintenance_state"
-            ]
-        )
-
-        print(
-            "  Failure probability:",
-            context[
-                "failure_probability"
-            ]
-        )
-
-
-        print(
-            "\nSupporting topology:"
-        )
-
-        print(
-            "  Cyber + Maintenance -> "
-            "SRV-B1-01"
-        )
-
-        print(
-            "  All three domains -> ZONE-B"
-        )
-
-
-    # ========================================================
-    # Final
-    # ========================================================
-
-    print(
-        "\n============================================"
-    )
-    print(
-        "THREE-DOMAIN STORE CONTRACT SUMMARY"
-    )
-    print(
-        "============================================"
-    )
-
-
-    print(
-        "PASS: Three-domain correlation persisted."
-    )
-
-    print(
-        "PASS: Deterministic ID preserved."
-    )
-
-    print(
-        "PASS: Three event relationships preserved."
-    )
-
-    print(
-        "PASS: Three domains preserved."
-    )
-
-    print(
-        "PASS: ZONE-level concern preserved."
-    )
-
-    print(
-        "PASS: Independent sensor evidence preserved."
-    )
-
-    print(
-        "PASS: Stronger pairwise server context preserved."
-    )
-
-    print(
-        "PASS: Explainable graph path available."
-    )
-
-
-    print(
-        "\n============================================"
-    )
-    print(
-        "DC-GUARDIAN THREE-DOMAIN "
-        "CORRELATION STORE PASSED"
-    )
-    print(
-        "============================================"
-    )
-
-
-finally:
-
-    driver.close()
+if __name__ == "__main__":
+    test_three_domain_correlation_store_contract()

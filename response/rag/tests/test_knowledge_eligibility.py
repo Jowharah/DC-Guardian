@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import pytest  # noqa: E402
+
+
 import sys
 from pathlib import Path
 
@@ -45,6 +48,10 @@ def main() -> None:
     print("Physical security: ELIGIBLE")
     print("Project policy:    INSUFFICIENT_APPROVED_KNOWLEDGE")
     print("Safety regulation: ELIGIBLE")
+
+
+def test_knowledge_eligibility_contract():
+    main()
 
 
 if __name__ == "__main__":

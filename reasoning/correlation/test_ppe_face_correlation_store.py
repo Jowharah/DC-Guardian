@@ -19,250 +19,257 @@ Verifies:
     - no cross-model person identity claim is introduced
 """
 
-from pathlib import Path
-import sys
+import pytest  # noqa: E402
+
+pytestmark = [pytest.mark.neo4j]
+
+def test_ppe_face_correlation_store_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
+
+    from pathlib import Path
+    import sys
 
 
-# ============================================================
-# Project paths
-# ============================================================
+    # ============================================================
+    # Project paths
+    # ============================================================
 
-PROJECT_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[2]
-)
-
-
-for directory in [
-    PROJECT_ROOT / "reasoning" / "graph",
-    PROJECT_ROOT / "reasoning" / "correlation",
-]:
-
-    if str(directory) not in sys.path:
-
-        sys.path.insert(
-            0,
-            str(directory)
-        )
-
-
-# ============================================================
-# Imports
-# ============================================================
-
-from ingest_event import (
-    create_driver,
-    NEO4J_DATABASE,
-)
-
-from correlation_engine import (
-    find_cross_domain_correlations,
-)
-
-from correlation_store import (
-    persist_correlation,
-)
-
-
-# ============================================================
-# Controlled scenario
-#
-# Created by test_ppe_face_correlation.py
-# ============================================================
-
-SCENARIO_ID = (
-    "SCENARIO-CORR-PPE-FACE-001"
-)
-
-
-print(
-    "\n============================================"
-)
-print(
-    "DC-GUARDIAN PPE + FACE CORRELATION STORE"
-)
-print(
-    "============================================"
-)
-
-
-driver = create_driver()
-
-
-try:
-
-    print(
-        "PASS: Connected to Neo4j."
+    PROJECT_ROOT = (
+        Path(__file__)
+        .resolve()
+        .parents[2]
     )
 
 
-    # ========================================================
-    # Rediscover correlation
-    # ========================================================
+    for directory in [
+        PROJECT_ROOT / "reasoning" / "graph",
+        PROJECT_ROOT / "reasoning" / "correlation",
+    ]:
 
-    correlations = (
-        find_cross_domain_correlations(
-            driver,
+        if str(directory) not in sys.path:
 
-            scenario_id=
-                SCENARIO_ID,
+            sys.path.insert(
+                0,
+                str(directory)
+            )
 
-            window_minutes=
-                15,
-        )
+
+    # ============================================================
+    # Imports
+    # ============================================================
+
+    from ingest_event import (
+        create_driver,
+        NEO4J_DATABASE,
+    )
+
+    from correlation_engine import (
+        find_cross_domain_correlations,
+    )
+
+    from correlation_store import (
+        persist_correlation,
     )
 
 
-    if len(
-        correlations
-    ) != 1:
-
-        raise AssertionError(
-            "Expected exactly one PPE + Face "
-            "correlation for "
-            f"{SCENARIO_ID}; "
-            f"found {len(correlations)}."
-        )
-
-
-    correlation = (
-        correlations[
-            0
-        ]
-    )
-
-
-    assert (
-        correlation[
-            "correlation_type"
-        ]
-        == "CORRELATED_INFRASTRUCTURE_RISK"
-    )
-
-
-    assert (
-        correlation[
-            "scope"
-        ]
-        == "ZONE"
-    )
-
-
-    assert (
-        correlation[
-            "shared_entity_id"
-        ]
-        == "ZONE-B"
-    )
-
-
-    domains = {
-        event[
-            "domain"
-        ]
-        for event
-        in correlation[
-            "events"
-        ]
-    }
-
-
-    assert domains == {
-        "SAFETY",
-        "PHYSICAL_SECURITY",
-    }
-
-
-    print(
-        "PASS: PPE + Face correlation rediscovered."
-    )
-
-    print(
-        "PASS: Common scope = ZONE-B."
-    )
-
-
-    # ========================================================
-    # Verify semantics before persistence
-    # ========================================================
-
-    safety_event = next(
-        event
-        for event
-        in correlation[
-            "events"
-        ]
-        if (
-            event[
-                "domain"
-            ]
-            == "SAFETY"
-        )
-    )
-
-
-    physical_event = next(
-        event
-        for event
-        in correlation[
-            "events"
-        ]
-        if (
-            event[
-                "domain"
-            ]
-            == "PHYSICAL_SECURITY"
-        )
-    )
-
-
-    assert (
-        safety_event[
-            "state"
-        ]
-        == "PPE_NON_COMPLIANT"
-    )
-
-
-    assert (
-        physical_event[
-            "state"
-        ]
-        == "RECOGNIZED_PERSON"
-    )
-
-
-    assert (
-        physical_event[
-            "authorization_status"
-        ]
-        == "UNAUTHORIZED"
-    )
-
-
-    print(
-        "PASS: PPE non-compliance evidence preserved."
-    )
-
-    print(
-        "PASS: Unauthorized physical-security "
-        "evidence preserved."
-    )
-
-
-    # ========================================================
-    # Remove previous persisted correlation only
+    # ============================================================
+    # Controlled scenario
     #
-    # Contributing Event nodes remain untouched.
-    # ========================================================
+    # Created by test_ppe_face_correlation.py
+    # ============================================================
 
-    with driver.session(
-        database=NEO4J_DATABASE
-    ) as session:
+    SCENARIO_ID = (
+        "SCENARIO-CORR-PPE-FACE-001"
+    )
 
-        session.run(
-            """
+
+    print(
+        "\n============================================"
+    )
+    print(
+        "DC-GUARDIAN PPE + FACE CORRELATION STORE"
+    )
+    print(
+        "============================================"
+    )
+
+
+    driver = create_driver()
+
+
+    try:
+
+        print(
+            "PASS: Connected to Neo4j."
+        )
+
+
+        # ========================================================
+        # Rediscover correlation
+        # ========================================================
+
+        correlations = (
+            find_cross_domain_correlations(
+                driver,
+
+                scenario_id=
+                    SCENARIO_ID,
+
+                window_minutes=
+                    15,
+            )
+        )
+
+
+        if len(
+            correlations
+        ) != 1:
+
+            raise AssertionError(
+                "Expected exactly one PPE + Face "
+                "correlation for "
+                f"{SCENARIO_ID}; "
+                f"found {len(correlations)}."
+            )
+
+
+        correlation = (
+            correlations[
+                0
+            ]
+        )
+
+
+        assert (
+            correlation[
+                "correlation_type"
+            ]
+            == "CORRELATED_INFRASTRUCTURE_RISK"
+        )
+
+
+        assert (
+            correlation[
+                "scope"
+            ]
+            == "ZONE"
+        )
+
+
+        assert (
+            correlation[
+                "shared_entity_id"
+            ]
+            == "ZONE-B"
+        )
+
+
+        domains = {
+            event[
+                "domain"
+            ]
+            for event
+            in correlation[
+                "events"
+            ]
+        }
+
+
+        assert domains == {
+            "SAFETY",
+            "PHYSICAL_SECURITY",
+        }
+
+
+        print(
+            "PASS: PPE + Face correlation rediscovered."
+        )
+
+        print(
+            "PASS: Common scope = ZONE-B."
+        )
+
+
+        # ========================================================
+        # Verify semantics before persistence
+        # ========================================================
+
+        safety_event = next(
+            event
+            for event
+            in correlation[
+                "events"
+            ]
+            if (
+                event[
+                    "domain"
+                ]
+                == "SAFETY"
+            )
+        )
+
+
+        physical_event = next(
+            event
+            for event
+            in correlation[
+                "events"
+            ]
+            if (
+                event[
+                    "domain"
+                ]
+                == "PHYSICAL_SECURITY"
+            )
+        )
+
+
+        assert (
+            safety_event[
+                "state"
+            ]
+            == "PPE_NON_COMPLIANT"
+        )
+
+
+        assert (
+            physical_event[
+                "state"
+            ]
+            == "RECOGNIZED_PERSON"
+        )
+
+
+        assert (
+            physical_event[
+                "authorization_status"
+            ]
+            == "UNAUTHORIZED"
+        )
+
+
+        print(
+            "PASS: PPE non-compliance evidence preserved."
+        )
+
+        print(
+            "PASS: Unauthorized physical-security "
+            "evidence preserved."
+        )
+
+
+        # ========================================================
+        # Remove previous persisted correlation only
+        #
+        # Contributing Event nodes remain untouched.
+        # ========================================================
+
+        with driver.session(
+            database=NEO4J_DATABASE
+        ) as session:
+
+            session.run(
+                """
             MATCH (c:Correlation {
                 scenario_id: $scenario_id
             })
@@ -270,115 +277,115 @@ try:
             DETACH DELETE c
             """,
 
-            scenario_id=
-                SCENARIO_ID,
-        ).consume()
+                scenario_id=
+                    SCENARIO_ID,
+            ).consume()
 
 
-    print(
-        "PASS: Previous persisted PPE + Face "
-        "correlation cleared."
-    )
+        print(
+            "PASS: Previous persisted PPE + Face "
+            "correlation cleared."
+        )
 
 
-    # ========================================================
-    # Persist
-    # ========================================================
+        # ========================================================
+        # Persist
+        # ========================================================
 
-    result = persist_correlation(
-        correlation,
-        driver,
-    )
-
-
-    assert (
-        result[
-            "correlation_type"
-        ]
-        == "CORRELATED_INFRASTRUCTURE_RISK"
-    )
+        result = persist_correlation(
+            correlation,
+            driver,
+        )
 
 
-    assert (
-        result[
-            "scope"
-        ]
-        == "ZONE"
-    )
+        assert (
+            result[
+                "correlation_type"
+            ]
+            == "CORRELATED_INFRASTRUCTURE_RISK"
+        )
 
 
-    assert (
-        result[
-            "shared_entity_id"
-        ]
-        == "ZONE-B"
-    )
+        assert (
+            result[
+                "scope"
+            ]
+            == "ZONE"
+        )
 
 
-    assert (
-        result[
-            "event_count"
-        ]
-        == 2
-    )
+        assert (
+            result[
+                "shared_entity_id"
+            ]
+            == "ZONE-B"
+        )
 
 
-    assert set(
-        result[
-            "domains"
-        ]
-    ) == {
-        "SAFETY",
-        "PHYSICAL_SECURITY",
-    }
+        assert (
+            result[
+                "event_count"
+            ]
+            == 2
+        )
 
 
-    print(
-        "PASS: PPE + Face correlation persisted."
-    )
+        assert set(
+            result[
+                "domains"
+            ]
+        ) == {
+            "SAFETY",
+            "PHYSICAL_SECURITY",
+        }
 
 
-    # ========================================================
-    # Deterministic / idempotent persistence
-    # ========================================================
-
-    second_result = persist_correlation(
-        correlation,
-        driver,
-    )
+        print(
+            "PASS: PPE + Face correlation persisted."
+        )
 
 
-    assert (
-        second_result[
-            "correlation_id"
-        ]
-        == result[
-            "correlation_id"
-        ]
-    )
+        # ========================================================
+        # Deterministic / idempotent persistence
+        # ========================================================
+
+        second_result = persist_correlation(
+            correlation,
+            driver,
+        )
 
 
-    print(
-        "PASS: Repeated persistence uses "
-        "deterministic correlation ID."
-    )
+        assert (
+            second_result[
+                "correlation_id"
+            ]
+            == result[
+                "correlation_id"
+            ]
+        )
 
 
-    # ========================================================
-    # Graph verification
-    # ========================================================
-
-    with driver.session(
-        database=NEO4J_DATABASE
-    ) as session:
+        print(
+            "PASS: Repeated persistence uses "
+            "deterministic correlation ID."
+        )
 
 
-        # ----------------------------------------------------
-        # Exactly one Correlation node
-        # ----------------------------------------------------
+        # ========================================================
+        # Graph verification
+        # ========================================================
 
-        record = session.run(
-            """
+        with driver.session(
+            database=NEO4J_DATABASE
+        ) as session:
+
+
+            # ----------------------------------------------------
+            # Exactly one Correlation node
+            # ----------------------------------------------------
+
+            record = session.run(
+                """
             MATCH (c:Correlation {
                 correlation_id: $correlation_id
             })
@@ -403,75 +410,75 @@ try:
                     AS domains
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "count"
+                ]
+                == 1
+            )
 
 
-        assert (
-            record[
-                "correlation_type"
-            ]
-            == "CORRELATED_INFRASTRUCTURE_RISK"
-        )
+            assert (
+                record[
+                    "correlation_type"
+                ]
+                == "CORRELATED_INFRASTRUCTURE_RISK"
+            )
 
 
-        assert (
-            record[
-                "scope"
-            ]
-            == "ZONE"
-        )
+            assert (
+                record[
+                    "scope"
+                ]
+                == "ZONE"
+            )
 
 
-        assert (
-            record[
-                "shared_entity_id"
-            ]
-            == "ZONE-B"
-        )
+            assert (
+                record[
+                    "shared_entity_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            record[
-                "event_count"
-            ]
-            == 2
-        )
+            assert (
+                record[
+                    "event_count"
+                ]
+                == 2
+            )
 
 
-        assert set(
-            record[
-                "domains"
-            ]
-        ) == {
-            "SAFETY",
-            "PHYSICAL_SECURITY",
-        }
+            assert set(
+                record[
+                    "domains"
+                ]
+            ) == {
+                "SAFETY",
+                "PHYSICAL_SECURITY",
+            }
 
 
-        print(
-            "PASS: PPE + Face Correlation node "
-            "is idempotent."
-        )
+            print(
+                "PASS: PPE + Face Correlation node "
+                "is idempotent."
+            )
 
 
-        # ----------------------------------------------------
-        # Exactly two contributing Events
-        # ----------------------------------------------------
+            # ----------------------------------------------------
+            # Exactly two contributing Events
+            # ----------------------------------------------------
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (event:Event)
                 -[relationship:CONTRIBUTES_TO]->
@@ -494,42 +501,42 @@ try:
                     AS event_ids
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "relationship_count"
-            ]
-            == 2
-        )
+            assert (
+                record[
+                    "relationship_count"
+                ]
+                == 2
+            )
 
 
-        assert set(
-            record[
-                "domains"
-            ]
-        ) == {
-            "SAFETY",
-            "PHYSICAL_SECURITY",
-        }
+            assert set(
+                record[
+                    "domains"
+                ]
+            ) == {
+                "SAFETY",
+                "PHYSICAL_SECURITY",
+            }
 
 
-        print(
-            "PASS: Two contributing events linked."
-        )
+            print(
+                "PASS: Two contributing events linked."
+            )
 
 
-        # ----------------------------------------------------
-        # Correlation -> ZONE-B
-        # ----------------------------------------------------
+            # ----------------------------------------------------
+            # Correlation -> ZONE-B
+            # ----------------------------------------------------
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (correlation:Correlation {
                     correlation_id: $correlation_id
@@ -547,42 +554,42 @@ try:
                     AS zone_ids
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "relationship_count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "relationship_count"
+                ]
+                == 1
+            )
 
 
-        assert (
-            record[
-                "zone_ids"
-            ]
-            == [
-                "ZONE-B"
-            ]
-        )
+            assert (
+                record[
+                    "zone_ids"
+                ]
+                == [
+                    "ZONE-B"
+                ]
+            )
 
 
-        print(
-            "PASS: Correlation CONCERNS ZONE-B."
-        )
+            print(
+                "PASS: Correlation CONCERNS ZONE-B."
+            )
 
 
-        # ----------------------------------------------------
-        # Full explainable PPE + Face graph
-        # ----------------------------------------------------
+            # ----------------------------------------------------
+            # Full explainable PPE + Face graph
+            # ----------------------------------------------------
 
-        context = session.run(
-            """
+            context = session.run(
+                """
             MATCH
                 (safety:Event {
                     domain:
@@ -711,151 +718,151 @@ try:
                     AS shared_zone_id
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        if context is None:
+            if context is None:
 
-            raise AssertionError(
-                "Explainable PPE + Face "
-                "correlation path not found."
+                raise AssertionError(
+                    "Explainable PPE + Face "
+                    "correlation path not found."
+                )
+
+
+            # ----------------------------------------------------
+            # PPE semantics
+            # ----------------------------------------------------
+
+            assert (
+                context[
+                    "safety_state"
+                ]
+                == "PPE_NON_COMPLIANT"
             )
 
 
-        # ----------------------------------------------------
-        # PPE semantics
-        # ----------------------------------------------------
-
-        assert (
-            context[
-                "safety_state"
-            ]
-            == "PPE_NON_COMPLIANT"
-        )
+            assert (
+                context[
+                    "ppe_status"
+                ]
+                == "NON_COMPLIANT"
+            )
 
 
-        assert (
-            context[
-                "ppe_status"
-            ]
-            == "NON_COMPLIANT"
-        )
+            assert (
+                context[
+                    "ppe_person_count"
+                ]
+                == 1
+            )
 
 
-        assert (
-            context[
-                "ppe_person_count"
-            ]
-            == 1
-        )
+            assert (
+                context[
+                    "ppe_camera_id"
+                ]
+                == "CAM-B-01"
+            )
 
 
-        assert (
-            context[
-                "ppe_camera_id"
-            ]
-            == "CAM-B-01"
-        )
+            assert (
+                context[
+                    "safety_zone_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            context[
-                "safety_zone_id"
-            ]
-            == "ZONE-B"
-        )
+            # ----------------------------------------------------
+            # Face semantics
+            # ----------------------------------------------------
+
+            assert (
+                context[
+                    "physical_state"
+                ]
+                == "RECOGNIZED_PERSON"
+            )
 
 
-        # ----------------------------------------------------
-        # Face semantics
-        # ----------------------------------------------------
-
-        assert (
-            context[
-                "physical_state"
-            ]
-            == "RECOGNIZED_PERSON"
-        )
+            assert (
+                context[
+                    "authorization_status"
+                ]
+                == "UNAUTHORIZED"
+            )
 
 
-        assert (
-            context[
-                "authorization_status"
-            ]
-            == "UNAUTHORIZED"
-        )
+            assert (
+                context[
+                    "person_id"
+                ]
+                == "P003"
+            )
 
 
-        assert (
-            context[
-                "person_id"
-            ]
-            == "P003"
-        )
+            assert (
+                context[
+                    "face_camera_id"
+                ]
+                == "CAM-B-01"
+            )
 
 
-        assert (
-            context[
-                "face_camera_id"
-            ]
-            == "CAM-B-01"
-        )
+            assert (
+                context[
+                    "physical_zone_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            context[
-                "physical_zone_id"
-            ]
-            == "ZONE-B"
-        )
+            # ----------------------------------------------------
+            # Correlation semantics
+            # ----------------------------------------------------
+
+            assert (
+                context[
+                    "scope"
+                ]
+                == "ZONE"
+            )
 
 
-        # ----------------------------------------------------
-        # Correlation semantics
-        # ----------------------------------------------------
-
-        assert (
-            context[
-                "scope"
-            ]
-            == "ZONE"
-        )
+            assert (
+                context[
+                    "shared_entity_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            context[
-                "shared_entity_id"
-            ]
-            == "ZONE-B"
-        )
+            assert (
+                context[
+                    "shared_zone_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            context[
-                "shared_zone_id"
-            ]
-            == "ZONE-B"
-        )
+            print(
+                "PASS: Explainable PPE + Face "
+                "graph path verified."
+            )
 
 
-        print(
-            "PASS: Explainable PPE + Face "
-            "graph path verified."
-        )
+            # ----------------------------------------------------
+            # Critical identity boundary
+            #
+            # PPE Event must NOT identify P003 or any Person.
+            # ----------------------------------------------------
 
-
-        # ----------------------------------------------------
-        # Critical identity boundary
-        #
-        # PPE Event must NOT identify P003 or any Person.
-        # ----------------------------------------------------
-
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (safety:Event {
                     event_id:
@@ -872,274 +879,278 @@ try:
                     AS identifies_count
             """,
 
-            safety_event_id=
-                safety_event[
-                    "event_id"
+                safety_event_id=
+                    safety_event[
+                        "event_id"
+                    ],
+            ).single()
+
+
+            assert (
+                record[
+                    "identifies_count"
+                ]
+                == 0
+            )
+
+
+            print(
+                "PASS: PPE event has no Person "
+                "identity relationship."
+            )
+
+
+            # ----------------------------------------------------
+            # Both evidence paths share infrastructure context,
+            # not asserted human identity.
+            # ----------------------------------------------------
+
+            assert (
+                context[
+                    "ppe_camera_id"
+                ]
+                == context[
+                    "face_camera_id"
+                ]
+                == "CAM-B-01"
+            )
+
+
+            assert (
+                context[
+                    "safety_zone_id"
+                ]
+                == context[
+                    "physical_zone_id"
+                ]
+                == context[
+                    "shared_zone_id"
+                ]
+                == "ZONE-B"
+            )
+
+
+            print(
+                "PASS: Correlation is based on shared "
+                "camera/zone context, not person identity."
+            )
+
+
+            # ====================================================
+            # Display
+            # ====================================================
+
+            print(
+                "\n============================================"
+            )
+            print(
+                "PERSISTED PPE + FACE CONTEXT"
+            )
+            print(
+                "============================================"
+            )
+
+
+            print(
+                "Correlation ID:",
+                result[
+                    "correlation_id"
                 ],
-        ).single()
+            )
 
 
-        assert (
-            record[
-                "identifies_count"
-            ]
-            == 0
-        )
+            print(
+                "Type:",
+                context[
+                    "correlation_type"
+                ],
+            )
 
 
-        print(
-            "PASS: PPE event has no Person "
-            "identity relationship."
-        )
+            print(
+                "Scope:",
+                context[
+                    "scope"
+                ],
+            )
 
 
-        # ----------------------------------------------------
-        # Both evidence paths share infrastructure context,
-        # not asserted human identity.
-        # ----------------------------------------------------
-
-        assert (
-            context[
-                "ppe_camera_id"
-            ]
-            == context[
-                "face_camera_id"
-            ]
-            == "CAM-B-01"
-        )
+            print(
+                "Shared zone:",
+                context[
+                    "shared_zone_id"
+                ],
+            )
 
 
-        assert (
-            context[
-                "safety_zone_id"
-            ]
-            == context[
-                "physical_zone_id"
-            ]
-            == context[
-                "shared_zone_id"
-            ]
-            == "ZONE-B"
-        )
+            print(
+                "\nSafety / PPE:"
+            )
+
+            print(
+                "  State:",
+                context[
+                    "safety_state"
+                ],
+            )
+
+            print(
+                "  PPE status:",
+                context[
+                    "ppe_status"
+                ],
+            )
+
+            print(
+                "  Persons:",
+                context[
+                    "ppe_person_count"
+                ],
+            )
+
+            print(
+                "  Camera:",
+                context[
+                    "ppe_camera_id"
+                ],
+            )
+
+            print(
+                "  Zone:",
+                context[
+                    "safety_zone_id"
+                ],
+            )
 
 
-        print(
-            "PASS: Correlation is based on shared "
-            "camera/zone context, not person identity."
-        )
+            print(
+                "\nPhysical Security / Face:"
+            )
+
+            print(
+                "  Person:",
+                context[
+                    "person_id"
+                ],
+            )
+
+            print(
+                "  State:",
+                context[
+                    "physical_state"
+                ],
+            )
+
+            print(
+                "  Authorization:",
+                context[
+                    "authorization_status"
+                ],
+            )
+
+            print(
+                "  Camera:",
+                context[
+                    "face_camera_id"
+                ],
+            )
+
+            print(
+                "  Zone:",
+                context[
+                    "physical_zone_id"
+                ],
+            )
 
 
-        # ====================================================
-        # Display
-        # ====================================================
+        # ========================================================
+        # Summary
+        # ========================================================
 
         print(
             "\n============================================"
         )
         print(
-            "PERSISTED PPE + FACE CONTEXT"
+            "PPE + FACE STORE CONTRACT SUMMARY"
+        )
+        print(
+            "============================================"
+        )
+
+        print(
+            "PASS: PPE + Face correlation persisted."
+        )
+
+        print(
+            "PASS: Deterministic correlation ID."
+        )
+
+        print(
+            "PASS: Persistence idempotent."
+        )
+
+        print(
+            "PASS: Two evidence events preserved."
+        )
+
+        print(
+            "PASS: SAFETY preserved."
+        )
+
+        print(
+            "PASS: PHYSICAL_SECURITY preserved."
+        )
+
+        print(
+            "PASS: PPE_NON_COMPLIANT preserved."
+        )
+
+        print(
+            "PASS: UNAUTHORIZED context preserved."
+        )
+
+        print(
+            "PASS: ZONE-level concern preserved."
+        )
+
+        print(
+            "PASS: PPE Camera observation path preserved."
+        )
+
+        print(
+            "PASS: Face Camera observation path preserved."
+        )
+
+        print(
+            "PASS: No PPE -> Person identity link introduced."
+        )
+
+        print(
+            "PASS: Shared physical context preserved "
+            "without cross-model identity claim."
+        )
+
+        print(
+            "PASS: Explainable graph path available."
+        )
+
+
+        print(
+            "\n============================================"
+        )
+        print(
+            "DC-GUARDIAN PPE + FACE "
+            "CORRELATION STORE PASSED"
         )
         print(
             "============================================"
         )
 
 
-        print(
-            "Correlation ID:",
-            result[
-                "correlation_id"
-            ],
-        )
+    finally:
+
+        driver.close()
 
 
-        print(
-            "Type:",
-            context[
-                "correlation_type"
-            ],
-        )
-
-
-        print(
-            "Scope:",
-            context[
-                "scope"
-            ],
-        )
-
-
-        print(
-            "Shared zone:",
-            context[
-                "shared_zone_id"
-            ],
-        )
-
-
-        print(
-            "\nSafety / PPE:"
-        )
-
-        print(
-            "  State:",
-            context[
-                "safety_state"
-            ],
-        )
-
-        print(
-            "  PPE status:",
-            context[
-                "ppe_status"
-            ],
-        )
-
-        print(
-            "  Persons:",
-            context[
-                "ppe_person_count"
-            ],
-        )
-
-        print(
-            "  Camera:",
-            context[
-                "ppe_camera_id"
-            ],
-        )
-
-        print(
-            "  Zone:",
-            context[
-                "safety_zone_id"
-            ],
-        )
-
-
-        print(
-            "\nPhysical Security / Face:"
-        )
-
-        print(
-            "  Person:",
-            context[
-                "person_id"
-            ],
-        )
-
-        print(
-            "  State:",
-            context[
-                "physical_state"
-            ],
-        )
-
-        print(
-            "  Authorization:",
-            context[
-                "authorization_status"
-            ],
-        )
-
-        print(
-            "  Camera:",
-            context[
-                "face_camera_id"
-            ],
-        )
-
-        print(
-            "  Zone:",
-            context[
-                "physical_zone_id"
-            ],
-        )
-
-
-    # ========================================================
-    # Summary
-    # ========================================================
-
-    print(
-        "\n============================================"
-    )
-    print(
-        "PPE + FACE STORE CONTRACT SUMMARY"
-    )
-    print(
-        "============================================"
-    )
-
-    print(
-        "PASS: PPE + Face correlation persisted."
-    )
-
-    print(
-        "PASS: Deterministic correlation ID."
-    )
-
-    print(
-        "PASS: Persistence idempotent."
-    )
-
-    print(
-        "PASS: Two evidence events preserved."
-    )
-
-    print(
-        "PASS: SAFETY preserved."
-    )
-
-    print(
-        "PASS: PHYSICAL_SECURITY preserved."
-    )
-
-    print(
-        "PASS: PPE_NON_COMPLIANT preserved."
-    )
-
-    print(
-        "PASS: UNAUTHORIZED context preserved."
-    )
-
-    print(
-        "PASS: ZONE-level concern preserved."
-    )
-
-    print(
-        "PASS: PPE Camera observation path preserved."
-    )
-
-    print(
-        "PASS: Face Camera observation path preserved."
-    )
-
-    print(
-        "PASS: No PPE -> Person identity link introduced."
-    )
-
-    print(
-        "PASS: Shared physical context preserved "
-        "without cross-model identity claim."
-    )
-
-    print(
-        "PASS: Explainable graph path available."
-    )
-
-
-    print(
-        "\n============================================"
-    )
-    print(
-        "DC-GUARDIAN PPE + FACE "
-        "CORRELATION STORE PASSED"
-    )
-    print(
-        "============================================"
-    )
-
-
-finally:
-
-    driver.close()
+if __name__ == "__main__":
+    test_ppe_face_correlation_store_contract()

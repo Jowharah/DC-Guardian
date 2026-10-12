@@ -17,236 +17,243 @@ Verifies:
     - Cyber -> Server -> Rack -> Zone path remains explainable
 """
 
-from pathlib import Path
-import sys
+import pytest  # noqa: E402
+
+pytestmark = [pytest.mark.neo4j]
+
+def test_face_cyber_correlation_store_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
+
+    from pathlib import Path
+    import sys
 
 
-# ============================================================
-# Project paths
-# ============================================================
+    # ============================================================
+    # Project paths
+    # ============================================================
 
-PROJECT_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[2]
-)
-
-
-for directory in [
-    PROJECT_ROOT / "reasoning" / "graph",
-    PROJECT_ROOT / "reasoning" / "correlation",
-]:
-
-    if str(directory) not in sys.path:
-
-        sys.path.insert(
-            0,
-            str(directory)
-        )
-
-
-from ingest_event import (
-    create_driver,
-    NEO4J_DATABASE,
-)
-
-from correlation_engine import (
-    find_cross_domain_correlations,
-)
-
-from correlation_store import (
-    persist_correlation,
-)
-
-
-# ============================================================
-# Controlled scenario
-# ============================================================
-
-SCENARIO_ID = (
-    "SCENARIO-CORR-FACE-CYBER-001"
-)
-
-
-print(
-    "\n============================================"
-)
-print(
-    "DC-GUARDIAN FACE + CYBER CORRELATION STORE"
-)
-print(
-    "============================================"
-)
-
-
-driver = create_driver()
-
-
-try:
-
-    print(
-        "PASS: Connected to Neo4j."
+    PROJECT_ROOT = (
+        Path(__file__)
+        .resolve()
+        .parents[2]
     )
 
 
-    # ========================================================
-    # Rediscover correlation
-    # ========================================================
+    for directory in [
+        PROJECT_ROOT / "reasoning" / "graph",
+        PROJECT_ROOT / "reasoning" / "correlation",
+    ]:
 
-    correlations = (
-        find_cross_domain_correlations(
-            driver,
+        if str(directory) not in sys.path:
 
-            scenario_id=
-                SCENARIO_ID,
+            sys.path.insert(
+                0,
+                str(directory)
+            )
 
-            window_minutes=
-                15,
-        )
+
+    from ingest_event import (
+        create_driver,
+        NEO4J_DATABASE,
+    )
+
+    from correlation_engine import (
+        find_cross_domain_correlations,
+    )
+
+    from correlation_store import (
+        persist_correlation,
     )
 
 
-    if len(
-        correlations
-    ) != 1:
+    # ============================================================
+    # Controlled scenario
+    # ============================================================
 
-        raise AssertionError(
-            "Expected exactly one Face + Cyber "
-            "correlation for "
-            f"{SCENARIO_ID}; "
-            f"found {len(correlations)}."
-        )
-
-
-    correlation = (
-        correlations[
-            0
-        ]
+    SCENARIO_ID = (
+        "SCENARIO-CORR-FACE-CYBER-001"
     )
-
-
-    assert (
-        correlation[
-            "scope"
-        ]
-        == "ZONE"
-    )
-
-
-    assert (
-        correlation[
-            "shared_entity_id"
-        ]
-        == "ZONE-B"
-    )
-
-
-    domains = {
-        event[
-            "domain"
-        ]
-        for event
-        in correlation[
-            "events"
-        ]
-    }
-
-
-    assert domains == {
-        "CYBERSECURITY",
-        "PHYSICAL_SECURITY",
-    }
 
 
     print(
-        "PASS: Face + Cyber correlation rediscovered."
+        "\n============================================"
     )
-
     print(
-        "PASS: Common scope = ZONE-B."
+        "DC-GUARDIAN FACE + CYBER CORRELATION STORE"
+    )
+    print(
+        "============================================"
     )
 
 
-    # ========================================================
-    # Verify physical-security semantics before persistence
-    # ========================================================
+    driver = create_driver()
 
-    physical_event = next(
-        event
-        for event
-        in correlation[
-            "events"
-        ]
-        if (
+
+    try:
+
+        print(
+            "PASS: Connected to Neo4j."
+        )
+
+
+        # ========================================================
+        # Rediscover correlation
+        # ========================================================
+
+        correlations = (
+            find_cross_domain_correlations(
+                driver,
+
+                scenario_id=
+                    SCENARIO_ID,
+
+                window_minutes=
+                    15,
+            )
+        )
+
+
+        if len(
+            correlations
+        ) != 1:
+
+            raise AssertionError(
+                "Expected exactly one Face + Cyber "
+                "correlation for "
+                f"{SCENARIO_ID}; "
+                f"found {len(correlations)}."
+            )
+
+
+        correlation = (
+            correlations[
+                0
+            ]
+        )
+
+
+        assert (
+            correlation[
+                "scope"
+            ]
+            == "ZONE"
+        )
+
+
+        assert (
+            correlation[
+                "shared_entity_id"
+            ]
+            == "ZONE-B"
+        )
+
+
+        domains = {
             event[
                 "domain"
             ]
-            == "PHYSICAL_SECURITY"
-        )
-    )
-
-
-    cyber_event = next(
-        event
-        for event
-        in correlation[
-            "events"
-        ]
-        if (
-            event[
-                "domain"
+            for event
+            in correlation[
+                "events"
             ]
-            == "CYBERSECURITY"
+        }
+
+
+        assert domains == {
+            "CYBERSECURITY",
+            "PHYSICAL_SECURITY",
+        }
+
+
+        print(
+            "PASS: Face + Cyber correlation rediscovered."
         )
-    )
+
+        print(
+            "PASS: Common scope = ZONE-B."
+        )
 
 
-    assert (
-        physical_event[
-            "state"
-        ]
-        == "RECOGNIZED_PERSON"
-    )
+        # ========================================================
+        # Verify physical-security semantics before persistence
+        # ========================================================
+
+        physical_event = next(
+            event
+            for event
+            in correlation[
+                "events"
+            ]
+            if (
+                event[
+                    "domain"
+                ]
+                == "PHYSICAL_SECURITY"
+            )
+        )
 
 
-    assert (
-        physical_event[
-            "authorization_status"
-        ]
-        == "UNAUTHORIZED"
-    )
+        cyber_event = next(
+            event
+            for event
+            in correlation[
+                "events"
+            ]
+            if (
+                event[
+                    "domain"
+                ]
+                == "CYBERSECURITY"
+            )
+        )
 
 
-    assert (
-        cyber_event[
-            "state"
-        ]
-        == "HIGH_CONFIDENCE_ANOMALY"
-    )
+        assert (
+            physical_event[
+                "state"
+            ]
+            == "RECOGNIZED_PERSON"
+        )
 
 
-    print(
-        "PASS: Unauthorized physical-security "
-        "evidence preserved."
-    )
-
-    print(
-        "PASS: Cybersecurity anomaly preserved."
-    )
+        assert (
+            physical_event[
+                "authorization_status"
+            ]
+            == "UNAUTHORIZED"
+        )
 
 
-    # ========================================================
-    # Remove previous persisted correlation only
-    #
-    # Contributing events remain untouched.
-    # ========================================================
+        assert (
+            cyber_event[
+                "state"
+            ]
+            == "HIGH_CONFIDENCE_ANOMALY"
+        )
 
-    with driver.session(
-        database=NEO4J_DATABASE
-    ) as session:
 
-        session.run(
-            """
+        print(
+            "PASS: Unauthorized physical-security "
+            "evidence preserved."
+        )
+
+        print(
+            "PASS: Cybersecurity anomaly preserved."
+        )
+
+
+        # ========================================================
+        # Remove previous persisted correlation only
+        #
+        # Contributing events remain untouched.
+        # ========================================================
+
+        with driver.session(
+            database=NEO4J_DATABASE
+        ) as session:
+
+            session.run(
+                """
             MATCH (c:Correlation {
                 scenario_id: $scenario_id
             })
@@ -254,115 +261,115 @@ try:
             DETACH DELETE c
             """,
 
-            scenario_id=
-                SCENARIO_ID,
-        ).consume()
+                scenario_id=
+                    SCENARIO_ID,
+            ).consume()
 
 
-    print(
-        "PASS: Previous persisted Face + Cyber "
-        "correlation cleared."
-    )
+        print(
+            "PASS: Previous persisted Face + Cyber "
+            "correlation cleared."
+        )
 
 
-    # ========================================================
-    # Persist
-    # ========================================================
+        # ========================================================
+        # Persist
+        # ========================================================
 
-    result = persist_correlation(
-        correlation,
-        driver,
-    )
-
-
-    assert (
-        result[
-            "correlation_type"
-        ]
-        == "CORRELATED_INFRASTRUCTURE_RISK"
-    )
+        result = persist_correlation(
+            correlation,
+            driver,
+        )
 
 
-    assert (
-        result[
-            "scope"
-        ]
-        == "ZONE"
-    )
+        assert (
+            result[
+                "correlation_type"
+            ]
+            == "CORRELATED_INFRASTRUCTURE_RISK"
+        )
 
 
-    assert (
-        result[
-            "shared_entity_id"
-        ]
-        == "ZONE-B"
-    )
+        assert (
+            result[
+                "scope"
+            ]
+            == "ZONE"
+        )
 
 
-    assert (
-        result[
-            "event_count"
-        ]
-        == 2
-    )
+        assert (
+            result[
+                "shared_entity_id"
+            ]
+            == "ZONE-B"
+        )
 
 
-    assert set(
-        result[
-            "domains"
-        ]
-    ) == {
-        "CYBERSECURITY",
-        "PHYSICAL_SECURITY",
-    }
+        assert (
+            result[
+                "event_count"
+            ]
+            == 2
+        )
 
 
-    print(
-        "PASS: Face + Cyber correlation persisted."
-    )
+        assert set(
+            result[
+                "domains"
+            ]
+        ) == {
+            "CYBERSECURITY",
+            "PHYSICAL_SECURITY",
+        }
 
 
-    # ========================================================
-    # Deterministic / idempotent persistence
-    # ========================================================
-
-    second_result = persist_correlation(
-        correlation,
-        driver,
-    )
+        print(
+            "PASS: Face + Cyber correlation persisted."
+        )
 
 
-    assert (
-        second_result[
-            "correlation_id"
-        ]
-        == result[
-            "correlation_id"
-        ]
-    )
+        # ========================================================
+        # Deterministic / idempotent persistence
+        # ========================================================
+
+        second_result = persist_correlation(
+            correlation,
+            driver,
+        )
 
 
-    print(
-        "PASS: Repeated persistence uses "
-        "deterministic correlation ID."
-    )
+        assert (
+            second_result[
+                "correlation_id"
+            ]
+            == result[
+                "correlation_id"
+            ]
+        )
 
 
-    # ========================================================
-    # Graph verification
-    # ========================================================
-
-    with driver.session(
-        database=NEO4J_DATABASE
-    ) as session:
+        print(
+            "PASS: Repeated persistence uses "
+            "deterministic correlation ID."
+        )
 
 
-        # ----------------------------------------------------
-        # Exactly one Correlation node
-        # ----------------------------------------------------
+        # ========================================================
+        # Graph verification
+        # ========================================================
 
-        record = session.run(
-            """
+        with driver.session(
+            database=NEO4J_DATABASE
+        ) as session:
+
+
+            # ----------------------------------------------------
+            # Exactly one Correlation node
+            # ----------------------------------------------------
+
+            record = session.run(
+                """
             MATCH (c:Correlation {
                 correlation_id: $correlation_id
             })
@@ -387,75 +394,75 @@ try:
                     AS domains
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "count"
+                ]
+                == 1
+            )
 
 
-        assert (
-            record[
-                "correlation_type"
-            ]
-            == "CORRELATED_INFRASTRUCTURE_RISK"
-        )
+            assert (
+                record[
+                    "correlation_type"
+                ]
+                == "CORRELATED_INFRASTRUCTURE_RISK"
+            )
 
 
-        assert (
-            record[
-                "scope"
-            ]
-            == "ZONE"
-        )
+            assert (
+                record[
+                    "scope"
+                ]
+                == "ZONE"
+            )
 
 
-        assert (
-            record[
-                "shared_entity_id"
-            ]
-            == "ZONE-B"
-        )
+            assert (
+                record[
+                    "shared_entity_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            record[
-                "event_count"
-            ]
-            == 2
-        )
+            assert (
+                record[
+                    "event_count"
+                ]
+                == 2
+            )
 
 
-        assert set(
-            record[
-                "domains"
-            ]
-        ) == {
-            "CYBERSECURITY",
-            "PHYSICAL_SECURITY",
-        }
+            assert set(
+                record[
+                    "domains"
+                ]
+            ) == {
+                "CYBERSECURITY",
+                "PHYSICAL_SECURITY",
+            }
 
 
-        print(
-            "PASS: Face + Cyber Correlation node "
-            "is idempotent."
-        )
+            print(
+                "PASS: Face + Cyber Correlation node "
+                "is idempotent."
+            )
 
 
-        # ----------------------------------------------------
-        # Two contributing Events
-        # ----------------------------------------------------
+            # ----------------------------------------------------
+            # Two contributing Events
+            # ----------------------------------------------------
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (event:Event)
                 -[relationship:CONTRIBUTES_TO]->
@@ -478,42 +485,42 @@ try:
                     AS event_ids
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "relationship_count"
-            ]
-            == 2
-        )
+            assert (
+                record[
+                    "relationship_count"
+                ]
+                == 2
+            )
 
 
-        assert set(
-            record[
-                "domains"
-            ]
-        ) == {
-            "CYBERSECURITY",
-            "PHYSICAL_SECURITY",
-        }
+            assert set(
+                record[
+                    "domains"
+                ]
+            ) == {
+                "CYBERSECURITY",
+                "PHYSICAL_SECURITY",
+            }
 
 
-        print(
-            "PASS: Two contributing events linked."
-        )
+            print(
+                "PASS: Two contributing events linked."
+            )
 
 
-        # ----------------------------------------------------
-        # Correlation -> ZONE-B
-        # ----------------------------------------------------
+            # ----------------------------------------------------
+            # Correlation -> ZONE-B
+            # ----------------------------------------------------
 
-        record = session.run(
-            """
+            record = session.run(
+                """
             MATCH
                 (correlation:Correlation {
                     correlation_id: $correlation_id
@@ -531,42 +538,42 @@ try:
                     AS zone_ids
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        assert (
-            record[
-                "relationship_count"
-            ]
-            == 1
-        )
+            assert (
+                record[
+                    "relationship_count"
+                ]
+                == 1
+            )
 
 
-        assert (
-            record[
-                "zone_ids"
-            ]
-            == [
-                "ZONE-B"
-            ]
-        )
+            assert (
+                record[
+                    "zone_ids"
+                ]
+                == [
+                    "ZONE-B"
+                ]
+            )
 
 
-        print(
-            "PASS: Correlation CONCERNS ZONE-B."
-        )
+            print(
+                "PASS: Correlation CONCERNS ZONE-B."
+            )
 
 
-        # ----------------------------------------------------
-        # Full explainable Face + Cyber graph
-        # ----------------------------------------------------
+            # ----------------------------------------------------
+            # Full explainable Face + Cyber graph
+            # ----------------------------------------------------
 
-        context = session.run(
-            """
+            context = session.run(
+                """
             MATCH
                 (physical:Event {
                     domain:
@@ -695,326 +702,330 @@ try:
                     AS shared_zone_id
             """,
 
-            correlation_id=
-                result[
-                    "correlation_id"
-                ],
-        ).single()
+                correlation_id=
+                    result[
+                        "correlation_id"
+                    ],
+            ).single()
 
 
-        if context is None:
+            if context is None:
 
-            raise AssertionError(
-                "Explainable Face + Cyber "
-                "correlation path not found."
+                raise AssertionError(
+                    "Explainable Face + Cyber "
+                    "correlation path not found."
+                )
+
+
+            # ----------------------------------------------------
+            # Physical semantics
+            # ----------------------------------------------------
+
+            assert (
+                context[
+                    "physical_state"
+                ]
+                == "RECOGNIZED_PERSON"
             )
 
 
-        # ----------------------------------------------------
-        # Physical semantics
-        # ----------------------------------------------------
-
-        assert (
-            context[
-                "physical_state"
-            ]
-            == "RECOGNIZED_PERSON"
-        )
+            assert (
+                context[
+                    "authorization_status"
+                ]
+                == "UNAUTHORIZED"
+            )
 
 
-        assert (
-            context[
-                "authorization_status"
-            ]
-            == "UNAUTHORIZED"
-        )
+            assert (
+                context[
+                    "person_id"
+                ]
+                == "P003"
+            )
 
 
-        assert (
-            context[
-                "person_id"
-            ]
-            == "P003"
-        )
+            assert (
+                context[
+                    "camera_id"
+                ]
+                == "CAM-B-01"
+            )
 
 
-        assert (
-            context[
-                "camera_id"
-            ]
-            == "CAM-B-01"
-        )
+            assert (
+                context[
+                    "physical_zone_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            context[
-                "physical_zone_id"
-            ]
-            == "ZONE-B"
-        )
+            # ----------------------------------------------------
+            # Cyber semantics
+            # ----------------------------------------------------
+
+            assert (
+                context[
+                    "cyber_state"
+                ]
+                == "HIGH_CONFIDENCE_ANOMALY"
+            )
 
 
-        # ----------------------------------------------------
-        # Cyber semantics
-        # ----------------------------------------------------
-
-        assert (
-            context[
-                "cyber_state"
-            ]
-            == "HIGH_CONFIDENCE_ANOMALY"
-        )
+            assert (
+                context[
+                    "server_id"
+                ]
+                == "SRV-B1-01"
+            )
 
 
-        assert (
-            context[
-                "server_id"
-            ]
-            == "SRV-B1-01"
-        )
+            assert (
+                context[
+                    "rack_id"
+                ]
+                == "RACK-B1"
+            )
 
 
-        assert (
-            context[
-                "rack_id"
-            ]
-            == "RACK-B1"
-        )
+            assert (
+                context[
+                    "cyber_zone_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            context[
-                "cyber_zone_id"
-            ]
-            == "ZONE-B"
-        )
+            # ----------------------------------------------------
+            # Correlation semantics
+            # ----------------------------------------------------
+
+            assert (
+                context[
+                    "scope"
+                ]
+                == "ZONE"
+            )
 
 
-        # ----------------------------------------------------
-        # Correlation semantics
-        # ----------------------------------------------------
-
-        assert (
-            context[
-                "scope"
-            ]
-            == "ZONE"
-        )
+            assert (
+                context[
+                    "shared_entity_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            context[
-                "shared_entity_id"
-            ]
-            == "ZONE-B"
-        )
+            assert (
+                context[
+                    "shared_zone_id"
+                ]
+                == "ZONE-B"
+            )
 
 
-        assert (
-            context[
-                "shared_zone_id"
-            ]
-            == "ZONE-B"
-        )
+            print(
+                "PASS: Explainable Face + Cyber "
+                "graph path verified."
+            )
 
 
-        print(
-            "PASS: Explainable Face + Cyber "
-            "graph path verified."
-        )
+            # ====================================================
+            # Display
+            # ====================================================
+
+            print(
+                "\n============================================"
+            )
+            print(
+                "PERSISTED FACE + CYBER CONTEXT"
+            )
+            print(
+                "============================================"
+            )
 
 
-        # ====================================================
-        # Display
-        # ====================================================
+            print(
+                "Correlation ID:",
+                result[
+                    "correlation_id"
+                ],
+            )
+
+
+            print(
+                "Type:",
+                context[
+                    "correlation_type"
+                ],
+            )
+
+
+            print(
+                "Scope:",
+                context[
+                    "scope"
+                ],
+            )
+
+
+            print(
+                "Shared zone:",
+                context[
+                    "shared_zone_id"
+                ],
+            )
+
+
+            print(
+                "\nPhysical Security:"
+            )
+
+            print(
+                "  Person:",
+                context[
+                    "person_id"
+                ],
+            )
+
+            print(
+                "  State:",
+                context[
+                    "physical_state"
+                ],
+            )
+
+            print(
+                "  Authorization:",
+                context[
+                    "authorization_status"
+                ],
+            )
+
+            print(
+                "  Camera:",
+                context[
+                    "camera_id"
+                ],
+            )
+
+            print(
+                "  Zone:",
+                context[
+                    "physical_zone_id"
+                ],
+            )
+
+
+            print(
+                "\nCybersecurity:"
+            )
+
+            print(
+                "  State:",
+                context[
+                    "cyber_state"
+                ],
+            )
+
+            print(
+                "  Server:",
+                context[
+                    "server_id"
+                ],
+            )
+
+            print(
+                "  Rack:",
+                context[
+                    "rack_id"
+                ],
+            )
+
+            print(
+                "  Zone:",
+                context[
+                    "cyber_zone_id"
+                ],
+            )
+
+
+        # ========================================================
+        # Summary
+        # ========================================================
 
         print(
             "\n============================================"
         )
         print(
-            "PERSISTED FACE + CYBER CONTEXT"
+            "FACE + CYBER STORE CONTRACT SUMMARY"
+        )
+        print(
+            "============================================"
+        )
+
+        print(
+            "PASS: Face + Cyber correlation persisted."
+        )
+
+        print(
+            "PASS: Deterministic correlation ID."
+        )
+
+        print(
+            "PASS: Persistence idempotent."
+        )
+
+        print(
+            "PASS: Two evidence events preserved."
+        )
+
+        print(
+            "PASS: PHYSICAL_SECURITY preserved."
+        )
+
+        print(
+            "PASS: CYBERSECURITY preserved."
+        )
+
+        print(
+            "PASS: UNAUTHORIZED context preserved."
+        )
+
+        print(
+            "PASS: ZONE-level concern preserved."
+        )
+
+        print(
+            "PASS: Camera observation path preserved."
+        )
+
+        print(
+            "PASS: Server topology path preserved."
+        )
+
+        print(
+            "PASS: Explainable graph path available."
+        )
+
+
+        print(
+            "\n============================================"
+        )
+        print(
+            "DC-GUARDIAN FACE + CYBER "
+            "CORRELATION STORE PASSED"
         )
         print(
             "============================================"
         )
 
 
-        print(
-            "Correlation ID:",
-            result[
-                "correlation_id"
-            ],
-        )
+    finally:
+
+        driver.close()
 
 
-        print(
-            "Type:",
-            context[
-                "correlation_type"
-            ],
-        )
-
-
-        print(
-            "Scope:",
-            context[
-                "scope"
-            ],
-        )
-
-
-        print(
-            "Shared zone:",
-            context[
-                "shared_zone_id"
-            ],
-        )
-
-
-        print(
-            "\nPhysical Security:"
-        )
-
-        print(
-            "  Person:",
-            context[
-                "person_id"
-            ],
-        )
-
-        print(
-            "  State:",
-            context[
-                "physical_state"
-            ],
-        )
-
-        print(
-            "  Authorization:",
-            context[
-                "authorization_status"
-            ],
-        )
-
-        print(
-            "  Camera:",
-            context[
-                "camera_id"
-            ],
-        )
-
-        print(
-            "  Zone:",
-            context[
-                "physical_zone_id"
-            ],
-        )
-
-
-        print(
-            "\nCybersecurity:"
-        )
-
-        print(
-            "  State:",
-            context[
-                "cyber_state"
-            ],
-        )
-
-        print(
-            "  Server:",
-            context[
-                "server_id"
-            ],
-        )
-
-        print(
-            "  Rack:",
-            context[
-                "rack_id"
-            ],
-        )
-
-        print(
-            "  Zone:",
-            context[
-                "cyber_zone_id"
-            ],
-        )
-
-
-    # ========================================================
-    # Summary
-    # ========================================================
-
-    print(
-        "\n============================================"
-    )
-    print(
-        "FACE + CYBER STORE CONTRACT SUMMARY"
-    )
-    print(
-        "============================================"
-    )
-
-    print(
-        "PASS: Face + Cyber correlation persisted."
-    )
-
-    print(
-        "PASS: Deterministic correlation ID."
-    )
-
-    print(
-        "PASS: Persistence idempotent."
-    )
-
-    print(
-        "PASS: Two evidence events preserved."
-    )
-
-    print(
-        "PASS: PHYSICAL_SECURITY preserved."
-    )
-
-    print(
-        "PASS: CYBERSECURITY preserved."
-    )
-
-    print(
-        "PASS: UNAUTHORIZED context preserved."
-    )
-
-    print(
-        "PASS: ZONE-level concern preserved."
-    )
-
-    print(
-        "PASS: Camera observation path preserved."
-    )
-
-    print(
-        "PASS: Server topology path preserved."
-    )
-
-    print(
-        "PASS: Explainable graph path available."
-    )
-
-
-    print(
-        "\n============================================"
-    )
-    print(
-        "DC-GUARDIAN FACE + CYBER "
-        "CORRELATION STORE PASSED"
-    )
-    print(
-        "============================================"
-    )
-
-
-finally:
-
-    driver.close()
+if __name__ == "__main__":
+    test_face_cyber_correlation_store_contract()

@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import pytest  # noqa: E402
+
+pytestmark = [pytest.mark.private_data('response/rag/knowledge_base/chunks')]
+
+
 import json
 from pathlib import Path
 import sys
@@ -79,6 +84,10 @@ def main():
     print("="*60)
     print(f"DC-GUARDIAN RAG CHUNKING CONTRACT PASSED: {len(ids)}/{len(ids)}")
     print("="*60)
+
+
+def test_chunking_contract():
+    main()
 
 
 if __name__=="__main__":

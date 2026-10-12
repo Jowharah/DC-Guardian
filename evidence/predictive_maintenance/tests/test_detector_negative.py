@@ -3,239 +3,248 @@ DC-Guardian Predictive Maintenance
 Detector Negative-Input Contract Test
 """
 
-import pandas as pd
+import pytest  # noqa: E402
 
-from evidence.predictive_maintenance.src.maintenance_detector import (
-    assess_drive_health,
-)
+def test_detector_negative_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
 
+    import pandas as pd
 
-print(
-    "\n============================================"
-)
-print(
-    "DC-GUARDIAN MAINTENANCE NEGATIVE TEST"
-)
-print(
-    "============================================"
-)
+    from evidence.predictive_maintenance.src.maintenance_detector import (
+        assess_drive_health,
+    )
 
 
-def valid_history():
+    print(
+        "\n============================================"
+    )
+    print(
+        "DC-GUARDIAN MAINTENANCE NEGATIVE TEST"
+    )
+    print(
+        "============================================"
+    )
 
-    return pd.DataFrame(
-        {
-            "date": pd.date_range(
-                "2026-01-01",
-                periods=8,
-                freq="D",
-            ),
 
-            "serial_number":
-                ["DRV-001"] * 8,
+    def valid_history():
 
-            "smart_5_raw":
-                [0] * 8,
-
-            "smart_9_raw":
-                list(
-                    range(
-                        100,
-                        108,
-                    )
+        return pd.DataFrame(
+            {
+                "date": pd.date_range(
+                    "2026-01-01",
+                    periods=8,
+                    freq="D",
                 ),
 
-            "smart_192_raw":
-                [1] * 8,
+                "serial_number":
+                    ["DRV-001"] * 8,
 
-            "smart_193_raw":
-                list(
-                    range(
-                        10,
-                        18,
-                    )
-                ),
+                "smart_5_raw":
+                    [0] * 8,
 
-            "smart_194_raw":
-                [32] * 8,
+                "smart_9_raw":
+                    list(
+                        range(
+                            100,
+                            108,
+                        )
+                    ),
 
-            "smart_198_raw":
-                [0] * 8,
+                "smart_192_raw":
+                    [1] * 8,
 
-            "smart_4_raw":
-                [5] * 8,
+                "smart_193_raw":
+                    list(
+                        range(
+                            10,
+                            18,
+                        )
+                    ),
 
-            "smart_12_raw":
-                [5] * 8,
-        }
+                "smart_194_raw":
+                    [32] * 8,
+
+                "smart_198_raw":
+                    [0] * 8,
+
+                "smart_4_raw":
+                    [5] * 8,
+
+                "smart_12_raw":
+                    [5] * 8,
+            }
+        )
+
+
+    # ============================================================
+    # Empty history
+    # ============================================================
+
+    empty = valid_history().iloc[0:0]
+
+
+    try:
+
+        assess_drive_health(
+            empty
+        )
+
+        raise AssertionError(
+            "Empty history was not rejected."
+        )
+
+    except ValueError as error:
+
+        assert (
+            "cannot be empty"
+            in str(error)
+        )
+
+
+    print(
+        "PASS: Empty history rejected."
     )
 
 
-# ============================================================
-# Empty history
-# ============================================================
+    # ============================================================
+    # Missing SMART feature
+    # ============================================================
 
-empty = valid_history().iloc[0:0]
-
-
-try:
-
-    assess_drive_health(
-        empty
-    )
-
-    raise AssertionError(
-        "Empty history was not rejected."
-    )
-
-except ValueError as error:
-
-    assert (
-        "cannot be empty"
-        in str(error)
+    missing_feature = (
+        valid_history()
+        .drop(
+            columns=[
+                "smart_198_raw"
+            ]
+        )
     )
 
 
-print(
-    "PASS: Empty history rejected."
-)
+    try:
 
+        assess_drive_health(
+            missing_feature
+        )
 
-# ============================================================
-# Missing SMART feature
-# ============================================================
+        raise AssertionError(
+            "Missing SMART feature "
+            "was not rejected."
+        )
 
-missing_feature = (
-    valid_history()
-    .drop(
-        columns=[
+    except ValueError as error:
+
+        assert (
             "smart_198_raw"
-        ]
-    )
-)
+            in str(error)
+        )
 
 
-try:
-
-    assess_drive_health(
-        missing_feature
-    )
-
-    raise AssertionError(
-        "Missing SMART feature "
-        "was not rejected."
-    )
-
-except ValueError as error:
-
-    assert (
-        "smart_198_raw"
-        in str(error)
+    print(
+        "PASS: Missing SMART feature rejected."
     )
 
 
-print(
-    "PASS: Missing SMART feature rejected."
-)
+    # ============================================================
+    # Multiple drives
+    # ============================================================
 
-
-# ============================================================
-# Multiple drives
-# ============================================================
-
-multiple_drives = (
-    valid_history()
-)
-
-
-multiple_drives.loc[
-    multiple_drives.index[-1],
-    "serial_number",
-] = "DRV-002"
-
-
-try:
-
-    assess_drive_health(
-        multiple_drives
-    )
-
-    raise AssertionError(
-        "Multiple-drive history "
-        "was not rejected."
-    )
-
-except ValueError as error:
-
-    assert (
-        "exactly one drive"
-        in str(error)
+    multiple_drives = (
+        valid_history()
     )
 
 
-print(
-    "PASS: Multiple-drive history rejected."
-)
+    multiple_drives.loc[
+        multiple_drives.index[-1],
+        "serial_number",
+    ] = "DRV-002"
 
 
-# ============================================================
-# Invalid date
-# ============================================================
-# ============================================================
-# Invalid date
-# ============================================================
+    try:
 
-invalid_date = (
-    valid_history()
-)
+        assess_drive_health(
+            multiple_drives
+        )
 
+        raise AssertionError(
+            "Multiple-drive history "
+            "was not rejected."
+        )
 
-# Convert date column to object so the test can deliberately
-# inject a malformed timestamp.
-invalid_date[
-    "date"
-] = invalid_date[
-    "date"
-].astype(
-    object
-)
+    except ValueError as error:
+
+        assert (
+            "exactly one drive"
+            in str(error)
+        )
 
 
-invalid_date.loc[
-    invalid_date.index[-1],
-    "date",
-] = "NOT-A-DATE"
-
-
-try:
-
-    assess_drive_health(
-        invalid_date
+    print(
+        "PASS: Multiple-drive history rejected."
     )
 
-    raise AssertionError(
-        "Invalid date was not rejected."
+
+    # ============================================================
+    # Invalid date
+    # ============================================================
+    # ============================================================
+    # Invalid date
+    # ============================================================
+
+    invalid_date = (
+        valid_history()
     )
 
-except (
-    ValueError,
-    TypeError,
-):
 
-    pass
+    # Convert date column to object so the test can deliberately
+    # inject a malformed timestamp.
+    invalid_date[
+        "date"
+    ] = invalid_date[
+        "date"
+    ].astype(
+        object
+    )
 
 
-print(
-    "PASS: Invalid timestamp rejected."
-)
+    invalid_date.loc[
+        invalid_date.index[-1],
+        "date",
+    ] = "NOT-A-DATE"
 
 
-print(
-    "\n============================================"
-)
-print(
-    "MAINTENANCE NEGATIVE CONTRACT PASSED"
-)
-print(
-    "============================================"
-)
+    try:
+
+        assess_drive_health(
+            invalid_date
+        )
+
+        raise AssertionError(
+            "Invalid date was not rejected."
+        )
+
+    except (
+        ValueError,
+        TypeError,
+    ):
+
+        pass
+
+
+    print(
+        "PASS: Invalid timestamp rejected."
+    )
+
+
+    print(
+        "\n============================================"
+    )
+    print(
+        "MAINTENANCE NEGATIVE CONTRACT PASSED"
+    )
+    print(
+        "============================================"
+    )
+
+
+if __name__ == "__main__":
+    test_detector_negative_contract()

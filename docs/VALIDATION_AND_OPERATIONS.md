@@ -59,7 +59,19 @@ python -m pytest presentation/backend/tests/test_investigator_sources.py present
 
 Browser demonstrations included live OpenAI responses for unified, operational, and individual SSH Evidence, as well as opt-in history restoration. The latest frontend build and full end-to-end security suite have not been confirmed by this test result. See [AI Investigator](AI_INVESTIGATOR.md).
 
-## Full project check — 2026-10-12
+## Full project check — 2026-10-12 (all tests under pytest)
+
+`python check_all.py`: **14 passed, 0 failed, 0 skipped**:
+- runtime;
+- Evidence (23 passed, 4 GPU skipped there), plus the GPU suites in `.venv-ppe` (3) and `.venv-gru` (1);
+- Reasoning runner (24 contracts, ordered), uncertainty and labelling (16);
+- RAG foundation and RAG tests (10), agents (37), integration (12);
+- backend (400), frontend build, Playwright (14);
+- live API smoke test.
+
+See [Testing](TESTING.md).
+
+## Earlier full project check — 2026-10-12
 
 `python check_all.py`: **54 passed, 0 failed, 0 skipped** — backend pytest 372 (including the 99-operation access matrix, claim checks, privacy/pseudonym and audit-checkpoint tests), frontend build, Playwright 11 browser tests (including the WCAG A/AA scans), live API GET smoke test with 0 server errors. Report: `logs/checks/20261012-090248/report.md` (local, not committed). Previous run (2026-10-11, after Decision Rules v2): 54/54 with 327 backend and 8 browser tests.
 

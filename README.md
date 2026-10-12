@@ -79,7 +79,7 @@ python check_all.py --skip-live  # without calling the running backend
 python check_all.py --only ppe   # checks whose name contains "ppe"
 ```
 
-Runs the runtime smoke test, all Evidence component contracts (GPU scripts in `.venv-ppe` / `.venv-gru`), the 24 Reasoning contracts (Neo4j; test nodes are removed afterwards), Response, Decision and integration contracts, the Presentation backend tests, the frontend build and, if the backend is running, a GET-only live API smoke test. No check calls OpenAI. Results go to `logs/checks/<timestamp>/report.md` (and `logs/checks/latest.md`), with one log file per check. Checks that need private local data are skipped when that data is absent.
+Runs the runtime smoke test and every test suite under pytest: Evidence (GPU tests in `.venv-ppe` / `.venv-gru`), the 24 Reasoning contracts in dependency order (Neo4j; test nodes are removed afterwards), the uncertainty study, Response RAG and agents, Decision and integration, the Presentation backend, then the frontend build, the Playwright browser tests and, if the backend is running, a GET-only live API smoke test. Test layout, markers and single-suite commands: [docs/TESTING.md](docs/TESTING.md). No check calls OpenAI. Results go to `logs/checks/<timestamp>/report.md` (and `logs/checks/latest.md`), with one log file per check. Checks that need private local data are skipped when that data is absent.
 
 The running backend writes `logs/api_access.log`, `logs/backend.log` and `logs/errors.log` (see `logs/README.md`).
 

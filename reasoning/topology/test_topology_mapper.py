@@ -1,649 +1,658 @@
-﻿from copy import deepcopy
-from pathlib import Path
+﻿
+import pytest  # noqa: E402
 
-import json
-import sys
+def test_topology_mapper_contract():
+    """The original script checks, unchanged (converted 2026-10-12)."""
+    from copy import deepcopy
+    from pathlib import Path
 
-from jsonschema import (
-    Draft202012Validator,
-    FormatChecker,
-)
+    import json
+    import sys
 
-
-# ============================================================
-# Project paths
-# ============================================================
-
-PROJECT_ROOT = (
-    Path(__file__)
-    .resolve()
-    .parents[2]
-)
-
-
-TOPOLOGY_MODULE_DIR = (
-    PROJECT_ROOT
-    / "reasoning"
-    / "topology"
-)
-
-
-if str(
-    TOPOLOGY_MODULE_DIR
-) not in sys.path:
-
-    sys.path.insert(
-        0,
-        str(
-            TOPOLOGY_MODULE_DIR
-        )
+    from jsonschema import (
+        Draft202012Validator,
+        FormatChecker,
     )
 
 
-from topology_mapper import (
-    map_ssh_event_to_scenario,
-    validate_target_mapping,
-    build_server_index,
-)
+    # ============================================================
+    # Project paths
+    # ============================================================
+
+    PROJECT_ROOT = (
+        Path(__file__)
+        .resolve()
+        .parents[2]
+    )
 
 
-SCHEMA_FILE = (
-    PROJECT_ROOT
-    / "shared"
-    / "schemas"
-    / "event_schema.json"
-)
+    TOPOLOGY_MODULE_DIR = (
+        PROJECT_ROOT
+        / "reasoning"
+        / "topology"
+    )
 
 
-TOPOLOGY_FILE = (
-    PROJECT_ROOT
-    / "shared"
-    / "topology"
-    / "data_center_topology.json"
-)
+    if str(
+        TOPOLOGY_MODULE_DIR
+    ) not in sys.path:
 
-
-# ============================================================
-# JSON loader
-# ============================================================
-
-def load_json(
-    file_path
-):
-
-    with open(
-        file_path,
-        "r",
-        encoding="utf-8"
-    ) as file:
-
-        return json.load(
-            file
+        sys.path.insert(
+            0,
+            str(
+                TOPOLOGY_MODULE_DIR
+            )
         )
 
 
-# ============================================================
-# Load schema
-# ============================================================
-
-schema = load_json(
-    SCHEMA_FILE
-)
+    from topology_mapper import (
+        map_ssh_event_to_scenario,
+        validate_target_mapping,
+        build_server_index,
+    )
 
 
-validator = Draft202012Validator(
-    schema,
-    format_checker=FormatChecker()
-)
+    SCHEMA_FILE = (
+        PROJECT_ROOT
+        / "shared"
+        / "schemas"
+        / "event_schema.json"
+    )
 
 
-# ============================================================
-# Representative normalized SSH event
-#
-# This represents output AFTER the SSH adapter but BEFORE
-# topology mapping.
-# ============================================================
+    TOPOLOGY_FILE = (
+        PROJECT_ROOT
+        / "shared"
+        / "topology"
+        / "data_center_topology.json"
+    )
 
-normalized_event = {
 
-    "event_id":
-        "EVT-SSH-MAP-TEST-001",
+    # ============================================================
+    # JSON loader
+    # ============================================================
 
-    "schema_version":
-        "1.0",
+    def load_json(
+        file_path
+    ):
 
-    "timestamp":
-        "2000-12-17T02:25:00Z",
+        with open(
+            file_path,
+            "r",
+            encoding="utf-8"
+        ) as file:
 
-    "window": {
-        "start":
-            "2000-12-17T02:25:00Z",
+            return json.load(
+                file
+            )
 
-        "end":
-            "2000-12-17T02:30:00Z",
-    },
 
-    "domain":
-        "CYBERSECURITY",
+    # ============================================================
+    # Load schema
+    # ============================================================
 
-    "event_type":
-        "SSH_BEHAVIOR_ASSESSMENT",
+    schema = load_json(
+        SCHEMA_FILE
+    )
 
-    "source": {
-        "component":
-            "ssh_detector",
 
-        "component_version":
+    validator = Draft202012Validator(
+        schema,
+        format_checker=FormatChecker()
+    )
+
+
+    # ============================================================
+    # Representative normalized SSH event
+    #
+    # This represents output AFTER the SSH adapter but BEFORE
+    # topology mapping.
+    # ============================================================
+
+    normalized_event = {
+
+        "event_id":
+            "EVT-SSH-MAP-TEST-001",
+
+        "schema_version":
             "1.0",
 
-        "model_name":
-            "SSH_HYBRID_V1",
-    },
+        "timestamp":
+            "2000-12-17T02:25:00Z",
 
-    "entities": {
-        "person_id":
-            None,
+        "window": {
+            "start":
+                "2000-12-17T02:25:00Z",
 
-        "source_ip":
-            "203.0.113.20",
+            "end":
+                "2000-12-17T02:30:00Z",
+        },
 
-        "asset_id":
-            None,
+        "domain":
+            "CYBERSECURITY",
 
-        "server_id":
-            None,
+        "event_type":
+            "SSH_BEHAVIOR_ASSESSMENT",
 
-        "camera_id":
-            None,
+        "source": {
+            "component":
+                "ssh_detector",
 
-        "sensor_id":
-            None,
+            "component_version":
+                "1.0",
 
-        "equipment_id":
-            None,
-    },
+            "model_name":
+                "SSH_HYBRID_V1",
+        },
 
-    "location": {
-        "data_center_id":
-            None,
+        "entities": {
+            "person_id":
+                None,
 
-        "zone_id":
-            None,
+            "source_ip":
+                "203.0.113.20",
 
-        "rack_id":
-            None,
+            "asset_id":
+                None,
 
-        "access_point_id":
-            None,
-    },
+            "server_id":
+                None,
 
-    "assessment": {
-        "state":
-            "HIGH_CONFIDENCE_ANOMALY",
+            "camera_id":
+                None,
 
-        "confidence":
-            "MEDIUM",
+            "sensor_id":
+                None,
 
-        "score":
-            None,
+            "equipment_id":
+                None,
+        },
 
-        "anomaly_detected":
-            True,
-    },
+        "location": {
+            "data_center_id":
+                None,
 
-    "evidence": {
-        "detector_votes":
-            2,
+            "zone_id":
+                None,
 
-        "detector_combination":
-            "RULE+AE",
-    },
+            "rack_id":
+                None,
 
-    "provenance": {
-        "source_type":
-            "CONTROLLED_TEST",
+            "access_point_id":
+                None,
+        },
 
-        "dataset_name":
-            "DC-Guardian Mapper Test",
+        "assessment": {
+            "state":
+                "HIGH_CONFIDENCE_ANOMALY",
 
-        "original_event_id":
-            None,
+            "confidence":
+                "MEDIUM",
 
-        "synthetic_mapping":
-            False,
+            "score":
+                None,
 
-        "mapping_type":
-            "NONE",
+            "anomaly_detected":
+                True,
+        },
 
-        "original_timestamp":
-            None,
+        "evidence": {
+            "detector_votes":
+                2,
 
-        "scenario_id":
-            None,
-    },
-}
+            "detector_combination":
+                "RULE+AE",
+        },
+
+        "provenance": {
+            "source_type":
+                "CONTROLLED_TEST",
+
+            "dataset_name":
+                "DC-Guardian Mapper Test",
+
+            "original_event_id":
+                None,
+
+            "synthetic_mapping":
+                False,
+
+            "mapping_type":
+                "NONE",
+
+            "original_timestamp":
+                None,
+
+            "scenario_id":
+                None,
+        },
+    }
 
 
-# ============================================================
-# Validate normalized input first
-# ============================================================
+    # ============================================================
+    # Validate normalized input first
+    # ============================================================
 
-input_errors = list(
-    validator.iter_errors(
+    input_errors = list(
+        validator.iter_errors(
+            normalized_event
+        )
+    )
+
+
+    if input_errors:
+
+        raise ValueError(
+            "Normalized test event is "
+            "invalid before mapping."
+        )
+
+
+    print(
+        "\n============================================"
+    )
+
+    print(
+        "DC-GUARDIAN TOPOLOGY MAPPER TEST"
+    )
+
+    print(
+        "============================================"
+    )
+
+
+    # ============================================================
+    # Test 1 - valid mapping
+    # ============================================================
+
+    original_copy = deepcopy(
         normalized_event
     )
-)
 
 
-if input_errors:
+    mapped_event = (
+        map_ssh_event_to_scenario(
+            normalized_event,
 
-    raise ValueError(
-        "Normalized test event is "
-        "invalid before mapping."
+            scenario_id=
+                "SCENARIO-001",
+
+            scenario_timestamp=
+                "2026-09-16T14:25:00Z",
+
+            target_name=
+                "ZONE_A_SERVER",
+        )
     )
 
 
-print(
-    "\n============================================"
-)
-
-print(
-    "DC-GUARDIAN TOPOLOGY MAPPER TEST"
-)
-
-print(
-    "============================================"
-)
-
-
-# ============================================================
-# Test 1 - valid mapping
-# ============================================================
-
-original_copy = deepcopy(
-    normalized_event
-)
-
-
-mapped_event = (
-    map_ssh_event_to_scenario(
-        normalized_event,
-
-        scenario_id=
-            "SCENARIO-001",
-
-        scenario_timestamp=
-            "2026-09-16T14:25:00Z",
-
-        target_name=
-            "ZONE_A_SERVER",
+    mapped_errors = sorted(
+        validator.iter_errors(
+            mapped_event
+        ),
+        key=lambda error: list(
+            error.absolute_path
+        )
     )
-)
 
 
-mapped_errors = sorted(
-    validator.iter_errors(
-        mapped_event
-    ),
-    key=lambda error: list(
-        error.absolute_path
+    if mapped_errors:
+
+        print(
+            "\nFAIL: Mapped event does "
+            "not match event schema."
+        )
+
+        for error in mapped_errors:
+
+            location = ".".join(
+                str(item)
+                for item
+                in error.absolute_path
+            )
+
+            print(
+                f"Field: {location}"
+            )
+
+            print(
+                f"Error: {error.message}"
+            )
+
+        raise SystemExit(1)
+
+
+    # ------------------------------------------------------------
+    # Expected topology
+    # ------------------------------------------------------------
+
+    assert (
+        mapped_event[
+            "entities"
+        ][
+            "server_id"
+        ]
+        == "SRV-A1-01"
     )
-)
 
 
-if mapped_errors:
+    assert (
+        mapped_event[
+            "entities"
+        ][
+            "asset_id"
+        ]
+        == "SRV-A1-01"
+    )
+
+
+    assert (
+        mapped_event[
+            "location"
+        ][
+            "rack_id"
+        ]
+        == "RACK-A1"
+    )
+
+
+    assert (
+        mapped_event[
+            "location"
+        ][
+            "zone_id"
+        ]
+        == "ZONE-A"
+    )
+
+
+    assert (
+        mapped_event[
+            "location"
+        ][
+            "data_center_id"
+        ]
+        == "DC-01"
+    )
+
+
+    # ------------------------------------------------------------
+    # Expected scenario time
+    # ------------------------------------------------------------
+
+    assert (
+        mapped_event[
+            "timestamp"
+        ]
+        == "2026-09-16T14:25:00Z"
+    )
+
+
+    assert (
+        mapped_event[
+            "window"
+        ][
+            "end"
+        ]
+        == "2026-09-16T14:30:00Z"
+    )
+
+
+    # ------------------------------------------------------------
+    # Expected provenance
+    # ------------------------------------------------------------
+
+    assert (
+        mapped_event[
+            "provenance"
+        ][
+            "synthetic_mapping"
+        ]
+        is True
+    )
+
+
+    assert (
+        mapped_event[
+            "provenance"
+        ][
+            "mapping_type"
+        ]
+        == "SYNTHETIC_SCENARIO"
+    )
+
+
+    assert (
+        mapped_event[
+            "provenance"
+        ][
+            "scenario_id"
+        ]
+        == "SCENARIO-001"
+    )
+
+
+    assert (
+        mapped_event[
+            "provenance"
+        ][
+            "original_event_id"
+        ]
+        == "EVT-SSH-MAP-TEST-001"
+    )
+
+
+    assert (
+        mapped_event[
+            "provenance"
+        ][
+            "original_timestamp"
+        ]
+        == "2000-12-17T02:25:00Z"
+    )
+
+
+    # ------------------------------------------------------------
+    # Critical:
+    # original normalized event must remain unchanged.
+    # ------------------------------------------------------------
+
+    assert (
+        normalized_event
+        == original_copy
+    )
+
 
     print(
-        "\nFAIL: Mapped event does "
-        "not match event schema."
+        "\nPASS: Valid SSH scenario "
+        "mapping accepted."
     )
 
-    for error in mapped_errors:
+    print(
+        "PASS: Server -> rack -> zone -> "
+        "data center relationship verified."
+    )
 
-        location = ".".join(
-            str(item)
-            for item
-            in error.absolute_path
+    print(
+        "PASS: 2026 synthetic scenario "
+        "timestamp applied."
+    )
+
+    print(
+        "PASS: Original event timestamp "
+        "and event ID preserved."
+    )
+
+    print(
+        "PASS: Original normalized event "
+        "was not modified."
+    )
+
+    print(
+        "PASS: Mapped event matches "
+        "Common Event Schema v1.0."
+    )
+
+
+    # ============================================================
+    # Test 2 - invalid topology relationship
+    # ============================================================
+
+    topology = load_json(
+        TOPOLOGY_FILE
+    )
+
+
+    server_index = (
+        build_server_index(
+            topology
+        )
+    )
+
+
+    invalid_target = {
+        "server_id":
+            "SRV-A1-01",
+
+        "rack_id":
+            "RACK-B1",
+
+        "zone_id":
+            "ZONE-B",
+    }
+
+
+    invalid_rejected = False
+
+
+    try:
+
+        validate_target_mapping(
+            invalid_target,
+            server_index,
+            "DC-01"
+        )
+
+    except ValueError as error:
+
+        invalid_rejected = True
+
+        print(
+            "\nPASS: Invalid topology "
+            "mapping rejected."
         )
 
         print(
-            f"Field: {location}"
+            "  Rejection reason:"
         )
 
         print(
-            f"Error: {error.message}"
+            f"  {error}"
         )
 
-    raise SystemExit(1)
+
+    if not invalid_rejected:
+
+        raise AssertionError(
+            "Invalid topology mapping "
+            "was incorrectly accepted."
+        )
 
 
-# ------------------------------------------------------------
-# Expected topology
-# ------------------------------------------------------------
+    # ============================================================
+    # Test 3 - prevent accidental remapping
+    # ============================================================
 
-assert (
-    mapped_event[
-        "entities"
-    ][
-        "server_id"
-    ]
-    == "SRV-A1-01"
-)
+    remapping_rejected = False
 
 
-assert (
-    mapped_event[
-        "entities"
-    ][
-        "asset_id"
-    ]
-    == "SRV-A1-01"
-)
+    try:
+
+        map_ssh_event_to_scenario(
+            mapped_event,
+
+            scenario_id=
+                "SCENARIO-002",
+
+            scenario_timestamp=
+                "2026-09-16T15:00:00Z",
+
+            target_name=
+                "ZONE_B_CRITICAL_SERVER",
+        )
+
+    except ValueError as error:
+
+        remapping_rejected = True
+
+        print(
+            "\nPASS: Already mapped event "
+            "cannot be remapped."
+        )
+
+        print(
+            f"  Rejection reason: {error}"
+        )
 
 
-assert (
-    mapped_event[
-        "location"
-    ][
-        "rack_id"
-    ]
-    == "RACK-A1"
-)
+    if not remapping_rejected:
+
+        raise AssertionError(
+            "Already mapped event "
+            "was incorrectly remapped."
+        )
 
 
-assert (
-    mapped_event[
-        "location"
-    ][
-        "zone_id"
-    ]
-    == "ZONE-A"
-)
-
-
-assert (
-    mapped_event[
-        "location"
-    ][
-        "data_center_id"
-    ]
-    == "DC-01"
-)
-
-
-# ------------------------------------------------------------
-# Expected scenario time
-# ------------------------------------------------------------
-
-assert (
-    mapped_event[
-        "timestamp"
-    ]
-    == "2026-09-16T14:25:00Z"
-)
-
-
-assert (
-    mapped_event[
-        "window"
-    ][
-        "end"
-    ]
-    == "2026-09-16T14:30:00Z"
-)
-
-
-# ------------------------------------------------------------
-# Expected provenance
-# ------------------------------------------------------------
-
-assert (
-    mapped_event[
-        "provenance"
-    ][
-        "synthetic_mapping"
-    ]
-    is True
-)
-
-
-assert (
-    mapped_event[
-        "provenance"
-    ][
-        "mapping_type"
-    ]
-    == "SYNTHETIC_SCENARIO"
-)
-
-
-assert (
-    mapped_event[
-        "provenance"
-    ][
-        "scenario_id"
-    ]
-    == "SCENARIO-001"
-)
-
-
-assert (
-    mapped_event[
-        "provenance"
-    ][
-        "original_event_id"
-    ]
-    == "EVT-SSH-MAP-TEST-001"
-)
-
-
-assert (
-    mapped_event[
-        "provenance"
-    ][
-        "original_timestamp"
-    ]
-    == "2000-12-17T02:25:00Z"
-)
-
-
-# ------------------------------------------------------------
-# Critical:
-# original normalized event must remain unchanged.
-# ------------------------------------------------------------
-
-assert (
-    normalized_event
-    == original_copy
-)
-
-
-print(
-    "\nPASS: Valid SSH scenario "
-    "mapping accepted."
-)
-
-print(
-    "PASS: Server -> rack -> zone -> "
-    "data center relationship verified."
-)
-
-print(
-    "PASS: 2026 synthetic scenario "
-    "timestamp applied."
-)
-
-print(
-    "PASS: Original event timestamp "
-    "and event ID preserved."
-)
-
-print(
-    "PASS: Original normalized event "
-    "was not modified."
-)
-
-print(
-    "PASS: Mapped event matches "
-    "Common Event Schema v1.0."
-)
-
-
-# ============================================================
-# Test 2 - invalid topology relationship
-# ============================================================
-
-topology = load_json(
-    TOPOLOGY_FILE
-)
-
-
-server_index = (
-    build_server_index(
-        topology
-    )
-)
-
-
-invalid_target = {
-    "server_id":
-        "SRV-A1-01",
-
-    "rack_id":
-        "RACK-B1",
-
-    "zone_id":
-        "ZONE-B",
-}
-
-
-invalid_rejected = False
-
-
-try:
-
-    validate_target_mapping(
-        invalid_target,
-        server_index,
-        "DC-01"
-    )
-
-except ValueError as error:
-
-    invalid_rejected = True
+    # ============================================================
+    # Final result
+    # ============================================================
 
     print(
-        "\nPASS: Invalid topology "
-        "mapping rejected."
+        "\n============================================"
     )
 
     print(
-        "  Rejection reason:"
+        "TOPOLOGY MAPPER TEST SUMMARY"
     )
 
     print(
-        f"  {error}"
+        "============================================"
     )
 
-
-if not invalid_rejected:
-
-    raise AssertionError(
-        "Invalid topology mapping "
-        "was incorrectly accepted."
-    )
-
-
-# ============================================================
-# Test 3 - prevent accidental remapping
-# ============================================================
-
-remapping_rejected = False
-
-
-try:
-
-    map_ssh_event_to_scenario(
-        mapped_event,
-
-        scenario_id=
-            "SCENARIO-002",
-
-        scenario_timestamp=
-            "2026-09-16T15:00:00Z",
-
-        target_name=
-            "ZONE_B_CRITICAL_SERVER",
-    )
-
-except ValueError as error:
-
-    remapping_rejected = True
 
     print(
-        "\nPASS: Already mapped event "
-        "cannot be remapped."
+        "PASS: Valid topology mapping"
     )
 
     print(
-        f"  Rejection reason: {error}"
+        "PASS: Invalid topology rejection"
+    )
+
+    print(
+        "PASS: Remapping protection"
+    )
+
+    print(
+        "PASS: Provenance preservation"
+    )
+
+    print(
+        "PASS: Common-schema validation"
     )
 
 
-if not remapping_rejected:
+    print(
+        "\n============================================"
+    )
 
-    raise AssertionError(
-        "Already mapped event "
-        "was incorrectly remapped."
+    print(
+        "DC-GUARDIAN TOPOLOGY MAPPER PASSED"
+    )
+
+    print(
+        "============================================"
     )
 
 
-# ============================================================
-# Final result
-# ============================================================
-
-print(
-    "\n============================================"
-)
-
-print(
-    "TOPOLOGY MAPPER TEST SUMMARY"
-)
-
-print(
-    "============================================"
-)
-
-
-print(
-    "PASS: Valid topology mapping"
-)
-
-print(
-    "PASS: Invalid topology rejection"
-)
-
-print(
-    "PASS: Remapping protection"
-)
-
-print(
-    "PASS: Provenance preservation"
-)
-
-print(
-    "PASS: Common-schema validation"
-)
-
-
-print(
-    "\n============================================"
-)
-
-print(
-    "DC-GUARDIAN TOPOLOGY MAPPER PASSED"
-)
-
-print(
-    "============================================"
-)
+if __name__ == "__main__":
+    test_topology_mapper_contract()

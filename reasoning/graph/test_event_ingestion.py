@@ -7,7 +7,7 @@ with the same 15 checks; the contract's nodes are removed afterwards.
 """
 import pytest
 
-from conftest import cleanup_graph, single
+from graph_test_support import cleanup_graph, single
 from ingest_event import ingest_ssh_event
 from ssh_event_adapter import adapt_ssh_assessment
 from topology_mapper import map_ssh_event_to_scenario
