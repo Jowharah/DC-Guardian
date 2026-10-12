@@ -6,6 +6,16 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — RAG retrieval re-evaluation (all four experiments)
+
+- **Why:** the Response document still reported the retrieval experiments on the 260-chunk corpus from before the CFR section fix; only the abstention configuration had been re-run.
+- **What:** all four configurations (raw, diverse, controlled, controlled + abstention) re-run on the 255-chunk index with the same 18 frozen cases; `docs/DC_Guardian_Response_Architecture_and_Validation.md` now carries a dated re-evaluation table beside the original, and the updated chunk counts.
+- **Result (selected controlled policy):** Recall@3 90.2% → 96.1%, Precision@3 65.7% → 71.6%, MRR 0.873 → 0.971; Hit Rate@3 100%; filter and provenance 100%. Controlled diversity remains the best trade-off; abstention remains experimental (MRR 0.618).
+- **Weak cases:** heat + drive-risk with three expected sources (Recall@3 0.33); one physical-access case ranks the right source second; the no-source case still needs the eligibility check.
+- **Verified:** `verify_response_rag.py` reports 13 sources and 255 chunks; all RAG checks pass.
+
+---
+
 ## 2026-10-12 — Claim checker measured on live answers
 
 - **Method:**
