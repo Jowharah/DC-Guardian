@@ -6,6 +6,16 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Investigator instructions: presence and causation (measured, no effect)
+
+- **What:** the Investigator instructions now give exact wording for presence ("recognized in an image from a camera declared in ZONE-X"; never present, standing, inside or on site; no room names the context lacks). They forbid stating causes ("model assessed elevated failure risk; reported SMART values include …", never "failing because of"), and say temperature, cooling and HVAC causes were not assessed.
+- **Test:** 20 new questions (`ROUND2` in `claim_check_collect.py`) asked with the old instructions and again with the new ones (the backend restart was confirmed by process start time). The 40 answers were shuffled under neutral IDs and labelled blind; the key was opened only afterwards. Summary in `claim_check_labels.json` (`round2`).
+- **Result:** answers with an overclaim 2/20 before, 3/20 after (presence 0→1, causation 1→1, vest "not worn" 1→1); factual errors 3→1. No measurable improvement. The wording got more precise, but overclaims persist at roughly 10–15% of tempting questions.
+- **Decision:** keep the instructions (more precise, no harm) and record that they are not a control. Next: a post-generation check, measured on new questions.
+- **Verified:** backend pytest 394 passed. Live calls: 40, operator-approved.
+
+---
+
 ## 2026-10-12 — Open a listed record in the Monitoring Center
 
 - **Why (operator request):** Analytics drill-down lists and Review Queue items showed record IDs, but the only way to reach the record was a generic "Open Monitoring Center" button and a search through the feed.

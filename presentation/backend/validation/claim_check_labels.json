@@ -223,5 +223,29 @@
       "state": false,
       "other": null
     }
+  },
+  "round2": {
+    "_about": "Instruction-change test (2026-10-12): the ROUND2 questions were asked with the old and the new Investigator instructions; all 40 answers were shuffled under neutral IDs and labelled blind to the condition; the key was opened afterwards.",
+    "before": {
+      "answers": 20,
+      "with_overclaim": 2,
+      "presence": 0,
+      "causation": 1,
+      "absence": 1,
+      "other_errors": 3
+    },
+    "after": {
+      "answers": 20,
+      "with_overclaim": 3,
+      "presence": 1,
+      "causation": 1,
+      "absence": 1,
+      "other_errors": 1
+    },
+    "categories": {
+      "presence": "person stated as present/in a place",
+      "causation": "cause stated as fact (incl. why a model decided)",
+      "absence": "PPE stated as not worn rather than not detected"
+    }
   }
 }
