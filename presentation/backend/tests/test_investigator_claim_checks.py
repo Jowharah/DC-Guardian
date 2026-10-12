@@ -58,3 +58,13 @@ def test_every_mode_returns_claim_checks(monkeypatch):
         "human_review": None, "restrictions": {}})
     result = chat.ask_single_evidence("ssh", "S1", chat.InvestigatorQuestion(question="Is this benign?"), admin)
     assert result["claim_checks"]["status"] == "MISMATCH"
+
+
+def test_per_person_ppe_statuses_are_not_mismatches():
+    """Live run 2026-10-12: one worker compliant, one not; overall NON_COMPLIANT."""
+    record = ("ppe", "P2", {"overall_status": "NON_COMPLIANT", "human_review": None, "people": [
+        {"person_index": 0, "status": "COMPLIANT"}, {"person_index": 1, "status": "NON_COMPLIANT"}]})
+    answer = "Person 0 compliance status: COMPLIANT. Missing PPE: None. Person 1 is non-compliant: missing safety vest."
+    result = claim_checks(answer, [record])
+    assert result["status"] == "NO_RECOGNIZED_PROBLEM", result["checks"]
+    assert result["summary"]["state_matches"] == 2

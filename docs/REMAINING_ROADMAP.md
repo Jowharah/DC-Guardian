@@ -33,7 +33,7 @@ Keep every existing check; reorganize them. Tracked with status in [Work Log —
 Done since 2026-10-11: live specialist check, single-event specialists, API access matrix and policy decisions, Investigator claim checks / privacy / pseudonyms / call audit, external audit checkpoints, accessibility scan, `main` branch protection with required CI.
 
 1. **Independent labelling round** (pack in `reasoning/uncertainty/labelling/pack/`): teammates label; then re-run `evaluate.py` and `decision_v2_validation.py`. Validates both the Bayesian study and the Decision v2 group rule. Consider a severity column to validate MEDIUM vs LOW.
-2. **First live runs** (operator consent, sends Evidence to OpenAI): a single-event specialist and Investigator questions, to check pseudonyms, claim checks and the call audit on real answers; then measure the claim checker (precision/recall) on a set of real answers.
+2. ~~First live runs~~ (done 2026-10-12; found and fixed three issues). Follow-ups: **safety knowledge-base review** (OSHA 1910.135 chunk mis-parsed, too little PPE guidance, so the PPE specialist cannot ground its answer); measure the claim checker on a larger set of real answers.
 3. **Review lifecycle** (needs an operator policy): investigation states (e.g. open, in review, resolved), who may close and reopen, and how it relates to verdicts and Decisions.
 4. **Testing plan item 5:** convert the remaining script tests to pytest after the group reviews the pilot.
 5. **Operations routines:** where and how often audit checkpoints are written; backup and recovery of the SQLite store and Neo4j; manual keyboard / screen-reader review.

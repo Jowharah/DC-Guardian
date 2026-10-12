@@ -150,6 +150,11 @@ def single_evidence_context(kind:str,evidence_id:str,principal:Principal=Depends
       "environment":("event_id","zone_id","sensor_id","assessment"),
     }[kind]
     selected={key:record[key] for key in allowed if key in record}
+    if kind=="face":
+        # Zone authorization from the controlled access graph, as unified and pair
+        # contexts already include; without it the Investigator cannot say whether
+        # a recognized person was allowed in the zone (live run 2026-10-12).
+        selected["zone_authorization"]=face_image_validation.face_authorization(evidence_id,principal)
     from presentation.backend.app.evidence_review import summary
     return {"kind":kind,"evidence_id":evidence_id,"zone_id":zone,
             "source_assessment":selected,"human_review":summary(kind,evidence_id),
