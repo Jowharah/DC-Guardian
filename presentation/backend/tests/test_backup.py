@@ -60,3 +60,12 @@ def test_unreachable_neo4j_is_recorded_not_fatal(live_data, tmp_path_factory, mo
     folder, manifest = backup.create(tmp_path_factory.mktemp("offsite"))
     assert manifest["graph"].startswith("NOT_EXPORTED")
     assert json.loads((folder / "manifest.json").read_text(encoding="utf-8"))["version"] == backup.VERSION
+
+
+def test_backup_folder_setting_gives_default_locations(monkeypatch, tmp_path_factory):
+    base = tmp_path_factory.mktemp("DC-Guardian Backup")
+    monkeypatch.setenv("DCG_BACKUP_DIR", str(base))
+    assert backup.default_dir("backups") == str(base / "backups")
+    assert backup.default_dir("checkpoints") == str(base / "checkpoints")
+    monkeypatch.setenv("DCG_BACKUP_DIR", "")
+    assert backup.default_dir("backups") is None

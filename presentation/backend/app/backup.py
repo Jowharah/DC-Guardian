@@ -39,6 +39,13 @@ from presentation.backend.app.incident_store import _db_path
 VERSION = "DCG-BACKUP-v1"
 
 
+def default_dir(sub):
+    """<DCG_BACKUP_DIR>/<sub> when the operator has set a backup folder, else None."""
+    from presentation.backend.app.authentication import local_setting
+    base = local_setting("DCG_BACKUP_DIR")
+    return str(Path(base) / sub) if base else None
+
+
 def sha256(path):
     digest = hashlib.sha256()
     with open(path, "rb") as handle:
@@ -165,13 +172,16 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="DC-GUARDIAN local backup and restore check")
     sub = parser.add_subparsers(dest="command", required=True)
     c = sub.add_parser("create")
-    c.add_argument("--out-dir", required=True)
+    c.add_argument("--out-dir", default=default_dir("backups"),
+                   help="default: <DCG_BACKUP_DIR>/backups")
     c.add_argument("--state", help="ingestion_state.sqlite3 to include")
     c.add_argument("--no-graph", action="store_true", help="skip the Neo4j export")
     v = sub.add_parser("verify")
     v.add_argument("--backup", required=True)
     args = parser.parse_args(argv)
     if args.command == "create":
+        if not args.out_dir:
+            parser.error("give --out-dir or set DCG_BACKUP_DIR")
         folder, manifest = create(args.out_dir, args.state, not args.no_graph)
         print(f"Backup written: {folder}")
         print(json.dumps({"tables": len(manifest["tables"]), "graph": manifest["graph"],
