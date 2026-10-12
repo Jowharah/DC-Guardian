@@ -6,6 +6,12 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-12 — Development workflow guide
+
+- **What:** `docs/DEVELOPMENT_WORKFLOW.md`: the pull-request workflow, the `main` ruleset and why each setting, the two CI jobs and how to read a failure, the GitHub CLI install and login, and the Kaspersky certificate fix for Node tools (`claude rc`, Playwright). Linked from `docs/README.md` and `CLAUDE.md`.
+
+---
+
 ## 2026-10-12 — `main` branch protection and GitHub CLI
 
 - **What:** the operator created a repository ruleset on `main`: block deletion and force pushes; require a pull request (0 approvals, merge commits only); require both CI jobs to pass with the branch up to date. GitHub CLI 2.102.0 installed (portable, user folder, checksum-verified) and signed in, so pull requests are opened with `gh pr create`.
