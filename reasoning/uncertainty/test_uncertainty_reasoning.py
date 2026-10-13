@@ -221,6 +221,14 @@ def test_committed_evaluation_report_is_current():
     assert committed["knowledge_base_version"] == KB["knowledge_base_version"]
 
 
+def test_committed_v2_evaluation_reports_are_current():
+    for name in ("v2", "v2-chatgpt"):
+        path, suffix, _ = evaluate.SCENARIO_SETS[name]
+        committed = json.loads((evaluate.RESULTS_DIR / f"evaluation_results{suffix}.json").read_text(encoding="utf-8"))
+        fresh = json.loads(json.dumps(evaluate.evaluate(path)))
+        assert committed["results"] == fresh["results"], f"Re-run evaluate.py --set {name} and commit the results."
+
+
 def test_evaluation_does_not_modify_the_knowledge_base():
     before = copy.deepcopy(KB)
     evaluate.evaluate()

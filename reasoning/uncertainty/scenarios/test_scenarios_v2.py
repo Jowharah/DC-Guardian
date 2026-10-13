@@ -65,9 +65,18 @@ def test_every_v2_environmental_state_is_what_the_detector_says_for_its_reading(
 
 
 def test_committed_files_are_current():
-    before = {p: _text(p) for p in (v2.V2_PATH, v2.EXTENDED_PATH)}
+    before = {p: _text(p) for p in (v2.V2_PATH, v2.V2_CHATGPT_PATH, v2.EXTENDED_PATH)}
     v2.build()
     assert before == {p: _text(p) for p in before}, "Run build_scenarios_v2.py and commit the result."
+
+
+def test_chatgpt_sensitivity_set_differs_from_v2_only_in_labels():
+    strip = lambda s: {**s, "label_status": None,
+                       "events": [{k: v for k, v in e.items() if k != "ground_truth_incident"} for e in s["events"]]}
+    operator, chatgpt = _load(v2.V2_PATH), _load(v2.V2_CHATGPT_PATH)
+    assert [strip(s) for s in operator] == [strip(s) for s in chatgpt]
+    assert {s["label_status"] for s in chatgpt} == {v2.CHATGPT}
+    assert all("ground_truth_incident" in e for s in chatgpt for e in s["events"])
 
 
 def test_v1_is_unchanged():

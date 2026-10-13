@@ -32,7 +32,7 @@ Keep every existing check; reorganize them. Tracked with status in [Work Log —
 
 Done since 2026-10-11: live specialist check, single-event specialists, API access matrix and policy decisions, Investigator claim checks / privacy / pseudonyms / call audit, external audit checkpoints, accessibility scan, `main` branch protection with required CI.
 
-1. **Independent labelling round** (pack in `reasoning/uncertainty/labelling/pack/`): teammates label; then re-run `evaluate.py` and `decision_v2_validation.py`. Validates both the Bayesian study and the Decision v2 group rule. Consider a severity column to validate MEDIUM vs LOW.
+1. **Independent labelling round** (pack in `reasoning/uncertainty/labelling/pack/`; prefer `pack_v2/`, whose alerts the detectors can actually produce, scored with `score_labels.py --pack v2`): teammates label; then re-run `evaluate.py` and `decision_v2_validation.py`. Validates both the Bayesian study and the Decision v2 group rule. Consider a severity column to validate MEDIUM vs LOW.
 2. ~~First live runs~~ (done 2026-10-12; found and fixed three issues). Safety knowledge fixed 2026-10-12 (CFR section boundaries; PPE specialist now grounded). Abstention recalibrated (threshold unchanged). Claim checker measured 2026-10-12: holdout recall 0/3, no false alarms. Instruction tightening tested 2026-10-12 (blind before/after): no measurable effect (2/20 vs 3/20). Model judge added 2026-10-12 (post-generation): 4/5 overclaims caught on blind test answers, 1 false alarm in 35. Next: teammates label a fresh answer set to confirm with independent labels.
 3. ~~Review lifecycle~~ (done 2026-10-12, default policy `DCG-LIFECYCLE-v1`, operator-adjustable): open → in review → resolved, reopen; automatic reopen when Evidence or verdicts change; hash-chained.
 4. ~~Testing plan item 5~~ (done 2026-10-12: every test under pytest, equivalence shown; see [Testing](TESTING.md)). Optional: split the 55 module-level files into one test per check.
@@ -41,9 +41,10 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
 7. ~~Baseline comparison and latency~~ (done 2026-10-13; [report draft](report/evaluation_baseline_and_latency.md)):
    - correlation against isolated single-domain monitoring on the held-out scenarios: fewer alerts, higher queue average precision, incidents shown whole;
    - per-stage latency: detector start-up dominates, about 4 to 10 s per upload.
-8. **Scenario set v2 relabelling** (2026-10-13; before item 9, because it changes the baseline numbers). The 8 scenarios that used leak, smoke, airflow or cooling states the detector cannot produce were rewritten with detector-derived readings.
-   - Waiting on the operator: a full blind relabel of all 40 v2 scenarios (`reasoning/uncertainty/labelling/pack_v2/`, 85 pairs), then the ChatGPT comparison labels on the same pack. These are same-author labels, not independent ones.
-   - Then: re-run the uncertainty evaluation and the baseline comparison on v2, and report v1 and v2 side by side.
+8. ~~Scenario set v2 relabelling~~ (done 2026-10-13). The 8 scenarios that used leak, smoke, airflow or cooling states the detector cannot produce were rewritten with detector-derived readings; all 40 were relabelled blind by the operator, with ChatGPT's labels of the same pack as a sensitivity check ([results](UNCERTAINTY_REASONING.md#results-on-scenario-set-v2-2026-10-13)).
+   - Correlation beats isolated single-domain monitoring under every labelling.
+   - The Bayesian advantage over the crisp rule is no longer statistically clear on v2 (interval includes zero).
+   - The labellings disagree mainly on whether heat or humidity plus a drive at risk is one incident: item 1 (independent human labels) should settle it.
 9. **Model enhancement and workflow optimisation** (proposal "optimization", operator interpretation 2026-10-13): new detector versions beside the frozen ones, selected on validation data and evaluated once on the locked test (PPE first: recall 0.52); a persistent inference worker to remove per-upload model loading.
 
 ## Acceptance rules

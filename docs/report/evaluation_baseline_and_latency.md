@@ -1,6 +1,6 @@
 # Evaluation against single-domain monitoring, and pipeline latency
 
-*Draft report section (2026-10-13). Generated results: `presentation/backend/validation/results/baseline_comparison.md` and `latency_benchmark.md`; reproduce with the scripts of the same name.*
+*Draft report section (2026-10-13). Generated results: `presentation/backend/validation/results/baseline_comparison.md` (v1), `baseline_comparison_v2.md` and `baseline_comparison_v2_chatgpt.md` (scenario set v2), and `latency_benchmark.md`; reproduce with the scripts of the same name.*
 
 ## 1. Does correlation improve on isolated single-domain monitoring?
 
@@ -37,11 +37,29 @@ The proposal asks whether combining multi-domain Evidence with graph context and
   - average precision rises from 0.67 to 0.71;
   - 9 of 13 incidents appear whole.
 
-**Scenario set.** These figures use scenario set v1. Eight of its 40 scenarios (five in the test split) include leak, smoke, airflow or cooling alerts that the prototype's environmental detector cannot produce. Scenario set v2 replaces them with the temperature or humidity readings the detector would give, and all 40 v2 scenarios are being relabelled blind from events alone. This is still the same author, so the labels are not independent. Heat or humidity alone is more ambiguous than a leak or smoke alarm, so the v2 figures may be lower. They will be reported beside these, and the 8 original scenarios will be reported separately as evidence of what extra sensors would add.
+**Scenario set.** The figures above use scenario set v1. Eight of its 40 scenarios (five in the test split) include leak, smoke, airflow or cooling alerts that the prototype's environmental detector cannot produce. Scenario set v2 replaces them with the temperature or humidity readings the detector would give. All 40 v2 scenarios were relabelled blind from events alone, by the same author (so the labels are still not independent) and, as a sensitivity check, by ChatGPT on the same pack. The 8 original scenarios are kept apart as evidence of what extra sensors would add.
+
+**The same comparison on v2 (held-out test split).** Reproduce with `baseline_comparison.py --set v2` and `--set v2-chatgpt`.
+
+| Measure | v1, author labels | v2, author blind relabel | v2, ChatGPT labels |
+|---|---|---|---|
+| Labelled incidents | 18 | 18 | 9 |
+| Alerts shown, isolated → DC-GUARDIAN | 65 → 44 | 65 → 44 | 65 → 44 |
+| Alerts with no incident event | 23 → 16 | 25 → 21 | 45 → 34 |
+| Incidents shown whole in one alert | 0 → 11 | 0 → 14 | 0 → 8 |
+| Share of top-severity alerts that are incidents | 64% → 86% | 77% → 100% | 50% → 86% |
+| Average precision of the review queue | 0.66 → 0.74 | 0.73 → 0.81 | 0.48 → 0.75 |
+| Difference in average precision (95% CI) | +0.02 to +0.18 | +0.02 to +0.19 | +0.10 to +0.50 |
+| Alerts reviewed until every incident event seen | 64.5 → 43.4 | 64.2 → 42.2 | 61.5 → 32.8 |
+
+- **The conclusion holds under all three labellings:** fewer alerts, more incidents shown whole, a cleaner top severity level, and an average-precision gain whose interval excludes zero.
+- **The size of the gain depends on who labels.** The two v2 labellings agree on 73% of pairs (Cohen's kappa 0.46). ChatGPT marks half as many pairs related, mainly because it does not count heat or humidity followed by a drive at risk as one incident, so many more isolated alerts become noise and the gain looks larger.
+- **Not independent:** the v2 author labels were written after discussing how the system links events, and ChatGPT is a language model's second opinion. Independent human labels are still the main missing evidence.
+- **Correlation method:** under the v2 labels the Bayesian model's advantage over the crisp rule is no longer statistically clear (see `docs/UNCERTAINTY_REASONING.md`). The comparison here uses the crisp rule, as the live system does.
 
 **Limits.**
 - **Synthetic data:** the scenarios and topology are synthetic.
-- **Author labels:** the relatedness labels, the scenarios and the known-mechanism list all come from the same author. An independent labelling round is pending.
+- **Author labels:** the relatedness labels, the scenarios and the known-mechanism list all come from the same author. ChatGPT's labels on v2 are a second opinion, not independent validation; an independent human labelling round is pending.
 - **No severity labels:** the scenarios have no severity labels, so this tests ranking, not whether each level is right.
 - **The baseline is DC-GUARDIAN's own single-event policy, not a commercial tool:** the result measures the value added by correlation.
 - **Response recommendations are not covered:** they need a user evaluation.
