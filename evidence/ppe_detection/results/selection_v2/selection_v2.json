@@ -1,0 +1,114 @@
+{
+  "rule": "(declared 2026-10-13, committed before any v2 candidate was trained):\n1. Every trained candidate and the frozen PPE-v1 model are scored on the same\n   810 validation images, each at its own training image size.\n2. Criterion: mean mAP@0.5 of the two classes the compliance policy requires\n   (helmet, safety-vest). Overall mAP@0.5 and recall are reported, not used.\n3. A candidate within 0.01 of the best score loses to a smaller (faster) one.\n4. The winner is copied to models/ppe_yolov8_v2_best.pt with its metadata.\n   Only then is the locked test run, once (evaluate_final_test_v2.py).\n   If no candidate beats PPE-v1 on the criterion, nothing is selected.",
+  "validation_images": 810,
+  "results": {
+    "PPE-v1 (frozen)": {
+      "architecture": "yolov8n",
+      "image_size": 640,
+      "criterion_required_map50": 0.5687,
+      "overall": {
+        "precision": 0.6848,
+        "recall": 0.5212,
+        "map50": 0.5696,
+        "map50_95": 0.3526
+      },
+      "required_classes": {
+        "helmet": {
+          "precision": 0.7962,
+          "recall": 0.5395,
+          "map50": 0.6696,
+          "map50_95": 0.4466
+        },
+        "safety-vest": {
+          "precision": 0.5638,
+          "recall": 0.4375,
+          "map50": 0.4678,
+          "map50_95": 0.2845
+        }
+      },
+      "inference_ms_per_image": 10.65
+    },
+    "v2m1024": {
+      "architecture": "yolov8m",
+      "image_size": 1024,
+      "criterion_required_map50": 0.6479,
+      "overall": {
+        "precision": 0.7975,
+        "recall": 0.6223,
+        "map50": 0.6914,
+        "map50_95": 0.4619
+      },
+      "required_classes": {
+        "helmet": {
+          "precision": 0.7491,
+          "recall": 0.5789,
+          "map50": 0.7127,
+          "map50_95": 0.4963
+        },
+        "safety-vest": {
+          "precision": 0.8208,
+          "recall": 0.4167,
+          "map50": 0.583,
+          "map50_95": 0.3781
+        }
+      },
+      "inference_ms_per_image": 13.43
+    },
+    "v2n1024": {
+      "architecture": "yolov8n",
+      "image_size": 1024,
+      "criterion_required_map50": 0.6161,
+      "overall": {
+        "precision": 0.6384,
+        "recall": 0.5706,
+        "map50": 0.6109,
+        "map50_95": 0.3831
+      },
+      "required_classes": {
+        "helmet": {
+          "precision": 0.7698,
+          "recall": 0.5658,
+          "map50": 0.7114,
+          "map50_95": 0.4791
+        },
+        "safety-vest": {
+          "precision": 0.5649,
+          "recall": 0.4583,
+          "map50": 0.5209,
+          "map50_95": 0.3114
+        }
+      },
+      "inference_ms_per_image": 10.92
+    },
+    "v2s1024": {
+      "architecture": "yolov8s",
+      "image_size": 1024,
+      "criterion_required_map50": 0.648,
+      "overall": {
+        "precision": 0.7138,
+        "recall": 0.6117,
+        "map50": 0.6594,
+        "map50_95": 0.4296
+      },
+      "required_classes": {
+        "helmet": {
+          "precision": 0.7723,
+          "recall": 0.5658,
+          "map50": 0.7134,
+          "map50_95": 0.4845
+        },
+        "safety-vest": {
+          "precision": 0.6801,
+          "recall": 0.3958,
+          "map50": 0.5825,
+          "map50_95": 0.3549
+        }
+      },
+      "inference_ms_per_image": 13.01
+    }
+  },
+  "selected": "v2s1024",
+  "locked_test_accessed": false,
+  "selected_weights": "ppe_yolov8_v2_best.pt",
+  "selected_sha256": "b1ee6e2b11369bdccc82ce2827a4c45d0a6bbf7936d5406f9438785a3d269c75"
+}

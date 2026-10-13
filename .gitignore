@@ -132,6 +132,16 @@ evidence/ppe_detection/results/training/**/weights/
 # Smoke-test model is not a final artifact
 evidence/ppe_detection/models/ppe_yolov8n_smoke.pt
 
+# PPE v2: COCO-pretrained starting weights (downloaded) and generated training images
+evidence/ppe_detection/models/pretrained/
+evidence/ppe_detection/results/training_v2/**/*.jpg
+evidence/ppe_detection/results/training_v2/**/*.png
+evidence/ppe_detection/results/training_v2/*.log
+evidence/ppe_detection/results/training_v2/**/weights/
+evidence/ppe_detection/results/selection_v2/ultralytics/
+evidence/ppe_detection/results/posthoc_v2/ultralytics/
+evidence/ppe_detection/results/final_test_v2/ultralytics_eval/*.jpg
+
 # Keep final frozen model:
 # evidence/ppe_detection/models/ppe_yolov8_best.pt
 

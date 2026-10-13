@@ -6,6 +6,47 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-13 — PPE-v2 detector candidate (roadmap item 9, model enhancement)
+
+- **Why (operator decision):** PPE-v1 had the lowest recall of the detectors (locked test 0.524; vest 0.449). It is YOLOv8n at 640 px on 2,000–6,000 px photos.
+- **Protocol:** committed before training (`de1a113`). Revised once, before any candidate result (`a448fef`): the first epoch took 7 minutes, so the protocol moved to resized 1024-px training copies, 60 epochs and 4 workers. The scripts are `evidence/ppe_detection/src/train_v2.py`, `select_v2.py` and `evaluate_final_test_v2.py`.
+  - **v1 untouched:** the v1 weights, config and metadata are never written; the training script checks their hashes before and after.
+  - **Same data:** the PPE-v1 development split. Disjointness from the locked test is asserted.
+  - **Selection:** on the original validation images; criterion = mean helmet and vest mAP@0.5; the smaller model wins within 0.01 and must beat v1.
+  - **Locked test:** run once, by a script that refuses a second run.
+- **Training (RTX 3080 Ti):**
+  - YOLOv8s at 1024 px: 1 h 41 min;
+  - YOLOv8m: 2 h 58 min;
+  - YOLOv8n: 59 min.
+- **Selection (validation), `f9f5914`:**
+  - scores: v1 0.569, YOLOv8n 0.616, **YOLOv8s 0.648**, YOLOv8m 0.648;
+  - YOLOv8s and YOLOv8m are tied within 0.01, so YOLOv8s was selected.
+  - Vest recall at the reported operating point was 19 vs 21 of 48 vests, with vest precision 0.56 → 0.68.
+- **Locked test, once (`aeb3e5f`), PPE-v1 → PPE-v2:**
+  - all classes: mAP@0.5 0.545 → 0.595, recall 0.524 → 0.535;
+  - helmet: recall 0.603 → 0.654, mAP 0.676 → 0.708;
+  - **safety vest: recall 0.449 → 0.245, mAP 0.372 → 0.317.** This is the opposite of validation. There are only 49 vests in 23 images, so the size of the difference cannot be estimated, but v2 does not fix the vest weakness.
+- **Runtime unchanged:** `ppe_config.json` (PPE-v1) still drives the pipeline; switching to v2 is the operator's decision. Missed vests turn compliant people into NON_COMPLIANT alerts.
+- **Post-hoc analysis (operator request; after selection, not used to choose):** `src/evaluate_posthoc_v2.py` → `results/posthoc_v2/`.
+  - **Setup:** the same 810 locked images and settings as the official runs. Re-scoring v1 and v2s reproduced their official mAP@0.5 exactly (0.5447, 0.5951). The v1 hashes were checked before and after, and the run-once script was not touched.
+  - **Locked test:**
+    - v2n: all-class mAP 0.578, vest recall 0.367;
+    - v2m: **all-class mAP 0.625, recall 0.612, helmet recall 0.664, vest recall 0.449 (= v1), vest mAP 0.416 (v1 0.372)**.
+  - **Combined detector not built:** it was conditional on every v2 being worse than v1 on vests, and v2m is not.
+  - **The tie-break cost vests in hindsight:** v2m beats the official v2s on the test. Choosing v2m now would be test-informed, and a clean claim needs a fresh held-out set.
+  - **Batch-size difference:** the post-hoc validation used batch 16 against batch 8 for selection, which moves validation figures by about 0.01. v2s and v2m still tie within 0.01.
+  - **Docs:** report draft `docs/report/ppe_v2_model_enhancement.md`.
+- **Tests:** `evidence/ppe_detection/tests/test_ppe_v2_artifacts.py` (4, no GPU) checks (the fourth checks that the post-hoc file is labelled and never replaces the official result):
+  - the v1 hash and config are unchanged;
+  - the recorded selection follows the rule;
+  - the locked test used the selected weights.
+- **Caveats:**
+  - one seed per candidate;
+  - small vest and helmet samples;
+  - the tie between YOLOv8s and YOLOv8m depends on the declared 0.01 margin.
+
+---
+
 ## 2026-10-13 — Scenario set v2 evaluation: operator relabel and ChatGPT sensitivity
 
 - **Why:** item 8 of the roadmap. The operator finished the blind relabel of all 40 v2 scenarios and pasted ChatGPT's labels of the same pack, so the uncertainty evaluation and the baseline comparison can be re-run on v2 beside v1.

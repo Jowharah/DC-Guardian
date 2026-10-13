@@ -43,6 +43,76 @@ Required-class results:
 
 The safety-vest result is retained transparently as part of the frozen Evidence layer baseline and is a future robustness/optimization target.
 
+## PPE-v2 candidate (2026-10-13, not used at runtime)
+
+PPE-v1 stays frozen and is still the runtime detector. PPE-v2 was trained beside it to address the low recall. The photos are 2,000–6,000 px wide, so helmets and vests are only a few pixels across at 640 px.
+
+**Protocol** (committed before training in `de1a113`; revised before any result in `a448fef`):
+- **Data:** the PPE-v1 development split (6,479 train / 810 validation).
+- **Candidates:**
+  - YOLOv8n, YOLOv8s and YOLOv8m at 1024 px (`src/train_v2.py`);
+  - 60 epochs, seed 42;
+  - training reads copies resized once to 1024 px.
+- **Selection:** on the original validation images only (`src/select_v2.py`).
+  - Criterion: the mean mAP@0.5 of helmet and safety vest.
+  - Within 0.01 of the best, the smaller model wins.
+  - The winner must beat PPE-v1.
+- **Locked test:** run once on the selected model (`src/evaluate_final_test_v2.py`, which refuses a second run).
+
+**Selection (validation, original images):**
+
+| Model | Criterion | Helmet mAP@0.5 / recall | Vest mAP@0.5 / recall |
+|---|---:|---|---|
+| PPE-v1 (YOLOv8n, 640) | 0.569 | 0.670 / 0.539 | 0.468 / 0.438 |
+| YOLOv8n, 1024 | 0.616 | 0.711 / 0.566 | 0.521 / 0.458 |
+| **YOLOv8s, 1024 (selected)** | **0.648** | 0.713 / 0.566 | 0.583 / 0.396 |
+| YOLOv8m, 1024 | 0.648 | 0.713 / 0.579 | 0.583 / 0.417 |
+
+YOLOv8s and YOLOv8m tie (0.6480 vs 0.6479), so the smaller model was selected.
+
+**Locked final test (810 images), PPE-v1 → PPE-v2:**
+
+| Classes | Precision | Recall | mAP@0.5 | mAP@0.5:0.95 |
+|---|---|---|---|---|
+| All classes | 0.689 → 0.709 | 0.524 → 0.535 | 0.545 → **0.595** | 0.336 → 0.385 |
+| Helmet (78) | 0.732 → 0.761 | 0.603 → **0.654** | 0.676 → 0.708 | 0.456 → 0.493 |
+| Safety vest (49) | 0.621 → 0.582 | 0.449 → **0.245** | 0.372 → 0.317 | 0.220 → 0.175 |
+| Person (1,351) | 0.836 → 0.861 | 0.854 → 0.856 | 0.869 → 0.893 | 0.691 → 0.692 |
+
+**Reading:**
+- **Improved:** overall detection and helmets.
+- **Vest worse:** the vest result went the opposite way to validation. About 12 of 49 vests were found against about 22 for v1, while validation favoured v2 on mAP. Both sets hold under 50 vests in about 23 images, so a swing of about 10 vests reverses the conclusion and the size of the difference cannot be estimated reliably. v2 does not fix the vest weakness.
+- **Effect on compliance:** compliance needs both items, so a missed vest makes a compliant person look NON_COMPLIANT. More vest data, or a vest-specific evaluation, is needed before relying on either model for vests.
+- **Runtime:** switching to v2 is an operator decision. Until then `ppe_config.json` (PPE-v1) is unchanged.
+
+### Post-hoc: all candidates on the locked test (after selection; not used to choose)
+
+At the operator's request, after the vest regression, the two unselected candidates were scored on the same 810 locked images with the same settings (`src/evaluate_posthoc_v2.py`, `results/posthoc_v2/`). Re-scoring v1 and v2s1024 reproduced their official results exactly (mAP@0.5 0.5447 and 0.5951). **v2s1024 remains the official PPE-v2 result.**
+
+| Locked test, post-hoc | All mAP@0.5 / recall | Helmet recall / mAP@0.5 | Vest recall / mAP@0.5 | Person mAP@0.5 |
+|---|---|---|---|---|
+| PPE-v1 (baseline) | 0.545 / 0.524 | 0.603 / 0.676 | 0.449 / 0.372 | 0.869 |
+| v2n1024 | 0.578 / 0.532 | 0.592 / 0.744 | 0.367 / 0.383 | 0.884 |
+| **v2s1024 (official)** | 0.595 / 0.535 | 0.654 / 0.708 | 0.245 / 0.317 | 0.893 |
+| v2m1024 | **0.625 / 0.612** | **0.664** / 0.739 | **0.449 / 0.416** | **0.900** |
+
+At the runtime confidence threshold (0.25), vest recall on the locked test is v1 0.449, v2n 0.367, v2s 0.327 and v2m 0.449.
+
+**Reading:**
+- **Not every v2 model is worse on vests.** YOLOv8m matches v1's vest recall and has a higher vest mAP, so the planned combined detector (v2 for helmet and person, v1 for vests) was **not built**; its condition was not met.
+- **The tie-break cost vest performance.** The selection rule broke the YOLOv8s/YOLOv8m validation tie (0.6480 vs 0.6479) in favour of the smaller model. On the locked test YOLOv8m is better on every class shown, so in hindsight the tie-break cost vest performance.
+- **YOLOv8m cannot be claimed as "the" PPE-v2.** That would be choosing on the locked test. Using YOLOv8m would be an operator decision informed by the test, and a clean claim would need a fresh held-out set.
+- **Batch-size note:** the post-hoc validation table uses batch 16, matching the test settings, while selection used batch 8. Validation figures therefore differ by about 0.01, and YOLOv8s and YOLOv8m still tie within 0.01 (0.638 vs 0.645).
+
+**Artifacts:**
+- `models/ppe_yolov8_v2_best.pt` and `models/ppe_v2_training_metadata.json`;
+- `results/selection_v2/`;
+- `results/final_test_v2/`;
+- `results/posthoc_v2/` (post-hoc);
+- `results/training_v2/<candidate>/results.csv`.
+
+`tests/test_ppe_v2_artifacts.py` checks that the v1 weights and config are unchanged and that the recorded selection follows the declared rule.
+
 ## Runtime flow
 
 ```text

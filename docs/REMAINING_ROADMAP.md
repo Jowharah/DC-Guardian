@@ -45,7 +45,11 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
    - Correlation beats isolated single-domain monitoring under every labelling.
    - The Bayesian advantage over the crisp rule is no longer statistically clear on v2 (interval includes zero).
    - The labellings disagree mainly on whether heat or humidity plus a drive at risk is one incident: item 1 (independent human labels) should settle it.
-9. **Model enhancement and workflow optimisation** (proposal "optimization", operator interpretation 2026-10-13): new detector versions beside the frozen ones, selected on validation data and evaluated once on the locked test (PPE first: recall 0.52); a persistent inference worker to remove per-upload model loading.
+9. **Model enhancement and workflow optimisation** (proposal "optimization", operator interpretation 2026-10-13): new detector versions beside the frozen ones, selected on validation data and evaluated once on the locked test; a persistent inference worker to remove per-upload model loading.
+   - **PPE-v2 done 2026-10-13** (YOLOv8s, 1024 px; see `evidence/ppe_detection/README.md`). Locked test: overall mAP@0.5 0.545 → 0.595 and helmet recall 0.603 → 0.654, but safety-vest recall 0.449 → 0.245 (49 vests; validation pointed the other way).
+   - **Post-hoc** (after selection; not used to choose): on the locked test, the unselected YOLOv8m matches v1 on vests (recall 0.449, mAP 0.416 vs 0.372) and is best overall (mAP@0.5 0.625). The combined v1-vest detector was therefore not built.
+   - Open: the operator decides the runtime model (v1, the official v2s, or v2m as a test-informed choice). Vests need more data before any model is relied on; a clean claim needs a fresh held-out set.
+   - Next candidates: the maintenance recall / alert-rate curve, and the persistent inference worker.
 
 ## Acceptance rules
 

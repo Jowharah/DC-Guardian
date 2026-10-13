@@ -1,0 +1,50 @@
+{
+  "candidate": "v2s1024",
+  "model_family": "YOLOv8",
+  "architecture": "yolov8s",
+  "pretrained_initialization": "yolov8s.pt",
+  "pretrained_sha256": "1f47a78bf100391c2a140b7ac73a1caae18c32779be7d310658112f7ac9aa78a",
+  "dataset": "SH17",
+  "split": "PPE-v1 development split (6,479 train / 810 validation)",
+  "locked_test_accessed": false,
+  "epochs_requested": 60,
+  "patience": 20,
+  "image_size": 1024,
+  "batch_size": 8,
+  "seed": 42,
+  "smoke_test": false,
+  "gpu": "NVIDIA GeForce RTX 3080 Ti",
+  "pytorch": "2.14.0+cu126",
+  "cuda": "12.6",
+  "training_run": "evidence\\ppe_detection\\results\\training_v2\\v2s1024",
+  "best_checkpoint": "evidence\\ppe_detection\\results\\training_v2\\v2s1024\\weights\\best.pt",
+  "selected_by": "select_v2.py",
+  "validation": {
+    "architecture": "yolov8s",
+    "image_size": 1024,
+    "criterion_required_map50": 0.648,
+    "overall": {
+      "precision": 0.7138,
+      "recall": 0.6117,
+      "map50": 0.6594,
+      "map50_95": 0.4296
+    },
+    "required_classes": {
+      "helmet": {
+        "precision": 0.7723,
+        "recall": 0.5658,
+        "map50": 0.7134,
+        "map50_95": 0.4845
+      },
+      "safety-vest": {
+        "precision": 0.6801,
+        "recall": 0.3958,
+        "map50": 0.5825,
+        "map50_95": 0.3549
+      }
+    },
+    "inference_ms_per_image": 13.01
+  },
+  "weights": "ppe_yolov8_v2_best.pt",
+  "weights_sha256": "b1ee6e2b11369bdccc82ce2827a4c45d0a6bbf7936d5406f9438785a3d269c75"
+}
