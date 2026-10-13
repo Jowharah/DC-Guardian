@@ -12,7 +12,7 @@ import pytest
 
 from evidence.environmental_monitoring.src.environmental_detector import assess_environmental_condition
 from reasoning.uncertainty.bayesian_correlation import is_abnormal
-from reasoning.uncertainty.labelling import build_labelling_pack, build_relabel_pack
+from reasoning.uncertainty.labelling import build_labelling_pack, build_pack_v2
 from reasoning.uncertainty.scenarios import build_scenarios_v2 as v2
 
 V1_SHA256 = "c73ae520823cad38bc27e664f46ab5a2bacbc1060a49d556795b355e1dbd12e1"  # LF bytes, as published
@@ -81,26 +81,36 @@ def test_extended_set_is_the_eight_v1_scenarios_verbatim():
     assert all(s == v1[s["scenario_id"]] for s in extended)
 
 
-def test_only_the_rewritten_scenarios_change_beyond_readings():
+def test_only_the_rewritten_scenarios_change_states_or_narratives():
     v1 = {s["scenario_id"]: s for s in _load(v2.V1_PATH)}
     for scenario in _load(v2.V2_PATH):
-        if scenario["scenario_id"] in v2.REWRITES:
-            continue
         old = v1[scenario["scenario_id"]]
-        assert [e["state"] for e in scenario["events"]] == [e["state"] for e in old["events"]]
-        assert [e.get("ground_truth_incident") for e in scenario["events"]] == \
-               [e.get("ground_truth_incident") for e in old["events"]]
-
-
-def test_rewritten_scenarios_carry_no_reused_labels():
-    for scenario in _load(v2.V2_PATH):
-        if scenario["scenario_id"] not in v2.REWRITES:
-            assert "label_status" not in scenario
+        assert [e["event_id"] for e in scenario["events"]] == [e["event_id"] for e in old["events"]]
+        if scenario["scenario_id"] in v2.REWRITES:
+            assert scenario["narrative"] != old["narrative"]
             continue
-        if scenario["label_status"] == v2.PENDING:
-            assert all("ground_truth_incident" not in e for e in scenario["events"])
-        else:
-            assert scenario["label_status"] == "OPERATOR_BLIND_RELABEL"
+        assert [e["state"] for e in scenario["events"]] == [e["state"] for e in old["events"]]
+        assert scenario["narrative"] == old["narrative"]
+
+
+def test_no_v1_label_is_copied_into_v2():
+    statuses = {s["label_status"] for s in _load(v2.V2_PATH)}
+    assert len(statuses) == 1 and statuses <= {v2.PENDING, v2.RELABELLED}, "all 40 scenarios share one label source"
+    if statuses == {v2.PENDING}:
+        assert not v2.OPERATOR_LABELS.exists()
+        assert all("ground_truth_incident" not in e for s in _load(v2.V2_PATH) for e in s["events"])
+
+
+def test_operator_labels_must_cover_every_pair(tmp_path, monkeypatch):
+    rows = list(csv.DictReader(open(build_pack_v2.PACK_DIR / "labels.csv", encoding="utf-8-sig")))
+    path = tmp_path / "operator-v2_labels.csv"
+    with open(path, "w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows({**r, "related": "N"} for r in rows[:-1])
+    monkeypatch.setattr(v2, "OPERATOR_LABELS", path)
+    with pytest.raises(SystemExit, match="every pair"):
+        v2.load_operator_labels()
 
 
 def test_pair_labels_become_incidents_and_contradictions_are_refused():
@@ -114,21 +124,29 @@ def test_pair_labels_become_incidents_and_contradictions_are_refused():
         v2.operator_incidents(scenario, key, rows)
 
 
-def test_relabel_pack_is_current_blind_and_complete():
-    pack_dir = build_relabel_pack.PACK_DIR
+def test_v2_pack_is_current_blind_and_complete():
+    pack_dir = build_pack_v2.PACK_DIR
     before = {p.name: _text(p) for p in pack_dir.iterdir()}
-    key_before = _text(build_relabel_pack.KEY_PATH)
-    build_relabel_pack.build()
-    assert before == {p.name: _text(p) for p in pack_dir.iterdir()} and key_before == _text(build_relabel_pack.KEY_PATH)
+    key_before = _text(build_pack_v2.KEY_PATH)
+    build_pack_v2.build()
+    assert before == {p.name: _text(p) for p in pack_dir.iterdir()} and key_before == _text(build_pack_v2.KEY_PATH)
     text = "\n".join(p.read_text(encoding="utf-8").lower() for p in pack_dir.iterdir())
     leaks = ("ground_truth", "unrelated", "coincid", "narrative", "incident i", '"split"', "dev split", "test split",
-             "leak", "smoke", "airflow", "cooling_anomaly", "chiller fault")
+             "leak", "smoke", "airflow", "cooling_anomaly")
     for word in leaks:
-        assert word not in text, f"relabel pack leaks '{word}'"
-    v1 = {s["scenario_id"]: s for s in _load(v2.V1_PATH)}
-    for sid, (title, _) in v2.REWRITES.items():
-        assert title.lower() not in text and v1[sid]["title"].lower() not in text
-        assert sid.lower() + "-" not in text, "pack leaks original event IDs"
+        assert word not in text, f"v2 pack leaks '{word}'"
+    for scenario in _load(v2.V1_PATH) + _load(v2.V2_PATH):
+        assert scenario["title"].lower() not in text, f"v2 pack leaks title of {scenario['scenario_id']}"
+        assert scenario["scenario_id"].lower() + "-" not in text, "v2 pack leaks original event IDs"
     rows = list(csv.DictReader(open(pack_dir / "labels.csv", encoding="utf-8-sig")))
-    assert len(rows) == 20 and all(not r["related"] for r in rows)
-    assert build_labelling_pack.VISIBLE == tuple(v for v in build_relabel_pack.VISIBLE if v != "measurements")
+    pairs = [(r["event_a"], r["event_b"]) for r in rows]
+    assert len(pairs) == len(set(pairs)) == 85 and all(not r["related"] for r in rows)
+    assert build_labelling_pack.VISIBLE == tuple(v for v in build_pack_v2.VISIBLE if v != "measurements")
+
+
+def test_v2_pack_order_does_not_line_up_with_the_v1_pack():
+    v1_key = json.loads(build_labelling_pack.KEY_PATH.read_text(encoding="utf-8"))["scenarios"]
+    v2_key = json.loads(build_pack_v2.KEY_PATH.read_text(encoding="utf-8"))["scenarios"]
+    v1_order = [v1_key[k]["original_id"] for k in sorted(v1_key)]
+    v2_order = [v2_key[k]["original_id"] for k in sorted(v2_key)]
+    assert sorted(v1_order) == sorted(v2_order) and all(a != b for a, b in zip(v1_order, v2_order))

@@ -17,11 +17,13 @@ remain reproducible. This script writes:
 
 Operator decisions (2026-10-13):
 - leak -> high humidity; smoke, airflow and cooling -> high temperature;
-- narratives describe what the sensors read, not what is related;
-- the 8 rewritten scenarios are relabelled blind (labelling/relabel_v2/); old
-  labels are not reused and labels are never invented. Until the operator's
-  labels exist (labelling/relabel_v2/operator_labels.csv) those scenarios are
-  marked PENDING_BLIND_RELABEL and carry no ground truth.
+- narratives of the 8 rewritten scenarios describe what the sensors read, not
+  what is related;
+- all 40 v2 scenarios are relabelled blind by the operator (labelling/pack_v2/);
+  no v1 label is copied into v2 and labels are never invented. Until the
+  operator's labels exist (labelling/results/operator-v2_labels.csv) every
+  scenario is marked PENDING_BLIND_RELABEL and carries no ground truth. The
+  operator also wrote v1, so v2 labels are still not independent labels.
 
 Run from the repository root:
     python reasoning/uncertainty/scenarios/build_scenarios_v2.py
@@ -45,9 +47,11 @@ HERE = Path(__file__).resolve().parent
 V1_PATH = HERE / "labelled_scenarios.json"
 V2_PATH = HERE / "labelled_scenarios_v2.json"
 EXTENDED_PATH = HERE / "extended_sensor_scenarios.json"
-RELABEL_DIR = HERE.parent / "labelling" / "relabel_v2"
-OPERATOR_LABELS = RELABEL_DIR / "operator_labels.csv"
+LABELLING_DIR = HERE.parent / "labelling"
+PACK_V2_KEY = LABELLING_DIR / "pack_v2_key.json"
+OPERATOR_LABELS = LABELLING_DIR / "results" / "operator-v2_labels.csv"
 PENDING = "PENDING_BLIND_RELABEL"
+RELABELLED = "OPERATOR_BLIND_RELABEL"
 
 # Raw readings (temperature_c, humidity_pct) for every environmental event.
 # Thresholds of the frozen detector: temperature > 35 C, humidity > 80 % or < 20 %.
@@ -148,11 +152,14 @@ def operator_incidents(scenario: dict, key: dict, rows: list[dict]) -> dict[str,
 def load_operator_labels() -> tuple[dict, list[dict]] | None:
     if not OPERATOR_LABELS.exists():
         return None
-    key = json.loads((RELABEL_DIR / "pack_key.json").read_text(encoding="utf-8"))
+    key = json.loads(PACK_V2_KEY.read_text(encoding="utf-8"))
     rows = list(csv.DictReader(open(OPERATOR_LABELS, encoding="utf-8-sig")))
     bad = [r["pair"] for r in rows if r["related"].strip().upper() not in ("Y", "N")]
     if bad:
-        raise SystemExit(f"operator_labels.csv: related must be Y or N ({', '.join(bad)})")
+        raise SystemExit(f"{OPERATOR_LABELS.name}: related must be Y or N ({', '.join(bad)})")
+    expected = {r["pair"] for r in csv.DictReader(open(LABELLING_DIR / "pack_v2" / "labels.csv", encoding="utf-8-sig"))}
+    if {r["pair"] for r in rows} != expected or len(rows) != len(expected):
+        raise SystemExit(f"{OPERATOR_LABELS.name}: must contain every pair of pack_v2/labels.csv exactly once")
     return key, rows
 
 
@@ -178,14 +185,15 @@ def build() -> dict:
             new["title"], new["narrative"] = REWRITES[scenario["scenario_id"]]
             new["original_v1_states"] = sorted({e["state"] for e in scenario["events"]
                                                  if e["domain"] == "ENVIRONMENTAL" and e["state"] in MAPPING})
-            for event in new["events"]:
-                event.pop("ground_truth_incident", None)
-            if labels:
-                for event_id, incident in operator_incidents(new, *labels).items():
-                    next(e for e in new["events"] if e["event_id"] == event_id)["ground_truth_incident"] = incident
-                new["label_status"] = "OPERATOR_BLIND_RELABEL"
-            else:
-                new["label_status"] = PENDING
+        # No v1 label is carried into v2: ground truth comes only from the operator's blind labels.
+        for event in new["events"]:
+            event.pop("ground_truth_incident", None)
+        if labels:
+            for event_id, incident in operator_incidents(new, *labels).items():
+                next(e for e in new["events"] if e["event_id"] == event_id)["ground_truth_incident"] = incident
+            new["label_status"] = RELABELLED
+        else:
+            new["label_status"] = PENDING
         v2_scenarios.append(new)
 
     v2 = {"scenario_set_version": "DCG-LABELLED-SCENARIOS-v2", "topology": v1["topology"],
@@ -193,8 +201,10 @@ def build() -> dict:
           "environmental_states": "Every environmental state is assigned by the frozen environmental detector "
                                   "(assess_environmental_condition) from the event's measurements; "
                                   "built by build_scenarios_v2.py.",
-          "labelling": v1["labelling"] + " Scenarios with label_status PENDING_BLIND_RELABEL carry no ground "
-                       "truth until the operator's blind labels exist; OPERATOR_BLIND_RELABEL marks those labels.",
+          "labelling": "Full blind relabel of all 40 scenarios by the operator (labelling/pack_v2/), who also wrote "
+                       "v1, so these are not independent labels. Pair labels become incidents: events joined by "
+                       "related pairs share a ground_truth_incident; null marks an event related to no other. "
+                       "PENDING_BLIND_RELABEL: no ground truth yet; no v1 label is copied.",
           "scenarios": v2_scenarios}
     ext = {"scenario_set_version": "DCG-EXTENDED-SENSOR-SCENARIOS-v1", "topology": v1["topology"],
            "purpose": "Future-work evidence: the 8 v1 scenarios whose environmental states need leak, smoke or "

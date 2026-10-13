@@ -14,20 +14,27 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
     - Every environmental event (24) has a raw reading, and its state is assigned by `assess_environmental_condition`; no state is typed by hand.
     - Mapping: leak → HIGH_HUMIDITY; smoke, airflow and cooling → HIGH_TEMPERATURE.
     - The 16 unchanged environmental events reproduce their v1 state; the script stops otherwise.
-    - The 8 rewritten scenarios have observation-only narratives and status `PENDING_BLIND_RELABEL`, with no ground truth.
+    - The 8 rewritten scenarios have observation-only narratives.
+    - **No v1 label is copied** (operator decision: full blind relabel). All 40 scenarios are `PENDING_BLIND_RELABEL`, with no ground truth, until the operator's labels exist.
   - **Extended-sensor set:** `extended_sensor_scenarios.json` holds the 8 v1 originals verbatim, reported apart as future-work evidence.
   - **v1 unchanged:** `labelled_scenarios.json` is pinned by a hash test.
-  - **Relabelling pack:** `reasoning/uncertainty/labelling/relabel_v2/` is a blind pack for the 8 scenarios (20 pairs, readings shown, neutral IDs R01–R08), with operator steps in its README.
-    - `build_labelling_pack.build()` now takes parameters, and the published 40-scenario pack rebuilds byte-identical.
-    - The operator's pair labels become incident labels (connected Y pairs). Contradictory labels are refused, not guessed.
-  - **Tests:** `reasoning/uncertainty/scenarios/test_scenarios_v2.py` (10). Among them, a test fails if a v2 environmental state is outside what the detector produces, determined by running the detector over the measurement range.
+  - **Full v2 blind pack:** `reasoning/uncertainty/labelling/pack_v2/`, built by `build_pack_v2.py`, with the key in `pack_v2_key.json`.
+    - All 40 scenarios, 85 pairs, same format as the v1 pack, readings shown, neutral IDs V01–V40.
+    - The order is new: no scenario sits in the same position as in the v1 pack.
+    - `build_labelling_pack.build()` now takes parameters, and the published v1 pack rebuilds byte-identical.
+  - **Labels to incidents:** the operator saves the filled sheet as `labelling/results/operator-v2_labels.csv`, which must cover all 85 pairs.
+    - `build_scenarios_v2.py` turns connected related pairs into incidents. Contradictory labels are refused, not guessed.
+    - Same-domain events join an incident only through a cross-domain event.
+  - **First 8-scenario pack removed:** the `relabel_v2/` pack (8 scenarios, 20 pairs) from the first commit of this PR is redundant now that every scenario is relabelled.
+  - **Tests:** `reasoning/uncertainty/scenarios/test_scenarios_v2.py` (12). Among them, a test fails if a v2 environmental state is outside what the detector produces, determined by running the detector over the measurement range.
+- **Not independent:** the v2 labels are a full blind relabel by the same author who wrote v1, so they are still not independent labels.
 - **Docs, person access:** the website and Neo4j are the authority for zone access. The topology file only seeds P001–P003, and P005's Zone B access exists only in Neo4j (VALIDATION_AND_OPERATIONS).
 - **Expected effect:** the Bayesian knowledge base treats all dedicated room sensors as strong evidence, so model inputs barely change. Results can change through the new labels: heat alone is more ambiguous.
 - **Not done yet (waiting on the operator):**
   - the operator's blind labels;
   - the ChatGPT labels (pasted by the operator, no API call);
   - the v2 re-run of the uncertainty evaluation and the baseline comparison, with old and new results side by side. The latency benchmark does not use the scenarios.
-- **Verified:** `check_all.py` 14/14 (uncertainty and labelling 26 passed; Reasoning contracts; backend 404; Playwright 14; live API smoke 0 server errors).
+- **Verified:** full `check_all.py`, 14 of 14 suite-level checks (the 54 script checks became 14 pytest suites on 2026-10-12): Evidence 23 passed + 4 skipped (GPU tests, which pass in `.venv-ppe` 3/3 and `.venv-gru` 1/1); Reasoning contracts 24/24; uncertainty and labelling 28; RAG 10; agents 37; integration 12; backend 404; Playwright 14; live API smoke 0 server errors.
 
 ---
 
