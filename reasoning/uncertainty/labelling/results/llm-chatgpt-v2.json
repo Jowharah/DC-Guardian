@@ -1,0 +1,425 @@
+{
+  "labelled_pairs": 85,
+  "pack": "v2",
+  "agreement_with_v1_author": {
+    "test": {
+      "agreement": 0.746,
+      "cohens_kappa": 0.477
+    },
+    "all": {
+      "agreement": 0.741,
+      "cohens_kappa": 0.491
+    }
+  },
+  "test": {
+    "agreement": 0.797,
+    "cohens_kappa": 0.555,
+    "independent_labels": {
+      "pairs": 59,
+      "related": 13,
+      "crisp": {
+        "tp": 12,
+        "fp": 14,
+        "fn": 1,
+        "precision": 0.462,
+        "recall": 0.923,
+        "f1": 0.615
+      },
+      "bayesian": {
+        "tp": 13,
+        "fp": 11,
+        "fn": 0,
+        "precision": 0.542,
+        "recall": 1.0,
+        "f1": 0.703
+      },
+      "bootstrap": {
+        "draws": 2000,
+        "unit": "scenario",
+        "crisp_f1_ci95": [
+          0.298,
+          0.85
+        ],
+        "bayesian_f1_ci95": [
+          0.429,
+          0.867
+        ],
+        "difference_f1_ci95": [
+          -0.067,
+          0.229
+        ],
+        "share_bayesian_better": 0.825
+      }
+    },
+    "consensus_pairs": {
+      "pairs": 47,
+      "related": 13,
+      "crisp": {
+        "tp": 12,
+        "fp": 6,
+        "fn": 1,
+        "precision": 0.667,
+        "recall": 0.923,
+        "f1": 0.774
+      },
+      "bayesian": {
+        "tp": 13,
+        "fp": 3,
+        "fn": 0,
+        "precision": 0.812,
+        "recall": 1.0,
+        "f1": 0.897
+      },
+      "bootstrap": {
+        "draws": 2000,
+        "unit": "scenario",
+        "crisp_f1_ci95": [
+          0.48,
+          0.947
+        ],
+        "bayesian_f1_ci95": [
+          0.692,
+          1.0
+        ],
+        "difference_f1_ci95": [
+          -0.033,
+          0.357
+        ],
+        "share_bayesian_better": 0.903
+      }
+    }
+  },
+  "all": {
+    "agreement": 0.729,
+    "cohens_kappa": 0.462,
+    "independent_labels": {
+      "pairs": 85,
+      "related": 22,
+      "crisp": {
+        "tp": 21,
+        "fp": 23,
+        "fn": 1,
+        "precision": 0.477,
+        "recall": 0.955,
+        "f1": 0.636
+      },
+      "bayesian": {
+        "tp": 20,
+        "fp": 22,
+        "fn": 2,
+        "precision": 0.476,
+        "recall": 0.909,
+        "f1": 0.625
+      },
+      "bootstrap": {
+        "draws": 2000,
+        "unit": "scenario",
+        "crisp_f1_ci95": [
+          0.439,
+          0.817
+        ],
+        "bayesian_f1_ci95": [
+          0.444,
+          0.781
+        ],
+        "difference_f1_ci95": [
+          -0.136,
+          0.107
+        ],
+        "share_bayesian_better": 0.396
+      }
+    },
+    "consensus_pairs": {
+      "pairs": 62,
+      "related": 21,
+      "crisp": {
+        "tp": 20,
+        "fp": 8,
+        "fn": 1,
+        "precision": 0.714,
+        "recall": 0.952,
+        "f1": 0.816
+      },
+      "bayesian": {
+        "tp": 20,
+        "fp": 5,
+        "fn": 1,
+        "precision": 0.8,
+        "recall": 0.952,
+        "f1": 0.87
+      },
+      "bootstrap": {
+        "draws": 2000,
+        "unit": "scenario",
+        "crisp_f1_ci95": [
+          0.618,
+          0.944
+        ],
+        "bayesian_f1_ci95": [
+          0.71,
+          0.97
+        ],
+        "difference_f1_ci95": [
+          -0.071,
+          0.228
+        ],
+        "share_bayesian_better": 0.734
+      }
+    }
+  },
+  "disagreements": [
+    {
+      "neutral_pair": "V06-E1 + V06-E2",
+      "original_pair": "D01-E1 + D01-E2",
+      "scenario": "D01",
+      "split": "dev",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Ambient heat and drive SMART risk may coincide without common cause.",
+      "p_related": 0.8994
+    },
+    {
+      "neutral_pair": "V02-E2 + V02-E3",
+      "original_pair": "D03-E2 + D03-E3",
+      "scenario": "D03",
+      "split": "dev",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Same-zone heat and SMART risk could coincide; no established causal link.",
+      "p_related": 0.5564
+    },
+    {
+      "neutral_pair": "V22-E1 + V22-E2",
+      "original_pair": "D08-E1 + D08-E2",
+      "scenario": "D08",
+      "split": "dev",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "38-minute gap and SSH anomaly lacks explicit link to unauthorized P003.",
+      "p_related": 0.5564
+    },
+    {
+      "neutral_pair": "V23-E1 + V23-E4",
+      "original_pair": "D09-E1 + D09-E2",
+      "scenario": "D09",
+      "split": "dev",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Humidity and drive risk on another server lack demonstrated mechanism.",
+      "p_related": 0.8994
+    },
+    {
+      "neutral_pair": "V23-E1 + V23-E3",
+      "original_pair": "D09-E1 + D09-E3",
+      "scenario": "D09",
+      "split": "dev",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "3",
+      "note": "Humidity does not explain explicit SSH security event.",
+      "p_related": 0.7428
+    },
+    {
+      "neutral_pair": "V23-E1 + V23-E2",
+      "original_pair": "D09-E1 + D09-E4",
+      "scenario": "D09",
+      "split": "dev",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "3",
+      "note": "Unauthorized person and high humidity have no established link.",
+      "p_related": 0.8965
+    },
+    {
+      "neutral_pair": "V23-E3 + V23-E4",
+      "original_pair": "D09-E2 + D09-E3",
+      "scenario": "D09",
+      "split": "dev",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "3",
+      "note": "Security event and drive risk are on different servers.",
+      "p_related": 0.6929
+    },
+    {
+      "neutral_pair": "V23-E2 + V23-E4",
+      "original_pair": "D09-E2 + D09-E4",
+      "scenario": "D09",
+      "split": "dev",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "3",
+      "note": "Unauthorized person and drive SMART risk not causally connected.",
+      "p_related": 0.7428
+    },
+    {
+      "neutral_pair": "V38-E1 + V38-E2",
+      "original_pair": "D10-E1 + D10-E2",
+      "scenario": "D10",
+      "split": "dev",
+      "author": false,
+      "labeller": true,
+      "labeller_confidence": "2",
+      "note": "Extreme heat in utilities plausibly prompts maintenance response with PPE alert.",
+      "p_related": 0.4788
+    },
+    {
+      "neutral_pair": "V28-E1 + V28-E2",
+      "original_pair": "D14-E1 + D14-E2",
+      "scenario": "D14",
+      "split": "dev",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "High humidity and SMART disk risk may coincide without evidence of damage.",
+      "p_related": 0.5564
+    },
+    {
+      "neutral_pair": "V25-E1 + V25-E2",
+      "original_pair": "D15-E1 + D15-E2",
+      "scenario": "D15",
+      "split": "dev",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Unknown visitor and single-detector SSH candidate lack corroboration.",
+      "p_related": 0.4483
+    },
+    {
+      "neutral_pair": "V29-E2 + V29-E3",
+      "original_pair": "T02-E2 + T02-E3",
+      "scenario": "T02",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Room heat and SMART risk may coincide; no direct evidence of causation.",
+      "p_related": 0.5564
+    },
+    {
+      "neutral_pair": "V03-E2 + V03-E4",
+      "original_pair": "T08-E2 + T08-E3",
+      "scenario": "T08",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Heat and drive SMART risk are distinct signals without failure evidence.",
+      "p_related": 0.8994
+    },
+    {
+      "neutral_pair": "V03-E2 + V03-E3",
+      "original_pair": "T08-E2 + T08-E4",
+      "scenario": "T08",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "3",
+      "note": "Environmental heat does not explain SSH anomaly.",
+      "p_related": 0.4788
+    },
+    {
+      "neutral_pair": "V03-E3 + V03-E4",
+      "original_pair": "T08-E3 + T08-E4",
+      "scenario": "T08",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "3",
+      "note": "Different servers and independent cyber/SMART detectors.",
+      "p_related": 0.6829
+    },
+    {
+      "neutral_pair": "V15-E1 + V15-E2",
+      "original_pair": "T13-E1 + T13-E2",
+      "scenario": "T13",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Same server but SSH security event does not establish SMART drive deterioration.",
+      "p_related": 0.9186
+    },
+    {
+      "neutral_pair": "V37-E1 + V37-E2",
+      "original_pair": "T15-E1 + T15-E2",
+      "scenario": "T15",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Room heat and SMART risk may coexist without causal evidence.",
+      "p_related": 0.5564
+    },
+    {
+      "neutral_pair": "V37-E1 + V37-E3",
+      "original_pair": "T15-E1 + T15-E3",
+      "scenario": "T15",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "3",
+      "note": "Borderline SMART risk insufficient to tie to ambient heat.",
+      "p_related": 0.2853
+    },
+    {
+      "neutral_pair": "V07-E1 + V07-E4",
+      "original_pair": "T16-E1 + T16-E2",
+      "scenario": "T16",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Heat and drive SMART risk not demonstrably causally linked.",
+      "p_related": 0.8994
+    },
+    {
+      "neutral_pair": "V32-E1 + V32-E2",
+      "original_pair": "T18-E1 + T18-E2",
+      "scenario": "T18",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Unknown person and weak SSH candidate lack corroborating common actor.",
+      "p_related": 0.7091
+    },
+    {
+      "neutral_pair": "V40-E1 + V40-E2",
+      "original_pair": "T19-E1 + T19-E2",
+      "scenario": "T19",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Unauthorized P001 in utilities and heat lack evidence of intervention.",
+      "p_related": 0.7428
+    },
+    {
+      "neutral_pair": "V09-E1 + V09-E2",
+      "original_pair": "T20-E1 + T20-E2",
+      "scenario": "T20",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "95-minute gap; humidity and SMART drive risk lack direct linkage.",
+      "p_related": 0.1925
+    },
+    {
+      "neutral_pair": "V01-E2 + V01-E3",
+      "original_pair": "T23-E2 + T23-E3",
+      "scenario": "T23",
+      "split": "test",
+      "author": true,
+      "labeller": false,
+      "labeller_confidence": "2",
+      "note": "Unknown person and server temperature alone do not establish a common incident.",
+      "p_related": 0.4406
+    }
+  ]
+}

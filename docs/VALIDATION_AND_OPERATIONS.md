@@ -145,6 +145,7 @@ Optional: set `DCG_CHECKPOINT_KEY` (kept out of the repository) to sign checkpoi
 - **Incidents shown whole:** 0 → 11 of 18.
 - **HIGH alerts:** 86% are real incidents; the isolated top level, MEDIUM, is 64%.
 - **Caveat:** author labels. Report draft: [evaluation_baseline_and_latency](report/evaluation_baseline_and_latency.md).
+- **Scenario set v2** (`--set v2`, operator blind relabel; `--set v2-chatgpt`, ChatGPT labels as a sensitivity check): alerts 65 → 44 in both; queue average precision 0.73 → 0.81 (CI +0.02 to +0.19) and 0.48 → 0.75 (CI +0.10 to +0.50); incidents whole 14 of 18 and 8 of 9. The conclusion holds under every labelling; its size depends on the labeller (the two v2 labellings agree on 73% of pairs, kappa 0.46).
 
 ## Pipeline latency — 2026-10-13
 

@@ -38,9 +38,12 @@ Scenario set v2 (`../scenarios/labelled_scenarios_v2.json`) replaces leak, smoke
    - Events joined by Y pairs become one incident; an event with no Y pair has no incident.
    - If two events end up in one incident although they were marked N, the script stops and names the pair to resolve.
 3. **ChatGPT comparison:** paste the same `pack_v2/` files into ChatGPT, as in the first round, and save its sheet as `results/llm-chatgpt-v2_labels.csv`. Nothing in this repository calls OpenAI.
-4. **Re-run and compare:** re-run the uncertainty evaluation and the baseline comparison on v2, and report them beside the v1 results.
+4. **Re-run and compare** (done 2026-10-13):
+   - `build_scenarios_v2.py` also writes `labelled_scenarios_v2_chatgpt.json`, the same scenarios with ChatGPT's labels as ground truth (sensitivity check only);
+   - `evaluate.py --set v2` / `--set v2-chatgpt` and `baseline_comparison.py --set v2` / `--set v2-chatgpt`;
+   - `score_labels.py <labels.csv> --name <code> --pack v2` scores a v2 labeller against the operator's v2 labels and the v1 author labels (`results/operator-v2.md`, `results/llm-chatgpt-v2.md`).
 
-The operator also wrote v1, so the v2 labels are a blind relabel by the same author. They remove the narratives' influence, but they are not independent labels.
+The operator also wrote v1, so the v2 labels are a blind relabel by the same author. They remove the narratives' influence, but they are not independent labels. Results: [Uncertainty Reasoning — v2](../../../docs/UNCERTAINTY_REASONING.md#results-on-scenario-set-v2-2026-10-13).
 
 ## Files
 

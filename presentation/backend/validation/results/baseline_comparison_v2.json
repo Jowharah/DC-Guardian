@@ -1,0 +1,154 @@
+{
+  "protocol": "fixed 2026-10-13 before results; see module docstring",
+  "policy": "DCG-DECISION-v2",
+  "linkage_rule": "L2_KNOWN_MECHANISM_WITHIN_10_MIN",
+  "labels": "Scenario set v2 (detector-producible environmental states), labels: the operator's full blind relabel of labelling/pack_v2/. The operator also wrote v1 and the knowledge base, so these are not independent labels.",
+  "tie_orders": 500,
+  "seed": 20261013,
+  "splits": {
+    "test": {
+      "isolated": {
+        "alerts": 65,
+        "noise_alerts": 25,
+        "relevant_alerts": 40,
+        "levels": {
+          "HIGH": {
+            "alerts": 0,
+            "relevant": 0
+          },
+          "MEDIUM": {
+            "alerts": 22,
+            "relevant": 17
+          },
+          "LOW": {
+            "alerts": 43,
+            "relevant": 23
+          }
+        },
+        "top_level": "MEDIUM",
+        "top_level_precision": 0.7727272727272727,
+        "incidents": 18,
+        "incidents_in_one_alert": 0,
+        "multi_event_incidents": 18,
+        "multi_event_incidents_in_one_alert": 0,
+        "mean_alerts_per_multi_event_incident": 2.2222222222222223,
+        "average_precision": 0.7294624487550985,
+        "alerts_until_every_incident_seen": 49.86,
+        "alerts_until_every_incident_event_seen": 64.222,
+        "mean_rank_first_sight": 18.528222222222222
+      },
+      "dc_guardian": {
+        "alerts": 44,
+        "noise_alerts": 21,
+        "relevant_alerts": 23,
+        "levels": {
+          "HIGH": {
+            "alerts": 7,
+            "relevant": 7
+          },
+          "MEDIUM": {
+            "alerts": 13,
+            "relevant": 8
+          },
+          "LOW": {
+            "alerts": 24,
+            "relevant": 8
+          }
+        },
+        "top_level": "HIGH",
+        "top_level_precision": 1.0,
+        "incidents": 18,
+        "incidents_in_one_alert": 14,
+        "multi_event_incidents": 18,
+        "multi_event_incidents_in_one_alert": 14,
+        "mean_alerts_per_multi_event_incident": 1.2777777777777777,
+        "average_precision": 0.8106241825775744,
+        "alerts_until_every_incident_seen": 36.5,
+        "alerts_until_every_incident_event_seen": 42.222,
+        "mean_rank_first_sight": 13.278333333333334
+      }
+    },
+    "dev": {
+      "isolated": {
+        "alerts": 37,
+        "noise_alerts": 12,
+        "relevant_alerts": 25,
+        "levels": {
+          "HIGH": {
+            "alerts": 0,
+            "relevant": 0
+          },
+          "MEDIUM": {
+            "alerts": 16,
+            "relevant": 11
+          },
+          "LOW": {
+            "alerts": 21,
+            "relevant": 14
+          }
+        },
+        "top_level": "MEDIUM",
+        "top_level_precision": 0.6875,
+        "incidents": 11,
+        "incidents_in_one_alert": 0,
+        "multi_event_incidents": 11,
+        "multi_event_incidents_in_one_alert": 0,
+        "mean_alerts_per_multi_event_incident": 2.272727272727273,
+        "average_precision": 0.707793948378779,
+        "alerts_until_every_incident_seen": 29.818,
+        "alerts_until_every_incident_event_seen": 36.616,
+        "mean_rank_first_sight": 13.97890909090909
+      },
+      "dc_guardian": {
+        "alerts": 23,
+        "noise_alerts": 9,
+        "relevant_alerts": 14,
+        "levels": {
+          "HIGH": {
+            "alerts": 4,
+            "relevant": 4
+          },
+          "MEDIUM": {
+            "alerts": 11,
+            "relevant": 6
+          },
+          "LOW": {
+            "alerts": 8,
+            "relevant": 4
+          }
+        },
+        "top_level": "HIGH",
+        "top_level_precision": 1.0,
+        "incidents": 11,
+        "incidents_in_one_alert": 8,
+        "multi_event_incidents": 11,
+        "multi_event_incidents_in_one_alert": 8,
+        "mean_alerts_per_multi_event_incident": 1.2727272727272727,
+        "average_precision": 0.8055716723587815,
+        "alerts_until_every_incident_seen": 19.17,
+        "alerts_until_every_incident_event_seen": 22.156,
+        "mean_rank_first_sight": 8.515272727272729
+      }
+    }
+  },
+  "scenario_set": "v2",
+  "test_difference_ci95": {
+    "average_precision": [
+      0.016,
+      0.185
+    ],
+    "alerts_until_every_incident_event_seen": [
+      -33.4,
+      -14.55
+    ],
+    "alerts": [
+      -29,
+      -14
+    ]
+  },
+  "bootstrap": {
+    "draws": 1000,
+    "unit": "scenario",
+    "tie_orders_per_draw": 20
+  }
+}

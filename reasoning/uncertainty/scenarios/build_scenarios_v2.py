@@ -11,6 +11,10 @@ remain reproducible. This script writes:
     labelled_scenarios_v2.json      40 scenarios; every environmental event
                                     carries a raw reading and the state the
                                     frozen detector assigns to it
+    labelled_scenarios_v2_chatgpt.json
+                                    the same 40 scenarios with ChatGPT's blind
+                                    labels of the same pack as ground truth
+                                    (sensitivity check only, never the headline)
     extended_sensor_scenarios.json  the 8 original scenarios, verbatim from v1:
                                     what leak/smoke/airflow sensors would add
                                     (future-work evidence, reported apart)
@@ -24,6 +28,8 @@ Operator decisions (2026-10-13):
   operator's labels exist (labelling/results/operator-v2_labels.csv) every
   scenario is marked PENDING_BLIND_RELABEL and carries no ground truth. The
   operator also wrote v1, so v2 labels are still not independent labels.
+- ChatGPT labelled the same blind pack (labelling/results/llm-chatgpt-v2_labels.csv,
+  pasted by the operator); those labels drive only the sensitivity file.
 
 Run from the repository root:
     python reasoning/uncertainty/scenarios/build_scenarios_v2.py
@@ -46,12 +52,15 @@ from evidence.environmental_monitoring.src.environmental_detector import assess_
 HERE = Path(__file__).resolve().parent
 V1_PATH = HERE / "labelled_scenarios.json"
 V2_PATH = HERE / "labelled_scenarios_v2.json"
+V2_CHATGPT_PATH = HERE / "labelled_scenarios_v2_chatgpt.json"
 EXTENDED_PATH = HERE / "extended_sensor_scenarios.json"
 LABELLING_DIR = HERE.parent / "labelling"
 PACK_V2_KEY = LABELLING_DIR / "pack_v2_key.json"
 OPERATOR_LABELS = LABELLING_DIR / "results" / "operator-v2_labels.csv"
+CHATGPT_LABELS = LABELLING_DIR / "results" / "llm-chatgpt-v2_labels.csv"
 PENDING = "PENDING_BLIND_RELABEL"
 RELABELLED = "OPERATOR_BLIND_RELABEL"
+CHATGPT = "CHATGPT_BLIND_LABEL"
 
 # Raw readings (temperature_c, humidity_pct) for every environmental event.
 # Thresholds of the frozen detector: temperature > 35 C, humidity > 80 % or < 20 %.
@@ -149,24 +158,44 @@ def operator_incidents(scenario: dict, key: dict, rows: list[dict]) -> dict[str,
     return incidents
 
 
-def load_operator_labels() -> tuple[dict, list[dict]] | None:
-    if not OPERATOR_LABELS.exists():
+def load_labels(path: Path) -> tuple[dict, list[dict]] | None:
+    if not path.exists():
         return None
     key = json.loads(PACK_V2_KEY.read_text(encoding="utf-8"))
-    rows = list(csv.DictReader(open(OPERATOR_LABELS, encoding="utf-8-sig")))
+    with open(path, encoding="utf-8-sig") as handle:
+        rows = list(csv.DictReader(handle))
     bad = [r["pair"] for r in rows if r["related"].strip().upper() not in ("Y", "N")]
     if bad:
-        raise SystemExit(f"{OPERATOR_LABELS.name}: related must be Y or N ({', '.join(bad)})")
-    expected = {r["pair"] for r in csv.DictReader(open(LABELLING_DIR / "pack_v2" / "labels.csv", encoding="utf-8-sig"))}
+        raise SystemExit(f"{path.name}: related must be Y or N ({', '.join(bad)})")
+    with open(LABELLING_DIR / "pack_v2" / "labels.csv", encoding="utf-8-sig") as handle:
+        expected = {r["pair"] for r in csv.DictReader(handle)}
     if {r["pair"] for r in rows} != expected or len(rows) != len(expected):
-        raise SystemExit(f"{OPERATOR_LABELS.name}: must contain every pair of pack_v2/labels.csv exactly once")
+        raise SystemExit(f"{path.name}: must contain every pair of pack_v2/labels.csv exactly once")
     return key, rows
+
+
+def load_operator_labels() -> tuple[dict, list[dict]] | None:
+    return load_labels(OPERATOR_LABELS)
+
+
+def apply_labels(scenarios: list[dict], labels: tuple[dict, list[dict]] | None, status: str) -> list[dict]:
+    """Copies of the unlabelled v2 scenarios with incidents from one labeller's pair labels."""
+    labelled = []
+    for scenario in scenarios:
+        new = copy.deepcopy(scenario)
+        if labels:
+            for event_id, incident in operator_incidents(new, *labels).items():
+                next(e for e in new["events"] if e["event_id"] == event_id)["ground_truth_incident"] = incident
+            new["label_status"] = status
+        else:
+            new["label_status"] = PENDING
+        labelled.append(new)
+    return labelled
 
 
 def build() -> dict:
     v1 = json.loads(V1_PATH.read_text(encoding="utf-8"))
-    labels = load_operator_labels()
-    v2_scenarios, extended = [], []
+    unlabelled, extended = [], []
     for scenario in v1["scenarios"]:
         new = copy.deepcopy(scenario)
         rewritten = scenario["scenario_id"] in REWRITES
@@ -185,16 +214,11 @@ def build() -> dict:
             new["title"], new["narrative"] = REWRITES[scenario["scenario_id"]]
             new["original_v1_states"] = sorted({e["state"] for e in scenario["events"]
                                                  if e["domain"] == "ENVIRONMENTAL" and e["state"] in MAPPING})
-        # No v1 label is carried into v2: ground truth comes only from the operator's blind labels.
+        # No v1 label is carried into v2: ground truth comes only from blind labels of pack_v2.
         for event in new["events"]:
             event.pop("ground_truth_incident", None)
-        if labels:
-            for event_id, incident in operator_incidents(new, *labels).items():
-                next(e for e in new["events"] if e["event_id"] == event_id)["ground_truth_incident"] = incident
-            new["label_status"] = RELABELLED
-        else:
-            new["label_status"] = PENDING
-        v2_scenarios.append(new)
+        unlabelled.append(new)
+    v2_scenarios = apply_labels(unlabelled, load_operator_labels(), RELABELLED)
 
     v2 = {"scenario_set_version": "DCG-LABELLED-SCENARIOS-v2", "topology": v1["topology"],
           "derived_from": "DCG-LABELLED-SCENARIOS-v1 (unchanged)",
@@ -213,8 +237,17 @@ def build() -> dict:
            "labelling": v1["labelling"], "scenarios": extended}
     V2_PATH.write_text(json.dumps(v2, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     EXTENDED_PATH.write_text(json.dumps(ext, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    chatgpt_labels = load_labels(CHATGPT_LABELS)
+    if chatgpt_labels:
+        sensitivity = {**v2, "scenario_set_version": "DCG-LABELLED-SCENARIOS-v2-CHATGPT",
+                       "labelling": "Sensitivity check only, never the headline result: ChatGPT's labels of the same "
+                                    "blind pack (labelling/pack_v2/, pasted by the operator, no API call) as ground "
+                                    "truth. A language model's second opinion, not an independent expert.",
+                       "scenarios": apply_labels(unlabelled, chatgpt_labels, CHATGPT)}
+        V2_CHATGPT_PATH.write_text(json.dumps(sensitivity, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     pending = sum(s.get("label_status") == PENDING for s in v2_scenarios)
-    return {"scenarios": len(v2_scenarios), "rewritten": len(extended), "pending_labels": pending}
+    return {"scenarios": len(v2_scenarios), "rewritten": len(extended), "pending_labels": pending,
+            "chatgpt_sensitivity": bool(chatgpt_labels)}
 
 
 if __name__ == "__main__":
@@ -222,3 +255,5 @@ if __name__ == "__main__":
     print(f"v2: {summary['scenarios']} scenarios, {summary['rewritten']} rewritten, "
           f"{summary['pending_labels']} awaiting blind labels")
     print(f"Wrote {V2_PATH.relative_to(PROJECT_ROOT)} and {EXTENDED_PATH.relative_to(PROJECT_ROOT)}")
+    if summary["chatgpt_sensitivity"]:
+        print(f"Wrote {V2_CHATGPT_PATH.relative_to(PROJECT_ROOT)} (sensitivity check: ChatGPT labels as ground truth)")

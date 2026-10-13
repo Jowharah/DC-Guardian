@@ -6,6 +6,24 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-13 — Scenario set v2 evaluation: operator relabel and ChatGPT sensitivity
+
+- **Why:** item 8 of the roadmap. The operator finished the blind relabel of all 40 v2 scenarios and pasted ChatGPT's labels of the same pack, so the uncertainty evaluation and the baseline comparison can be re-run on v2 beside v1.
+- **What:**
+  - **Labels committed unchanged:** `labelling/results/operator-v2_labels.csv` (operator; while checking the sheet the operator corrected V04 E1–E4 to N, a contradiction the build script would have refused, and fixed notes and three confidences) and `llm-chatgpt-v2_labels.csv` (ChatGPT, pasted by the operator; no API call).
+  - **Scenario sets:** `build_scenarios_v2.py` now gives `labelled_scenarios_v2.json` the operator's incidents (29) and also writes `labelled_scenarios_v2_chatgpt.json`, the same scenarios with ChatGPT's incidents (16), for the sensitivity check only.
+  - **Scripts:** `evaluate.py`, `baseline_comparison.py` take `--set v1|v2|v2-chatgpt` (v1 default; v1 outputs regenerate byte-identical). `score_labels.py --pack v2` scores a v2 labeller against the operator's v2 labels and the v1 author labels.
+  - **Results** (`reasoning/uncertainty/results/evaluation_report_v2*.md`, `presentation/backend/validation/results/baseline_comparison_v2*.md`, `labelling/results/{operator,llm-chatgpt}-v2.md`), test split:
+    - Bayesian vs crisp F1: v1 0.731 vs 0.593 (difference +0.022 to +0.261); v2 operator 0.857 vs 0.784 (**−0.040 to +0.190**); v2 ChatGPT 0.703 vs 0.615 (−0.067 to +0.229). Perturbed models beating crisp: 87%, 48%, 62%.
+    - Baseline, isolated → DC-GUARDIAN: alerts 65 → 44 under all labels; queue average precision 0.66 → 0.74 (v1), 0.73 → 0.81 (v2 operator, CI +0.02 to +0.19), 0.48 → 0.75 (v2 ChatGPT, CI +0.10 to +0.50).
+    - Agreement (85 pairs): operator v2 vs v1 73% (kappa 0.46); ChatGPT v2 vs operator v2 73% (kappa 0.46). ChatGPT marks 22 pairs related, the operator 43; 10 of the 23 disagreements are heat or humidity followed by a drive at risk.
+- **Reading:** correlation beats isolated monitoring under every labelling. The Bayesian gain over the crisp rule is positive but no longer significant on v2. The higher v2 scores reflect changed labels (same author, after discussing how the system links events), not a better model. Docs: UNCERTAINTY_REASONING (v2 results), report draft, VALIDATION_AND_OPERATIONS, roadmap item 8 closed, labelling README.
+- **Tests:** v2 and v2-chatgpt evaluation results must be current; the ChatGPT set must differ from v2 only in labels.
+- **Verified:** full `check_all.py` 14/14, run in a separate worktree with the local environments and private data linked in: Evidence 23 passed + 4 skipped (GPU, which pass in `.venv-ppe` 3/3 and `.venv-gru` 1/1); Reasoning contracts passed; uncertainty and labelling 30; RAG 10; agents 37; integration 12; backend 404; Playwright 14; live API smoke 0 server errors.
+- **Caveat:** neither labelling is independent human validation; roadmap item 1 (teammates, preferably on `pack_v2/`) remains the missing evidence.
+
+---
+
 ## 2026-10-13 — Scenario set v2: environmental states the detector can produce
 
 - **Why (operator decision, relayed from the operator's other session):** 8 of 40 labelled scenarios used environmental states the frozen detector cannot produce: WATER_LEAK_DETECTED (D14, T22), SMOKE_DETECTED (D10, T12), AIRFLOW_ANOMALY (D03, T09) and COOLING_ANOMALY (T02, T19). Five of them are in the test split, so the PR #21 baseline numbers depend on alerts the prototype cannot raise.

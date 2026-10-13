@@ -23,7 +23,8 @@
             "temperature_c": 37.2,
             "humidity_pct": 44.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D01-E2",
@@ -33,10 +34,11 @@
           "failure_probability": 0.82,
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D02",
@@ -57,7 +59,8 @@
             "temperature_c": 42.5,
             "humidity_pct": 40.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D02-E2",
@@ -67,10 +70,11 @@
           "failure_probability": 0.55,
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D03",
@@ -90,7 +94,8 @@
             "temperature_c": 37.5,
             "humidity_pct": 38.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": null
         },
         {
           "event_id": "D03-E2",
@@ -104,7 +109,8 @@
             "temperature_c": 36.4,
             "humidity_pct": 46.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D03-E3",
@@ -114,13 +120,14 @@
           "failure_probability": 0.77,
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
       "original_v1_states": [
         "AIRFLOW_ANOMALY"
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D04",
@@ -136,7 +143,8 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D04-E2",
@@ -145,10 +153,11 @@
           "state": "EXPLICIT_SECURITY_EVENT",
           "server_id": "SRV-A1-02",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D05",
@@ -162,7 +171,8 @@
           "domain": "PHYSICAL_SECURITY",
           "state": "UNKNOWN_PERSON",
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D05-E2",
@@ -171,10 +181,11 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.81,
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D06",
@@ -189,7 +200,8 @@
           "state": "ANOMALY_CANDIDATE",
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         },
         {
           "event_id": "D06-E2",
@@ -198,10 +210,11 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.58,
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D07",
@@ -217,7 +230,8 @@
           "failure_probability": 0.91,
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         },
         {
           "event_id": "D07-E2",
@@ -227,10 +241,11 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D08",
@@ -246,7 +261,8 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D08-E2",
@@ -255,10 +271,11 @@
           "state": "HIGH_CONFIDENCE_ANOMALY",
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D09",
@@ -278,7 +295,8 @@
             "temperature_c": 24.1,
             "humidity_pct": 85.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D09-E2",
@@ -288,7 +306,8 @@
           "failure_probability": 0.74,
           "server_id": "SRV-A1-02",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D09-E3",
@@ -297,7 +316,8 @@
           "state": "EXPLICIT_SECURITY_EVENT",
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D09-E4",
@@ -307,10 +327,11 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D10",
@@ -330,7 +351,8 @@
             "temperature_c": 46.0,
             "humidity_pct": 30.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": null
         },
         {
           "event_id": "D10-E2",
@@ -339,13 +361,14 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.66,
           "camera_id": "CAM-C-01",
-          "zone_id": "ZONE-C"
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": null
         }
       ],
       "original_v1_states": [
         "SMOKE_DETECTED"
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D11",
@@ -360,7 +383,8 @@
           "state": "ANOMALY_CANDIDATE",
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         },
         {
           "event_id": "D11-E2",
@@ -370,7 +394,8 @@
           "failure_probability": 0.52,
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D11-E3",
@@ -385,10 +410,11 @@
             "temperature_c": 41.8,
             "humidity_pct": 38.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D12",
@@ -404,7 +430,8 @@
           "failure_probability": 0.88,
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         },
         {
           "event_id": "D12-E2",
@@ -413,10 +440,11 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.79,
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D13",
@@ -431,7 +459,8 @@
           "state": "HIGH_CONFIDENCE_ANOMALY",
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         },
         {
           "event_id": "D13-E2",
@@ -441,10 +470,11 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D14",
@@ -464,7 +494,8 @@
             "temperature_c": 25.0,
             "humidity_pct": 91.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D14-E2",
@@ -474,13 +505,14 @@
           "failure_probability": 0.71,
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
       "original_v1_states": [
         "WATER_LEAK_DETECTED"
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D15",
@@ -494,7 +526,8 @@
           "domain": "PHYSICAL_SECURITY",
           "state": "UNKNOWN_PERSON",
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D15-E2",
@@ -503,10 +536,11 @@
           "state": "ANOMALY_CANDIDATE",
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "D16",
@@ -522,7 +556,8 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D16-E2",
@@ -531,7 +566,8 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.83,
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "D16-E3",
@@ -540,10 +576,11 @@
           "state": "EXPLICIT_SECURITY_EVENT",
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T01",
@@ -564,7 +601,8 @@
             "temperature_c": 43.1,
             "humidity_pct": 39.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T01-E2",
@@ -574,7 +612,8 @@
           "failure_probability": 0.79,
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T01-E3",
@@ -583,10 +622,11 @@
           "state": "ANOMALY_CANDIDATE",
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T02",
@@ -606,7 +646,8 @@
             "temperature_c": 38.2,
             "humidity_pct": 40.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T02-E2",
@@ -620,7 +661,8 @@
             "temperature_c": 36.9,
             "humidity_pct": 45.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T02-E3",
@@ -630,7 +672,8 @@
           "failure_probability": 0.73,
           "server_id": "SRV-A1-02",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T02-E4",
@@ -640,13 +683,14 @@
           "failure_probability": 0.48,
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         }
       ],
       "original_v1_states": [
         "COOLING_ANOMALY"
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T03",
@@ -662,7 +706,8 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T03-E2",
@@ -671,10 +716,11 @@
           "state": "EXPLICIT_SECURITY_EVENT",
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T04",
@@ -690,7 +736,8 @@
           "failure_probability": 0.62,
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T04-E2",
@@ -704,10 +751,11 @@
             "temperature_c": 23.0,
             "humidity_pct": 16.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T05",
@@ -727,7 +775,8 @@
             "temperature_c": 24.6,
             "humidity_pct": 86.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T05-E2",
@@ -736,10 +785,11 @@
           "state": "HIGH_CONFIDENCE_ANOMALY",
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T06",
@@ -753,7 +803,8 @@
           "domain": "PHYSICAL_SECURITY",
           "state": "UNKNOWN_PERSON",
           "camera_id": "CAM-C-01",
-          "zone_id": "ZONE-C"
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T06-E2",
@@ -762,10 +813,11 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.72,
           "camera_id": "CAM-C-01",
-          "zone_id": "ZONE-C"
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T07",
@@ -781,7 +833,8 @@
           "failure_probability": 0.84,
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T07-E2",
@@ -790,10 +843,11 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.77,
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T08",
@@ -808,7 +862,8 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.61,
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T08-E2",
@@ -822,7 +877,8 @@
             "temperature_c": 37.8,
             "humidity_pct": 43.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T08-E3",
@@ -832,7 +888,8 @@
           "failure_probability": 0.81,
           "server_id": "SRV-A1-02",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T08-E4",
@@ -841,10 +898,11 @@
           "state": "ANOMALY_CANDIDATE",
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T09",
@@ -864,7 +922,8 @@
             "temperature_c": 36.8,
             "humidity_pct": 41.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T09-E2",
@@ -874,7 +933,8 @@
           "failure_probability": 0.76,
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T09-E3",
@@ -883,13 +943,14 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.55,
           "camera_id": "CAM-C-01",
-          "zone_id": "ZONE-C"
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": null
         }
       ],
       "original_v1_states": [
         "AIRFLOW_ANOMALY"
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T10",
@@ -905,7 +966,8 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T10-E2",
@@ -914,7 +976,8 @@
           "state": "HIGH_CONFIDENCE_ANOMALY",
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T10-E3",
@@ -928,10 +991,11 @@
             "temperature_c": 36.2,
             "humidity_pct": 47.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T11",
@@ -946,7 +1010,8 @@
           "state": "ANOMALY_CANDIDATE",
           "server_id": "SRV-A1-02",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T11-E2",
@@ -955,7 +1020,8 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.52,
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T11-E3",
@@ -965,10 +1031,11 @@
           "failure_probability": 0.47,
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T12",
@@ -988,7 +1055,8 @@
             "temperature_c": 47.5,
             "humidity_pct": 28.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T12-E2",
@@ -997,7 +1065,8 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.88,
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T12-E3",
@@ -1005,13 +1074,14 @@
           "domain": "PHYSICAL_SECURITY",
           "state": "UNKNOWN_PERSON",
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         }
       ],
       "original_v1_states": [
         "SMOKE_DETECTED"
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T13",
@@ -1026,7 +1096,8 @@
           "state": "EXPLICIT_SECURITY_EVENT",
           "server_id": "SRV-A1-02",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T13-E2",
@@ -1036,10 +1107,11 @@
           "failure_probability": 0.86,
           "server_id": "SRV-A1-02",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T14",
@@ -1055,7 +1127,8 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T14-E2",
@@ -1064,10 +1137,11 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.69,
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T15",
@@ -1087,7 +1161,8 @@
             "temperature_c": 38.4,
             "humidity_pct": 42.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T15-E2",
@@ -1097,7 +1172,8 @@
           "failure_probability": 0.72,
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T15-E3",
@@ -1107,10 +1183,11 @@
           "failure_probability": 0.49,
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T16",
@@ -1130,7 +1207,8 @@
             "temperature_c": 37.0,
             "humidity_pct": 44.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T16-E2",
@@ -1140,7 +1218,8 @@
           "failure_probability": 0.75,
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T16-E3",
@@ -1150,7 +1229,8 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I2"
         },
         {
           "event_id": "T16-E4",
@@ -1159,10 +1239,11 @@
           "state": "EXPLICIT_SECURITY_EVENT",
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I2"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T17",
@@ -1183,7 +1264,8 @@
             "temperature_c": 42.0,
             "humidity_pct": 41.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T17-E2",
@@ -1193,10 +1275,11 @@
           "failure_probability": 0.51,
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T18",
@@ -1210,7 +1293,8 @@
           "domain": "PHYSICAL_SECURITY",
           "state": "UNKNOWN_PERSON",
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T18-E2",
@@ -1219,10 +1303,11 @@
           "state": "ANOMALY_CANDIDATE",
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T19",
@@ -1238,7 +1323,8 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P001",
           "camera_id": "CAM-C-01",
-          "zone_id": "ZONE-C"
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T19-E2",
@@ -1252,7 +1338,8 @@
             "temperature_c": 37.9,
             "humidity_pct": 39.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T19-E3",
@@ -1262,13 +1349,14 @@
           "failure_probability": 0.71,
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         }
       ],
       "original_v1_states": [
         "COOLING_ANOMALY"
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T20",
@@ -1288,7 +1376,8 @@
             "temperature_c": 23.8,
             "humidity_pct": 84.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T20-E2",
@@ -1298,10 +1387,11 @@
           "failure_probability": 0.79,
           "server_id": "SRV-A1-02",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T21",
@@ -1316,7 +1406,8 @@
           "state": "HIGH_CONFIDENCE_ANOMALY",
           "server_id": "SRV-A1-01",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T21-E2",
@@ -1324,10 +1415,11 @@
           "domain": "PHYSICAL_SECURITY",
           "state": "UNKNOWN_PERSON",
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T22",
@@ -1347,7 +1439,8 @@
             "temperature_c": 24.5,
             "humidity_pct": 93.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T22-E2",
@@ -1356,7 +1449,8 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.8,
           "camera_id": "CAM-C-01",
-          "zone_id": "ZONE-C"
+          "zone_id": "ZONE-C",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T22-E3",
@@ -1366,13 +1460,14 @@
           "failure_probability": 0.53,
           "server_id": "SRV-B1-01",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         }
       ],
       "original_v1_states": [
         "WATER_LEAK_DETECTED"
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T23",
@@ -1387,7 +1482,8 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.64,
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": null
         },
         {
           "event_id": "T23-E2",
@@ -1395,7 +1491,8 @@
           "domain": "PHYSICAL_SECURITY",
           "state": "UNKNOWN_PERSON",
           "camera_id": "CAM-B-01",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T23-E3",
@@ -1410,10 +1507,11 @@
             "temperature_c": 41.2,
             "humidity_pct": 40.0
           },
-          "state_source": "environmental_detector 1.0 (frozen detector)"
+          "state_source": "environmental_detector 1.0 (frozen detector)",
+          "ground_truth_incident": "I1"
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     },
     {
       "scenario_id": "T24",
@@ -1429,7 +1527,8 @@
           "authorization": "UNAUTHORIZED",
           "person_id": "P003",
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T24-E2",
@@ -1438,7 +1537,8 @@
           "state": "PPE_NON_COMPLIANT",
           "confidence": 0.9,
           "camera_id": "CAM-A-01",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T24-E3",
@@ -1447,7 +1547,8 @@
           "state": "EXPLICIT_SECURITY_EVENT",
           "server_id": "SRV-A1-02",
           "rack_id": "RACK-A1",
-          "zone_id": "ZONE-A"
+          "zone_id": "ZONE-A",
+          "ground_truth_incident": "I1"
         },
         {
           "event_id": "T24-E4",
@@ -1457,10 +1558,11 @@
           "failure_probability": 0.66,
           "server_id": "SRV-B1-02",
           "rack_id": "RACK-B1",
-          "zone_id": "ZONE-B"
+          "zone_id": "ZONE-B",
+          "ground_truth_incident": null
         }
       ],
-      "label_status": "PENDING_BLIND_RELABEL"
+      "label_status": "OPERATOR_BLIND_RELABEL"
     }
   ]
 }

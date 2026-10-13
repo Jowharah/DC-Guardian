@@ -1,6 +1,6 @@
 # DC-GUARDIAN — Reasoning under uncertainty (Bayesian correlation)
 
-**Updated:** 2026-10-11  
+**Updated:** 2026-10-13 (scenario set v2 results)  
 **Branch:** developed on `feature/uncertainty-reasoning` (from `bf37dba`), merged into `feature/presentation-dashboard` on 2026-10-11 and into `main` with PR #2  
 **Status:** research component with contract tests and an offline evaluation. Not yet wired into the dashboard, the Decision layer or Neo4j.
 
@@ -92,7 +92,7 @@ Five of these are in the test split. Operator decisions:
   - **Not independent:** the operator also wrote v1, so the v2 labels are a blind relabel by the same author, not independent labels.
 - **Extended-sensor set (`extended_sensor_scenarios.json`):** the 8 original scenarios, verbatim with v1 labels, as future-work evidence of what leak, smoke and airflow sensors would add. Reported apart from the headline results.
 
-**Expected effect.** The Bayesian knowledge base treats every dedicated room sensor as strong evidence, and the domain pairs and times are unchanged. The model's inputs for these pairs are therefore almost unchanged. What may change is the ground truth: heat or humidity alone is more ambiguous than a leak or smoke alarm, and every scenario is labelled afresh without its narrative, so the new labels, and with them the reported numbers, may differ. The results above are on v1 until the relabelled v2 results are added.
+**Effect.** The Bayesian knowledge base treats every dedicated room sensor as strong evidence, and the domain pairs and times are unchanged, so the model's inputs are almost unchanged. The ground truth did change: the operator's blind relabel agrees with the v1 labels on 73% of pairs (kappa 0.46). The v1 results below stay the published reference; the v2 results are in [Results on scenario set v2](#results-on-scenario-set-v2-2026-10-13).
 
 ## Results
 
@@ -124,6 +124,26 @@ Correlation of either kind cuts alerts by about a third against single-domain al
 - Removing any one factor drops F1 to 0.588–0.605, roughly the crisp level, so all four factors contribute.
 - Perturbing every probability with log-normal noise (σ 0.3, 200 draws) gives F1 median 0.704, 5th–95th percentile 0.578–0.815; 87 % of perturbed models still beat the crisp rule. The result does not hinge on the exact expert numbers.
 
+### Results on scenario set v2 (2026-10-13)
+
+Regenerate with `evaluate.py --set v2` (headline v2 labels: the operator's full blind relabel) and `evaluate.py --set v2-chatgpt` (sensitivity: ChatGPT's labels of the same pack as ground truth); reports in `reasoning/uncertainty/results/evaluation_report_v2*.md`. The knowledge base, model and thresholds are unchanged.
+
+**Test split (59 pairs), v1 and v2 side by side:**
+
+| Labels | Related pairs | Crisp F1 | Bayesian F1 | Bayesian − crisp F1, 95% interval | Bayesian AP | Perturbed models beating crisp |
+|---|---:|---:|---:|---|---:|---:|
+| v1, author (published) | 28 | 0.593 | 0.731 | +0.022 to +0.261 | 0.829 | 87% |
+| v2, operator blind relabel | 25 | 0.784 | 0.857 | **−0.040 to +0.190** | 0.919 | 48% |
+| v2, ChatGPT (sensitivity) | 13 | 0.615 | 0.703 | −0.067 to +0.229 | 0.799 | 62% |
+
+**Label agreement (all 85 pairs):** operator v2 vs v1 author labels 73% (kappa 0.46); ChatGPT v2 vs operator v2 73% (kappa 0.46; test split 80%, kappa 0.56). ChatGPT marks 22 pairs related against the operator's 43. Of the 23 disagreements, 22 are operator Y / ChatGPT N, and 10 of them are heat or humidity followed by a drive at risk: ChatGPT does not accept a SMART risk alert as evidence of heat damage. Where both were sure (confidence 3), they agree on 27 of 31 pairs.
+
+What this shows and what it does not:
+- **Both methods score higher on the v2 labels**, but the labels changed more than the scenarios did. The v2 labels come from the same author, written after discussing how the system links events (zones, timing), so the rise is not evidence that the model improved.
+- **The Bayesian advantage over the crisp rule is no longer clear.** Its point estimate stays positive under every labelling, but on both v2 labellings the 95% interval includes zero, and under the operator's v2 labels only 48% of perturbed models beat the crisp rule. Cite it as "positive but not significant on v2", not as an established gain.
+- **Correlation itself is robust.** Against isolated single-domain alerting, correlation cuts test alerts from 65 to 43–44 and links most incidents into one alert under all three labellings (see `docs/report/evaluation_baseline_and_latency.md`).
+- **The decisive judgement call** is whether heat or humidity plus a drive at risk is one incident. The knowledge base says yes (a "known" mechanism); ChatGPT says no. Independent human labels are needed to settle it.
+
 ## What the errors show
 
 - **Long cooling cascades are still missed.** Chiller-to-drive links 33–55 minutes apart score 0.18–0.41 (T02, T09, T19, D03). The time table treats all long gaps alike, but cascades are slow by nature. A better structure would make TimeGap depend on Topology, which is a natural next step but was not tuned in, to keep the evaluation honest.
@@ -148,6 +168,10 @@ Correlation of either kind cuts alerts by about a third against single-domain al
 ### LLM rater (ChatGPT), 2026-10-11
 
 ChatGPT labelled the blind pack (`labelling/results/llm-chatgpt.md`). Test split: 78% agreement with the author, Cohen's kappa 0.55; against its labels crisp F1 0.596 (0.40–0.77) and Bayesian F1 0.756 (0.61–0.86), difference +0.03 to +0.29. The ranking and gap match the author-label result. **This is not independent human validation:** its labels follow a fixed rule (cross-zone always N, including chiller-to-hall cascades despite the stated cooling dependency; same-zone Y only for the three domain pairs the knowledge base marks as known mechanisms), so agreement with the Bayesian model is partly circular. Its disagreements with the author highlight the judgement calls (S17 same-server cyber + drive; S22, S30 and S15 context cases) that human labellers should settle.
+
+### Scenario set v2: operator relabel and ChatGPT, 2026-10-13
+
+Both labelled `labelling/pack_v2/` blind: the operator (`results/operator-v2_labels.csv`) and ChatGPT (`results/llm-chatgpt-v2_labels.csv`, pasted by the operator; no API call). `score_labels.py --pack v2` scores a labeller against the operator's v2 labels and also against the v1 author labels (`results/operator-v2.md`, `results/llm-chatgpt-v2.md`; the operator file's 100% self-agreement is by construction, its useful figure is the 73% agreement with v1). Results and their reading are under [Results on scenario set v2](#results-on-scenario-set-v2-2026-10-13). Neither is independent human validation: the operator wrote v1 and the knowledge base, and ChatGPT is a language model's second opinion.
 
 ## Integration path
 
