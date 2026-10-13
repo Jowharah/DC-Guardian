@@ -70,6 +70,25 @@ Scenarios cover true incidents (cooling cascades, intrusions followed by console
 
 The knowledge base, scenarios and model code were committed (`c0b9dc3`) before the evaluation script and results (`22119f2`), and the knowledge base has not changed since. Both commits come from one working session three minutes apart, so the commit order shows only that the knowledge base was not changed after it was committed; it cannot show that no scenario was scored before that commit. Independent labelling (see Limitations) is the stronger safeguard.
 
+### Scenario set v2: only states the detector can produce (2026-10-13)
+
+The environmental detector measures temperature and humidity only: HIGH_TEMPERATURE above 35 °C, HIGH_HUMIDITY above 80 %, LOW_HUMIDITY below 20 %. Eight v1 scenarios use states it cannot produce:
+- WATER_LEAK_DETECTED: D14, T22;
+- SMOKE_DETECTED: D10, T12;
+- AIRFLOW_ANOMALY: D03, T09;
+- COOLING_ANOMALY: T02, T19.
+
+Five of these are in the test split. Operator decisions:
+- **v1 stays unchanged.** `labelled_scenarios.json` is pinned by a hash test, so published results remain reproducible.
+- **v2 (`labelled_scenarios_v2.json`, built by `scenarios/build_scenarios_v2.py`):**
+  - every environmental event carries a raw reading, and its state is what the frozen detector assigns (leak → high humidity; smoke, airflow and cooling → high temperature);
+  - narratives of the 8 rewritten scenarios describe readings, not relatedness;
+  - a test fails if any v2 environmental state is one the detector cannot produce. The producible states are found by running the detector over the measurement range.
+- **Blind relabelling:** the 8 rewritten scenarios are relabelled blind (`labelling/relabel_v2/`: the operator's labels first, then the ChatGPT comparison). Their old labels are not reused; until the new labels exist the scenarios are marked `PENDING_BLIND_RELABEL`.
+- **Extended-sensor set (`extended_sensor_scenarios.json`):** the 8 original scenarios, verbatim with v1 labels, as future-work evidence of what leak, smoke and airflow sensors would add. Reported apart from the headline results.
+
+**Expected effect.** The Bayesian knowledge base treats every dedicated room sensor as strong evidence, and the domain pairs and times are unchanged. The model's inputs for these pairs are therefore almost unchanged. What may change is the ground truth: heat or humidity alone is more ambiguous than a leak or smoke alarm, so the new labels, and with them the reported numbers, may differ. The results above are on v1 until the relabelled v2 results are added.
+
 ## Results
 
 Regenerate with `python reasoning/uncertainty/evaluate.py`; the full per-pair table is in `reasoning/uncertainty/results/evaluation_report.md`.

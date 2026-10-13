@@ -37,6 +37,8 @@ The proposal asks whether combining multi-domain Evidence with graph context and
   - average precision rises from 0.67 to 0.71;
   - 9 of 13 incidents appear whole.
 
+**Scenario set.** These figures use scenario set v1. Eight of its 40 scenarios (five in the test split) include leak, smoke, airflow or cooling alerts that the prototype's environmental detector cannot produce. Scenario set v2 replaces them with the temperature or humidity readings the detector would give, and those 8 scenarios are being relabelled blind. Heat or humidity alone is more ambiguous than a leak or smoke alarm, so the v2 figures may be lower. They will be reported beside these, and the 8 original scenarios will be reported separately as evidence of what extra sensors would add.
+
 **Limits.**
 - **Synthetic data:** the scenarios and topology are synthetic.
 - **Author labels:** the relatedness labels, the scenarios and the known-mechanism list all come from the same author. An independent labelling round is pending.

@@ -1,0 +1,61 @@
+{
+  "scenarios": {
+    "R01": {
+      "original_id": "T12",
+      "split": "test"
+    },
+    "R02": {
+      "original_id": "T02",
+      "split": "test"
+    },
+    "R03": {
+      "original_id": "T09",
+      "split": "test"
+    },
+    "R04": {
+      "original_id": "D03",
+      "split": "dev"
+    },
+    "R05": {
+      "original_id": "D10",
+      "split": "dev"
+    },
+    "R06": {
+      "original_id": "D14",
+      "split": "dev"
+    },
+    "R07": {
+      "original_id": "T19",
+      "split": "test"
+    },
+    "R08": {
+      "original_id": "T22",
+      "split": "test"
+    }
+  },
+  "events": {
+    "R01-E1": "T12-E1",
+    "R01-E2": "T12-E2",
+    "R01-E3": "T12-E3",
+    "R02-E1": "T02-E1",
+    "R02-E2": "T02-E2",
+    "R02-E3": "T02-E3",
+    "R02-E4": "T02-E4",
+    "R03-E1": "T09-E1",
+    "R03-E2": "T09-E3",
+    "R03-E3": "T09-E2",
+    "R04-E1": "D03-E1",
+    "R04-E2": "D03-E2",
+    "R04-E3": "D03-E3",
+    "R05-E1": "D10-E1",
+    "R05-E2": "D10-E2",
+    "R06-E1": "D14-E1",
+    "R06-E2": "D14-E2",
+    "R07-E1": "T19-E1",
+    "R07-E2": "T19-E2",
+    "R07-E3": "T19-E3",
+    "R08-E1": "T22-E1",
+    "R08-E2": "T22-E2",
+    "R08-E3": "T22-E3"
+  }
+}
