@@ -85,10 +85,30 @@ YOLOv8s and YOLOv8m tie (0.6480 vs 0.6479), so the smaller model was selected.
 - **Effect on compliance:** compliance needs both items, so a missed vest makes a compliant person look NON_COMPLIANT. More vest data, or a vest-specific evaluation, is needed before relying on either model for vests.
 - **Runtime:** switching to v2 is an operator decision. Until then `ppe_config.json` (PPE-v1) is unchanged.
 
+### Post-hoc: all candidates on the locked test (after selection; not used to choose)
+
+At the operator's request, after the vest regression, the two unselected candidates were scored on the same 810 locked images with the same settings (`src/evaluate_posthoc_v2.py`, `results/posthoc_v2/`). Re-scoring v1 and v2s1024 reproduced their official results exactly (mAP@0.5 0.5447 and 0.5951). **v2s1024 remains the official PPE-v2 result.**
+
+| Locked test, post-hoc | All mAP@0.5 / recall | Helmet recall / mAP@0.5 | Vest recall / mAP@0.5 | Person mAP@0.5 |
+|---|---|---|---|---|
+| PPE-v1 (baseline) | 0.545 / 0.524 | 0.603 / 0.676 | 0.449 / 0.372 | 0.869 |
+| v2n1024 | 0.578 / 0.532 | 0.592 / 0.744 | 0.367 / 0.383 | 0.884 |
+| **v2s1024 (official)** | 0.595 / 0.535 | 0.654 / 0.708 | 0.245 / 0.317 | 0.893 |
+| v2m1024 | **0.625 / 0.612** | **0.664** / 0.739 | **0.449 / 0.416** | **0.900** |
+
+At the runtime confidence threshold (0.25), vest recall on the locked test is v1 0.449, v2n 0.367, v2s 0.327 and v2m 0.449.
+
+**Reading:**
+- **Not every v2 model is worse on vests.** YOLOv8m matches v1's vest recall and has a higher vest mAP, so the planned combined detector (v2 for helmet and person, v1 for vests) was **not built**; its condition was not met.
+- **The tie-break cost vest performance.** The selection rule broke the YOLOv8s/YOLOv8m validation tie (0.6480 vs 0.6479) in favour of the smaller model. On the locked test YOLOv8m is better on every class shown, so in hindsight the tie-break cost vest performance.
+- **YOLOv8m cannot be claimed as "the" PPE-v2.** That would be choosing on the locked test. Using YOLOv8m would be an operator decision informed by the test, and a clean claim would need a fresh held-out set.
+- **Batch-size note:** the post-hoc validation table uses batch 16, matching the test settings, while selection used batch 8. Validation figures therefore differ by about 0.01, and YOLOv8s and YOLOv8m still tie within 0.01 (0.638 vs 0.645).
+
 **Artifacts:**
 - `models/ppe_yolov8_v2_best.pt` and `models/ppe_v2_training_metadata.json`;
 - `results/selection_v2/`;
 - `results/final_test_v2/`;
+- `results/posthoc_v2/` (post-hoc);
 - `results/training_v2/<candidate>/results.csv`.
 
 `tests/test_ppe_v2_artifacts.py` checks that the v1 weights and config are unchanged and that the recorded selection follows the declared rule.

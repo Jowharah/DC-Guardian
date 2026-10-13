@@ -12,6 +12,7 @@ Working on the repository with Claude Code: see [`CLAUDE.md`](../CLAUDE.md) at t
 ## Existing reference documents
 
 - [Report draft: evaluation against single-domain monitoring, and latency](report/evaluation_baseline_and_latency.md) — answers the proposal's research question on the labelled scenarios (held-out test split, bootstrap intervals) and reports per-stage pipeline latency.
+- [Report draft: PPE detector v2](report/ppe_v2_model_enhancement.md) — model enhancement: protocol, validation selection, the official locked test (helmet and overall improved, vest regressed) and the post-hoc evaluation of all candidates.
 - [Report draft: industrial deployment considerations](report/industrial_deployment_considerations.md) — section for the project report: controls in place and how they were verified, production requirements, threat-model summary, limitations.
 - [Testing](TESTING.md) — what each test suite covers, markers and automatic skips, commands, how the script tests were converted to pytest and shown to be equivalent, how to write new tests.
 - [Production Readiness](PRODUCTION_READINESS.md) — what must change before real data or multiple users: target deployment, decisions to make, STRIDE threat model with existing controls and gaps, scope for the independent security review.

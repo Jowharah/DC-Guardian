@@ -27,7 +27,16 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
   - helmet: recall 0.603 → 0.654, mAP 0.676 → 0.708;
   - **safety vest: recall 0.449 → 0.245, mAP 0.372 → 0.317.** This is the opposite of validation. There are only 49 vests in 23 images, so the size of the difference cannot be estimated, but v2 does not fix the vest weakness.
 - **Runtime unchanged:** `ppe_config.json` (PPE-v1) still drives the pipeline; switching to v2 is the operator's decision. Missed vests turn compliant people into NON_COMPLIANT alerts.
-- **Tests:** `evidence/ppe_detection/tests/test_ppe_v2_artifacts.py` (3, no GPU) checks:
+- **Post-hoc analysis (operator request; after selection, not used to choose):** `src/evaluate_posthoc_v2.py` → `results/posthoc_v2/`.
+  - **Setup:** the same 810 locked images and settings as the official runs. Re-scoring v1 and v2s reproduced their official mAP@0.5 exactly (0.5447, 0.5951). The v1 hashes were checked before and after, and the run-once script was not touched.
+  - **Locked test:**
+    - v2n: all-class mAP 0.578, vest recall 0.367;
+    - v2m: **all-class mAP 0.625, recall 0.612, helmet recall 0.664, vest recall 0.449 (= v1), vest mAP 0.416 (v1 0.372)**.
+  - **Combined detector not built:** it was conditional on every v2 being worse than v1 on vests, and v2m is not.
+  - **The tie-break cost vests in hindsight:** v2m beats the official v2s on the test. Choosing v2m now would be test-informed, and a clean claim needs a fresh held-out set.
+  - **Batch-size difference:** the post-hoc validation used batch 16 against batch 8 for selection, which moves validation figures by about 0.01. v2s and v2m still tie within 0.01.
+  - **Docs:** report draft `docs/report/ppe_v2_model_enhancement.md`.
+- **Tests:** `evidence/ppe_detection/tests/test_ppe_v2_artifacts.py` (4, no GPU) checks (the fourth checks that the post-hoc file is labelled and never replaces the official result):
   - the v1 hash and config are unchanged;
   - the recorded selection follows the rule;
   - the locked test used the selected weights.

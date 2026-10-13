@@ -50,3 +50,15 @@ def test_v2_locked_test_used_the_selected_weights_once():
     assert not result["training_performed"] and not result["model_selection_performed"]
     v1 = _json("results", "final_test", "ppe_final_test.json")
     assert v1["final_test_images"] == result["final_test_images"]
+
+
+def test_posthoc_analysis_is_labelled_and_never_replaces_the_official_result():
+    posthoc = _json("results", "posthoc_v2", "posthoc_v2.json")
+    assert posthoc["label"].startswith("POST-HOC") and posthoc["official_ppe_v2"] == "v2s1024"
+    for name, check in posthoc["consistency_with_official"].items():
+        assert check["official_map50"] == check["rescored_map50"], name
+    assert posthoc["weights_sha256"]["PPE-v1"] == V1_WEIGHTS_SHA256
+    assert posthoc["weights_sha256"]["v2s1024"] == V2_WEIGHTS_SHA256
+    # The combined detector is built only when every v2 candidate is worse than v1 on vests.
+    assert (posthoc["combined"] is None) == (not posthoc["all_v2_worse_than_v1_on_vests"])
+    assert _json("results", "selection_v2", "selection_v2.json")["selected"] == "v2s1024"
