@@ -6,6 +6,47 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-13 — Single-domain baseline comparison and pipeline latency
+
+- **Why:** a project-versus-proposal check found two gaps in the evaluation plan:
+  - the research question compares DC-GUARDIAN with isolated single-domain monitoring, and that comparison was missing;
+  - latency was logged but never measured.
+- **Baseline (`presentation/backend/validation/baseline_comparison.py`):** the protocol was fixed before any result was computed.
+  - Both systems use the DCG-DECISION-v2 single-event severities.
+  - Queues are sorted by severity, ties random over 500 orders.
+  - The held-out test split is primary, with a scenario bootstrap.
+  - Results (test split):
+    - alerts 65 → 44 (CI −29 to −14);
+    - average precision 0.66 → 0.74 (CI +0.02 to +0.18);
+    - 11 of 18 incidents shown whole (0 isolated);
+    - 86% of HIGH alerts are incidents.
+  - The dev split points the same way.
+  - Alert and linkage counts match the uncertainty study's operator view (a test asserts this).
+- **Latency (`presentation/backend/validation/latency_benchmark.py`):**
+  - **Upload endpoints:** run in-process against a temporary database with publish and retain off, so there is no OpenAI call and nothing is stored.
+  - **Neo4j:** ingestion and correlation of the correlation contract's controlled events, in a `SCENARIO-LATENCY-*` scope that is removed afterwards (verified: 0 nodes remain).
+  - **Decision v2:** timed in-process.
+  - **Observed use:** per-route latency from the access logs, matched against the OpenAPI path templates. FastAPI 0.143 wraps included routers, so `app.routes` no longer lists their paths.
+  - **Results:**
+    - inference 4.1 s (SSH), 4.2 s (PPE) and 10.1 s (Face): a new worker process per upload, model loading included;
+    - graph and correlation 0.05 s;
+    - Decision 8 µs;
+    - Investigator 3.2 s;
+    - specialists 12–24 s.
+- **Report draft:** `docs/report/evaluation_baseline_and_latency.md`.
+- **Verified:**
+  - both scripts run;
+  - new tests `test_baseline_comparison.py` (consistency with the uncertainty study, a hand-checked queue) and `test_latency_benchmark.py` (log parsing);
+  - backend suite.
+- **Caveats:**
+  - author labels;
+  - synthetic scenarios;
+  - the baseline uses DC-GUARDIAN's own single-event policy;
+  - one machine and one user, no load test;
+  - few observed specialist calls.
+
+---
+
 ## 2026-10-12 — Testing plan item 5 completed: every test under pytest
 
 - **What (operator request):** the remaining 55 script tests are pytest modules: 27 Evidence (4 GPU), 6 RAG and 22 Reasoning, including the labelling pack. Each straight-line script body moved unchanged into a `test_<name>_contract()` function; scripts with a `main()` got a test that calls it; a `__main__` guard keeps `python <file>` working; multi-line string lines were not re-indented.

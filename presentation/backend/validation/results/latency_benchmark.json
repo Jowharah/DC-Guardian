@@ -1,0 +1,516 @@
+{
+  "run_at": "2026-10-13T06:28:34+00:00",
+  "repeats": 10,
+  "machine": "operator workstation (Windows 11, single user, uvicorn --reload for observed use)",
+  "evidence": {
+    "SSH log (OpenSSH_2k, 2,000 lines)": {
+      "n": 10,
+      "median_ms": 4069.0,
+      "p95_ms": 4146.8,
+      "min_ms": 3967.5,
+      "max_ms": 4146.8
+    },
+    "PPE image (YOLOv8n, 2758 x 1839)": {
+      "n": 10,
+      "median_ms": 4237.7,
+      "p95_ms": 4336.7,
+      "min_ms": 4143.3,
+      "max_ms": 4336.7
+    },
+    "Face image (ArcFace)": {
+      "n": 10,
+      "median_ms": 10142.6,
+      "p95_ms": 10360.3,
+      "min_ms": 9889.8,
+      "max_ms": 10360.3
+    },
+    "Drive SMART history (30 days, Temporal RF v2)": {
+      "n": 10,
+      "median_ms": 56.0,
+      "p95_ms": 62.5,
+      "min_ms": 45.7,
+      "max_ms": 62.5
+    },
+    "Sensor readings (60 rows, thresholds)": {
+      "n": 10,
+      "median_ms": 8.8,
+      "p95_ms": 9.6,
+      "min_ms": 8.4,
+      "max_ms": 9.6
+    }
+  },
+  "reasoning": {
+    "Neo4j connection (one per upload)": {
+      "n": 10,
+      "median_ms": 3.6,
+      "p95_ms": 20.6,
+      "min_ms": 2.4,
+      "max_ms": 20.6
+    },
+    "Ingest SSH event": {
+      "n": 10,
+      "median_ms": 18.5,
+      "p95_ms": 24.4,
+      "min_ms": 15.2,
+      "max_ms": 24.4
+    },
+    "Ingest drive-risk event": {
+      "n": 10,
+      "median_ms": 19.5,
+      "p95_ms": 24.0,
+      "min_ms": 16.3,
+      "max_ms": 24.0
+    },
+    "Cross-domain correlation (scenario)": {
+      "n": 10,
+      "median_ms": 4.9,
+      "p95_ms": 7.4,
+      "min_ms": 3.5,
+      "max_ms": 7.4
+    },
+    "_correlated_runs": "10 of 10"
+  },
+  "decision": {
+    "DCG-DECISION-v2 group decision (per call, \u00b5s)": {
+      "n": 10,
+      "median_ms": 5.1,
+      "p95_ms": 7.9,
+      "min_ms": 4.5,
+      "max_ms": 7.9,
+      "unit": "microseconds"
+    }
+  },
+  "observed": {
+    "period": [
+      "2026-10-10 22:03:46,652",
+      "2026-10-13 09:28:33,112"
+    ],
+    "requests": 75444,
+    "routes": {
+      "GET /api/v1/access/employees": {
+        "n": 13,
+        "median_ms": 14.0,
+        "p95_ms": 105.0,
+        "min_ms": 9.0,
+        "max_ms": 468.0
+      },
+      "GET /api/v1/auth/me": {
+        "n": 60,
+        "median_ms": 2.0,
+        "p95_ms": 33.0,
+        "min_ms": 1.0,
+        "max_ms": 55.0
+      },
+      "GET /api/v1/correlations/pairs": {
+        "n": 4507,
+        "median_ms": 91.0,
+        "p95_ms": 148.0,
+        "min_ms": 13.0,
+        "max_ms": 470.0
+      },
+      "GET /api/v1/correlations/unified": {
+        "n": 4508,
+        "median_ms": 99.0,
+        "p95_ms": 157.0,
+        "min_ms": 13.0,
+        "max_ms": 446.0
+      },
+      "GET /api/v1/correlations/unified/{group_id}/graph": {
+        "n": 96,
+        "median_ms": 156.5,
+        "p95_ms": 341.0,
+        "min_ms": 39.0,
+        "max_ms": 444.0
+      },
+      "GET /api/v1/correlations/unified/{group_id}/review-decision": {
+        "n": 2513,
+        "median_ms": 153.0,
+        "p95_ms": 205.0,
+        "min_ms": 35.0,
+        "max_ms": 437.0
+      },
+      "GET /api/v1/correlations/unified/{group_id}/specialists": {
+        "n": 3887,
+        "median_ms": 100.0,
+        "p95_ms": 151.0,
+        "min_ms": 26.0,
+        "max_ms": 424.0
+      },
+      "GET /api/v1/correlations/unified/{group_id}/synthesis": {
+        "n": 60,
+        "median_ms": 139.0,
+        "p95_ms": 289.0,
+        "min_ms": 32.0,
+        "max_ms": 337.0
+      },
+      "GET /api/v1/cyber/face-ssh/candidates": {
+        "n": 4505,
+        "median_ms": 19.0,
+        "p95_ms": 62.0,
+        "min_ms": 4.0,
+        "max_ms": 357.0
+      },
+      "GET /api/v1/decisions/standalone": {
+        "n": 2041,
+        "median_ms": 51.0,
+        "p95_ms": 108.0,
+        "min_ms": 11.0,
+        "max_ms": 371.0
+      },
+      "GET /api/v1/environment/events": {
+        "n": 4507,
+        "median_ms": 9.0,
+        "p95_ms": 22.0,
+        "min_ms": 2.0,
+        "max_ms": 350.0
+      },
+      "GET /api/v1/events/standalone": {
+        "n": 4507,
+        "median_ms": 10.0,
+        "p95_ms": 30.0,
+        "min_ms": 1.0,
+        "max_ms": 233.0
+      },
+      "GET /api/v1/evidence-reviews": {
+        "n": 5775,
+        "median_ms": 9.0,
+        "p95_ms": 21.0,
+        "min_ms": 1.0,
+        "max_ms": 349.0
+      },
+      "GET /api/v1/evidence-reviews/{kind}/{evidence_id}": {
+        "n": 1357,
+        "median_ms": 5.0,
+        "p95_ms": 21.0,
+        "min_ms": 2.0,
+        "max_ms": 154.0
+      },
+      "GET /api/v1/evidence/{kind}/{event_id}/graph": {
+        "n": 47,
+        "median_ms": 20.0,
+        "p95_ms": 252.0,
+        "min_ms": 9.0,
+        "max_ms": 361.0
+      },
+      "GET /api/v1/face/observations": {
+        "n": 4507,
+        "median_ms": 13.0,
+        "p95_ms": 34.0,
+        "min_ms": 1.0,
+        "max_ms": 230.0
+      },
+      "GET /api/v1/face/observations/{oid}": {
+        "n": 78,
+        "median_ms": 6.0,
+        "p95_ms": 40.0,
+        "min_ms": 2.0,
+        "max_ms": 111.0
+      },
+      "GET /api/v1/face/observations/{oid}/authorization": {
+        "n": 78,
+        "median_ms": 10.0,
+        "p95_ms": 23.0,
+        "min_ms": 4.0,
+        "max_ms": 53.0
+      },
+      "GET /api/v1/face/observations/{oid}/image": {
+        "n": 78,
+        "median_ms": 31.5,
+        "p95_ms": 98.0,
+        "min_ms": 12.0,
+        "max_ms": 123.0
+      },
+      "GET /api/v1/health": {
+        "n": 23,
+        "median_ms": 1.0,
+        "p95_ms": 3.0,
+        "min_ms": 1.0,
+        "max_ms": 68.0
+      },
+      "GET /api/v1/image-observations/{kind}/{observation_id}/metadata": {
+        "n": 164,
+        "median_ms": 6.0,
+        "p95_ms": 34.0,
+        "min_ms": 2.0,
+        "max_ms": 70.0
+      },
+      "GET /api/v1/incidents": {
+        "n": 4507,
+        "median_ms": 12.0,
+        "p95_ms": 31.0,
+        "min_ms": 2.0,
+        "max_ms": 254.0
+      },
+      "GET /api/v1/investigator/evidence/{kind}/{evidence_id}/context": {
+        "n": 116,
+        "median_ms": 4.0,
+        "p95_ms": 10.0,
+        "min_ms": 2.0,
+        "max_ms": 13.0
+      },
+      "GET /api/v1/investigator/evidence/{kind}/{evidence_id}/history": {
+        "n": 33,
+        "median_ms": 12.0,
+        "p95_ms": 54.0,
+        "min_ms": 4.0,
+        "max_ms": 100.0
+      },
+      "GET /api/v1/investigator/operations/{candidate_id}/history": {
+        "n": 1,
+        "median_ms": 20.0,
+        "p95_ms": 20.0,
+        "min_ms": 20.0,
+        "max_ms": 20.0
+      },
+      "GET /api/v1/investigator/pairs/{pair_id}/context": {
+        "n": 62,
+        "median_ms": 34.5,
+        "p95_ms": 59.0,
+        "min_ms": 25.0,
+        "max_ms": 67.0
+      },
+      "GET /api/v1/investigator/pairs/{pair_id}/history": {
+        "n": 1,
+        "median_ms": 32.0,
+        "p95_ms": 32.0,
+        "min_ms": 32.0,
+        "max_ms": 32.0
+      },
+      "GET /api/v1/investigator/unified/{group_id}/context": {
+        "n": 20,
+        "median_ms": 174.0,
+        "p95_ms": 242.0,
+        "min_ms": 114.0,
+        "max_ms": 266.0
+      },
+      "GET /api/v1/investigator/unified/{group_id}/history": {
+        "n": 49,
+        "median_ms": 206.0,
+        "p95_ms": 357.0,
+        "min_ms": 32.0,
+        "max_ms": 373.0
+      },
+      "GET /api/v1/lifecycle/{subject_type}/{subject_id}": {
+        "n": 2,
+        "median_ms": 41.5,
+        "p95_ms": 46.0,
+        "min_ms": 37.0,
+        "max_ms": 46.0
+      },
+      "GET /api/v1/maintenance/events": {
+        "n": 4506,
+        "median_ms": 9.0,
+        "p95_ms": 28.0,
+        "min_ms": 2.0,
+        "max_ms": 131.0
+      },
+      "GET /api/v1/operations/correlations": {
+        "n": 4507,
+        "median_ms": 16.0,
+        "p95_ms": 50.0,
+        "min_ms": 3.0,
+        "max_ms": 359.0
+      },
+      "GET /api/v1/operations/correlations/{candidate_id}/graph": {
+        "n": 2,
+        "median_ms": 87.5,
+        "p95_ms": 150.0,
+        "min_ms": 25.0,
+        "max_ms": 150.0
+      },
+      "GET /api/v1/physical/image-correlations": {
+        "n": 4507,
+        "median_ms": 50.0,
+        "p95_ms": 105.0,
+        "min_ms": 6.0,
+        "max_ms": 382.0
+      },
+      "GET /api/v1/ppe/observations": {
+        "n": 4507,
+        "median_ms": 15.0,
+        "p95_ms": 37.0,
+        "min_ms": 2.0,
+        "max_ms": 255.0
+      },
+      "GET /api/v1/ppe/observations/{observation_id}": {
+        "n": 103,
+        "median_ms": 9.0,
+        "p95_ms": 73.0,
+        "min_ms": 2.0,
+        "max_ms": 130.0
+      },
+      "GET /api/v1/ppe/observations/{observation_id}/image": {
+        "n": 102,
+        "median_ms": 25.5,
+        "p95_ms": 75.0,
+        "min_ms": 7.0,
+        "max_ms": 191.0
+      },
+      "GET /api/v1/reviews/audit-integrity": {
+        "n": 2,
+        "median_ms": 4.0,
+        "p95_ms": 5.0,
+        "min_ms": 3.0,
+        "max_ms": 5.0
+      },
+      "GET /api/v1/reviews/unified/{group_id}/records": {
+        "n": 4130,
+        "median_ms": 67.0,
+        "p95_ms": 96.0,
+        "min_ms": 19.0,
+        "max_ms": 772.0
+      },
+      "GET /api/v1/scenarios": {
+        "n": 53,
+        "median_ms": 3.0,
+        "p95_ms": 11.0,
+        "min_ms": 1.0,
+        "max_ms": 18.0
+      },
+      "GET /api/v1/ssh/published": {
+        "n": 4506,
+        "median_ms": 23.0,
+        "p95_ms": 65.0,
+        "min_ms": 3.0,
+        "max_ms": 311.0
+      },
+      "GET /api/v1/ssh/published/{event_id}/decision": {
+        "n": 2,
+        "median_ms": 48.5,
+        "p95_ms": 80.0,
+        "min_ms": 17.0,
+        "max_ms": 80.0
+      },
+      "GET /api/v1/topology/cameras": {
+        "n": 5,
+        "median_ms": 2.0,
+        "p95_ms": 2.0,
+        "min_ms": 1.0,
+        "max_ms": 2.0
+      },
+      "GET /api/v1/topology/options": {
+        "n": 97,
+        "median_ms": 2.0,
+        "p95_ms": 6.0,
+        "min_ms": 1.0,
+        "max_ms": 12.0
+      },
+      "POST /api/v1/correlations/check-published": {
+        "n": 10,
+        "median_ms": 97.0,
+        "p95_ms": 246.0,
+        "min_ms": 53.0,
+        "max_ms": 246.0
+      },
+      "POST /api/v1/correlations/unified/{group_id}/specialists": {
+        "n": 3,
+        "median_ms": 23882.0,
+        "p95_ms": 24476.0,
+        "min_ms": 17196.0,
+        "max_ms": 24476.0
+      },
+      "POST /api/v1/environment/validate": {
+        "n": 41,
+        "median_ms": 7.0,
+        "p95_ms": 16.0,
+        "min_ms": 6.0,
+        "max_ms": 5821.0
+      },
+      "POST /api/v1/evidence-reviews/{kind}/{evidence_id}": {
+        "n": 4,
+        "median_ms": 8.5,
+        "p95_ms": 10.0,
+        "min_ms": 7.0,
+        "max_ms": 10.0
+      },
+      "POST /api/v1/evidence/{kind}/{evidence_id}/specialist": {
+        "n": 3,
+        "median_ms": 12493.0,
+        "p95_ms": 13374.0,
+        "min_ms": 12223.0,
+        "max_ms": 13374.0
+      },
+      "POST /api/v1/face/validate-image": {
+        "n": 41,
+        "median_ms": 10161.0,
+        "p95_ms": 10357.0,
+        "min_ms": 9887.0,
+        "max_ms": 22096.0
+      },
+      "POST /api/v1/images/{kind}/{observation_id}/capture-declaration": {
+        "n": 2,
+        "median_ms": 31.0,
+        "p95_ms": 43.0,
+        "min_ms": 19.0,
+        "max_ms": 43.0
+      },
+      "POST /api/v1/investigator/evidence/{kind}/{evidence_id}/ask": {
+        "n": 86,
+        "median_ms": 3168.0,
+        "p95_ms": 4507.0,
+        "min_ms": 1674.0,
+        "max_ms": 7502.0
+      },
+      "POST /api/v1/investigator/unified/{group_id}/ask": {
+        "n": 1,
+        "median_ms": 4754.0,
+        "p95_ms": 4754.0,
+        "min_ms": 4754.0,
+        "max_ms": 4754.0
+      },
+      "POST /api/v1/investigator/unified/{group_id}/history": {
+        "n": 1,
+        "median_ms": 45.0,
+        "p95_ms": 45.0,
+        "min_ms": 45.0,
+        "max_ms": 45.0
+      },
+      "POST /api/v1/maintenance/validate": {
+        "n": 41,
+        "median_ms": 57.0,
+        "p95_ms": 798.0,
+        "min_ms": 43.0,
+        "max_ms": 8986.0
+      },
+      "POST /api/v1/ppe/validate-image": {
+        "n": 37,
+        "median_ms": 4243.0,
+        "p95_ms": 4333.0,
+        "min_ms": 4131.0,
+        "max_ms": 12674.0
+      },
+      "POST /api/v1/reviews/unified/{group_id}/records": {
+        "n": 1,
+        "median_ms": 82.0,
+        "p95_ms": 82.0,
+        "min_ms": 82.0,
+        "max_ms": 82.0
+      },
+      "POST /api/v1/ssh/process-log": {
+        "n": 1,
+        "median_ms": 16188.0,
+        "p95_ms": 16188.0,
+        "min_ms": 16188.0,
+        "max_ms": 16188.0
+      },
+      "POST /api/v1/ssh/validate-log": {
+        "n": 40,
+        "median_ms": 4098.0,
+        "p95_ms": 4293.0,
+        "min_ms": 3965.0,
+        "max_ms": 13550.0
+      },
+      "PUT /api/v1/ssh/published/{event_id}/controlled-time": {
+        "n": 1,
+        "median_ms": 24.0,
+        "p95_ms": 24.0,
+        "min_ms": 24.0,
+        "max_ms": 24.0
+      }
+    }
+  },
+  "estimate_ssh_upload_to_dashboard_ms": {
+    "processing_median": 4214.5,
+    "plus_refresh_wait_up_to": 5000
+  }
+}
