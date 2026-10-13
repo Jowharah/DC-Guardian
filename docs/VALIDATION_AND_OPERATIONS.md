@@ -136,6 +136,30 @@ Optional: set `DCG_CHECKPOINT_KEY` (kept out of the repository) to sign checkpoi
 
 `presentation/backend/tests/test_access_matrix.py` lists every operation from the OpenAPI schema (99; 147 calls with each `{kind}` expanded) in a reviewed `POLICY` table and checks, with a throw-away database, unreachable Neo4j and OpenAI blocked: every operation except `/health` answers 401 without credentials; each non-admin role gets 403 exactly where it lacks the required permission and is not refused where it holds it. A new endpoint fails the test until classified. Zone isolation with real records stays in the domain RBAC tests. Policy (operator decisions 2026-10-12): every domain feed needs that domain's detail permission (maintenance/environment feeds were open to every role before); each domain's operator uploads and runs the pipeline for its own domain (security operators: SSH logs, safety operators: PPE/Face images, operations engineers: maintenance/environment), where maintenance/environment/SSH previously required `scenario:execute`. Declaring controlled metadata (SSH controlled time, image capture declarations), cross-domain views, unified groups and specialist evaluations stay administrator-only.
 
+## Single-domain baseline comparison — 2026-10-13
+
+`python presentation/backend/validation/baseline_comparison.py` compares DC-GUARDIAN with isolated single-domain monitoring on the labelled scenarios (`results/baseline_comparison.md`).
+- **Same single-event policy:** both systems use the v2 single-event severities; only correlation and group severity differ.
+- **Held-out test split, alerts:** 65 → 44 (95% CI of the difference −29 to −14).
+- **Queue average precision:** 0.66 → 0.74 (CI +0.02 to +0.18).
+- **Incidents shown whole:** 0 → 11 of 18.
+- **HIGH alerts:** 86% are real incidents; the isolated top level, MEDIUM, is 64%.
+- **Caveat:** author labels. Report draft: [evaluation_baseline_and_latency](report/evaluation_baseline_and_latency.md).
+
+## Pipeline latency — 2026-10-13
+
+`python presentation/backend/validation/latency_benchmark.py` (needs the component environments, the face enrollment and Neo4j; makes no OpenAI call; its `SCENARIO-LATENCY-*` graph nodes are removed afterwards) writes `results/latency_benchmark.md`.
+- **Controlled medians:**
+  - SSH log 4.1 s, PPE image 4.2 s, Face image 10.1 s (each a new worker process that loads its model);
+  - drive history 0.06 s, sensors 0.01 s;
+  - Neo4j ingestion of two events plus correlation 0.05 s;
+  - Decision v2 8 µs.
+- **From the access logs (about 75,000 requests):**
+  - unified feed 0.10 s;
+  - Investigator question 3.2 s;
+  - single-event specialist 12.5 s and group specialists 23.9 s (n = 3 each).
+- **Upload to screen:** about 4.3 s of processing, plus up to 5 s for the dashboard refresh.
+
 ## Decision Rules v2 validation — 2026-10-11
 
 `python presentation/backend/validation/decision_v2_validation.py` reproduces the dev-split selection and the single test-split evaluation of the group linkage rule (`results/decision_v2_validation.md`): escalated groups 89% genuine vs 38% (difference +0.51, 95% CI +0.08 to +0.88, scenario bootstrap). Author labels; see [AI Investigator — Decision Rules v2](AI_INVESTIGATOR.md#decision-rules-v2-2026-10-11).

@@ -38,6 +38,10 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
 4. ~~Testing plan item 5~~ (done 2026-10-12: every test under pytest, equivalence shown; see [Testing](TESTING.md)). Optional: split the 55 module-level files into one test per check.
 5. ~~Operations routines~~ (done 2026-10-12: backup + restore check, routine table in VALIDATION_AND_OPERATIONS, keyboard-only test). Backup folder chosen 2026-10-12 (`Documents\DC-Guardian Backup`, `DCG_BACKUP_DIR`); first backup and checkpoint verified. Remaining: a manual screen-reader pass; optionally checkpoints on a second drive and a daily scheduled run.
 6. **Production readiness** (design done 2026-10-12, [Production Readiness](PRODUCTION_READINESS.md)): the operator decides identity provider, database, image storage and whether real Evidence may go to OpenAI; then OIDC, PostgreSQL/object storage, containers behind a TLS proxy, and the **independent security review** (scope in the document). Security headers and the OpenAI rate limit are in place.
+7. ~~Baseline comparison and latency~~ (done 2026-10-13; [report draft](report/evaluation_baseline_and_latency.md)):
+   - correlation against isolated single-domain monitoring on the held-out scenarios: fewer alerts, higher queue average precision, incidents shown whole;
+   - per-stage latency: detector start-up dominates, about 4 to 10 s per upload.
+8. **Model enhancement and workflow optimisation** (proposal "optimization", operator interpretation 2026-10-13): new detector versions beside the frozen ones, selected on validation data and evaluated once on the locked test (PPE first: recall 0.52); a persistent inference worker to remove per-upload model loading.
 
 ## Acceptance rules
 
