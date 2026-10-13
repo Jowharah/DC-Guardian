@@ -1,0 +1,21 @@
+{
+  "candidate": "v2s1024",
+  "model_family": "YOLOv8",
+  "architecture": "yolov8s",
+  "pretrained_initialization": "yolov8s.pt",
+  "pretrained_sha256": "1f47a78bf100391c2a140b7ac73a1caae18c32779be7d310658112f7ac9aa78a",
+  "dataset": "SH17",
+  "split": "PPE-v1 development split (6,479 train / 810 validation)",
+  "locked_test_accessed": false,
+  "epochs_requested": 60,
+  "patience": 20,
+  "image_size": 1024,
+  "batch_size": 8,
+  "seed": 42,
+  "smoke_test": false,
+  "gpu": "NVIDIA GeForce RTX 3080 Ti",
+  "pytorch": "2.14.0+cu126",
+  "cuda": "12.6",
+  "training_run": "evidence\\ppe_detection\\results\\training_v2\\v2s1024",
+  "best_checkpoint": "evidence\\ppe_detection\\results\\training_v2\\v2s1024\\weights\\best.pt"
+}
