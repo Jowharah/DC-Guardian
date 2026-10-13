@@ -6,6 +6,38 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-13 — Scenario set v2: environmental states the detector can produce
+
+- **Why (operator decision, relayed from the operator's other session):** 8 of 40 labelled scenarios used environmental states the frozen detector cannot produce: WATER_LEAK_DETECTED (D14, T22), SMOKE_DETECTED (D10, T12), AIRFLOW_ANOMALY (D03, T09) and COOLING_ANOMALY (T02, T19). Five of them are in the test split, so the PR #21 baseline numbers depend on alerts the prototype cannot raise.
+- **What:**
+  - **v2 scenario set:** `reasoning/uncertainty/scenarios/build_scenarios_v2.py` writes `labelled_scenarios_v2.json`.
+    - Every environmental event (24) has a raw reading, and its state is assigned by `assess_environmental_condition`; no state is typed by hand.
+    - Mapping: leak → HIGH_HUMIDITY; smoke, airflow and cooling → HIGH_TEMPERATURE.
+    - The 16 unchanged environmental events reproduce their v1 state; the script stops otherwise.
+    - The 8 rewritten scenarios have observation-only narratives.
+    - **No v1 label is copied** (operator decision: full blind relabel). All 40 scenarios are `PENDING_BLIND_RELABEL`, with no ground truth, until the operator's labels exist.
+  - **Extended-sensor set:** `extended_sensor_scenarios.json` holds the 8 v1 originals verbatim, reported apart as future-work evidence.
+  - **v1 unchanged:** `labelled_scenarios.json` is pinned by a hash test.
+  - **Full v2 blind pack:** `reasoning/uncertainty/labelling/pack_v2/`, built by `build_pack_v2.py`, with the key in `pack_v2_key.json`.
+    - All 40 scenarios, 85 pairs, same format as the v1 pack, readings shown, neutral IDs V01–V40.
+    - The order is new: no scenario sits in the same position as in the v1 pack.
+    - `build_labelling_pack.build()` now takes parameters, and the published v1 pack rebuilds byte-identical.
+  - **Labels to incidents:** the operator saves the filled sheet as `labelling/results/operator-v2_labels.csv`, which must cover all 85 pairs.
+    - `build_scenarios_v2.py` turns connected related pairs into incidents. Contradictory labels are refused, not guessed.
+    - Same-domain events join an incident only through a cross-domain event.
+  - **First 8-scenario pack removed:** the `relabel_v2/` pack (8 scenarios, 20 pairs) from the first commit of this PR is redundant now that every scenario is relabelled.
+  - **Tests:** `reasoning/uncertainty/scenarios/test_scenarios_v2.py` (12). Among them, a test fails if a v2 environmental state is outside what the detector produces, determined by running the detector over the measurement range.
+- **Not independent:** the v2 labels are a full blind relabel by the same author who wrote v1, so they are still not independent labels.
+- **Docs, person access:** the website and Neo4j are the authority for zone access. The topology file only seeds P001–P003, and P005's Zone B access exists only in Neo4j (VALIDATION_AND_OPERATIONS).
+- **Expected effect:** the Bayesian knowledge base treats all dedicated room sensors as strong evidence, so model inputs barely change. Results can change through the new labels: heat alone is more ambiguous.
+- **Not done yet (waiting on the operator):**
+  - the operator's blind labels;
+  - the ChatGPT labels (pasted by the operator, no API call);
+  - the v2 re-run of the uncertainty evaluation and the baseline comparison, with old and new results side by side. The latency benchmark does not use the scenarios.
+- **Verified:** full `check_all.py`, 14 of 14 suite-level checks (the 54 script checks became 14 pytest suites on 2026-10-12): Evidence 23 passed + 4 skipped (GPU tests, which pass in `.venv-ppe` 3/3 and `.venv-gru` 1/1); Reasoning contracts 24/24; uncertainty and labelling 28; RAG 10; agents 37; integration 12; backend 404; Playwright 14; live API smoke 0 server errors.
+
+---
+
 ## 2026-10-13 — Single-domain baseline comparison and pipeline latency
 
 - **Why:** a project-versus-proposal check found two gaps in the evaluation plan:

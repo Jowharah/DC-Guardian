@@ -87,28 +87,39 @@ def facility_brief() -> list[str]:
     return lines + [""]
 
 
-def event_view(event: dict, start: datetime) -> dict:
+def _detail(key: str, value) -> str:
+    if key == "measurements":  # raw environmental readings (scenario set v2)
+        units = {"temperature_c": ("temperature", "°C"), "humidity_pct": ("humidity", "%")}
+        return " · ".join(f"{units[k][0]}: {v} {units[k][1]}" for k, v in value.items() if v is not None)
+    return f"{key.replace('_id', '').replace('_', ' ')}: {value}"
+
+
+def event_view(event: dict, start: datetime, visible: tuple = VISIBLE) -> dict:
     """What an operator sees of one event: relative time, domain, state, details."""
     when = datetime.fromisoformat(event["timestamp"].replace("Z", "+00:00"))
     minute = int((when - start).total_seconds() // 60)
-    details = " · ".join(f"{k.replace('_id', '').replace('_', ' ')}: {event[k]}" for k in VISIBLE[2:] if event.get(k) is not None)
+    details = " · ".join(_detail(k, event[k]) for k in visible[2:] if event.get(k) is not None)
     return {"id": event["neutral_id"], "time": f"+{minute} min ({when:%H:%M})", "minute": minute,
             "domain": event["domain"], "state": event["state"], "details": details}
 
 
-def event_line(event: dict, start: datetime) -> str:
-    v = event_view(event, start)
+def event_line(event: dict, start: datetime, visible: tuple = VISIBLE) -> str:
+    v = event_view(event, start, visible)
     return f"| {v['id']} | {v['time']} | {v['domain']} | {v['state']} | {v['details']} |"
 
 
-def build() -> dict:
-    scenarios = load_scenarios()
+def build(scenarios: list[dict] | None = None, *, pack_dir: Path = PACK_DIR, key_path: Path = KEY_PATH,
+          prefix: str = "S", seed: int = SHUFFLE_SEED, visible: tuple = VISIBLE, glossary: dict = GLOSSARY,
+          duration: str = "60–90 minutes") -> dict:
+    """Write a blind pack. Defaults build the published 40-scenario pack (v1); other
+    arguments build a smaller pack, e.g. the v2 relabelling round."""
+    scenarios = load_scenarios() if scenarios is None else scenarios
     order = list(range(len(scenarios)))
-    random.Random(SHUFFLE_SEED).shuffle(order)
+    random.Random(seed).shuffle(order)
     key, blind, rows = {"scenarios": {}, "events": {}}, [], []
     for number, index in enumerate(order, start=1):
         scenario = scenarios[index]
-        sid = f"S{number:02d}"
+        sid = f"{prefix}{number:02d}"
         key["scenarios"][sid] = {"original_id": scenario["scenario_id"], "split": scenario["split"]}
         events = sorted(scenario["events"], key=lambda e: e["timestamp"])
         for position, event in enumerate(events, start=1):
@@ -116,8 +127,8 @@ def build() -> dict:
             key["events"][event["neutral_id"]] = event["event_id"]
         start = datetime.fromisoformat(events[0]["timestamp"].replace("Z", "+00:00"))
         blind += [f"### Scenario {sid}", "", "| Event | Time | Domain | State | Details |", "|---|---|---|---|---|"]
-        blind += [event_line(e, start) for e in events] + [""]
-        views = {e["neutral_id"]: event_view(e, start) for e in events}
+        blind += [event_line(e, start, visible) for e in events] + [""]
+        views = {e["neutral_id"]: event_view(e, start, visible) for e in events}
         for left, right in candidate_pairs(scenario):
             a, b = sorted([left["neutral_id"], right["neutral_id"]])
             va, vb = views[a], views[b]
@@ -132,7 +143,7 @@ def build() -> dict:
                          "minutes_apart": abs(vb["minute"] - va["minute"]), "other_events_in_scenario": others,
                          "related": "", "confidence": "", "note": ""})
 
-    PACK_DIR.mkdir(parents=True, exist_ok=True)
+    pack_dir.mkdir(parents=True, exist_ok=True)
     instructions = [
         "# Independent labelling — DC-Guardian scenarios",
         "",
@@ -155,7 +166,7 @@ def build() -> dict:
         "- `confidence`: **1** guess · **2** fairly sure · **3** sure.",
         "- `note` (optional): your reason, especially when unsure.",
         "",
-        f"There are {len(rows)} rows in {len(scenarios)} scenarios; expect about 60–90 minutes. Each row of "
+        f"There are {len(rows)} rows in {len(scenarios)} scenarios; expect about {duration}. Each row of "
         "`labels.csv` shows both events in full, the minutes between them and the other alerts in the same scenario, "
         "so you can work in Excel alone; `scenarios_blind.md` shows each scenario as a whole if you prefer. "
         "**Make a copy of `labels.csv`, fill in the copy**, save it as CSV (keep the columns) and send it back.",
@@ -163,18 +174,18 @@ def build() -> dict:
         *facility_brief(),
         "## What the alerts mean",
         "",
-        *[f"- **{domain}:** {text}" for domain, text in GLOSSARY.items()],
+        *[f"- **{domain}:** {text}" for domain, text in glossary.items()],
         "",
     ]
-    (PACK_DIR / "INSTRUCTIONS.md").write_text("\n".join(instructions), encoding="utf-8")
-    (PACK_DIR / "scenarios_blind.md").write_text(
+    (pack_dir / "INSTRUCTIONS.md").write_text("\n".join(instructions), encoding="utf-8")
+    (pack_dir / "scenarios_blind.md").write_text(
         "\n".join(["# Scenarios (blind)", "", "Times are minutes from the first alert in the scenario.", ""] + blind),
         encoding="utf-8")
-    with open(PACK_DIR / "labels.csv", "w", newline="", encoding="utf-8-sig") as handle:
+    with open(pack_dir / "labels.csv", "w", newline="", encoding="utf-8-sig") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
-    KEY_PATH.write_text(json.dumps(key, indent=2) + "\n", encoding="utf-8")
+    key_path.write_text(json.dumps(key, indent=2) + "\n", encoding="utf-8")
     return {"scenarios": len(scenarios), "pairs": len(rows)}
 
 

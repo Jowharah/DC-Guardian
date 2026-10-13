@@ -41,7 +41,10 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
 7. ~~Baseline comparison and latency~~ (done 2026-10-13; [report draft](report/evaluation_baseline_and_latency.md)):
    - correlation against isolated single-domain monitoring on the held-out scenarios: fewer alerts, higher queue average precision, incidents shown whole;
    - per-stage latency: detector start-up dominates, about 4 to 10 s per upload.
-8. **Model enhancement and workflow optimisation** (proposal "optimization", operator interpretation 2026-10-13): new detector versions beside the frozen ones, selected on validation data and evaluated once on the locked test (PPE first: recall 0.52); a persistent inference worker to remove per-upload model loading.
+8. **Scenario set v2 relabelling** (2026-10-13; before item 9, because it changes the baseline numbers). The 8 scenarios that used leak, smoke, airflow or cooling states the detector cannot produce were rewritten with detector-derived readings.
+   - Waiting on the operator: a full blind relabel of all 40 v2 scenarios (`reasoning/uncertainty/labelling/pack_v2/`, 85 pairs), then the ChatGPT comparison labels on the same pack. These are same-author labels, not independent ones.
+   - Then: re-run the uncertainty evaluation and the baseline comparison on v2, and report v1 and v2 side by side.
+9. **Model enhancement and workflow optimisation** (proposal "optimization", operator interpretation 2026-10-13): new detector versions beside the frozen ones, selected on validation data and evaluated once on the locked test (PPE first: recall 0.52); a persistent inference worker to remove per-upload model loading.
 
 ## Acceptance rules
 

@@ -188,6 +188,13 @@ The local reset tool supports a dry-run report and a guarded, backed-up executio
 
 The SSH validator expects approved OpenSSH-style records. Changing the timestamp syntax without parser support can yield zero parsed events. Historical log timestamps must not be silently replaced by controlled test timestamps.
 
+## Person zone access: where the authority lives
+
+The website (Administration → employee access) and Neo4j are the authority for which person may enter which zone (`AUTHORIZED_FOR` edges); the Face authorization check reads Neo4j. `shared/topology/data_center_topology.json` only **seeds** the initial staff (P001–P003) when the topology is loaded and is not updated by the website. Example: P005's Zone B access was granted on the admin page and exists only in Neo4j; do not add it to the topology file. Consequences:
+- **Topology reloads re-add grants:** reloading the topology merges the file's grants again, so a grant revoked on the website for P001–P003 comes back.
+- **The blind pack's staff list is incomplete:** that list (`reasoning/uncertainty/labelling/`) is read from the file, so it shows only P001–P003.
+- **Backups:** the Neo4j graph export in the backup holds the authoritative access.
+
 ## Dashboard verification checklist
 
 - Monitoring Center receipt timestamps show actual ingestion/storage time; original observation/capture and specialist evaluation times remain distinct.
