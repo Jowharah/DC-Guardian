@@ -6,6 +6,15 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-14 — SSH honeypot dataset source confirmed and cited
+
+- **Why:** the honeypot CSV used for the SSH detector's external behavioural validation had no recorded source (DATASETS_AND_CITATIONS marked it "to confirm"). The operator found the data paper on Zenodo.
+- **Confirmed:** Boiko & Niiakyi (2026), *A 4-Month Dataset of SSH Botnet Interactions and Command Payloads*, Zenodo doi:10.5281/zenodo.20435481, v2.3, **CC BY 4.0**; data paper *Data in Brief* 66, 112860. The record's `honey_csv.tar.gz` (MD5 `8788f4d1…`, as published) was downloaded to a scratch folder and its `ssh_attacks_full.csv` compared row by row with the local `ssh_honeypot_dataset.csv`: identical columns and 145,425 events (27 Jul – 14 Nov 2025) with the same timestamps, sessions, IPs, ports, event types and messages.
+- **Difference:** the local file is an earlier release. v2.1 re-labelled the `level` column (INFO = connection noise, WARNING = attack actions; all 145,425 rows carry the other label locally), and 42 command texts differ only in line endings. `analyze_honeypot.py` does not read `level`, so the published SSH findings are unaffected. The local file is unchanged and still not committed.
+- **Docs:** DATASETS_AND_CITATIONS (table row, licence summary, two BibTeX entries), `evidence/ssh_anomaly/README.md` (source note).
+
+---
+
 ## 2026-10-14 — Face image source confirmed and cited
 
 - **What (operator):** the controlled face images come from the Kaggle *Face Verification Dataset* (Zagorskii 2025, `juice0lover/face-identification`, MIT).
