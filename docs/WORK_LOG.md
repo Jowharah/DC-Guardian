@@ -24,6 +24,37 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-14 — External PPE test and dataset citations
+
+- **Why (operator):**
+  - SH17's locked test has only 49 vests and 78 helmets, too few to settle v1 against v2.
+  - The runtime v2m was chosen after seeing the locked test, so it needs an independent check.
+  - Every dataset the project uses should be cited, with the terms each requires.
+- **External test (`evidence/ppe_detection/src/evaluate_external_helmet_jacket.py`):**
+  - **Protocol:** committed before running (`63b94b8`).
+  - **Data:** the Kaggle *Safety Helmet and Reflective Jacket* test split (Naik 2023, Apache 2.0; downloaded by the operator into the ignored `data/raw/helmet_jacket/`). 4 of 1,575 images were near-duplicates of SH17 by difference hash and were excluded.
+  - **Mapping:** helmet and reflective jacket onto SH17 helmet and safety-vest: 3,080 helmets, 2,343 vests.
+  - **Integrity:** nothing trained or tuned on it; model hashes checked before and after.
+  - **Results, mAP@0.5 / recall at conf 0.25:**
+
+    | Model | Helmet | Vest |
+    |---|---|---|
+    | v1 | **0.495 / 0.361** | 0.368 / 0.269 |
+    | v2s | 0.428 / 0.306 | 0.325 / 0.274 |
+    | v2m | 0.401 / 0.278 | **0.418** / 0.257 |
+
+    The 95% Wilson intervals are about ±0.02.
+  - **Sensitivity:** `evaluate_external_sensitivity.py` runs the v2 models at 640 px, because these images are 640 × 640 and are upscaled at 1024. Results: v2s 0.458 / 0.332 helmet, 0.416 / 0.286 vest; v2m 0.466 / 0.335 helmet, **0.495 / 0.312 vest**.
+  - **Reading:** all models are well below their SH17 figures. Helmets favour v1 even at 640 px; vests favour v2m. The v2 improvement is dataset-dependent; the runtime v2m is supported for vests, not helmets.
+  - **Not measured:** compliance (no person labels).
+- **Citations (`docs/DATASETS_AND_CITATIONS.md`):** every dataset, pretrained model and RAG source, with its terms and BibTeX.
+  - SH17 is **CC BY-NC-SA 4.0** (non-commercial, share-alike) and Ultralytics is **AGPL-3.0**; both were added as a production licence decision in PRODUCTION_READINESS.
+  - Backblaze: cite, data not for sale. Loghub: research use with citation. The new dataset: Apache 2.0.
+  - **To confirm by the operator:** the origin and licence of the SSH honeypot CSV; the source and consent of the controlled face photos; the licence of the face-model weights.
+- **Docs:** PPE README external section, report draft `ppe_v2_model_enhancement.md`, roadmap, docs index.
+
+---
+
 ## 2026-10-14 — Runtime PPE detector switched to PPE-v2m (YOLOv8m, 1024 px)
 
 - **Why (operator decision):** the post-hoc locked-test analysis (PR #24) showed the unselected YOLOv8m candidate is best overall (mAP@0.5 0.625) and matches PPE-v1 on safety vests (recall 0.449), while the official PPE-v2 (YOLOv8s) regressed on vests. The operator chose it for runtime knowing the choice is test-informed.

@@ -52,10 +52,32 @@ YOLOv8m matches v1's vest recall and improves every other figure shown. A combin
 - **The pre-declared tie-break cost vest performance in hindsight.** YOLOv8m does better on the test, but choosing it now would be selection on the test. Using it at runtime would be an operator decision informed by the test, and an independent claim would need a fresh held-out set.
 - **Runtime choice (operator, 2026-10-14):** the deployed pipeline now uses YOLOv8m (PPE-v2m), described as a test-informed choice. Before switching, the frozen compliance policy was re-checked with it on the validation images: the dashboard status agrees with ground truth on 95.3% of images (PPE-v1 94.8%), violations caught 99.2% (98.8%), the same 2 violations reported compliant, and an upload takes 4.06 s against 3.90 s. PPE-v1 remains selectable with one setting (`DCG_PPE_DETECTOR=v1`).
 
+## External test on a second dataset (2026-10-14)
+
+To get beyond SH17's 49 test vests, the three detectors were scored on the test split of a second public dataset, *Safety Helmet and Reflective Jacket* (Naik, 2023; Apache 2.0).
+- **Protocol:** nothing was trained or tuned on it, and the protocol was committed before running.
+- **Data:** 4 near-duplicates of SH17 images were removed, leaving 1,571 images with 3,080 helmets and 2,343 reflective jackets. The jackets were scored as SH17 safety vests.
+
+| Model (input size) | Helmet mAP@0.5 | Helmet recall* | Vest mAP@0.5 | Vest recall* |
+|---|---:|---:|---:|---:|
+| PPE-v1 (640) | **0.495** | **0.361** | 0.368 | 0.269 |
+| PPE-v2 official, YOLOv8s (1024) | 0.428 | 0.306 | 0.325 | 0.274 |
+| PPE-v2m runtime, YOLOv8m (1024) | 0.401 | 0.278 | 0.418 | 0.257 |
+| PPE-v2m at 640 (sensitivity) | 0.466 | 0.335 | **0.495** | **0.312** |
+
+\*Recall at the runtime confidence threshold 0.25. The 95% intervals are about ±0.02.
+
+- **Every model scores well below its SH17 figures** (helmet mAP about 0.70 on SH17).
+- **Helmets: v1 is best here,** the reverse of SH17.
+- **Vests: v2m is best,** most clearly when run at the images' native 640 px.
+- **Image size explains part of the v2 helmet gap:** these images are 640 × 640, so the 1024-px v2 models see upscaled input.
+- **No single model wins on both datasets,** so the v2 improvement should be stated as dataset-dependent. The deployed v2m is supported by independent data for vests, not for helmets.
+
 ## Limitations
 
 - one training seed per candidate;
 - small helmet and vest samples (78 and 49 test instances);
 - the SH17 images are not data-centre scenes;
 - compliance-level accuracy was measured only at image level on validation, where 748 of 810 images are non-compliant and only 8 fully compliant, so false alarms on compliant staff are barely tested;
-- the runtime model (YOLOv8m) was chosen after seeing the locked test, so its test figures are optimistic until a fresh held-out set confirms them.
+- the runtime model (YOLOv8m) was chosen after seeing the locked test, so its test figures are optimistic until a fresh held-out set confirms them; the external test confirms it for vests but not for helmets;
+- the external dataset maps "reflective jacket" onto "safety vest", is pre-resized to 640 px and has no person labels, so compliance is not measured there.
