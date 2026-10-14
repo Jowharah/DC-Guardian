@@ -1,0 +1,58 @@
+{
+  "sh17_train": 6479,
+  "sh17_validation": 810,
+  "kaggle_train_kept": 6973,
+  "kaggle_valid_kept": 1488,
+  "kaggle_train_near_duplicates_dropped": 377,
+  "kaggle_valid_near_duplicates_dropped": 87,
+  "labels_train": {
+    "ground_truth": {
+      "helmet": 13376,
+      "safety-vest": 10863
+    },
+    "pseudo": {
+      "person": 9626,
+      "gloves": 1134,
+      "shoes": 1796,
+      "head": 8502,
+      "face": 4933,
+      "hands": 3653,
+      "ear": 3501,
+      "glasses": 700,
+      "face-mask-medical": 104,
+      "safety-suit": 228,
+      "tools": 107,
+      "face-guard": 33,
+      "ear-mufs": 31,
+      "foot": 30,
+      "medical-suit": 1
+    }
+  },
+  "labels_valid": {
+    "ground_truth": {
+      "helmet": 2832,
+      "safety-vest": 2227
+    },
+    "pseudo": {
+      "person": 2022,
+      "ear": 716,
+      "head": 1767,
+      "shoes": 371,
+      "face": 996,
+      "hands": 783,
+      "foot": 5,
+      "glasses": 141,
+      "gloves": 255,
+      "safety-suit": 55,
+      "ear-mufs": 7,
+      "face-mask-medical": 20,
+      "tools": 23,
+      "face-guard": 5
+    }
+  },
+  "pseudo_labeller": "ppe_yolov8_v2m_best.pt",
+  "pseudo_labeller_sha256": "ae2e58d55623401035219fbd5800ab706b8b2caa5631d9101e0ab75438cd0a7c",
+  "pseudo_conf": 0.5,
+  "pseudo_imgsz": 640,
+  "hamming_max": 6
+}

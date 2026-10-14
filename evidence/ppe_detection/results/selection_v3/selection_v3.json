@@ -1,0 +1,416 @@
+{
+  "rule": "accept if criterion gain over PPE-v2m >= 0.01 and SH17 person mAP@0.5 drop <= 0.02",
+  "locked_test_accessed": false,
+  "kaggle_test_accessed": false,
+  "results": {
+    "PPE-v1": {
+      "sha256": "0f0577e37241e423faac75a3c3999538260abc55c220e0b2626bbe7c4bf5bc74",
+      "image_size": 640,
+      "sh17_validation": {
+        "overall": {
+          "precision": 0.6787,
+          "recall": 0.5204,
+          "map50": 0.5673,
+          "map50_95": 0.3516
+        },
+        "person": {
+          "precision": 0.8501,
+          "recall": 0.8771,
+          "map50": 0.9032,
+          "map50_95": 0.7096
+        },
+        "ear": {
+          "precision": 0.8403,
+          "recall": 0.6695,
+          "map50": 0.7082,
+          "map50_95": 0.3963
+        },
+        "ear-mufs": {
+          "precision": 0.4527,
+          "recall": 0.2083,
+          "map50": 0.143,
+          "map50_95": 0.0889
+        },
+        "face": {
+          "precision": 0.9492,
+          "recall": 0.8557,
+          "map50": 0.902,
+          "map50_95": 0.6557
+        },
+        "face-guard": {
+          "precision": 0.7518,
+          "recall": 0.4666,
+          "map50": 0.541,
+          "map50_95": 0.2095
+        },
+        "face-mask-medical": {
+          "precision": 0.7206,
+          "recall": 0.5753,
+          "map50": 0.6015,
+          "map50_95": 0.3292
+        },
+        "foot": {
+          "precision": 0.1625,
+          "recall": 0.0132,
+          "map50": 0.0639,
+          "map50_95": 0.0256
+        },
+        "tools": {
+          "precision": 0.4828,
+          "recall": 0.2399,
+          "map50": 0.2724,
+          "map50_95": 0.1337
+        },
+        "glasses": {
+          "precision": 0.7249,
+          "recall": 0.4588,
+          "map50": 0.5172,
+          "map50_95": 0.2508
+        },
+        "gloves": {
+          "precision": 0.6709,
+          "recall": 0.4078,
+          "map50": 0.4715,
+          "map50_95": 0.2856
+        },
+        "helmet": {
+          "precision": 0.7683,
+          "recall": 0.5395,
+          "map50": 0.6562,
+          "map50_95": 0.4317
+        },
+        "hands": {
+          "precision": 0.8383,
+          "recall": 0.7704,
+          "map50": 0.8281,
+          "map50_95": 0.5341
+        },
+        "head": {
+          "precision": 0.9212,
+          "recall": 0.8793,
+          "map50": 0.9101,
+          "map50_95": 0.6705
+        },
+        "medical-suit": {
+          "precision": 0.552,
+          "recall": 0.5882,
+          "map50": 0.6194,
+          "map50_95": 0.4487
+        },
+        "shoes": {
+          "precision": 0.748,
+          "recall": 0.4897,
+          "map50": 0.5513,
+          "map50_95": 0.287
+        },
+        "safety-suit": {
+          "precision": 0.5395,
+          "recall": 0.37,
+          "map50": 0.4838,
+          "map50_95": 0.2354
+        },
+        "safety-vest": {
+          "precision": 0.5656,
+          "recall": 0.4375,
+          "map50": 0.4717,
+          "map50_95": 0.285
+        }
+      },
+      "kaggle_validation": {
+        "overall": {
+          "precision": 0.644,
+          "recall": 0.3757,
+          "map50": 0.4208,
+          "map50_95": 0.2019
+        },
+        "helmet": {
+          "precision": 0.7306,
+          "recall": 0.4322,
+          "map50": 0.4976,
+          "map50_95": 0.2442
+        },
+        "safety-vest": {
+          "precision": 0.5574,
+          "recall": 0.3193,
+          "map50": 0.344,
+          "map50_95": 0.1597
+        }
+      },
+      "criterion": 0.4924
+    },
+    "PPE-v2m (runtime)": {
+      "sha256": "ae2e58d55623401035219fbd5800ab706b8b2caa5631d9101e0ab75438cd0a7c",
+      "image_size": 1024,
+      "sh17_validation": {
+        "overall": {
+          "precision": 0.7971,
+          "recall": 0.6207,
+          "map50": 0.6907,
+          "map50_95": 0.4615
+        },
+        "person": {
+          "precision": 0.887,
+          "recall": 0.8854,
+          "map50": 0.9166,
+          "map50_95": 0.7313
+        },
+        "ear": {
+          "precision": 0.9036,
+          "recall": 0.8251,
+          "map50": 0.8576,
+          "map50_95": 0.5418
+        },
+        "ear-mufs": {
+          "precision": 1.0,
+          "recall": 0.4579,
+          "map50": 0.4731,
+          "map50_95": 0.3543
+        },
+        "face": {
+          "precision": 0.9603,
+          "recall": 0.9025,
+          "map50": 0.9489,
+          "map50_95": 0.7053
+        },
+        "face-guard": {
+          "precision": 0.4937,
+          "recall": 0.3077,
+          "map50": 0.4002,
+          "map50_95": 0.2436
+        },
+        "face-mask-medical": {
+          "precision": 0.8755,
+          "recall": 0.7945,
+          "map50": 0.814,
+          "map50_95": 0.5063
+        },
+        "foot": {
+          "precision": 0.557,
+          "recall": 0.3026,
+          "map50": 0.4169,
+          "map50_95": 0.1835
+        },
+        "tools": {
+          "precision": 0.5411,
+          "recall": 0.3758,
+          "map50": 0.3809,
+          "map50_95": 0.2177
+        },
+        "glasses": {
+          "precision": 0.7924,
+          "recall": 0.701,
+          "map50": 0.7526,
+          "map50_95": 0.4556
+        },
+        "gloves": {
+          "precision": 0.8154,
+          "recall": 0.5542,
+          "map50": 0.6403,
+          "map50_95": 0.4205
+        },
+        "helmet": {
+          "precision": 0.75,
+          "recall": 0.5789,
+          "map50": 0.7125,
+          "map50_95": 0.4962
+        },
+        "hands": {
+          "precision": 0.9155,
+          "recall": 0.836,
+          "map50": 0.9057,
+          "map50_95": 0.6301
+        },
+        "head": {
+          "precision": 0.9371,
+          "recall": 0.9058,
+          "map50": 0.9368,
+          "map50_95": 0.7081
+        },
+        "medical-suit": {
+          "precision": 0.9272,
+          "recall": 0.5882,
+          "map50": 0.748,
+          "map50_95": 0.564
+        },
+        "shoes": {
+          "precision": 0.826,
+          "recall": 0.6668,
+          "map50": 0.7442,
+          "map50_95": 0.4481
+        },
+        "safety-suit": {
+          "precision": 0.5694,
+          "recall": 0.4737,
+          "map50": 0.5168,
+          "map50_95": 0.2654
+        },
+        "safety-vest": {
+          "precision": 0.7995,
+          "recall": 0.3958,
+          "map50": 0.5769,
+          "map50_95": 0.3744
+        }
+      },
+      "kaggle_validation": {
+        "overall": {
+          "precision": 0.6936,
+          "recall": 0.3653,
+          "map50": 0.4073,
+          "map50_95": 0.2051
+        },
+        "helmet": {
+          "precision": 0.7368,
+          "recall": 0.3589,
+          "map50": 0.406,
+          "map50_95": 0.2055
+        },
+        "safety-vest": {
+          "precision": 0.6504,
+          "recall": 0.3718,
+          "map50": 0.4086,
+          "map50_95": 0.2048
+        }
+      },
+      "criterion": 0.526
+    },
+    "PPE-v3m (v3m1024)": {
+      "sha256": "92a0a00f94b5166b066f721e4004e46210c1cadcb5c182714952c38baca61471",
+      "image_size": 1024,
+      "sh17_validation": {
+        "overall": {
+          "precision": 0.755,
+          "recall": 0.6184,
+          "map50": 0.6624,
+          "map50_95": 0.442
+        },
+        "person": {
+          "precision": 0.8898,
+          "recall": 0.8814,
+          "map50": 0.913,
+          "map50_95": 0.7312
+        },
+        "ear": {
+          "precision": 0.8947,
+          "recall": 0.8311,
+          "map50": 0.8573,
+          "map50_95": 0.5407
+        },
+        "ear-mufs": {
+          "precision": 0.7277,
+          "recall": 0.3333,
+          "map50": 0.3802,
+          "map50_95": 0.307
+        },
+        "face": {
+          "precision": 0.9444,
+          "recall": 0.9031,
+          "map50": 0.9479,
+          "map50_95": 0.6969
+        },
+        "face-guard": {
+          "precision": 0.5691,
+          "recall": 0.3077,
+          "map50": 0.3613,
+          "map50_95": 0.2278
+        },
+        "face-mask-medical": {
+          "precision": 0.8928,
+          "recall": 0.7985,
+          "map50": 0.8268,
+          "map50_95": 0.5045
+        },
+        "foot": {
+          "precision": 0.6007,
+          "recall": 0.3421,
+          "map50": 0.3676,
+          "map50_95": 0.1722
+        },
+        "tools": {
+          "precision": 0.5474,
+          "recall": 0.3907,
+          "map50": 0.3915,
+          "map50_95": 0.2216
+        },
+        "glasses": {
+          "precision": 0.7575,
+          "recall": 0.7165,
+          "map50": 0.7385,
+          "map50_95": 0.4375
+        },
+        "gloves": {
+          "precision": 0.7589,
+          "recall": 0.5255,
+          "map50": 0.6011,
+          "map50_95": 0.3938
+        },
+        "helmet": {
+          "precision": 0.8028,
+          "recall": 0.4868,
+          "map50": 0.636,
+          "map50_95": 0.4258
+        },
+        "hands": {
+          "precision": 0.9064,
+          "recall": 0.8469,
+          "map50": 0.9028,
+          "map50_95": 0.6216
+        },
+        "head": {
+          "precision": 0.9348,
+          "recall": 0.8999,
+          "map50": 0.9245,
+          "map50_95": 0.7062
+        },
+        "medical-suit": {
+          "precision": 0.6238,
+          "recall": 0.6471,
+          "map50": 0.688,
+          "map50_95": 0.4904
+        },
+        "shoes": {
+          "precision": 0.7945,
+          "recall": 0.6653,
+          "map50": 0.7228,
+          "map50_95": 0.4146
+        },
+        "safety-suit": {
+          "precision": 0.4297,
+          "recall": 0.4737,
+          "map50": 0.4064,
+          "map50_95": 0.2171
+        },
+        "safety-vest": {
+          "precision": 0.7608,
+          "recall": 0.464,
+          "map50": 0.5957,
+          "map50_95": 0.4046
+        }
+      },
+      "kaggle_validation": {
+        "overall": {
+          "precision": 0.9314,
+          "recall": 0.9128,
+          "map50": 0.9642,
+          "map50_95": 0.7721
+        },
+        "helmet": {
+          "precision": 0.9428,
+          "recall": 0.9266,
+          "map50": 0.9701,
+          "map50_95": 0.7789
+        },
+        "safety-vest": {
+          "precision": 0.9201,
+          "recall": 0.899,
+          "map50": 0.9583,
+          "map50_95": 0.7654
+        }
+      },
+      "criterion": 0.79
+    }
+  },
+  "criterion_gain_over_v2m": 0.264,
+  "person_map50_drop_vs_v2m": 0.0036,
+  "accepted": true,
+  "selected_sha256": "92a0a00f94b5166b066f721e4004e46210c1cadcb5c182714952c38baca61471"
+}

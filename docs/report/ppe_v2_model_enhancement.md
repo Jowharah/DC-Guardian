@@ -73,6 +73,20 @@ To get beyond SH17's 49 test vests, the three detectors were scored on the test 
 - **Image size explains part of the v2 helmet gap:** these images are 640 × 640, so the 1024-px v2 models see upscaled input.
 - **No single model wins on both datasets,** so the v2 improvement should be stated as dataset-dependent. The deployed v2m is supported by independent data for vests, not for helmets.
 
+## PPE-v3: adding the second dataset to training (2026-10-15)
+
+The external test showed both a domain gap and the vest weakness, so the Kaggle training split (about 14,000 helmets and 11,000 jackets) was added to SH17. Its images label only helmets and jackets, so people and the other classes were pseudo-labelled by PPE-v2m; near-duplicates of any test image (377 in the Kaggle training split) were removed first. The protocol was committed before training: one YOLOv8m candidate from the PPE-v2m weights, accepted on validation only if it beat PPE-v2m by 0.01 on a helmet/vest criterion averaged over both datasets without losing more than 0.02 person mAP.
+
+| Final test (run once) | Kaggle helmet / vest mAP@0.5 | SH17 helmet / vest mAP@0.5 | SH17 vest recall | SH17 all mAP@0.5 |
+|---|---|---|---:|---:|
+| PPE-v1 | 0.495 / 0.368 | 0.676 / 0.372 | 0.449 | 0.545 |
+| PPE-v2m (runtime) | 0.401 / 0.418 | 0.739 / 0.416 | 0.449 | 0.625 |
+| PPE-v3m | **0.962 / 0.958** | 0.727 / **0.442** | 0.388 | 0.619 |
+
+- **More data of one kind transfers to that kind only.** v3 is excellent on held-out Kaggle images (same source as its new training data) but no better than PPE-v2m on SH17: a little lower on helmets and overall, a little higher on vest mAP, lower on vest recall.
+- **The person class was protected:** SH17 person mAP is unchanged (0.900), so pseudo-labelling avoided the expected failure.
+- **Implication:** PPE accuracy is domain-dependent, and the right model for a data centre can only be chosen on images from that setting. PPE-v2m stays at runtime.
+
 ## Limitations
 
 - one training seed per candidate;
@@ -80,4 +94,5 @@ To get beyond SH17's 49 test vests, the three detectors were scored on the test 
 - the SH17 images are not data-centre scenes;
 - compliance-level accuracy was measured only at image level on validation, where 748 of 810 images are non-compliant and only 8 fully compliant, so false alarms on compliant staff are barely tested;
 - the runtime model (YOLOv8m) was chosen after seeing the locked test, so its test figures are optimistic until a fresh held-out set confirms them; the external test confirms it for vests but not for helmets;
-- the external dataset maps "reflective jacket" onto "safety vest", is pre-resized to 640 px and has no person labels, so compliance is not measured there.
+- the external dataset maps "reflective jacket" onto "safety vest", is pre-resized to 640 px and has no person labels, so compliance is not measured there;
+- PPE-v3's Kaggle test is same-source, and its training used pseudo-labels from PPE-v2m, which carry PPE-v2m's errors into the non-PPE classes.
