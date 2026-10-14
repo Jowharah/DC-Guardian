@@ -1,6 +1,6 @@
 # Datasets, models and sources: citations and terms
 
-**Updated:** 2026-10-14. Every external dataset, pretrained model and knowledge source DC-GUARDIAN uses, with the citation it asks for and its terms. Datasets are never committed to Git (see `.gitignore`); only results and frozen model weights are.
+**Updated:** 2026-10-14 (face dataset confirmed by the operator). Every external dataset, pretrained model and knowledge source DC-GUARDIAN uses, with the citation it asks for and its terms. Datasets are never committed to Git (see `.gitignore`); only results and frozen model weights are.
 
 Licence terms were checked against the official pages on 2026-10-14. Re-check them before any non-academic use. Items marked **To confirm** need the operator.
 
@@ -13,7 +13,7 @@ Licence terms were checked against the official pages on 2026-10-14. Re-check th
 | **Backblaze Drive Stats** (2025 Q2 – 2026 Q1) | Predictive maintenance (Temporal RF v2, GRU challenger) | Backblaze conditions (no licence name given) | Cite Backblaze as the source; you are solely responsible for how you use the data; derivative works may be sold, the data itself may not. |
 | **Loghub OpenSSH**: Zhu et al. (2023) | SSH anomaly detector: parser, features, model development | Loghub terms (Zenodo record) | Free for research or academic work, on condition that users refer to the repository and cite the paper. Include the licence notice in copies. |
 | **SSH honeypot dataset** (`ssh_honeypot_dataset.csv`; 145,425 events, 2025) | External behavioural validation of the SSH detector (not training) | **To confirm** | **To confirm:** the source, the author and the licence. Nothing in the repository records where it came from. |
-| **Controlled face photographs** (`controlled_faces/`: 5 enrolled people, 4 unknown) | Face recognition enrollment, validation and locked test | **To confirm** | **To confirm:** who took the photos and whether the people in them consented. If they are team members, record their consent; if they come from a public dataset, cite it. The photos and embeddings are private and never committed. |
+| **Face Verification Dataset**: Zagorskii (2025), Kaggle (`juice0lover/face-identification`) | Face recognition: 46 images of 13 actors chosen from it (`controlled_faces/`): 5 enrolled as "staff", 5 unknown for the locked test, 3 unknown for validation | **MIT** (Kaggle dataset metadata) | Attribution and the licence notice. The author describes the images as faces of actors "sourced from online film databases and public web resources", cropped automatically and resized to 100 × 100 px; the 46 project images are all 100 × 100. The MIT licence covers the author's compilation; it cannot grant rights in the underlying photographs or the people's likenesses. Use them for academic testing only, and never commit them; the photos and enrollment embeddings stay local. |
 | **DC-01 topology** (`shared/topology/`) and **labelled scenarios** (`reasoning/uncertainty/scenarios/`) | Reasoning, correlation, Bayesian study, Decision v2 validation | Written by the project team (synthetic) | None external. Described in the report as synthetic and author-labelled. |
 
 ## 2. Pretrained models and libraries whose terms matter
@@ -44,7 +44,7 @@ U.S. federal government works (NIST, OSHA, DOE) are generally in the public doma
 ## 4. What this means for the project
 
 - **Academic use (the practice module) is covered,** provided the citations below appear in the report.
-- **The PPE detector is the main obstacle to commercial or industrial use.** SH17 is non-commercial and share-alike, and Ultralytics is AGPL-3.0. A production deployment would need commercially licensed training data and an Enterprise licence, or a permissively licensed detector. The InsightFace-derived face weights raise the same question. Add this to the production requirements (`PRODUCTION_READINESS.md`).
+- **The PPE detector is the main obstacle to commercial or industrial use.** SH17 is non-commercial and share-alike, and Ultralytics is AGPL-3.0. A production deployment would need commercially licensed training data and an Enterprise licence, or a permissively licensed detector. The InsightFace-derived face weights raise the same question. The face images are public web photos of actors (Face Verification Dataset, MIT for the compilation); they are fine for testing the pipeline, but a deployment would enrol its own staff with consent and a biometric-data policy. Add this to the production requirements (`PRODUCTION_READINESS.md`).
 - **Backblaze and Loghub allow research use with citation.**
 
 ## 5. References (BibTeX)
@@ -70,6 +70,13 @@ U.S. federal government works (NIST, OSHA, DOE) are generally in the public doma
   author       = {{Backblaze, Inc.}},
   howpublished = {https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data},
   note         = {Quarters 2025 Q2 to 2026 Q1; accessed 2026}
+}
+@misc{zagorskii2025faceverification,
+  title        = {Face Verification Dataset},
+  author       = {Zagorskii, Aleksei},
+  year         = {2025},
+  howpublished = {Kaggle dataset, https://www.kaggle.com/datasets/juice0lover/face-identification},
+  note         = {MIT; cropped actor faces from public web sources, 100 x 100 px; accessed 2026-10-14}
 }
 @inproceedings{zhu2023loghub,
   title     = {Loghub: A Large Collection of System Log Datasets for {AI}-driven Log Analytics},
@@ -124,4 +131,4 @@ U.S. federal government works (NIST, OSHA, DOE) are generally in the public doma
 }
 ```
 
-The RAG documents are cited individually from the manifest (publisher, title, version, URL, access date). The SSH honeypot dataset and the face photographs are added once their sources are confirmed.
+The RAG documents are cited individually from the manifest (publisher, title, version, URL, access date). The SSH honeypot dataset is added once its source is confirmed.

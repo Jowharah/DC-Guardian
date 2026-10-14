@@ -6,6 +6,16 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-14 — Face image source confirmed and cited
+
+- **What (operator):** the controlled face images come from the Kaggle *Face Verification Dataset* (Zagorskii 2025, `juice0lover/face-identification`, MIT).
+  - It contains cropped photos of actors from public web sources, at 100 × 100 px; all 46 project images match that size.
+  - 13 actors were chosen: 5 enrolled as staff, 5 unknown for the test, 3 unknown for validation.
+- **Docs:** `docs/DATASETS_AND_CITATIONS.md` has the entry, the BibTeX and a privacy note: the MIT licence covers the compilation, not the people's likenesses; the images are for academic testing only and never committed; a deployment enrols its own staff with consent. The face README records the source.
+- **Still to confirm:** the origin of the SSH honeypot CSV.
+
+---
+
 ## 2026-10-14 — Persistent inference workers (roadmap item 9, workflow optimisation)
 
 - **Why:** almost all upload time was worker start-up and model loading. Each upload started a new process in the component environment (the latency benchmark had Face at about 10 s and PPE/SSH at about 4 s). The heavier PPE-v2m made this worse.
