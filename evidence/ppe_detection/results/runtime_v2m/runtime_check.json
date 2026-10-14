@@ -1,0 +1,81 @@
+{
+  "split": "validation (810 original images); locked test not read",
+  "policy": "PPE-POLICY-v1 (helmet, safety-vest), confidence 0.25, containment 0.5",
+  "compliance": {
+    "v1": {
+      "confusion_truth_to_predicted": {
+        "COMPLIANT->COMPLIANT": 3,
+        "COMPLIANT->NON_COMPLIANT": 5,
+        "COMPLIANT->NO_PERSON": 0,
+        "NON_COMPLIANT->COMPLIANT": 2,
+        "NON_COMPLIANT->NON_COMPLIANT": 739,
+        "NON_COMPLIANT->NO_PERSON": 7,
+        "NO_PERSON->COMPLIANT": 0,
+        "NO_PERSON->NON_COMPLIANT": 28,
+        "NO_PERSON->NO_PERSON": 26
+      },
+      "images": 810,
+      "agreement": 0.9481,
+      "violations_caught": 0.988,
+      "false_alarms": 0.625,
+      "missed_violations": 0.0027,
+      "truly_non_compliant": 748,
+      "truly_compliant": 8
+    },
+    "v2m": {
+      "confusion_truth_to_predicted": {
+        "COMPLIANT->COMPLIANT": 3,
+        "COMPLIANT->NON_COMPLIANT": 5,
+        "COMPLIANT->NO_PERSON": 0,
+        "NON_COMPLIANT->COMPLIANT": 2,
+        "NON_COMPLIANT->NON_COMPLIANT": 742,
+        "NON_COMPLIANT->NO_PERSON": 4,
+        "NO_PERSON->COMPLIANT": 0,
+        "NO_PERSON->NON_COMPLIANT": 27,
+        "NO_PERSON->NO_PERSON": 27
+      },
+      "images": 810,
+      "agreement": 0.9531,
+      "violations_caught": 0.992,
+      "false_alarms": 0.625,
+      "missed_violations": 0.0027,
+      "truly_non_compliant": 748,
+      "truly_compliant": 8
+    }
+  },
+  "latency": {
+    "v1": {
+      "warm_inference": {
+        "n": 50,
+        "median_ms": 58.6,
+        "p95_ms": 71.3,
+        "max_ms": 74.0
+      },
+      "cold_worker": {
+        "n": 10,
+        "median_ms": 3904.2,
+        "p95_ms": 4056.3,
+        "max_ms": 4056.3
+      }
+    },
+    "v2m": {
+      "warm_inference": {
+        "n": 50,
+        "median_ms": 68.4,
+        "p95_ms": 86.6,
+        "max_ms": 88.5
+      },
+      "cold_worker": {
+        "n": 10,
+        "median_ms": 4063.7,
+        "p95_ms": 4133.2,
+        "max_ms": 4133.2
+      }
+    }
+  },
+  "truth_distribution": {
+    "NON_COMPLIANT": 748,
+    "NO_PERSON": 54,
+    "COMPLIANT": 8
+  }
+}

@@ -50,11 +50,12 @@ YOLOv8m matches v1's vest recall and improves every other figure shown. A combin
 - **Larger models at higher resolution improve PPE detection overall.** All three candidates beat v1 on all-class mAP on both validation and the locked test.
 - **Vests remain the weak class, and the small sample makes its result unstable.** Validation and test each hold fewer than 50 vests in about 23 images, so a difference of 10 vests reverses a conclusion. Validation favoured the selected YOLOv8s on vests; the locked test did not.
 - **The pre-declared tie-break cost vest performance in hindsight.** YOLOv8m does better on the test, but choosing it now would be selection on the test. Using it at runtime would be an operator decision informed by the test, and an independent claim would need a fresh held-out set.
-- **Runtime unchanged:** the deployed pipeline still uses PPE-v1 until the operator decides.
+- **Runtime choice (operator, 2026-10-14):** the deployed pipeline now uses YOLOv8m (PPE-v2m), described as a test-informed choice. Before switching, the frozen compliance policy was re-checked with it on the validation images: the dashboard status agrees with ground truth on 95.3% of images (PPE-v1 94.8%), violations caught 99.2% (98.8%), the same 2 violations reported compliant, and an upload takes 4.06 s against 3.90 s. PPE-v1 remains selectable with one setting (`DCG_PPE_DETECTOR=v1`).
 
 ## Limitations
 
 - one training seed per candidate;
 - small helmet and vest samples (78 and 49 test instances);
 - the SH17 images are not data-centre scenes;
-- compliance-level accuracy, meaning whether a person is correctly judged compliant, was not measured: only detection metrics.
+- compliance-level accuracy was measured only at image level on validation, where 748 of 810 images are non-compliant and only 8 fully compliant, so false alarms on compliant staff are barely tested;
+- the runtime model (YOLOv8m) was chosen after seeing the locked test, so its test figures are optimistic until a fresh held-out set confirms them.

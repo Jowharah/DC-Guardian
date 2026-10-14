@@ -43,9 +43,9 @@ Required-class results:
 
 The safety-vest result is retained transparently as part of the frozen Evidence layer baseline and is a future robustness/optimization target.
 
-## PPE-v2 candidate (2026-10-13, not used at runtime)
+## PPE-v2 candidates (2026-10-13)
 
-PPE-v1 stays frozen and is still the runtime detector. PPE-v2 was trained beside it to address the low recall. The photos are 2,000–6,000 px wide, so helmets and vests are only a few pixels across at 640 px.
+PPE-v1 stays frozen and selectable; since 2026-10-14 the runtime uses PPE-v2m (see [Runtime detector](#runtime-detector-ppe-v2m-2026-10-14)). PPE-v2 was trained beside it to address the low recall. The photos are 2,000–6,000 px wide, so helmets and vests are only a few pixels across at 640 px.
 
 **Protocol** (committed before training in `de1a113`; revised before any result in `a448fef`):
 - **Data:** the PPE-v1 development split (6,479 train / 810 validation).
@@ -83,7 +83,7 @@ YOLOv8s and YOLOv8m tie (0.6480 vs 0.6479), so the smaller model was selected.
 - **Improved:** overall detection and helmets.
 - **Vest worse:** the vest result went the opposite way to validation. About 12 of 49 vests were found against about 22 for v1, while validation favoured v2 on mAP. Both sets hold under 50 vests in about 23 images, so a swing of about 10 vests reverses the conclusion and the size of the difference cannot be estimated reliably. v2 does not fix the vest weakness.
 - **Effect on compliance:** compliance needs both items, so a missed vest makes a compliant person look NON_COMPLIANT. More vest data, or a vest-specific evaluation, is needed before relying on either model for vests.
-- **Runtime:** switching to v2 is an operator decision. Until then `ppe_config.json` (PPE-v1) is unchanged.
+- **Runtime:** the operator chose PPE-v2m (YOLOv8m) on 2026-10-14, after the post-hoc analysis below; `ppe_config.json` (PPE-v1) is unchanged and still selectable.
 
 ### Post-hoc: all candidates on the locked test (after selection; not used to choose)
 
@@ -113,10 +113,30 @@ At the runtime confidence threshold (0.25), vest recall on the locked test is v1
 
 `tests/test_ppe_v2_artifacts.py` checks that the v1 weights and config are unchanged and that the recorded selection follows the declared rule.
 
+## Runtime detector: PPE-v2m (2026-10-14)
+
+**Operator decision (2026-10-14):** the runtime uses **PPE-v2m** (YOLOv8m at 1024 px, the post-hoc candidate `v2m1024`). It was chosen *after* the post-hoc locked-test evaluation because it avoids the official v2s1024 vest regression, so it is a **test-informed choice**: its locked-test figures (overall mAP@0.5 0.625, vest recall 0.449) are optimistic until confirmed on a fresh held-out set. The official, validation-selected PPE-v2 result remains v2s1024.
+
+- **Frozen configuration:** `models/ppe_config_v2m.json` (configuration `PPE-v2m`). The policy, thresholds and association are identical to PPE-v1 (PPE-POLICY-v1: helmet and safety vest, confidence 0.25, IoU 0.7, containment 0.5); only the detector and its 1024 px input differ. Weights `models/ppe_yolov8_v2m_best.pt` (SHA-256 `ae2e58d5…`, the exact model scored post-hoc); provenance and the test-informed status in `models/ppe_v2m_metadata.json`.
+- **Selection:** the backend reads `DCG_PPE_DETECTOR` (`v2m` default; `v1` returns to the frozen PPE-v1 without a code change) and passes it to the worker; unknown values are refused (503). `PPECompliancePipeline()` called directly still defaults to PPE-v1.
+- **Runtime check before switching** (`src/evaluate_runtime_compliance.py`, `results/runtime_v2m/`; validation split only, locked test not read):
+
+| | PPE-v1 | PPE-v2m |
+|---|---:|---:|
+| Image status agrees with ground truth (810 images) | 94.8% | 95.3% |
+| Truly non-compliant images flagged NON_COMPLIANT (748) | 98.8% | 99.2% |
+| Truly non-compliant images reported COMPLIANT | 0.3% (2) | 0.3% (2) |
+| Truly compliant images flagged NON_COMPLIANT (of 8) | 5 | 5 |
+| Upload worker (new process, model load, one 2493 × 1662 image), median | 3.90 s | 4.06 s |
+| Inference per image when loaded, median | 59 ms | 68 ms |
+
+- **Reading:** the frozen policy behaves at least as well with PPE-v2m, and an upload takes about 0.16 s longer, dominated by process start-up rather than the model. SH17 is a poor test of false alarms: only 8 of 810 validation images are fully compliant, so that figure rests on 8 images. Data-centre images with compliant staff would test it properly.
+- **Tests:** `tests/test_ppe_v2m_runtime.py` (weights hash, same policy as v1, test-informed status recorded, v1 still selectable); `presentation/backend/tests/test_ppe_image_validation.py` (setting default, pass-through, unknown value refused).
+
 ## Runtime flow
 
 ```text
-image -> YOLOv8n detections -> person/PPE association
+image -> YOLOv8 detections (PPE-v2m by default, PPE-v1 selectable) -> person/PPE association
       -> frozen PPE policy -> COMPLIANT / NON_COMPLIANT / NO_PERSON
       -> Reasoning layer adapter
 ```
@@ -128,6 +148,8 @@ models/
   ppe_yolov8_best.pt
   ppe_config.json
   ppe_training_metadata.json
+  ppe_yolov8_v2_best.pt, ppe_v2_training_metadata.json      (official PPE-v2, v2s1024)
+  ppe_yolov8_v2m_best.pt, ppe_config_v2m.json, ppe_v2m_metadata.json   (runtime PPE-v2m)
 
 results/
   training/ppe_yolov8n_full/

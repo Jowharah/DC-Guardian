@@ -48,7 +48,8 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
 9. **Model enhancement and workflow optimisation** (proposal "optimization", operator interpretation 2026-10-13): new detector versions beside the frozen ones, selected on validation data and evaluated once on the locked test; a persistent inference worker to remove per-upload model loading.
    - **PPE-v2 done 2026-10-13** (YOLOv8s, 1024 px; see `evidence/ppe_detection/README.md`). Locked test: overall mAP@0.5 0.545 → 0.595 and helmet recall 0.603 → 0.654, but safety-vest recall 0.449 → 0.245 (49 vests; validation pointed the other way).
    - **Post-hoc** (after selection; not used to choose): on the locked test, the unselected YOLOv8m matches v1 on vests (recall 0.449, mAP 0.416 vs 0.372) and is best overall (mAP@0.5 0.625). The combined v1-vest detector was therefore not built.
-   - Open: the operator decides the runtime model (v1, the official v2s, or v2m as a test-informed choice). Vests need more data before any model is relied on; a clean claim needs a fresh held-out set.
+   - **Runtime switched to PPE-v2m 2026-10-14** (operator decision; test-informed, recorded as such). Before switching: same frozen policy, validation compliance-status agreement 95.3% vs 94.8%, upload 4.06 s vs 3.90 s. `DCG_PPE_DETECTOR=v1` returns to PPE-v1.
+   - Open: a fresh held-out set (ideally data-centre images with compliant staff) to confirm PPE-v2m and to test false alarms; vests need more data.
    - Next candidates: the maintenance recall / alert-rate curve, and the persistent inference worker.
 
 ## Acceptance rules

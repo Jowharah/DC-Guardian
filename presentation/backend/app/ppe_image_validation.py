@@ -1,7 +1,8 @@
 """Local PPE image validation against the frozen runtime (not an integrated incident).
 
 No source images are persisted by this endpoint. The endpoint validates decoded
-image bytes before running the unchanged frozen model. CUDA is required by that model.
+image bytes before running the selected frozen detector (DCG_PPE_DETECTOR: PPE-v2m by
+default, PPE-v1 selectable). CUDA is required by both.
 """
 from io import BytesIO
 import json
@@ -11,12 +12,19 @@ import tempfile
 from pathlib import Path
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, Response
 from PIL import Image, UnidentifiedImageError
-from presentation.backend.app.authentication import current_principal, authorize
+from presentation.backend.app.authentication import current_principal, authorize, local_setting
 from presentation.backend.app.authorization import Principal, Permission
 from presentation.backend.app.ppe_observations import save_observation, list_observations, get_observation, image_bytes
 
 router = APIRouter()
+# Runtime PPE detector (operator decision 2026-10-13: PPE-v2m; DCG_PPE_DETECTOR=v1 returns to frozen PPE-v1).
+PPE_DETECTORS = {"v1", "v2m"}
+DEFAULT_PPE_DETECTOR = "v2m"
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
+
+
+def ppe_detector() -> str:
+    return local_setting("DCG_PPE_DETECTOR").strip() or DEFAULT_PPE_DETECTOR
 MAX_PIXELS = 16_000_000
 ALLOWED_FORMATS = {"JPEG", "PNG"}
 
@@ -63,6 +71,9 @@ async def validate_ppe_image(
         raise HTTPException(status_code=503, detail="PPE_GPU_ENVIRONMENT_MISSING")
     if not worker.is_file():
         raise HTTPException(status_code=503, detail="PPE_WORKER_MISSING")
+    detector = ppe_detector()
+    if detector not in PPE_DETECTORS:
+        raise HTTPException(status_code=503, detail="PPE_DETECTOR_SETTING_INVALID")
     # The uploaded image is decoded and rewritten to a controlled temporary PNG.
     # No client-supplied filename or command is passed to the subprocess.
     with tempfile.TemporaryDirectory(prefix="dcg-ppe-") as temp_dir:
@@ -76,7 +87,7 @@ async def validate_ppe_image(
                 text=True,
                 timeout=120,
                 check=False,
-                env={**os.environ, "PYTHONPATH": str(project_root)},
+                env={**os.environ, "PYTHONPATH": str(project_root), "DCG_PPE_DETECTOR": detector},
             )
         except subprocess.TimeoutExpired as exc:
             raise HTTPException(status_code=504, detail="PPE_INFERENCE_TIMEOUT") from exc
