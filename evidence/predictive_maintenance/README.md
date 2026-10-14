@@ -292,6 +292,30 @@ The threshold represents an operational trade-off between:
 
 The threshold was not changed after viewing the 2026 Q1 holdout results.
 
+### Operating curve (2026-10-14, validation only)
+
+`src/operating_curve.py` (run with `.venv-gru`) scores the 2025 Q4 validation period once with the frozen model, after checking its hash. It does not read the 2026 Q1 holdout and changes nothing. The output is `results/operating_curve/` (table, JSON, chart).
+
+The validation population is 18.9 million drive-days: 206,929 drives, 631 of them failing within the 7-day window. At 0.45 it reproduces the published validation point exactly.
+
+| Threshold | Failing drives caught | Drives flagged | Flagged drives that fail | Extra checks per extra failure caught* | Median lead |
+|---:|---|---:|---:|---:|---:|
+| 0.25 | 391 (62.0%) | 11,265 | 3.8% | 233 | 7 d |
+| **0.30** | **379 (60.1%)** | 8,473 | 4.9% | 73 | 7 d |
+| 0.35 | 349 (55.3%) | 6,297 | 6.3% | 69 | 7 d |
+| 0.40 | 327 (51.8%) | 4,770 | 7.8% | 72 | 6 d |
+| **0.45 (frozen)** | **313 (49.6%)** | 3,761 | 9.4% | 31 | 6 d |
+| 0.50 | 289 (45.8%) | 3,025 | 11.3% | 21 | 6 d |
+| 0.60 | 232 (36.8%) | 1,855 | 15.3% | 10 | 5 d |
+
+\*Moving down from the next higher threshold in the full table: additional drives flagged for each additional failing drive caught.
+
+**Reading:**
+- **Validated by the curve:** the frozen threshold 0.45 sits at a knee. Above it, each extra failure caught costs about 20–30 additional drive checks; below it, about 70.
+- **0.30 is the other defensible point.** It catches 60% of failing drives instead of 50% and flags 2.3 times as many drives, until a second jump to more than 160 checks per extra failure below it.
+- **The choice is a cost decision, not a model property:** lowering the threshold pays only if a missed failure costs more than about 70 drive checks.
+- **Changing the threshold** would mean a new, versioned configuration chosen from this validation curve, evaluated once on the 2026 Q1 holdout, while threshold 0.45 stays reproducible.
+
 ---
 
 ## 11. Final Holdout Evaluation

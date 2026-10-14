@@ -50,7 +50,11 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
    - **Post-hoc** (after selection; not used to choose): on the locked test, the unselected YOLOv8m matches v1 on vests (recall 0.449, mAP 0.416 vs 0.372) and is best overall (mAP@0.5 0.625). The combined v1-vest detector was therefore not built.
    - **Runtime switched to PPE-v2m 2026-10-14** (operator decision; test-informed, recorded as such). Before switching: same frozen policy, validation compliance-status agreement 95.3% vs 94.8%, upload 4.06 s vs 3.90 s. `DCG_PPE_DETECTOR=v1` returns to PPE-v1.
    - Open: a fresh held-out set (ideally data-centre images with compliant staff) to confirm PPE-v2m and to test false alarms; vests need more data.
-   - Next candidates: the maintenance recall / alert-rate curve, and the persistent inference worker.
+   - **Maintenance operating curve done 2026-10-14** (validation only; `evidence/predictive_maintenance/README.md`):
+     - the frozen threshold 0.45 sits at a knee (about 31 extra checks per extra failure above it, about 70 below it);
+     - 0.30 is the other defensible point (60% of failing drives caught vs 50%, 2.3 times as many drives flagged).
+     - Open: the operator chooses whether to add 0.30 as a new versioned operating point, which would need one holdout evaluation.
+   - Next candidate: the persistent inference worker.
 
 ## Acceptance rules
 
