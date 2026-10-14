@@ -199,10 +199,19 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument("--smoke-test", action="store_true", help="1 epoch on 5%% of the data, to time training")
+    parser.add_argument("--resume", action="store_true",
+                        help="continue an interrupted run from its last.pt (same data, settings and epoch count)")
     args = parser.parse_args()
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA is unavailable; PPE training needs the project GPU.")
     frozen_before = {n: sha256(MODELS / n) for n in FROZEN}
+    if args.resume:
+        # The dataset is not rebuilt: the interrupted run's lists, labels and settings are reused unchanged.
+        summary = json.loads((V3_DATA / "prepare_summary.json").read_text(encoding="utf-8"))
+        last = RESULTS_DIR / CANDIDATE["name"] / "weights" / "last.pt"
+        results = YOLO(str(last)).train(resume=True)
+        finish(Path(results.save_dir), summary, frozen_before, smoke_test=False, resumed=True)
+        return
     summary = prepare()
     print(json.dumps(summary, indent=2))
     if args.prepare_only:
@@ -214,7 +223,12 @@ def main() -> None:
         batch=CANDIDATE["batch"], fraction=0.05 if args.smoke_test else 1.0, patience=PATIENCE, device=0,
         seed=SEED, deterministic=True, project=str(RESULTS_DIR), name=name, exist_ok=True, workers=4,
         plots=not args.smoke_test, verbose=True)
-    save_dir = Path(results.save_dir)
+    finish(Path(results.save_dir), summary, frozen_before, smoke_test=args.smoke_test, resumed=False)
+
+
+def finish(save_dir: Path, summary: dict, frozen_before: dict, smoke_test: bool, resumed: bool) -> None:
+    init = MODELS / CANDIDATE["init"]
+    name = save_dir.name
     if {n: sha256(MODELS / n) for n in FROZEN} != frozen_before:
         raise AssertionError("A frozen PPE artifact changed during v3 training")
     metadata = {"candidate": CANDIDATE["name"], "model_family": "YOLOv8", "architecture": CANDIDATE["architecture"],
@@ -223,9 +237,10 @@ def main() -> None:
                             "(Naik 2023), near-duplicates of SH17 and Kaggle test removed, persons and other "
                             "classes pseudo-labelled by PPE-v2m",
                 "prepare": summary, "locked_test_accessed": False, "kaggle_test_accessed": False,
-                "epochs_requested": 1 if args.smoke_test else EPOCHS, "patience": PATIENCE,
+                "epochs_requested": 1 if smoke_test else EPOCHS, "resumed_after_interruption": resumed,
+                "patience": PATIENCE,
                 "image_size": CANDIDATE["imgsz"], "batch_size": CANDIDATE["batch"], "seed": SEED,
-                "smoke_test": args.smoke_test, "gpu": torch.cuda.get_device_name(0), "pytorch": torch.__version__,
+                "smoke_test": smoke_test, "gpu": torch.cuda.get_device_name(0), "pytorch": torch.__version__,
                 "training_run": str(save_dir.relative_to(PROJECT_ROOT)),
                 "best_checkpoint": str((save_dir / "weights" / "best.pt").relative_to(PROJECT_ROOT))}
     (save_dir / "candidate_metadata.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
