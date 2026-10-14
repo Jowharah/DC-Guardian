@@ -12,7 +12,7 @@ Licence terms were checked against the official pages on 2026-10-14. Re-check th
 | **Safety Helmet and Reflective Jacket**: Naik (2023), Kaggle | External PPE test, helmet and vest (2026-10-14) | **Apache 2.0** (Kaggle dataset metadata) | Attribution and the licence notice. The image sources are not documented by the author. |
 | **Backblaze Drive Stats** (2025 Q2 – 2026 Q1) | Predictive maintenance (Temporal RF v2, GRU challenger) | Backblaze conditions (no licence name given) | Cite Backblaze as the source; you are solely responsible for how you use the data; derivative works may be sold, the data itself may not. |
 | **Loghub OpenSSH**: Zhu et al. (2023) | SSH anomaly detector: parser, features, model development | Loghub terms (Zenodo record) | Free for research or academic work, on condition that users refer to the repository and cite the paper. Include the licence notice in copies. |
-| **SSH honeypot dataset** (`ssh_honeypot_dataset.csv`; 145,425 events, 2025) | External behavioural validation of the SSH detector (not training) | **To confirm** | **To confirm:** the source, the author and the licence. Nothing in the repository records where it came from. |
+| **SSH honeypot dataset**: Boiko & Niiakyi (2026), Zenodo, *A 4-Month Dataset of SSH Botnet Interactions and Command Payloads* (`ssh_honeypot_dataset.csv`; 145,425 events, 27 Jul – 14 Nov 2025) | External behavioural validation of the SSH detector (not training) | **CC BY 4.0** (Zenodo record) | Attribution (cite the dataset and its data paper). Confirmed 2026-10-14 by comparing the local file with the record's `ssh_attacks_full.csv` (v2.3): same columns, all 145,425 events with the same timestamps, sessions, IPs, ports, event types and messages. The local file is an **earlier release**: v2.1 re-labelled the `level` column (INFO = connection noise, WARNING = attack actions), and 42 command texts differ only in line endings. `analyze_honeypot.py` does not read `level`, so the published SSH findings are unaffected. |
 | **Face Verification Dataset**: Zagorskii (2025), Kaggle (`juice0lover/face-identification`) | Face recognition: 46 images of 13 actors chosen from it (`controlled_faces/`): 5 enrolled as "staff", 5 unknown for the locked test, 3 unknown for validation | **MIT** (Kaggle dataset metadata) | Attribution and the licence notice. The author describes the images as faces of actors "sourced from online film databases and public web resources", cropped automatically and resized to 100 × 100 px; the 46 project images are all 100 × 100. The MIT licence covers the author's compilation; it cannot grant rights in the underlying photographs or the people's likenesses. Use them for academic testing only, and never commit them; the photos and enrollment embeddings stay local. |
 | **DC-01 topology** (`shared/topology/`) and **labelled scenarios** (`reasoning/uncertainty/scenarios/`) | Reasoning, correlation, Bayesian study, Decision v2 validation | Written by the project team (synthetic) | None external. Described in the report as synthetic and author-labelled. |
 
@@ -45,7 +45,7 @@ U.S. federal government works (NIST, OSHA, DOE) are generally in the public doma
 
 - **Academic use (the practice module) is covered,** provided the citations below appear in the report.
 - **The PPE detector is the main obstacle to commercial or industrial use.** SH17 is non-commercial and share-alike, and Ultralytics is AGPL-3.0. A production deployment would need commercially licensed training data and an Enterprise licence, or a permissively licensed detector. The InsightFace-derived face weights raise the same question. The face images are public web photos of actors (Face Verification Dataset, MIT for the compilation); they are fine for testing the pipeline, but a deployment would enrol its own staff with consent and a biometric-data policy. Add this to the production requirements (`PRODUCTION_READINESS.md`).
-- **Backblaze and Loghub allow research use with citation.**
+- **Backblaze, Loghub and the SSH honeypot dataset (CC BY 4.0) allow research use with citation.**
 
 ## 5. References (BibTeX)
 
@@ -70,6 +70,24 @@ U.S. federal government works (NIST, OSHA, DOE) are generally in the public doma
   author       = {{Backblaze, Inc.}},
   howpublished = {https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data},
   note         = {Quarters 2025 Q2 to 2026 Q1; accessed 2026}
+}
+@misc{boiko2026sshhoneypot,
+  title        = {A 4-Month Dataset of {SSH} Botnet Interactions and Command Payloads},
+  author       = {Boiko, Viktor and Niiakyi, Oleksandr},
+  year         = {2026},
+  publisher    = {Zenodo},
+  version      = {2.3},
+  doi          = {10.5281/zenodo.20435481},
+  note         = {CC BY 4.0; the project used an earlier release with the same events (pre-v2.1 level labels); accessed 2026-10-14}
+}
+@article{boiko2026sshhoneypotdib,
+  title   = {A 4-Month Dataset of Interactive {SSH} Honeypot Logs and Command Payloads},
+  author  = {Boiko, Viktor and Niiakyi, Oleksandr},
+  journal = {Data in Brief},
+  volume  = {66},
+  pages   = {112860},
+  year    = {2026},
+  doi     = {10.1016/j.dib.2026.112860}
 }
 @misc{zagorskii2025faceverification,
   title        = {Face Verification Dataset},
@@ -131,4 +149,4 @@ U.S. federal government works (NIST, OSHA, DOE) are generally in the public doma
 }
 ```
 
-The RAG documents are cited individually from the manifest (publisher, title, version, URL, access date). The SSH honeypot dataset is added once its source is confirmed.
+The RAG documents are cited individually from the manifest (publisher, title, version, URL, access date).

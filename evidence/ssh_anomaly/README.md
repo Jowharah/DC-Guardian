@@ -196,6 +196,8 @@ data/external/ssh_honeypot_dataset.csv
 
 It is not used to train SSH Detector v1.
 
+**Source:** Boiko, V. & Niiakyi, O. (2026), *A 4-Month Dataset of SSH Botnet Interactions and Command Payloads*, Zenodo, doi:10.5281/zenodo.20435481 (CC BY 4.0); data paper in *Data in Brief* 66, 112860. The local copy is an earlier release with the same 145,425 events; only the `level` labels (changed in v2.1, not used here) and the line endings of 42 commands differ. See `docs/DATASETS_AND_CITATIONS.md`.
+
 ------------------------------------------------------------------------
 
 ## Parsing
