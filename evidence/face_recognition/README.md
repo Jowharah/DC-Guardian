@@ -24,6 +24,8 @@ image -> RetinaFace -> ArcFace embedding -> frozen enrollment matching
 
 The controlled locked test contains 15 images: 6 known-person images and 9 unknown-person images.
 
+**Image source:** the 46 controlled images (13 actors: 5 enrolled as staff, 5 unknown for the test, 3 unknown for validation) were chosen from the *Face Verification Dataset* (Zagorskii, 2025, Kaggle `juice0lover/face-identification`, MIT). It contains public web photos of actors, cropped to 100 × 100 px. No real staff faces were collected. See [Datasets and Citations](../../docs/DATASETS_AND_CITATIONS.md).
+
 | Measure | Result |
 |---|---:|
 | Known identifications | 6 / 6 |
