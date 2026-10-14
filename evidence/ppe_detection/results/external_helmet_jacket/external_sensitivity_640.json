@@ -1,0 +1,167 @@
+{
+  "label": "SENSITIVITY (explanatory; v2 models at 640 px instead of 1024 px; not used to choose)",
+  "at_640": {
+    "PPE-v2 official (v2s1024)": {
+      "helmet": {
+        "precision": 0.7362,
+        "recall": 0.4085,
+        "map50": 0.4583,
+        "map50_95": 0.231,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.8708,
+          "recall": 0.3318,
+          "recall_ci95": [
+            0.3154,
+            0.3486
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.5965,
+        "recall": 0.3944,
+        "map50": 0.416,
+        "map50_95": 0.2209,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.7762,
+          "recall": 0.2857,
+          "recall_ci95": [
+            0.2677,
+            0.3043
+          ]
+        }
+      }
+    },
+    "PPE-v2m (runtime)": {
+      "helmet": {
+        "precision": 0.7841,
+        "recall": 0.4075,
+        "map50": 0.4656,
+        "map50_95": 0.2369,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.8804,
+          "recall": 0.3346,
+          "recall_ci95": [
+            0.3181,
+            0.3514
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.7633,
+        "recall": 0.4161,
+        "map50": 0.4954,
+        "map50_95": 0.2723,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.8938,
+          "recall": 0.3124,
+          "recall_ci95": [
+            0.294,
+            0.3315
+          ]
+        }
+      }
+    }
+  },
+  "at_native_setting": {
+    "PPE-v1": {
+      "helmet": {
+        "precision": 0.7283,
+        "recall": 0.4328,
+        "map50": 0.4947,
+        "map50_95": 0.2355,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.8652,
+          "recall": 0.3606,
+          "recall_ci95": [
+            0.3438,
+            0.3777
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.5281,
+        "recall": 0.3589,
+        "map50": 0.368,
+        "map50_95": 0.1725,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.7412,
+          "recall": 0.2689,
+          "recall_ci95": [
+            0.2514,
+            0.2873
+          ]
+        }
+      }
+    },
+    "PPE-v2 official (v2s1024)": {
+      "helmet": {
+        "precision": 0.7516,
+        "recall": 0.3724,
+        "map50": 0.4279,
+        "map50_95": 0.2183,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.8598,
+          "recall": 0.3065,
+          "recall_ci95": [
+            0.2905,
+            0.323
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.4498,
+        "recall": 0.3615,
+        "map50": 0.3249,
+        "map50_95": 0.1508,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.6194,
+          "recall": 0.274,
+          "recall_ci95": [
+            0.2563,
+            0.2924
+          ]
+        }
+      }
+    },
+    "PPE-v2m (runtime)": {
+      "helmet": {
+        "precision": 0.742,
+        "recall": 0.3597,
+        "map50": 0.4014,
+        "map50_95": 0.1996,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.8391,
+          "recall": 0.2782,
+          "recall_ci95": [
+            0.2627,
+            0.2943
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.6443,
+        "recall": 0.3769,
+        "map50": 0.4176,
+        "map50_95": 0.2092,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.849,
+          "recall": 0.2565,
+          "recall_ci95": [
+            0.2392,
+            0.2746
+          ]
+        }
+      }
+    }
+  }
+}

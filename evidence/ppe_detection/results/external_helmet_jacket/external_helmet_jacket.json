@@ -1,0 +1,126 @@
+{
+  "label": "EXTERNAL TEST (independent of SH17; nothing trained, selected or tuned on it)",
+  "dataset": "Safety Helmet and Reflective Jacket (Naik, 2023, Kaggle, Apache 2.0), test split",
+  "class_mapping": {
+    "Safety-Helmet": "helmet",
+    "Reflective-Jacket": "safety-vest"
+  },
+  "weights_sha256": {
+    "PPE-v1": "0f0577e37241e423faac75a3c3999538260abc55c220e0b2626bbe7c4bf5bc74",
+    "PPE-v2 official (v2s1024)": "b1ee6e2b11369bdccc82ce2827a4c45d0a6bbf7936d5406f9438785a3d269c75",
+    "PPE-v2m (runtime)": "ae2e58d55623401035219fbd5800ab706b8b2caa5631d9101e0ab75438cd0a7c"
+  },
+  "source_images": 1575,
+  "sh17_images_compared": 8099,
+  "hamming_max": 6,
+  "near_duplicates_of_sh17_excluded": 4,
+  "duplicate_examples": {
+    "helmet_jacket_07595.jpg": "pexels-photo-6474488.jpeg",
+    "helmet_jacket_07696.jpg": "pexels-photo-1216589.jpeg",
+    "helmet_jacket_07898.jpg": "pexels-photo-6474133.jpeg",
+    "helmet_jacket_08822.jpg": "pexels-photo-1216589.jpeg"
+  },
+  "images_evaluated": 1571,
+  "instances": {
+    "helmet": 3080,
+    "safety-vest": 2343
+  },
+  "results": {
+    "PPE-v1": {
+      "helmet": {
+        "precision": 0.7283,
+        "recall": 0.4328,
+        "map50": 0.4947,
+        "map50_95": 0.2355,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.8652,
+          "recall": 0.3606,
+          "recall_ci95": [
+            0.3438,
+            0.3777
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.5281,
+        "recall": 0.3589,
+        "map50": 0.368,
+        "map50_95": 0.1725,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.7412,
+          "recall": 0.2689,
+          "recall_ci95": [
+            0.2514,
+            0.2873
+          ]
+        }
+      }
+    },
+    "PPE-v2 official (v2s1024)": {
+      "helmet": {
+        "precision": 0.7516,
+        "recall": 0.3724,
+        "map50": 0.4279,
+        "map50_95": 0.2183,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.8598,
+          "recall": 0.3065,
+          "recall_ci95": [
+            0.2905,
+            0.323
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.4498,
+        "recall": 0.3615,
+        "map50": 0.3249,
+        "map50_95": 0.1508,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.6194,
+          "recall": 0.274,
+          "recall_ci95": [
+            0.2563,
+            0.2924
+          ]
+        }
+      }
+    },
+    "PPE-v2m (runtime)": {
+      "helmet": {
+        "precision": 0.742,
+        "recall": 0.3597,
+        "map50": 0.4014,
+        "map50_95": 0.1996,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.8391,
+          "recall": 0.2782,
+          "recall_ci95": [
+            0.2627,
+            0.2943
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.6443,
+        "recall": 0.3769,
+        "map50": 0.4176,
+        "map50_95": 0.2092,
+        "at_runtime_conf": {
+          "conf": 0.25,
+          "precision": 0.849,
+          "recall": 0.2565,
+          "recall_ci95": [
+            0.2392,
+            0.2746
+          ]
+        }
+      }
+    }
+  }
+}

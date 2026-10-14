@@ -40,6 +40,7 @@
 3. **Images:** object storage with server-side encryption and short-lived signed URLs, in place of the local folders. Face images and enrollment embeddings need the strictest retention.
 4. **OpenAI:** decide whether real Evidence may leave the organisation at all. If yes: a data-processing agreement, a region choice, keeping the pseudonyms and minimization, and an egress allow-list. If no: keep the Investigator and specialists disabled, or move them to a self-hosted model.
 5. **Hosting:** containers on the organisation's infrastructure, with the backend, Neo4j and the database on a private network and only the reverse proxy reachable.
+6. **Data and model licences (added 2026-10-14; see [Datasets and Citations](DATASETS_AND_CITATIONS.md)):** the PPE detector is trained on SH17 (CC BY-NC-SA 4.0, non-commercial) with Ultralytics YOLOv8 (AGPL-3.0), and the face weights may be limited to non-commercial research. Commercial deployment needs commercially licensed PPE training data and an Ultralytics Enterprise licence (or full AGPL compliance, or a permissively licensed detector), and cleared face-model terms.
 
 ## 3. Threat model (STRIDE)
 
