@@ -133,6 +133,31 @@ At the runtime confidence threshold (0.25), vest recall on the locked test is v1
 - **Reading:** the frozen policy behaves at least as well with PPE-v2m, and an upload takes about 0.16 s longer, dominated by process start-up rather than the model. SH17 is a poor test of false alarms: only 8 of 810 validation images are fully compliant, so that figure rests on 8 images. Data-centre images with compliant staff would test it properly.
 - **Tests:** `tests/test_ppe_v2m_runtime.py` (weights hash, same policy as v1, test-informed status recorded, v1 still selectable); `presentation/backend/tests/test_ppe_image_validation.py` (setting default, pass-through, unknown value refused).
 
+## External test: Safety Helmet and Reflective Jacket (2026-10-14)
+
+This is an independent check on far more helmets and vests than SH17 offers. It uses the **test split** of Naik (2023), a Kaggle dataset under Apache 2.0 (`src/evaluate_external_helmet_jacket.py`, `results/external_helmet_jacket/`).
+- **Protocol** (committed before running in `63b94b8`): nothing is trained, selected or tuned on it, and no model is changed.
+- **Overlap removed:** test images that are near-duplicates of any SH17 image (difference hash, Hamming distance ≤ 6) are excluded. 4 of 1,575 were, leaving 1,571.
+- **Class mapping:** Safety-Helmet → helmet, Reflective-Jacket → safety-vest, giving **3,080 helmets and 2,343 vests**.
+- **Settings:** the same as the SH17 locked evaluations.
+
+| Model (input size) | Helmet mAP@0.5 | Helmet recall at conf 0.25 (95% CI) | Vest mAP@0.5 | Vest recall at conf 0.25 (95% CI) |
+|---|---:|---|---:|---|
+| PPE-v1 (640) | **0.495** | **0.361** (0.344–0.378) | 0.368 | 0.269 (0.251–0.287) |
+| PPE-v2 official, v2s (1024) | 0.428 | 0.306 (0.290–0.323) | 0.325 | 0.274 (0.256–0.292) |
+| PPE-v2m runtime (1024) | 0.401 | 0.278 (0.263–0.294) | 0.418 | 0.257 (0.239–0.275) |
+
+**Input-size sensitivity** (explanatory, not used to choose; `src/evaluate_external_sensitivity.py`): these images are only 640 × 640, so at 1024 px the v2 models see upscaled, blurred input. At 640 px:
+- **v2s:** helmet 0.458 / 0.332, vest 0.416 / 0.286.
+- **v2m:** helmet 0.466 / 0.335, vest **0.495 / 0.312**.
+
+**Reading:**
+- **All models generalise poorly to this dataset.** Helmet mAP is 0.40–0.50 here against about 0.70 on SH17. The likely reasons are a different image source, pre-resized low-resolution images, many small objects and a looser "reflective jacket" label.
+- **Helmets:** PPE-v1 is the best of the three here, which reverses the SH17 result. Part of the v2 gap is the upscaling (it narrows at 640 px), but v1 still leads.
+- **Vests:** PPE-v2m has the best vest mAP. At 640 px it also has the best vest recall (0.312 against v1's 0.269), with intervals that barely touch. At its runtime size of 1024 px, vest recall is level with v1.
+- **What is not measured:** compliance, because the dataset has no person labels. Camera images are usually larger than 1024 px, so the 640-px images favour v1 in a way runtime images would not.
+- **Conclusion:** no model dominates across both datasets. The improvement claimed for v2 holds on SH17-like images; on other sources, helmets favour v1 and vests favour v2m. PPE-v2m as the runtime choice is supported for vests and not for helmets. Data-centre images, or training on more varied PPE data, are the way to settle this.
+
 ## Runtime flow
 
 ```text

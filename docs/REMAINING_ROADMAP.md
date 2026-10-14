@@ -50,6 +50,12 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
    - **Post-hoc** (after selection; not used to choose): on the locked test, the unselected YOLOv8m matches v1 on vests (recall 0.449, mAP 0.416 vs 0.372) and is best overall (mAP@0.5 0.625). The combined v1-vest detector was therefore not built.
    - **Runtime switched to PPE-v2m 2026-10-14** (operator decision; test-informed, recorded as such). Before switching: same frozen policy, validation compliance-status agreement 95.3% vs 94.8%, upload 4.06 s vs 3.90 s. `DCG_PPE_DETECTOR=v1` returns to PPE-v1.
    - Open: a fresh held-out set (ideally data-centre images with compliant staff) to confirm PPE-v2m and to test false alarms; vests need more data.
+   - **External test (2026-10-14)** on the Kaggle *Safety Helmet and Reflective Jacket* test split (1,571 images; 3,080 helmets, 2,343 vests; independent of SH17):
+     - helmets favour PPE-v1 (mAP@0.5 0.495 vs v2m 0.401);
+     - vests favour v2m (0.418 vs 0.368; 0.495 when run at the images' native 640 px);
+     - all models are well below their SH17 figures;
+     - the v2 improvement is dataset-dependent.
+   - Possible next step: a PPE-v3 trained on SH17 plus this dataset, with pseudo-labelled persons; or data-centre images.
    - Next candidates: the maintenance recall / alert-rate curve, and the persistent inference worker.
 
 ## Acceptance rules
