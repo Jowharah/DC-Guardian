@@ -6,6 +6,24 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-14 — Predictive maintenance operating curve (roadmap item 9)
+
+- **Why (operator):** Temporal RF v2 catches about half of failing drives (holdout drive recall 48%, precision 3.4%). Raising recall costs alerts, so the operating point is a trade-off that should be chosen with evidence.
+- **What:** `evidence/predictive_maintenance/src/operating_curve.py`, run with `.venv-gru` (the main environment has no pyarrow).
+  - **Validation only:** scores the 2025 Q4 validation period once with the frozen model (hash checked); the 2026 Q1 holdout is not read.
+  - **Batched reading:** the 18.9M-row feature table does not fit in memory twice. The probabilities are cached in the ignored processed folder.
+  - **Sweep:** thresholds 0.05–0.90 with the `evaluate.py` definitions (drive recall, alerts per 1,000 drive-days, lead time), plus drives flagged, drive-level precision and extra checks per extra failure caught.
+  - **Output:** `results/operating_curve/` (table, JSON, chart).
+- **Results:**
+  - At 0.45 it reproduces the published validation point exactly: 313/631 failing drives (49.6%), 1.91 alerts per 1,000, 3.14% precision, 6-day median lead.
+  - 0.45 is a knee: about 31 extra checks per extra failure above it, about 70 below it.
+  - 0.30 catches 379/631 (60.1%) with 8,473 drives flagged (vs 3,761); below 0.30 the cost jumps above 160.
+- **Changed:** nothing; the frozen model and threshold 0.45 stay. A new operating point would be a new versioned configuration, tested once on the holdout.
+- **Tests:** `evidence/predictive_maintenance/tests/test_operating_curve.py` (3; reads the committed JSON, no data needed).
+- **Caveat:** these are validation figures for the Backblaze fleet. A data centre's own drive models and check costs set the real trade-off.
+
+---
+
 ## 2026-10-14 — External PPE test and dataset citations
 
 - **Why (operator):**

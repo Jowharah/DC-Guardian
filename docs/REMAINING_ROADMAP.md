@@ -56,7 +56,11 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
      - all models are well below their SH17 figures;
      - the v2 improvement is dataset-dependent.
    - Possible next step: a PPE-v3 trained on SH17 plus this dataset, with pseudo-labelled persons; or data-centre images.
-   - Next candidates: the maintenance recall / alert-rate curve, and the persistent inference worker.
+   - **Maintenance operating curve done 2026-10-14** (validation only; `evidence/predictive_maintenance/README.md`):
+     - the frozen threshold 0.45 sits at a knee (about 31 extra checks per extra failure above it, about 70 below it);
+     - 0.30 is the other defensible point (60% of failing drives caught vs 50%, 2.3 times as many drives flagged).
+     - Operator decision 2026-10-14: keep 0.45; 0.30 is reported as the documented alternative (not deployed).
+   - Next candidate: the persistent inference worker.
 
 ## Acceptance rules
 
