@@ -152,6 +152,7 @@ Optional: set `DCG_CHECKPOINT_KEY` (kept out of the repository) to sign checkpoi
 `python presentation/backend/validation/latency_benchmark.py` (needs the component environments, the face enrollment and Neo4j; makes no OpenAI call; its `SCENARIO-LATENCY-*` graph nodes are removed afterwards) writes `results/latency_benchmark.md`.
 - **Controlled medians:**
   - SSH log 4.1 s, PPE image 4.2 s, Face image 10.1 s (each a new worker process that loads its model);
+  - PPE runtime switch check (2026-10-14, `evidence/ppe_detection/results/runtime_v2m/`): the upload worker takes 3.90 s with PPE-v1 and 4.06 s with PPE-v2m (median, 2493 × 1662 validation image);
   - drive history 0.06 s, sensors 0.01 s;
   - Neo4j ingestion of two events plus correlation 0.05 s;
   - Decision v2 8 µs.

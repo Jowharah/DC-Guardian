@@ -2,7 +2,7 @@
 DC-Guardian Evidence
 PPE Compliance Runtime Pipeline
 
-Frozen YOLOv8n detector
+Frozen YOLOv8 detector (PPE-v1 YOLOv8n or PPE-v2m YOLOv8m)
     -> normalized detections
     -> person/PPE association
     -> frozen PPE policy
@@ -52,6 +52,15 @@ CONFIG_FILE = (
     / "ppe_config.json"
 )
 
+# Selectable frozen detector configurations. Both use PPE-POLICY-v1 and the
+# same thresholds; only the detector differs. "v1" stays the default here, so
+# direct callers keep the frozen PPE-v1 runtime; the Presentation backend
+# chooses the runtime detector (DCG_PPE_DETECTOR).
+DETECTOR_CONFIGS = {
+    "v1": CONFIG_FILE,
+    "v2m": PPE_ROOT / "models" / "ppe_config_v2m.json",
+}
+
 
 # ============================================================
 # Runtime pipeline
@@ -59,20 +68,22 @@ CONFIG_FILE = (
 
 class PPECompliancePipeline:
 
-    def __init__(self):
+    def __init__(self, detector: str = "v1"):
 
         # ----------------------------------------------------
         # Required frozen artifacts
         # ----------------------------------------------------
 
-        if not MODEL_FILE.exists():
-            raise FileNotFoundError(
-                f"Frozen PPE model not found: {MODEL_FILE}"
+        if detector not in DETECTOR_CONFIGS:
+            raise ValueError(
+                f"Unknown PPE detector: {detector}"
             )
 
-        if not CONFIG_FILE.exists():
+        config_file = DETECTOR_CONFIGS[detector]
+
+        if not config_file.exists():
             raise FileNotFoundError(
-                f"Frozen PPE config not found: {CONFIG_FILE}"
+                f"Frozen PPE config not found: {config_file}"
             )
 
 
@@ -81,10 +92,21 @@ class PPECompliancePipeline:
         # ----------------------------------------------------
 
         self.config = json.loads(
-            CONFIG_FILE.read_text(
+            config_file.read_text(
                 encoding="utf-8"
             )
         )
+
+        model_file = (
+            PPE_ROOT
+            / "models"
+            / self.config["weights"]
+        )
+
+        if not model_file.exists():
+            raise FileNotFoundError(
+                f"Frozen PPE model not found: {model_file}"
+            )
 
 
         if (
@@ -217,7 +239,7 @@ class PPECompliancePipeline:
 
         self.model = YOLO(
             str(
-                MODEL_FILE
+                model_file
             )
         )
 
@@ -319,7 +341,7 @@ class PPECompliancePipeline:
         image,
     ):
         """
-        Run the frozen DC-Guardian PPE-v1 runtime pipeline.
+        Run the selected frozen DC-Guardian PPE runtime pipeline.
 
         Runtime thresholds and association parameters are loaded
         exclusively from the frozen PPE configuration.

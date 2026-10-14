@@ -6,6 +6,23 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-14 — Runtime PPE detector switched to PPE-v2m (YOLOv8m, 1024 px)
+
+- **Why (operator decision):** the post-hoc locked-test analysis (PR #24) showed the unselected YOLOv8m candidate is best overall (mAP@0.5 0.625) and matches PPE-v1 on safety vests (recall 0.449), while the official PPE-v2 (YOLOv8s) regressed on vests. The operator chose it for runtime knowing the choice is test-informed.
+- **What:**
+  - `models/ppe_yolov8_v2m_best.pt` (SHA-256 `ae2e58d5…`, the exact model scored post-hoc), `models/ppe_config_v2m.json` (frozen; PPE-POLICY-v1, same thresholds and association as v1; YOLOv8m, 1024 px; `model_selection_source: test_informed_post_hoc`), `models/ppe_v2m_metadata.json` (provenance, `TEST_INFORMED_POST_HOC`).
+  - `ppe_pipeline.py`: `PPECompliancePipeline(detector="v1")` selects a frozen configuration (`v1`, `v2m`); the default stays PPE-v1 for direct callers.
+  - Backend: `DCG_PPE_DETECTOR` (default `v2m`, `v1` returns to PPE-v1) is passed to the worker; unknown values are refused with 503 before any inference. `.env.example` documents it.
+  - PPE-v1 weights and config unchanged (hash-tested).
+- **Checked before switching** (`evidence/ppe_detection/src/evaluate_runtime_compliance.py`, `results/runtime_v2m/`; validation only, locked test not read):
+  - compliance status shown on the dashboard vs ground truth (same policy on labelled boxes): agreement 94.8% (v1) vs 95.3% (v2m); violations caught 98.8% vs 99.2%; violations reported compliant 2 vs 2; compliant images flagged 5 of 8 for both;
+  - upload worker (new process, model load, one 2493 × 1662 image): median 3.90 s vs 4.06 s; warm inference 59 vs 68 ms.
+- **Caveats:** test-informed choice, so its locked-test figures are optimistic until a fresh held-out set confirms them; SH17 validation has only 8 fully compliant images, so false alarms are barely tested.
+- **Tests:** `evidence/ppe_detection/tests/test_ppe_v2m_runtime.py` (4) and 4 new cases in `presentation/backend/tests/test_ppe_image_validation.py`.
+- **Verified:** full `check_all.py` 14/14 (separate worktree, local environments and private data linked): Evidence 31 passed + 4 skipped (GPU, which pass in `.venv-ppe` 3/3 and `.venv-gru` 1/1); backend 408; Playwright 14; live API smoke 0 server errors. End-to-end upload through the real endpoint and worker: `v2m` returns PPE-v2m / YOLOv8m, `v1` returns PPE-v1 / YOLOv8n; nothing stored.
+
+---
+
 ## 2026-10-13 — PPE-v2 detector candidate (roadmap item 9, model enhancement)
 
 - **Why (operator decision):** PPE-v1 had the lowest recall of the detectors (locked test 0.524; vest 0.449). It is YOLOv8n at 640 px on 2,000–6,000 px photos.

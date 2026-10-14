@@ -1,0 +1,52 @@
+{
+  "configuration_version": "PPE-v2m",
+  "configuration_frozen": true,
+
+  "model_family": "YOLOv8",
+  "architecture": "YOLOv8m",
+  "weights": "ppe_yolov8_v2m_best.pt",
+  "metadata": "ppe_v2m_metadata.json",
+  "dataset": "SH17",
+  "class_count": 17,
+
+  "image_size": 1024,
+  "training_epochs": 60,
+  "batch_size": 8,
+  "seed": 42,
+
+  "train_images": 6479,
+  "validation_images": 810,
+  "locked_test_images": 810,
+
+  "model_selection_source": "test_informed_post_hoc",
+  "locked_test_accessed_when_frozen": true,
+
+  "compliance_policy_frozen": true,
+  "policy_version": "PPE-POLICY-v1",
+  "policy_name": "BASELINE_DC_MAINTENANCE",
+
+  "required_ppe": [
+    "helmet",
+    "safety-vest"
+  ],
+
+  "confidence_threshold": 0.25,
+  "iou_threshold": 0.7,
+
+  "association_method": "object_containment",
+  "association_minimum_containment": 0.5,
+  "person_assignment": "strongest_eligible_match",
+
+  "runtime_statuses": [
+    "COMPLIANT",
+    "NON_COMPLIANT",
+    "NO_PERSON"
+  ],
+
+  "policy_semantics": "NON_COMPLIANT means one or more required PPE classes were not detected for at least one detected person. It does not prove physical absence.",
+
+  "policy_source": "project_defined_baseline",
+  "policy_development_source": "development_validation_only",
+
+  "notes": "PPE-v2m runtime configuration (operator decision 2026-10-13). Same compliance policy, thresholds and association as PPE-v1; only the detector (YOLOv8m at 1024 px) differs. The detector was chosen after a post-hoc locked-test evaluation, so its locked-test figures are optimistic until confirmed on a fresh held-out set. PPE-v1 (ppe_config.json) stays frozen and selectable with DCG_PPE_DETECTOR=v1."
+}

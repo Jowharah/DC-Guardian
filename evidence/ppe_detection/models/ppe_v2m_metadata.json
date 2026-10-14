@@ -1,0 +1,263 @@
+{
+  "candidate": "v2m1024",
+  "model_family": "YOLOv8",
+  "architecture": "yolov8m",
+  "pretrained_initialization": "yolov8m.pt",
+  "pretrained_sha256": "5d4a90cdc7a21786cc59cd19778e9eafff836df9e2da32524737c7ee6efe4fe5",
+  "dataset": "SH17",
+  "split": "PPE-v1 development split (6,479 train / 810 validation)",
+  "locked_test_accessed_during_training": false,
+  "locked_test_accessed_before_runtime_choice": true,
+  "epochs_requested": 60,
+  "patience": 20,
+  "image_size": 1024,
+  "batch_size": 8,
+  "seed": 42,
+  "smoke_test": false,
+  "gpu": "NVIDIA GeForce RTX 3080 Ti",
+  "pytorch": "2.14.0+cu126",
+  "cuda": "12.6",
+  "training_run": "evidence\\ppe_detection\\results\\training_v2\\v2m1024",
+  "best_checkpoint": "evidence\\ppe_detection\\results\\training_v2\\v2m1024\\weights\\best.pt",
+  "runtime_role": "PPE-v2m runtime detector (operator decision 2026-10-13)",
+  "weights_file": "ppe_yolov8_v2m_best.pt",
+  "weights_sha256": "ae2e58d55623401035219fbd5800ab706b8b2caa5631d9101e0ab75438cd0a7c",
+  "selection_status": "TEST_INFORMED_POST_HOC",
+  "selection_note": "Not the validation-selected model: select_v2.py chose v2s1024 by the pre-declared tie rule. v2m1024 was chosen for runtime after the post-hoc locked-test evaluation showed it avoids the v2s1024 safety-vest regression. Its locked-test figures are therefore optimistic; a clean claim needs a fresh held-out set.",
+  "validation_posthoc": {
+    "overall": {
+      "precision": 0.7970918948102509,
+      "recall": 0.6207092310244885,
+      "map50": 0.6907039254797961,
+      "map50_95": 0.46154343408721227
+    },
+    "per_class": {
+      "person": {
+        "precision": 0.8870001124511345,
+        "recall": 0.885417590462591,
+        "map50": 0.9165915615783714,
+        "map50_95": 0.7313107181459177
+      },
+      "ear": {
+        "precision": 0.9035678462689504,
+        "recall": 0.8250904704463209,
+        "map50": 0.8575655503479196,
+        "map50_95": 0.5418156078328134
+      },
+      "ear-mufs": {
+        "precision": 1.0,
+        "recall": 0.4579393240598614,
+        "map50": 0.473135593220339,
+        "map50_95": 0.35432149594209994
+      },
+      "face": {
+        "precision": 0.960338336588314,
+        "recall": 0.9025181367715966,
+        "map50": 0.9488511827970231,
+        "map50_95": 0.7053034379984344
+      },
+      "face-guard": {
+        "precision": 0.4937215143929743,
+        "recall": 0.3076923076923077,
+        "map50": 0.40021897766523595,
+        "map50_95": 0.24361826527648925
+      },
+      "face-mask-medical": {
+        "precision": 0.8755259386425133,
+        "recall": 0.7945205479452054,
+        "map50": 0.8140268615747729,
+        "map50_95": 0.506313083217928
+      },
+      "foot": {
+        "precision": 0.5569568621919698,
+        "recall": 0.3026315789473684,
+        "map50": 0.4169044191889514,
+        "map50_95": 0.18354438653003874
+      },
+      "tools": {
+        "precision": 0.5410768819431582,
+        "recall": 0.37579617834394907,
+        "map50": 0.3809226761640836,
+        "map50_95": 0.21767598155609397
+      },
+      "glasses": {
+        "precision": 0.7924248680236706,
+        "recall": 0.7010309278350515,
+        "map50": 0.7526074853173144,
+        "map50_95": 0.45564486597370557
+      },
+      "gloves": {
+        "precision": 0.8153624387600713,
+        "recall": 0.554171584749469,
+        "map50": 0.640274223892901,
+        "map50_95": 0.42051271656762407
+      },
+      "helmet": {
+        "precision": 0.7500029492106889,
+        "recall": 0.5789473684210527,
+        "map50": 0.7125295344851126,
+        "map50_95": 0.49620264025118577
+      },
+      "hands": {
+        "precision": 0.9154968898209345,
+        "recall": 0.8359687458860053,
+        "map50": 0.9057362907102569,
+        "map50_95": 0.6300895129780846
+      },
+      "head": {
+        "precision": 0.9370549167220839,
+        "recall": 0.9057851239669421,
+        "map50": 0.9367677246924963,
+        "map50_95": 0.708067453837003
+      },
+      "medical-suit": {
+        "precision": 0.9272028759309261,
+        "recall": 0.5882352941176471,
+        "map50": 0.7480320474544666,
+        "map50_95": 0.563956279761812
+      },
+      "shoes": {
+        "precision": 0.8259658393280098,
+        "recall": 0.6667942039112854,
+        "map50": 0.7441500189475805,
+        "map50_95": 0.44812375816909
+      },
+      "safety-suit": {
+        "precision": 0.5693766612793184,
+        "recall": 0.47368421052631576,
+        "map50": 0.5168004595888626,
+        "map50_95": 0.2653746178859121
+      },
+      "safety-vest": {
+        "precision": 0.799487280219548,
+        "recall": 0.3958333333333333,
+        "map50": 0.576852125530847,
+        "map50_95": 0.3743635575583751
+      }
+    }
+  },
+  "locked_test_posthoc": {
+    "overall": {
+      "precision": 0.669067787724743,
+      "recall": 0.6118147432954767,
+      "map50": 0.6245367033760223,
+      "map50_95": 0.41585417193891405
+    },
+    "per_class": {
+      "person": {
+        "precision": 0.8071124049682479,
+        "recall": 0.8941524796447077,
+        "map50": 0.899936243523815,
+        "map50_95": 0.7356124918930566
+      },
+      "ear": {
+        "precision": 0.840715757589663,
+        "recall": 0.8365261813537676,
+        "map50": 0.852102590140317,
+        "map50_95": 0.5593884222519642
+      },
+      "ear-mufs": {
+        "precision": 0.6378341337411245,
+        "recall": 0.44,
+        "map50": 0.473331253728677,
+        "map50_95": 0.2999478037714548
+      },
+      "face": {
+        "precision": 0.9317500329109413,
+        "recall": 0.8842794759825328,
+        "map50": 0.9249416942218978,
+        "map50_95": 0.6889315712496206
+      },
+      "face-guard": {
+        "precision": 0.4933447638855317,
+        "recall": 0.45454545454545453,
+        "map50": 0.4528571428571428,
+        "map50_95": 0.2391934362934363
+      },
+      "face-mask-medical": {
+        "precision": 0.8786328591508992,
+        "recall": 0.6410256410256411,
+        "map50": 0.6762819886892821,
+        "map50_95": 0.4206377249514742
+      },
+      "foot": {
+        "precision": 0.4015786555122085,
+        "recall": 0.273972602739726,
+        "map50": 0.22960926090751768,
+        "map50_95": 0.10105304591835595
+      },
+      "tools": {
+        "precision": 0.4026271729694104,
+        "recall": 0.4358407079646018,
+        "map50": 0.3535384627201261,
+        "map50_95": 0.2145871547930828
+      },
+      "glasses": {
+        "precision": 0.728740341318034,
+        "recall": 0.7156862745098039,
+        "map50": 0.7393342375773739,
+        "map50_95": 0.4436341149207806
+      },
+      "gloves": {
+        "precision": 0.636505087536086,
+        "recall": 0.5620437956204379,
+        "map50": 0.557983115997338,
+        "map50_95": 0.35073243584230185
+      },
+      "helmet": {
+        "precision": 0.7527984828532059,
+        "recall": 0.6637484777882671,
+        "map50": 0.7387068970162193,
+        "map50_95": 0.5472942453590351
+      },
+      "hands": {
+        "precision": 0.8715204611300041,
+        "recall": 0.8072387519064115,
+        "map50": 0.8588183294026742,
+        "map50_95": 0.6069208391830949
+      },
+      "head": {
+        "precision": 0.9096594200260673,
+        "recall": 0.9101188934127115,
+        "map50": 0.9296740312107039,
+        "map50_95": 0.7098300696581589
+      },
+      "medical-suit": {
+        "precision": 0.5140886317827743,
+        "recall": 0.3076923076923077,
+        "map50": 0.38667580855396155,
+        "map50_95": 0.16085833926539567
+      },
+      "shoes": {
+        "precision": 0.6645902672798429,
+        "recall": 0.625,
+        "map50": 0.632110773797983,
+        "map50_95": 0.3812274362070412
+      },
+      "safety-suit": {
+        "precision": 0.3627235739751563,
+        "recall": 0.5,
+        "map50": 0.4954814442454263,
+        "map50_95": 0.3469543950606818
+      },
+      "safety-vest": {
+        "precision": 0.5399303446914331,
+        "recall": 0.4489795918367347,
+        "map50": 0.41574068280192417,
+        "map50_95": 0.26271739634260355
+      }
+    }
+  },
+  "locked_test_posthoc_at_runtime_conf_0.25": {
+    "helmet": {
+      "conf": 0.25,
+      "precision": 0.7488,
+      "recall": 0.6497
+    },
+    "safety-vest": {
+      "conf": 0.25,
+      "precision": 0.5456,
+      "recall": 0.449
+    }
+  }
+}
