@@ -86,6 +86,16 @@ Measured on the operator workstation (Windows 11, RTX 3080 Ti, single user). The
 
 **Where the time goes:** detector start-up and inference dominate. Each upload starts a new worker process that loads its model, which keeps the component environments isolated. Graph reasoning, correlation and Decision rules add well under a second. The language-model steps take several seconds, but they run only when the operator asks.
 
+**Workflow optimisation (2026-10-14):** the workers now stay loaded between uploads, still each in its own isolated environment (`presentation/backend/validation/results/persistent_workers_benchmark.md`). Same machine, same run, 10 uploads each:
+
+| Upload | One process per upload | Persistent worker |
+|---|---:|---:|
+| SSH log | 7.3 s | 0.56 s |
+| PPE image (YOLOv8m) | 7.6 s | 0.60 s |
+| Face image | 17.8 s | 3.1 s |
+
+The responses are identical in both modes apart from the worker's timing field. The first upload after start-up, or after 15 idle minutes, still pays the model-loading time. These "before" times are higher than in the table above because the machine was more heavily loaded on 2026-10-14; the two columns come from the same run.
+
 **Limits:**
 - one machine and one user;
 - no load or concurrency test;

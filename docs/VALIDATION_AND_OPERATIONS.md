@@ -162,6 +162,19 @@ Optional: set `DCG_CHECKPOINT_KEY` (kept out of the repository) to sign checkpoi
   - single-event specialist 12.5 s and group specialists 23.9 s (n = 3 each).
 - **Upload to screen:** about 4.3 s of processing, plus up to 5 s for the dashboard refresh.
 
+## Persistent inference workers — 2026-10-14
+
+The PPE, Face and SSH workers stay loaded between uploads (`presentation/backend/app/inference_workers.py`, protocol in `worker_protocol.py`). Each still runs in its own component environment.
+- **Requests:** one at a time per worker. A request that times out (120 s), or a worker that dies, is killed and restarted on the next upload.
+- **Idle stop:** an idle worker stops after `DCG_WORKER_IDLE_SECONDS` (default 900), and workers exit when the backend stops.
+- **Logs:** worker output goes to `logs/workers/<name>.log`.
+- **Fallback:** `DCG_PERSISTENT_WORKERS=0` restores one process per upload. The backend tests use that mode; `test_inference_workers.py` covers the persistent mode with a fake worker.
+- **Measured** (`python presentation/backend/validation/persistent_workers_benchmark.py`, `results/persistent_workers_benchmark.md`), median per upload, one process per upload → persistent worker:
+  - SSH 7.3 → 0.56 s;
+  - PPE (YOLOv8m) 7.6 → 0.60 s;
+  - Face 17.8 → 3.1 s.
+- **Same results:** the responses are identical apart from the worker's `latency_ms`. The first upload after start-up or idle stop still takes the old time.
+
 ## Decision Rules v2 validation — 2026-10-11
 
 `python presentation/backend/validation/decision_v2_validation.py` reproduces the dev-split selection and the single test-split evaluation of the group linkage rule (`results/decision_v2_validation.md`): escalated groups 89% genuine vs 38% (difference +0.51, 95% CI +0.08 to +0.88, scenario bootstrap). Author labels; see [AI Investigator — Decision Rules v2](AI_INVESTIGATOR.md#decision-rules-v2-2026-10-11).

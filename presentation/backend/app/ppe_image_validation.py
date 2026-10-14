@@ -15,6 +15,7 @@ from PIL import Image, UnidentifiedImageError
 from presentation.backend.app.authentication import current_principal, authorize, local_setting
 from presentation.backend.app.authorization import Principal, Permission
 from presentation.backend.app.ppe_observations import save_observation, list_observations, get_observation, image_bytes
+from presentation.backend.app.inference_workers import run_worker
 
 router = APIRouter()
 # Runtime PPE detector (operator decision 2026-10-13: PPE-v2m; DCG_PPE_DETECTOR=v1 returns to frozen PPE-v1).
@@ -80,15 +81,11 @@ async def validate_ppe_image(
         image_path = Path(temp_dir) / "input.png"
         decoded.save(image_path, format="PNG")
         try:
-            completed = subprocess.run(
-                [str(python_executable), "-m", "presentation.backend.app.ppe_worker", str(image_path)],
-                cwd=str(project_root),
-                capture_output=True,
-                text=True,
-                timeout=120,
-                check=False,
+            # Persistent worker (model loaded once) unless DCG_PERSISTENT_WORKERS=0.
+            completed = run_worker(
+                python_executable, "presentation.backend.app.ppe_worker", image_path,
                 env={**os.environ, "PYTHONPATH": str(project_root), "DCG_PPE_DETECTOR": detector},
-            )
+                timeout=120, name=f"ppe-{detector}")
         except subprocess.TimeoutExpired as exc:
             raise HTTPException(status_code=504, detail="PPE_INFERENCE_TIMEOUT") from exc
         if completed.returncode != 0:

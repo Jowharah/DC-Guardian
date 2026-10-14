@@ -8,6 +8,7 @@ import tempfile
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, Response
 from presentation.backend.app.authentication import current_principal, authorize
 from presentation.backend.app.authorization import Principal, Permission
+from presentation.backend.app.inference_workers import run_worker
 from presentation.backend.app.ppe_image_validation import MAX_IMAGE_BYTES, validate_image
 from presentation.backend.app import face_observations
 from presentation.backend.app.face_zone_authorization import assess as assess_zone
@@ -44,27 +45,11 @@ async def validate_face(image: UploadFile = File(...), retain: bool = Form(False
         path = Path(folder) / "input.png"
         decoded.save(path, format="PNG")
         try:
-            run = subprocess.run(
-                [
-                    str(face_python),
-                    "-m",
-                    "presentation.backend.app.face_worker",
-                    str(path),
-                ],
-                cwd=str(project_root),
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=120,
-                check=False,
-                env={
-                    **os.environ,
-                    "PYTHONPATH": str(project_root),
-                    "PYTHONIOENCODING": "utf-8",
-                    "PYTHONUTF8": "1",
-                },
-            )
+            # Persistent worker (model loaded once) unless DCG_PERSISTENT_WORKERS=0.
+            run = run_worker(
+                face_python, "presentation.backend.app.face_worker", path,
+                env={**os.environ, "PYTHONPATH": str(project_root), "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"},
+                timeout=120, name="face")
         except subprocess.TimeoutExpired as exc:
             raise HTTPException(504, "FACE_INFERENCE_TIMEOUT") from exc
         if run.returncode:

@@ -1,0 +1,62 @@
+{
+  "run_at": "2026-10-14T08:42:38+00:00",
+  "repeats": 10,
+  "ppe_detector": "v2m (default)",
+  "one_process_per_upload": {
+    "SSH log (OpenSSH_2k)": {
+      "first_call_ms": 7353.2,
+      "n": 10,
+      "median_ms": 7281.8,
+      "p95_ms": 7447.9,
+      "min_ms": 6919.8,
+      "max_ms": 7447.9
+    },
+    "PPE image": {
+      "first_call_ms": 7585.4,
+      "n": 10,
+      "median_ms": 7617.0,
+      "p95_ms": 8502.0,
+      "min_ms": 6477.8,
+      "max_ms": 8502.0
+    },
+    "Face image": {
+      "first_call_ms": 17757.2,
+      "n": 10,
+      "median_ms": 17809.7,
+      "p95_ms": 18693.9,
+      "min_ms": 16873.3,
+      "max_ms": 18693.9
+    }
+  },
+  "persistent_workers": {
+    "SSH log (OpenSSH_2k)": {
+      "first_call_ms": 5862.9,
+      "n": 10,
+      "median_ms": 559.3,
+      "p95_ms": 602.4,
+      "min_ms": 541.2,
+      "max_ms": 602.4
+    },
+    "PPE image": {
+      "first_call_ms": 6033.0,
+      "n": 10,
+      "median_ms": 602.4,
+      "p95_ms": 632.0,
+      "min_ms": 566.9,
+      "max_ms": 632.0
+    },
+    "Face image": {
+      "first_call_ms": 16942.3,
+      "n": 10,
+      "median_ms": 3114.3,
+      "p95_ms": 3249.9,
+      "min_ms": 2930.7,
+      "max_ms": 3249.9
+    }
+  },
+  "identical_results_except_latency_ms": {
+    "SSH log (OpenSSH_2k)": true,
+    "PPE image": true,
+    "Face image": true
+  }
+}

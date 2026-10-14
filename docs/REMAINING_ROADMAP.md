@@ -60,7 +60,7 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
      - the frozen threshold 0.45 sits at a knee (about 31 extra checks per extra failure above it, about 70 below it);
      - 0.30 is the other defensible point (60% of failing drives caught vs 50%, 2.3 times as many drives flagged).
      - Operator decision 2026-10-14: keep 0.45; 0.30 is reported as the documented alternative (not deployed).
-   - Next candidate: the persistent inference worker.
+   - **Persistent inference workers done 2026-10-14:** median upload SSH 7.3 → 0.56 s, PPE 7.6 → 0.60 s, Face 17.8 → 3.1 s, with identical results; `DCG_PERSISTENT_WORKERS=0` restores the old behaviour.
 
 ## Acceptance rules
 
