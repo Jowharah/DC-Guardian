@@ -8,6 +8,7 @@ import tempfile
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from presentation.backend.app.authentication import current_principal, authorize
 from presentation.backend.app.authorization import Principal, Permission
+from presentation.backend.app.inference_workers import run_worker
 from presentation.backend.app.custom_scenarios import topology_options
 from presentation.backend.app.ssh_publication import save_preview
 
@@ -37,12 +38,11 @@ async def validate_ssh_log(
         file = Path(folder) / "input.log"
         file.write_bytes(raw)
         try:
-            proc = subprocess.run(
-                [sys.executable, "-m", "presentation.backend.app.ssh_worker", str(file)],
-                cwd=str(root), capture_output=True, text=True, encoding="utf-8",
-                errors="replace", timeout=120, check=False,
+            # Persistent worker (model loaded once) unless DCG_PERSISTENT_WORKERS=0.
+            proc = run_worker(
+                Path(sys.executable), "presentation.backend.app.ssh_worker", file,
                 env={**os.environ, "PYTHONPATH": str(root), "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"},
-            )
+                timeout=120, name="ssh")
         except subprocess.TimeoutExpired as exc:
             raise HTTPException(504, "SSH_INFERENCE_TIMEOUT") from exc
         if proc.returncode:

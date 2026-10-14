@@ -6,6 +6,36 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-14 — Persistent inference workers (roadmap item 9, workflow optimisation)
+
+- **Why:** almost all upload time was worker start-up and model loading. Each upload started a new process in the component environment (the latency benchmark had Face at about 10 s and PPE/SSH at about 4 s). The heavier PPE-v2m made this worse.
+- **What:**
+  - **Serve mode:** `worker_protocol.py` gives the PPE, Face and SSH workers a mode that loads the model once and answers one request line per upload. One-shot mode is unchanged.
+  - **Manager:** `inference_workers.py` keeps one worker per (interpreter, module, environment) in its own component venv.
+    - A change of `DCG_PPE_DETECTOR` starts a separate worker.
+    - Requests run one at a time per worker; a timeout or crash kills the worker and restarts it on the next upload (same 504/503 as before).
+    - An idle stop after `DCG_WORKER_IDLE_SECONDS` (900) frees GPU memory, and shutdown happens with the backend lifespan. Workers also exit when the backend's pipe closes.
+    - Only paths to backend-written temporary files cross the pipe, never a command.
+  - **Call sites:** the three upload endpoints use `run_worker`. `DCG_PERSISTENT_WORKERS=0` restores one process per upload; the backend test conftest sets it, because those tests stub `subprocess.run`.
+- **Measured** (`presentation/backend/validation/persistent_workers_benchmark.py`; same run, 10 uploads each; median, before → after):
+  - SSH 7.28 → 0.56 s;
+  - PPE (v2m) 7.62 → 0.60 s;
+  - Face 17.81 → 3.11 s.
+  - The first upload, which starts the worker, still takes 6–17 s.
+  - Responses are identical in both modes apart from the worker's `latency_ms` (and the SSH preview ID). The benchmark records this as "Same result: yes" for all three.
+- **Tests:** `presentation/backend/tests/test_inference_workers.py` (5) uses a fake worker, with no model or GPU. It covers:
+  - the model loads once and the process is reused;
+  - a failed request keeps the worker;
+  - a crash restarts it;
+  - a timeout raises as `subprocess.run` did and restarts the worker;
+  - the disabled mode uses one process per upload.
+- **Caveats:**
+  - one machine;
+  - the "before" times today are higher than in the 2026-10-13 benchmark (machine load), but both columns come from the same run;
+  - a loaded YOLOv8m worker keeps about 1–2 GB of GPU memory until the idle stop.
+
+---
+
 ## 2026-10-14 — Runtime PPE detector switched to PPE-v2m (YOLOv8m, 1024 px)
 
 - **Why (operator decision):** the post-hoc locked-test analysis (PR #24) showed the unselected YOLOv8m candidate is best overall (mAP@0.5 0.625) and matches PPE-v1 on safety vests (recall 0.449), while the official PPE-v2 (YOLOv8s) regressed on vests. The operator chose it for runtime knowing the choice is test-informed.

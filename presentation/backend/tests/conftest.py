@@ -15,6 +15,9 @@ def isolated_presentation_storage(tmp_path, monkeypatch):
     DCG_PRESENTATION_DB; tests that set their own path still override this.
     """
     monkeypatch.setenv("DCG_PRESENTATION_DB", str(tmp_path / "presentation.sqlite3"))
+    # One process per upload in tests: endpoint tests stub subprocess.run and never load models.
+    # test_inference_workers.py turns persistent workers back on with a fake worker.
+    monkeypatch.setenv("DCG_PERSISTENT_WORKERS", "0")
     # The Face authorization check keeps one shared Neo4j driver; never let a
     # test's fake (or a real connection) carry over into another test.
     from presentation.backend.app import face_zone_authorization

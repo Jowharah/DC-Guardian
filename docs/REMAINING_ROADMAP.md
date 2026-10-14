@@ -50,7 +50,8 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
    - **Post-hoc** (after selection; not used to choose): on the locked test, the unselected YOLOv8m matches v1 on vests (recall 0.449, mAP 0.416 vs 0.372) and is best overall (mAP@0.5 0.625). The combined v1-vest detector was therefore not built.
    - **Runtime switched to PPE-v2m 2026-10-14** (operator decision; test-informed, recorded as such). Before switching: same frozen policy, validation compliance-status agreement 95.3% vs 94.8%, upload 4.06 s vs 3.90 s. `DCG_PPE_DETECTOR=v1` returns to PPE-v1.
    - Open: a fresh held-out set (ideally data-centre images with compliant staff) to confirm PPE-v2m and to test false alarms; vests need more data.
-   - Next candidates: the maintenance recall / alert-rate curve, and the persistent inference worker.
+   - **Persistent inference workers done 2026-10-14:** median upload SSH 7.3 → 0.56 s, PPE 7.6 → 0.60 s, Face 17.8 → 3.1 s, with identical results; `DCG_PERSISTENT_WORKERS=0` restores the old behaviour.
+   - Next candidate: the maintenance recall / alert-rate curve (PR #27).
 
 ## Acceptance rules
 

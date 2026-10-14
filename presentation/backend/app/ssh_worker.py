@@ -1,10 +1,17 @@
-"""Bounded local OpenSSH log validation using the frozen SSH detector."""
-import json
+"""Bounded local OpenSSH log validation using the frozen SSH detector (one-shot or persistent, see worker_protocol)."""
 import sys
-from evidence.ssh_anomaly.src.ssh_pipeline import SSHPipeline
 
-def main():
-    result = SSHPipeline(year=2000).process_log_file(sys.argv[1])
+from presentation.backend.app.worker_protocol import run
+
+
+def load():
+    from evidence.ssh_anomaly.src.ssh_pipeline import SSHPipeline
+    return SSHPipeline(year=2000)
+
+
+def handle(pipeline, path):
+    from evidence.ssh_anomaly.src.ssh_pipeline import SSHPipeline
+    result = pipeline.process_log_file(str(path))
     assessments = SSHPipeline.security_relevant(result["assessments"])
     parsed = result["parsed_events"]
     summaries = []
@@ -28,13 +35,14 @@ def main():
             "isolation_forest": item.get("isolation_forest", {}),
             "autoencoder": item.get("autoencoder", {}),
         })
-    print("DCG_SSH_RESULT=" + json.dumps({
+    return {
         "parsed_count": len(parsed), "assessment_count": len(result["assessments"]),
         "security_relevant_count": len(assessments), "returned_count": len(summaries),
         "assessments": summaries, "truncated": len(assessments) > 100,
         "source_type": "OPERATOR_UPLOADED_OPENSSH_LOG",
         "pipeline_status": "SSH_ONLY_NOT_CORRELATED",
-    }, allow_nan=False))
+    }
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(run("DCG_SSH_RESULT=", load, handle))

@@ -1,14 +1,21 @@
-"""Isolated invocation of the frozen Face Recognition pipeline."""
-import json
+"""Isolated invocation of the frozen Face Recognition pipeline (one-shot or persistent, see worker_protocol)."""
 import sys
-from evidence.face_recognition.src.face_pipeline import FaceRecognitionPipeline
 
-def main():
-    result = FaceRecognitionPipeline().recognize(sys.argv[1])
+from presentation.backend.app.worker_protocol import run
+
+
+def load():
+    from evidence.face_recognition.src.face_pipeline import FaceRecognitionPipeline
+    return FaceRecognitionPipeline()
+
+
+def handle(pipeline, path):
+    result = pipeline.recognize(str(path))
     # Never return enrollment embeddings or local image paths.
     result.pop("image", None)
     result.pop("nearest_employee_id", None) if result.get("recognition_status") != "RECOGNIZED" else None
-    print("DCG_FACE_RESULT=" + json.dumps(result, allow_nan=False))
+    return result
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(run("DCG_FACE_RESULT=", load, handle))

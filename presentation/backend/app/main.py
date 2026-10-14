@@ -40,9 +40,20 @@ from presentation.backend.app.unified_decision import router as unified_decision
 from presentation.backend.app.post_publication_correlations import router as post_publication_router
 from presentation.backend.app.image_capture_declaration import router as image_capture_router
 
+from contextlib import asynccontextmanager
+from presentation.backend.app.inference_workers import shutdown_all as shutdown_inference_workers
+
+
+@asynccontextmanager
+async def lifespan(_app):
+    yield
+    # Persistent inference workers also exit by themselves when this process's pipes close.
+    shutdown_inference_workers()
+
+
 app = FastAPI(
     title="DC-GUARDIAN Presentation API", version="0.1.0",
-    docs_url=None, redoc_url=None,
+    docs_url=None, redoc_url=None, lifespan=lifespan,
 )
 
 from presentation.backend.app.logging_setup import configure as configure_logging,request_logging
