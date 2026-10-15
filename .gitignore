@@ -141,6 +141,12 @@ evidence/ppe_detection/results/training_v2/**/weights/
 evidence/ppe_detection/results/selection_v2/ultralytics/
 evidence/ppe_detection/results/posthoc_v2/ultralytics/
 evidence/ppe_detection/results/external_helmet_jacket/ultralytics/
+evidence/ppe_detection/results/training_v3/**/*.jpg
+evidence/ppe_detection/results/training_v3/**/*.png
+evidence/ppe_detection/results/training_v3/*.log
+evidence/ppe_detection/results/training_v3/**/weights/
+evidence/ppe_detection/results/selection_v3/ultralytics/
+evidence/ppe_detection/results/final_test_v3/ultralytics/
 evidence/ppe_detection/results/final_test_v2/ultralytics_eval/*.jpg
 
 # Keep final frozen model:

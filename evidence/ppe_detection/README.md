@@ -158,6 +158,42 @@ This is an independent check on far more helmets and vests than SH17 offers. It 
 - **What is not measured:** compliance, because the dataset has no person labels. Camera images are usually larger than 1024 px, so the 640-px images favour v1 in a way runtime images would not.
 - **Conclusion:** no model dominates across both datasets. The improvement claimed for v2 holds on SH17-like images; on other sources, helmets favour v1 and vests favour v2m. PPE-v2m as the runtime choice is supported for vests and not for helmets. Data-centre images, or training on more varied PPE data, are the way to settle this.
 
+## PPE-v3: SH17 plus the Kaggle helmet/jacket training data (2026-10-15)
+
+**Why:** vests stayed the weak class (SH17 has a few hundred). The Kaggle *Safety Helmet and Reflective Jacket* dataset (Naik 2023, Apache 2.0), already used for the external test, has a training split with about 14,000 helmets and 11,000 jackets.
+
+**Protocol** (committed and pushed before training, `f23f01e`; `src/train_v3.py`, `src/evaluate_v3.py`):
+- **Data:** the SH17 PPE-v1 development split plus Kaggle train/valid, minus near-duplicates (difference hash, Hamming ≤ 6) of any SH17 or Kaggle-test image: 377 training and 87 validation images were dropped, a real leak in the source dataset. Result: 13,452 training images (6,479 SH17 + 6,973 Kaggle; 13,376 Kaggle helmets and 10,863 vests) and 2,298 validation images.
+- **Pseudo-labels:** the Kaggle images label only helmets and jackets, so PPE-v2m added its own detections (confidence ≥ 0.5, 640 px) for every other class, chiefly 9,626 people, so that people are not learned as background. Helmet and vest labels came only from the dataset.
+- **One candidate:** YOLOv8m at 1024 px, initialised from PPE-v2m, 30 epochs (paused by the operator after 4 epochs and resumed from the checkpoint; recorded in the metadata).
+- **Acceptance on validation only:** mean helmet/vest mAP@0.5 over SH17 validation and Kaggle validation must beat PPE-v2m by ≥ 0.01, with SH17 person mAP@0.5 at most 0.02 lower.
+- **Test once:** Kaggle test (now same-source data) and the SH17 locked test (already used for PPE-v2 decisions; comparison only).
+
+**Validation (selection):**
+
+| Model | Criterion | SH17 helmet / vest / person mAP@0.5 | Kaggle helmet / vest mAP@0.5 |
+|---|---:|---|---|
+| PPE-v1 | 0.492 | 0.656 / 0.472 / 0.903 | 0.498 / 0.344 |
+| PPE-v2m (runtime) | 0.526 | 0.713 / 0.577 / 0.917 | 0.406 / 0.409 |
+| **PPE-v3m** | **0.790** | 0.636 / 0.596 / 0.913 | **0.970 / 0.958** |
+
+Accepted (gain +0.264; person −0.004). Note that the gain comes from the Kaggle half: on SH17 validation v3 is lower on helmets (0.636 vs 0.713).
+
+**Final test (run once):**
+
+| Model | Kaggle helmet mAP@0.5 (R) | Kaggle vest mAP@0.5 (R) | SH17 helmet mAP@0.5 (R) | SH17 vest mAP@0.5 (R) | SH17 person mAP@0.5 | SH17 all mAP@0.5 |
+|---|---|---|---|---|---:|---:|
+| PPE-v1 | 0.495 (0.433) | 0.368 (0.359) | 0.676 (0.603) | 0.372 (0.449) | 0.869 | 0.545 |
+| PPE-v2m (runtime) | 0.401 (0.360) | 0.418 (0.377) | **0.739** (0.664) | 0.416 (**0.449**) | 0.900 | **0.625** |
+| **PPE-v3m** | **0.962 (0.903)** | **0.958 (0.879)** | 0.727 (0.654) | **0.442** (0.388) | 0.900 | 0.619 |
+
+**Reading:**
+- **On images like its new training data, v3 is far better:** helmet and vest mAP rise from about 0.4 to 0.96. This test is same-source (different images, same collection and labelling style), so it shows learning of that domain, not general improvement.
+- **On SH17 it is not better than PPE-v2m:** helmet mAP 0.727 vs 0.739, all-class 0.619 vs 0.625, vest mAP higher (0.442 vs 0.416) but vest recall lower (0.388 vs 0.449). Person detection is unchanged (0.900), so the pseudo-labels did not damage it.
+- **Detection quality depends strongly on the image domain.** Which model suits a data centre depends on whether its cameras look more like SH17 or like the Kaggle images, so the deciding evidence is fresh data-centre-like images.
+- **Runtime unchanged:** PPE-v2m stays the live detector. v3 is stored (`models/ppe_yolov8_v3m_best.pt`, `models/ppe_v3m_metadata.json`) but not selectable at runtime until the operator decides; switching would also need the compliance and latency check run for PPE-v2m.
+- **Artifacts:** `results/training_v3/` (training curves, `prepare_summary.json`), `results/selection_v3/`, `results/final_test_v3/`; `tests/test_ppe_v3_artifacts.py`.
+
 ## Runtime flow
 
 ```text

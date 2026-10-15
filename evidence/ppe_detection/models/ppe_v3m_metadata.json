@@ -1,0 +1,217 @@
+{
+  "candidate": "v3m1024",
+  "model_family": "YOLOv8",
+  "architecture": "yolov8m",
+  "initialisation": "ppe_yolov8_v2m_best.pt",
+  "initialisation_sha256": "ae2e58d55623401035219fbd5800ab706b8b2caa5631d9101e0ab75438cd0a7c",
+  "datasets": "SH17 PPE-v1 development split + Safety Helmet and Reflective Jacket train/valid (Naik 2023), near-duplicates of SH17 and Kaggle test removed, persons and other classes pseudo-labelled by PPE-v2m",
+  "prepare": {
+    "sh17_train": 6479,
+    "sh17_validation": 810,
+    "kaggle_train_kept": 6973,
+    "kaggle_valid_kept": 1488,
+    "kaggle_train_near_duplicates_dropped": 377,
+    "kaggle_valid_near_duplicates_dropped": 87,
+    "labels_train": {
+      "ground_truth": {
+        "helmet": 13376,
+        "safety-vest": 10863
+      },
+      "pseudo": {
+        "person": 9626,
+        "gloves": 1134,
+        "shoes": 1796,
+        "head": 8502,
+        "face": 4933,
+        "hands": 3653,
+        "ear": 3501,
+        "glasses": 700,
+        "face-mask-medical": 104,
+        "safety-suit": 228,
+        "tools": 107,
+        "face-guard": 33,
+        "ear-mufs": 31,
+        "foot": 30,
+        "medical-suit": 1
+      }
+    },
+    "labels_valid": {
+      "ground_truth": {
+        "helmet": 2832,
+        "safety-vest": 2227
+      },
+      "pseudo": {
+        "person": 2022,
+        "ear": 716,
+        "head": 1767,
+        "shoes": 371,
+        "face": 996,
+        "hands": 783,
+        "foot": 5,
+        "glasses": 141,
+        "gloves": 255,
+        "safety-suit": 55,
+        "ear-mufs": 7,
+        "face-mask-medical": 20,
+        "tools": 23,
+        "face-guard": 5
+      }
+    },
+    "pseudo_labeller": "ppe_yolov8_v2m_best.pt",
+    "pseudo_labeller_sha256": "ae2e58d55623401035219fbd5800ab706b8b2caa5631d9101e0ab75438cd0a7c",
+    "pseudo_conf": 0.5,
+    "pseudo_imgsz": 640,
+    "hamming_max": 6
+  },
+  "locked_test_accessed": false,
+  "kaggle_test_accessed": false,
+  "epochs_requested": 30,
+  "resumed_after_interruption": true,
+  "patience": 10,
+  "image_size": 1024,
+  "batch_size": 8,
+  "seed": 42,
+  "smoke_test": false,
+  "gpu": "NVIDIA GeForce RTX 3080 Ti",
+  "pytorch": "2.14.0+cu126",
+  "training_run": "evidence\\ppe_detection\\results\\training_v3\\v3m1024",
+  "best_checkpoint": "evidence\\ppe_detection\\results\\training_v3\\v3m1024\\weights\\best.pt",
+  "selected_by": "evaluate_v3.py --stage validation",
+  "weights_file": "ppe_yolov8_v3m_best.pt",
+  "weights_sha256": "92a0a00f94b5166b066f721e4004e46210c1cadcb5c182714952c38baca61471",
+  "validation": {
+    "sha256": "92a0a00f94b5166b066f721e4004e46210c1cadcb5c182714952c38baca61471",
+    "image_size": 1024,
+    "sh17_validation": {
+      "overall": {
+        "precision": 0.755,
+        "recall": 0.6184,
+        "map50": 0.6624,
+        "map50_95": 0.442
+      },
+      "person": {
+        "precision": 0.8898,
+        "recall": 0.8814,
+        "map50": 0.913,
+        "map50_95": 0.7312
+      },
+      "ear": {
+        "precision": 0.8947,
+        "recall": 0.8311,
+        "map50": 0.8573,
+        "map50_95": 0.5407
+      },
+      "ear-mufs": {
+        "precision": 0.7277,
+        "recall": 0.3333,
+        "map50": 0.3802,
+        "map50_95": 0.307
+      },
+      "face": {
+        "precision": 0.9444,
+        "recall": 0.9031,
+        "map50": 0.9479,
+        "map50_95": 0.6969
+      },
+      "face-guard": {
+        "precision": 0.5691,
+        "recall": 0.3077,
+        "map50": 0.3613,
+        "map50_95": 0.2278
+      },
+      "face-mask-medical": {
+        "precision": 0.8928,
+        "recall": 0.7985,
+        "map50": 0.8268,
+        "map50_95": 0.5045
+      },
+      "foot": {
+        "precision": 0.6007,
+        "recall": 0.3421,
+        "map50": 0.3676,
+        "map50_95": 0.1722
+      },
+      "tools": {
+        "precision": 0.5474,
+        "recall": 0.3907,
+        "map50": 0.3915,
+        "map50_95": 0.2216
+      },
+      "glasses": {
+        "precision": 0.7575,
+        "recall": 0.7165,
+        "map50": 0.7385,
+        "map50_95": 0.4375
+      },
+      "gloves": {
+        "precision": 0.7589,
+        "recall": 0.5255,
+        "map50": 0.6011,
+        "map50_95": 0.3938
+      },
+      "helmet": {
+        "precision": 0.8028,
+        "recall": 0.4868,
+        "map50": 0.636,
+        "map50_95": 0.4258
+      },
+      "hands": {
+        "precision": 0.9064,
+        "recall": 0.8469,
+        "map50": 0.9028,
+        "map50_95": 0.6216
+      },
+      "head": {
+        "precision": 0.9348,
+        "recall": 0.8999,
+        "map50": 0.9245,
+        "map50_95": 0.7062
+      },
+      "medical-suit": {
+        "precision": 0.6238,
+        "recall": 0.6471,
+        "map50": 0.688,
+        "map50_95": 0.4904
+      },
+      "shoes": {
+        "precision": 0.7945,
+        "recall": 0.6653,
+        "map50": 0.7228,
+        "map50_95": 0.4146
+      },
+      "safety-suit": {
+        "precision": 0.4297,
+        "recall": 0.4737,
+        "map50": 0.4064,
+        "map50_95": 0.2171
+      },
+      "safety-vest": {
+        "precision": 0.7608,
+        "recall": 0.464,
+        "map50": 0.5957,
+        "map50_95": 0.4046
+      }
+    },
+    "kaggle_validation": {
+      "overall": {
+        "precision": 0.9314,
+        "recall": 0.9128,
+        "map50": 0.9642,
+        "map50_95": 0.7721
+      },
+      "helmet": {
+        "precision": 0.9428,
+        "recall": 0.9266,
+        "map50": 0.9701,
+        "map50_95": 0.7789
+      },
+      "safety-vest": {
+        "precision": 0.9201,
+        "recall": 0.899,
+        "map50": 0.9583,
+        "map50_95": 0.7654
+      }
+    },
+    "criterion": 0.79
+  }
+}
