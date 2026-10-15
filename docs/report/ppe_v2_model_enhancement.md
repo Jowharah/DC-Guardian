@@ -87,6 +87,42 @@ The external test showed both a domain gap and the vest weakness, so the Kaggle 
 - **The person class was protected:** SH17 person mAP is unchanged (0.900), so pseudo-labelling avoided the expected failure.
 - **Implication:** PPE accuracy is domain-dependent, and the right model for a data centre can only be chosen on images from that setting. PPE-v2m stays at runtime.
 
+## Third-dataset test: CHV (2026-10-15)
+
+After the PPE-v3 model (trained on SH17 plus the Kaggle data, PR #31), both earlier test sets had informed decisions. The four detectors were therefore scored on a third public dataset, CHV (Wang et al., 2021), which labels people, vests and helmets and was never used for training or selection.
+- **Data:** 1,155 of its 1,330 images, after removing 175 near-duplicates of SH17 or Kaggle images.
+- **Protocol:** committed before running.
+
+| Model | Helmet mAP@0.5 | Helmet recall at 0.25 | Vest mAP@0.5 | Vest recall at 0.25 | Person mAP@0.5 |
+|---|---:|---:|---:|---:|---:|
+| PPE-v1 | 0.754 | 0.609 | 0.687 | 0.655 | 0.837 |
+| PPE-v2 official (v2s) | 0.866 | 0.773 | 0.707 | 0.645 | 0.862 |
+| PPE-v2m (runtime) | 0.863 | 0.759 | 0.731 | 0.632 | 0.867 |
+| **PPE-v3m (PR #31)** | **0.882** | **0.851** | **0.836** | **0.838** | 0.870 |
+
+The 95% intervals on recall are about ±0.015 for helmets and ±0.025 for vests; v3m's helmet and vest recall intervals do not overlap any other model's.
+
+**Compliance** (the dashboard's image status against the frozen policy applied to the labelled boxes; 821 non-compliant, 327 compliant images):
+
+| Model | Agreement | Violations caught | False alarms | Missed violations |
+|---|---:|---:|---:|---:|
+| PPE-v1 | 81.0% | 95.6% | 54.1% | 4.4% |
+| PPE-v2 official (v2s) | 79.3% | 95.6% | 59.9% | 3.8% |
+| PPE-v2m (runtime) | 80.1% | 96.7% | 59.9% | 3.2% |
+| **PPE-v3m** | **84.0%** | 90.7% | **31.5%** | 9.3% |
+
+**Reading:**
+- **On truly unseen images, PPE-v3m detects helmets and vests clearly better than all earlier models.** This is the clean, independent evidence that the PPE work improved the detector.
+- **For compliance, it trades fewer false alarms (31.5% against 60%) for more missed violations (9.3% against 3.2%).** Because a missed violation is the safety-critical error, deploying v3m is a policy decision rather than an automatic upgrade.
+
+### Deployment decision
+
+The deployed detector stays PPE-v2m, although PPE-v3m detects better. The deciding figure is the missed-violation rate. On CHV:
+- **PPE-v3m:** reported 76 of 821 non-compliant images as compliant, and wrongly flagged 103 of 327 compliant images.
+- **PPE-v2m:** reported 26 as compliant and wrongly flagged 196.
+
+A false alarm reaches a human reviewer and is dismissed. A missed violation raises no alert and is never reviewed, so the system is tuned to minimise the error that escapes human oversight. This follows the project's principle that every alert goes to human review: false alarms are tolerable, silent misses are not. PPE-v3m could replace PPE-v2m once its vest threshold has been re-tuned on validation data to match PPE-v2m's miss rate and confirmed on fresh images.
+
 ## Limitations
 
 - one training seed per candidate;

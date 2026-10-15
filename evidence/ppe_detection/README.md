@@ -194,6 +194,75 @@ Accepted (gain +0.264; person −0.004). Note that the gain comes from the Kaggl
 - **Runtime unchanged:** PPE-v2m stays the live detector. v3 is stored (`models/ppe_yolov8_v3m_best.pt`, `models/ppe_v3m_metadata.json`) but not selectable at runtime until the operator decides; switching would also need the compliance and latency check run for PPE-v2m.
 - **Artifacts:** `results/training_v3/` (training curves, `prepare_summary.json`), `results/selection_v3/`, `results/final_test_v3/`; `tests/test_ppe_v3_artifacts.py`.
 
+## Third-dataset test: CHV (2026-10-15)
+
+The SH17 locked test and the Kaggle test have both informed decisions (the PPE-v2m runtime choice, PPE-v3 training), so neither is independent any more.
+- **Dataset:** CHV, *Color Helmet and Vest* (Wang et al., *Sensors* 2021), a third public dataset that labels people, vests and helmets. No model was trained, selected or tuned on it.
+- **Protocol:** `src/evaluate_external_chv.py`, committed before running (`1f63311`).
+  - All 1,330 images were used; 175 that are near-duplicates of SH17 or Kaggle images were excluded, leaving 1,155 images with 3,531 people, 3,192 helmets and 1,505 vests.
+  - The four helmet colours map to helmet.
+  - PPE-v3m uses PR #31's weights (hash checked) and runs in the PPE-v2m pipeline settings; no runtime setting changed.
+
+| Model | Helmet mAP@0.5 | Helmet recall at 0.25 | Vest mAP@0.5 | Vest recall at 0.25 | Person mAP@0.5 |
+|---|---:|---:|---:|---:|---:|
+| PPE-v1 | 0.754 | 0.609 | 0.687 | 0.655 | 0.837 |
+| PPE-v2 official (v2s) | 0.866 | 0.773 | 0.707 | 0.645 | 0.862 |
+| PPE-v2m (runtime) | 0.863 | 0.759 | 0.731 | 0.632 | 0.867 |
+| **PPE-v3m (PR #31)** | **0.882** | **0.851** | **0.836** | **0.838** | 0.870 |
+
+The 95% intervals on recall are about ±0.015 for helmets and ±0.025 for vests; v3m's helmet and vest recall intervals do not overlap any other model's.
+
+**Compliance** (the dashboard's image status against the frozen policy applied to the labelled boxes; 821 non-compliant, 327 compliant images):
+
+| Model | Agreement | Violations caught | False alarms | Missed violations |
+|---|---:|---:|---:|---:|
+| PPE-v1 | 81.0% | 95.6% | 54.1% | 4.4% |
+| PPE-v2 official (v2s) | 79.3% | 95.6% | 59.9% | 3.8% |
+| PPE-v2m (runtime) | 80.1% | 96.7% | 59.9% | 3.2% |
+| **PPE-v3m** | **84.0%** | 90.7% | **31.5%** | 9.3% |
+
+**Reading:**
+- **v3m is the best detector on unseen data.** Helmet and vest detection improve clearly over every other model: vest recall 0.84 against 0.63–0.66, vest mAP 0.84 against 0.69–0.73. Person detection is level.
+- **The training-domain effect is now independent evidence.** Unlike the Kaggle test, CHV played no part in v3's training or acceptance, so this is not a same-source result.
+- **v2 beats v1 on helmets here** (mAP 0.86 against 0.75). The v1 helmet lead on the Kaggle test was specific to that dataset.
+- **Compliance trade-off:**
+  - v3m halves the false alarms on compliant workers (31.5% against about 55–60%) and agrees with the labels most often (84%).
+  - It misses more real violations: 9.3% of non-compliant images reported COMPLIANT, against 3.2% for v2m.
+  - It sees PPE more readily, and sometimes PPE that is not there or not on that person. A missed violation is the safety-critical error, so switching the runtime to v3m is a policy decision: fewer false alarms against about three times more missed violations.
+- **Limits:**
+  - construction scenes from online sources, not data-centre cameras;
+  - near-duplicates were removed by difference hash, not by exhaustive search;
+  - compliance ground truth comes from the frozen association rule applied to the labelled boxes, not from human compliance labels.
+
+### Decision: the runtime stays on PPE-v2m (operator, 2026-10-15)
+
+PPE-v3m is the better detector. It agrees with the compliance labels more often (84.0% against 80.1%). The runtime nevertheless keeps **PPE-v2m**, because it **misses fewer real violations**.
+
+**The two errors a compliance check can make.** A person is NON_COMPLIANT when a required item (helmet or vest) is not detected on them, so the detector can be wrong in two ways:
+
+| Error | What happens | Consequence |
+|---|---|---|
+| False alarm: PPE is worn but not detected | The person is flagged NON_COMPLIANT | An operator reviews the alert and dismisses it: time is lost |
+| Missed violation: PPE is absent but "detected" | The person is reported COMPLIANT | No alert is raised and nobody reviews it: an unprotected worker goes unnoticed |
+
+**On CHV (image counts):**
+
+| | PPE-v2m | PPE-v3m |
+|---|---:|---:|
+| False alarms (of 327 compliant images) | 196 | 103 |
+| Missed violations (of 821 non-compliant images) | **26** | 76 |
+
+**Why v3m behaves this way.** It finds PPE far more readily (vest recall 0.84 against 0.63), which removes many false alarms but also produces PPE detections on, or next to, people who are not wearing it. One false helmet or vest attached to a person is enough to report them compliant. Likely reasons:
+- its added training data mostly shows people wearing PPE;
+- its "reflective jacket" label is broader than "safety vest";
+- the containment rule attaches nearby PPE to the person.
+
+**Why the miss rate decides.** DC-GUARDIAN sends every alert to human review, so a false alarm costs operator time but is caught. A missed violation produces no alert, so no human ever sees it. In safety monitoring the error that escapes review is minimised first. PPE-v2m therefore stays the runtime detector. PPE-v3m is reported as the improved detector, with this trade-off.
+
+**Revisit when:**
+- false alarms prove to be the bigger operational problem (operators ignoring a dashboard where about 60% of compliant people are flagged); or
+- PPE-v3m's confidence threshold, especially for vests, has been re-tuned on validation data, never on CHV, to bring its missed violations to PPE-v2m's level, and a fresh test confirms it.
+
 ## Runtime flow
 
 ```text

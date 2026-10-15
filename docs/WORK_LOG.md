@@ -29,6 +29,42 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-15 — Third-dataset PPE test (CHV)
+
+- **Why (operator):** test only, no further training. The SH17 locked test and the Kaggle test had both informed decisions, so the PPE models (including PR #31's PPE-v3m) lacked an independent check.
+- **What:** `evidence/ppe_detection/src/evaluate_external_chv.py` (protocol committed before running, `1f63311`).
+  - **Data:** CHV (Wang et al. 2021). Downloaded by the assistant from the authors' public Google Drive link into the ignored `data/raw/chv_download/`; the archive was listed before extraction and contained only images, labels and readme files.
+  - **Exclusions:** all 1,330 images, minus 175 near-duplicates of SH17 or Kaggle images, leaving 1,155 images: 3,531 people, 3,192 helmets, 1,505 vests.
+  - **Scoring:** detection and dashboard-level compliance for v1, v2s, v2m and v3m. v3m uses PR #31's weights (hash `92a0a00f…`) in the v2m pipeline settings. Model hashes were checked before and after.
+- **Results (detection, mAP@0.5 / recall at 0.25):**
+
+  | Model | Helmet | Vest |
+  |---|---|---|
+  | v1 | 0.754 / 0.609 | 0.687 / 0.655 |
+  | v2s | 0.866 / 0.773 | 0.707 / 0.645 |
+  | v2m | 0.863 / 0.759 | 0.731 / 0.632 |
+  | **v3m** | **0.882 / 0.851** | **0.836 / 0.838** |
+
+  Person mAP is about 0.84–0.87 for all models.
+- **Compliance (agreement / false alarms / missed violations):**
+  - v1: 81.0% / 54.1% / 4.4%;
+  - v2m: 80.1% / 59.9% / 3.2%;
+  - v3m: 84.0% / **31.5%** / **9.3%**.
+- **Reading:**
+  - v3m is the best detector on independent data.
+  - Deploying it trades half the false alarms for about three times more missed violations, which is a policy decision.
+  - v2 beats v1 on helmets here, so v1's lead on the Kaggle test was dataset-specific.
+- **Docs:** PPE README section, report draft, the CHV citation in `DATASETS_AND_CITATIONS.md`, roadmap.
+- **Tests:** `tests/test_ppe_external_chv.py`.
+- **Not changed:** the runtime (PPE-v2m) and PR #31.
+- **Operator decision (2026-10-15): keep PPE-v2m at runtime.**
+  - **Reasoning, as explained to the operator:** PPE-v3m detects better and agrees with the labels more often, but reports more non-compliant people as compliant (76 vs 26 of 821 images). It halves false alarms (103 vs 196 of 327). A false alarm goes to human review and is dismissed; a missed violation raises no alert and is never reviewed. Minimising the unreviewed error comes first.
+  - **Why v3m misses more:** it finds PPE more readily, so a false or nearby helmet or vest attached to an unprotected person reports them compliant. Its added data mostly shows people wearing PPE, and its "reflective jacket" label is broader.
+  - **Recorded in:** the PPE README (decision section), the report draft and the roadmap.
+  - **Revisit:** if false alarms become the main operational problem, or after v3m's vest threshold is re-tuned on validation data (not CHV) and confirmed on fresh images.
+
+---
+
 ## 2026-10-14 — Face image source confirmed and cited
 
 - **What (operator):** the controlled face images come from the Kaggle *Face Verification Dataset* (Zagorskii 2025, `juice0lover/face-identification`, MIT).
