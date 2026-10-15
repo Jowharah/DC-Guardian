@@ -101,6 +101,14 @@ The 95% intervals on recall are about ±0.015 for helmets and ±0.025 for vests;
 - **On truly unseen images, PPE-v3m detects helmets and vests clearly better than all earlier models.** This is the clean, independent evidence that the PPE work improved the detector.
 - **For compliance, it trades fewer false alarms (31.5% against 60%) for more missed violations (9.3% against 3.2%).** Because a missed violation is the safety-critical error, deploying v3m is a policy decision rather than an automatic upgrade.
 
+### Deployment decision
+
+The deployed detector stays PPE-v2m, although PPE-v3m detects better. The deciding figure is the missed-violation rate. On CHV:
+- **PPE-v3m:** reported 76 of 821 non-compliant images as compliant, and wrongly flagged 103 of 327 compliant images.
+- **PPE-v2m:** reported 26 as compliant and wrongly flagged 196.
+
+A false alarm reaches a human reviewer and is dismissed. A missed violation raises no alert and is never reviewed, so the system is tuned to minimise the error that escapes human oversight. This follows the project's principle that every alert goes to human review: false alarms are tolerable, silent misses are not. PPE-v3m could replace PPE-v2m once its vest threshold has been re-tuned on validation data to match PPE-v2m's miss rate and confirmed on fresh images.
+
 ## Limitations
 
 - one training seed per candidate;

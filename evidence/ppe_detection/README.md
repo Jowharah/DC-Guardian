@@ -198,6 +198,35 @@ The 95% intervals on recall are about ±0.015 for helmets and ±0.025 for vests;
   - near-duplicates were removed by difference hash, not by exhaustive search;
   - compliance ground truth comes from the frozen association rule applied to the labelled boxes, not from human compliance labels.
 
+### Decision: the runtime stays on PPE-v2m (operator, 2026-10-15)
+
+PPE-v3m is the better detector. It agrees with the compliance labels more often (84.0% against 80.1%). The runtime nevertheless keeps **PPE-v2m**, because it **misses fewer real violations**.
+
+**The two errors a compliance check can make.** A person is NON_COMPLIANT when a required item (helmet or vest) is not detected on them, so the detector can be wrong in two ways:
+
+| Error | What happens | Consequence |
+|---|---|---|
+| False alarm: PPE is worn but not detected | The person is flagged NON_COMPLIANT | An operator reviews the alert and dismisses it: time is lost |
+| Missed violation: PPE is absent but "detected" | The person is reported COMPLIANT | No alert is raised and nobody reviews it: an unprotected worker goes unnoticed |
+
+**On CHV (image counts):**
+
+| | PPE-v2m | PPE-v3m |
+|---|---:|---:|
+| False alarms (of 327 compliant images) | 196 | 103 |
+| Missed violations (of 821 non-compliant images) | **26** | 76 |
+
+**Why v3m behaves this way.** It finds PPE far more readily (vest recall 0.84 against 0.63), which removes many false alarms but also produces PPE detections on, or next to, people who are not wearing it. One false helmet or vest attached to a person is enough to report them compliant. Likely reasons:
+- its added training data mostly shows people wearing PPE;
+- its "reflective jacket" label is broader than "safety vest";
+- the containment rule attaches nearby PPE to the person.
+
+**Why the miss rate decides.** DC-GUARDIAN sends every alert to human review, so a false alarm costs operator time but is caught. A missed violation produces no alert, so no human ever sees it. In safety monitoring the error that escapes review is minimised first. PPE-v2m therefore stays the runtime detector. PPE-v3m is reported as the improved detector, with this trade-off.
+
+**Revisit when:**
+- false alarms prove to be the bigger operational problem (operators ignoring a dashboard where about 60% of compliant people are flagged); or
+- PPE-v3m's confidence threshold, especially for vests, has been re-tuned on validation data, never on CHV, to bring its missed violations to PPE-v2m's level, and a fresh test confirms it.
+
 ## Runtime flow
 
 ```text

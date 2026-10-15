@@ -43,6 +43,11 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 - **Docs:** PPE README section, report draft, the CHV citation in `DATASETS_AND_CITATIONS.md`, roadmap.
 - **Tests:** `tests/test_ppe_external_chv.py`.
 - **Not changed:** the runtime (PPE-v2m) and PR #31.
+- **Operator decision (2026-10-15): keep PPE-v2m at runtime.**
+  - **Reasoning, as explained to the operator:** PPE-v3m detects better and agrees with the labels more often, but reports more non-compliant people as compliant (76 vs 26 of 821 images). It halves false alarms (103 vs 196 of 327). A false alarm goes to human review and is dismissed; a missed violation raises no alert and is never reviewed. Minimising the unreviewed error comes first.
+  - **Why v3m misses more:** it finds PPE more readily, so a false or nearby helmet or vest attached to an unprotected person reports them compliant. Its added data mostly shows people wearing PPE, and its "reflective jacket" label is broader.
+  - **Recorded in:** the PPE README (decision section), the report draft and the roadmap.
+  - **Revisit:** if false alarms become the main operational problem, or after v3m's vest threshold is re-tuned on validation data (not CHV) and confirmed on fresh images.
 
 ---
 
