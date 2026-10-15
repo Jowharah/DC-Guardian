@@ -60,6 +60,10 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
      - the frozen threshold 0.45 sits at a knee (about 31 extra checks per extra failure above it, about 70 below it);
      - 0.30 is the other defensible point (60% of failing drives caught vs 50%, 2.3 times as many drives flagged).
      - Operator decision 2026-10-14: keep 0.45; 0.30 is reported as the documented alternative (not deployed).
+   - **Third-dataset test (CHV) done 2026-10-15** (test only):
+     - PPE-v3m (PR #31) detects helmets and vests best on unseen data (vest recall 0.84 vs 0.63 for v2m);
+     - for compliance it halves false alarms (31.5% vs 59.9%) but misses more violations (9.3% vs 3.2%).
+     - Open: the operator decides on PR #31 and on any runtime switch.
    - **Persistent inference workers done 2026-10-14:** median upload SSH 7.3 → 0.56 s, PPE 7.6 → 0.60 s, Face 17.8 → 3.1 s, with identical results; `DCG_PERSISTENT_WORKERS=0` restores the old behaviour.
 
 ## Acceptance rules

@@ -9,6 +9,7 @@ Licence terms were checked against the official pages on 2026-10-14. Re-check th
 | Dataset | Used for | Terms | What the terms require |
 |---|---|---|---|
 | **SH17**: Ahmad & Rahimi (2024) | PPE detector v1 and v2 (training, validation, locked test) | **CC BY-NC-SA 4.0** (official GitHub README) | Cite the paper. Non-commercial use only. Derivatives under the same licence, which arguably covers the PPE weights trained on it. |
+| **CHV, Color Helmet and Vest**: Wang et al. (2021) | Third-dataset PPE test (detection and compliance, 2026-10-15; not used for training) | Free use stated by the authors (no named licence) | Cite the paper. 1,330 images from online sources and existing open datasets; 175 near-duplicates of SH17 or Kaggle images excluded in the test. |
 | **Safety Helmet and Reflective Jacket**: Naik (2023), Kaggle | External PPE test, helmet and vest (2026-10-14) | **Apache 2.0** (Kaggle dataset metadata) | Attribution and the licence notice. The image sources are not documented by the author. |
 | **Backblaze Drive Stats** (2025 Q2 – 2026 Q1) | Predictive maintenance (Temporal RF v2, GRU challenger) | Backblaze conditions (no licence name given) | Cite Backblaze as the source; you are solely responsible for how you use the data; derivative works may be sold, the data itself may not. |
 | **Loghub OpenSSH**: Zhu et al. (2023) | SSH anomaly detector: parser, features, model development | Loghub terms (Zenodo record) | Free for research or academic work, on condition that users refer to the repository and cite the paper. Include the licence notice in copies. |
@@ -57,6 +58,14 @@ U.S. federal government works (NIST, OSHA, DOE) are generally in the public doma
   volume  = {6}, number = {2}, pages = {175--185}, year = {2025},
   doi     = {10.1016/j.jnlssr.2024.09.002},
   note    = {Dataset: https://github.com/ahmadmughees/SH17dataset, CC BY-NC-SA 4.0}
+}
+@article{wang2021chv,
+  title   = {Fast Personal Protective Equipment Detection for Real Construction Sites Using Deep Learning Approaches},
+  author  = {Wang, Zijian and Wu, Yimin and Yang, Lichao and Thirunavukarasu, Arjun and Evison, Colin and Zhao, Yifan},
+  journal = {Sensors},
+  volume  = {21}, number = {10}, pages = {3478}, year = {2021},
+  doi     = {10.3390/s21103478},
+  note    = {CHV dataset: https://github.com/ZijianWang-ZW/PPE_detection}
 }
 @misc{naik2023helmetjacket,
   title        = {Safety Helmet and Reflective Jacket},

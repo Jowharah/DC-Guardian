@@ -1,0 +1,302 @@
+{
+  "label": "THIRD-DATASET TEST (CHV; nothing trained, selected or tuned on it; SH17 and Kaggle near-duplicates excluded)",
+  "dataset": "CHV, Wang et al. 2021, Sensors 21(10):3478, doi:10.3390/s21103478; all 1,330 images",
+  "class_mapping": {
+    "person": "person",
+    "vest": "safety-vest",
+    "blue/red/white/yellow helmet": "helmet"
+  },
+  "weights_sha256": {
+    "PPE-v1": "0f0577e37241e423faac75a3c3999538260abc55c220e0b2626bbe7c4bf5bc74",
+    "PPE-v2 official (v2s1024)": "b1ee6e2b11369bdccc82ce2827a4c45d0a6bbf7936d5406f9438785a3d269c75",
+    "PPE-v2m (runtime)": "ae2e58d55623401035219fbd5800ab706b8b2caa5631d9101e0ab75438cd0a7c",
+    "PPE-v3m (PR #31)": "92a0a00f94b5166b066f721e4004e46210c1cadcb5c182714952c38baca61471"
+  },
+  "source_images": 1330,
+  "images_compared_against": 18599,
+  "hamming_max": 6,
+  "near_duplicates_excluded": 175,
+  "duplicate_examples": {
+    "ppe_0004.jpg": "helmet_jacket/train/images/helmet_jacket_06384.jpg",
+    "ppe_0005.jpg": "helmet_jacket/train/images/helmet_jacket_01381.jpg",
+    "ppe_0006.jpg": "helmet_jacket/train/images/helmet_jacket_03659.jpg",
+    "ppe_0009.jpg": "helmet_jacket/train/images/helmet_jacket_03905.jpg",
+    "ppe_0012.jpg": "helmet_jacket/train/images/helmet_jacket_03268.jpg",
+    "ppe_0013.jpg": "helmet_jacket/train/images/helmet_jacket_01178.jpg",
+    "ppe_0021.jpg": "helmet_jacket/valid/images/helmet_jacket_10279.jpg",
+    "ppe_0023.jpg": "helmet_jacket/train/images/helmet_jacket_07068.jpg",
+    "ppe_0024.jpg": "helmet_jacket/train/images/helmet_jacket_01555.jpg",
+    "ppe_0027.jpg": "helmet_jacket/test/images/helmet_jacket_08833.jpg"
+  },
+  "images_evaluated": 1155,
+  "instances": {
+    "helmet": 3192,
+    "person": 3531,
+    "safety-vest": 1505
+  },
+  "truth_distribution": {
+    "NON_COMPLIANT": 821,
+    "COMPLIANT": 327,
+    "NO_PERSON": 7
+  },
+  "detection": {
+    "PPE-v1": {
+      "person": {
+        "precision": 0.8228,
+        "recall": 0.8348,
+        "map50": 0.8367,
+        "map50_95": 0.4127,
+        "at_runtime_conf": {
+          "precision": 0.7946,
+          "recall": 0.842,
+          "recall_ci95": [
+            0.8296,
+            0.8536
+          ]
+        }
+      },
+      "helmet": {
+        "precision": 0.8966,
+        "recall": 0.5895,
+        "map50": 0.7536,
+        "map50_95": 0.3931,
+        "at_runtime_conf": {
+          "precision": 0.8701,
+          "recall": 0.6087,
+          "recall_ci95": [
+            0.5917,
+            0.6255
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.7454,
+        "recall": 0.6206,
+        "map50": 0.6868,
+        "map50_95": 0.3229,
+        "at_runtime_conf": {
+          "precision": 0.6925,
+          "recall": 0.6555,
+          "recall_ci95": [
+            0.6311,
+            0.679
+          ]
+        }
+      }
+    },
+    "PPE-v2 official (v2s1024)": {
+      "person": {
+        "precision": 0.8279,
+        "recall": 0.8706,
+        "map50": 0.8615,
+        "map50_95": 0.4235,
+        "at_runtime_conf": {
+          "precision": 0.8241,
+          "recall": 0.8717,
+          "recall_ci95": [
+            0.8603,
+            0.8823
+          ]
+        }
+      },
+      "helmet": {
+        "precision": 0.9191,
+        "recall": 0.7684,
+        "map50": 0.866,
+        "map50_95": 0.4601,
+        "at_runtime_conf": {
+          "precision": 0.9144,
+          "recall": 0.7731,
+          "recall_ci95": [
+            0.7582,
+            0.7873
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.7579,
+        "recall": 0.6386,
+        "map50": 0.7067,
+        "map50_95": 0.3353,
+        "at_runtime_conf": {
+          "precision": 0.7538,
+          "recall": 0.6449,
+          "recall_ci95": [
+            0.6204,
+            0.6687
+          ]
+        }
+      }
+    },
+    "PPE-v2m (runtime)": {
+      "person": {
+        "precision": 0.8198,
+        "recall": 0.8805,
+        "map50": 0.8674,
+        "map50_95": 0.4316,
+        "at_runtime_conf": {
+          "precision": 0.8404,
+          "recall": 0.8767,
+          "recall_ci95": [
+            0.8654,
+            0.8871
+          ]
+        }
+      },
+      "helmet": {
+        "precision": 0.9158,
+        "recall": 0.7788,
+        "map50": 0.8626,
+        "map50_95": 0.4671,
+        "at_runtime_conf": {
+          "precision": 0.9301,
+          "recall": 0.7591,
+          "recall_ci95": [
+            0.7439,
+            0.7736
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.8058,
+        "recall": 0.6588,
+        "map50": 0.7311,
+        "map50_95": 0.3457,
+        "at_runtime_conf": {
+          "precision": 0.8336,
+          "recall": 0.6325,
+          "recall_ci95": [
+            0.6079,
+            0.6565
+          ]
+        }
+      }
+    },
+    "PPE-v3m (PR #31)": {
+      "person": {
+        "precision": 0.8803,
+        "recall": 0.8601,
+        "map50": 0.8702,
+        "map50_95": 0.4388,
+        "at_runtime_conf": {
+          "precision": 0.856,
+          "recall": 0.8703,
+          "recall_ci95": [
+            0.8588,
+            0.881
+          ]
+        }
+      },
+      "helmet": {
+        "precision": 0.922,
+        "recall": 0.8263,
+        "map50": 0.8819,
+        "map50_95": 0.459,
+        "at_runtime_conf": {
+          "precision": 0.9062,
+          "recall": 0.8507,
+          "recall_ci95": [
+            0.8379,
+            0.8627
+          ]
+        }
+      },
+      "safety-vest": {
+        "precision": 0.8133,
+        "recall": 0.8126,
+        "map50": 0.8361,
+        "map50_95": 0.4257,
+        "at_runtime_conf": {
+          "precision": 0.7713,
+          "recall": 0.8379,
+          "recall_ci95": [
+            0.8184,
+            0.8556
+          ]
+        }
+      }
+    }
+  },
+  "compliance": {
+    "PPE-v1": {
+      "confusion_truth_to_predicted": {
+        "COMPLIANT->COMPLIANT": 149,
+        "COMPLIANT->NON_COMPLIANT": 177,
+        "COMPLIANT->NO_PERSON": 1,
+        "NON_COMPLIANT->COMPLIANT": 36,
+        "NON_COMPLIANT->NON_COMPLIANT": 785,
+        "NON_COMPLIANT->NO_PERSON": 0,
+        "NO_PERSON->COMPLIANT": 0,
+        "NO_PERSON->NON_COMPLIANT": 5,
+        "NO_PERSON->NO_PERSON": 2
+      },
+      "images": 1155,
+      "agreement": 0.8104,
+      "violations_caught": 0.9562,
+      "false_alarms": 0.5413,
+      "missed_violations": 0.0438,
+      "truly_non_compliant": 821,
+      "truly_compliant": 327
+    },
+    "PPE-v2 official (v2s1024)": {
+      "confusion_truth_to_predicted": {
+        "COMPLIANT->COMPLIANT": 130,
+        "COMPLIANT->NON_COMPLIANT": 196,
+        "COMPLIANT->NO_PERSON": 1,
+        "NON_COMPLIANT->COMPLIANT": 31,
+        "NON_COMPLIANT->NON_COMPLIANT": 785,
+        "NON_COMPLIANT->NO_PERSON": 5,
+        "NO_PERSON->COMPLIANT": 0,
+        "NO_PERSON->NON_COMPLIANT": 6,
+        "NO_PERSON->NO_PERSON": 1
+      },
+      "images": 1155,
+      "agreement": 0.7931,
+      "violations_caught": 0.9562,
+      "false_alarms": 0.5994,
+      "missed_violations": 0.0378,
+      "truly_non_compliant": 821,
+      "truly_compliant": 327
+    },
+    "PPE-v2m (runtime)": {
+      "confusion_truth_to_predicted": {
+        "COMPLIANT->COMPLIANT": 130,
+        "COMPLIANT->NON_COMPLIANT": 196,
+        "COMPLIANT->NO_PERSON": 1,
+        "NON_COMPLIANT->COMPLIANT": 26,
+        "NON_COMPLIANT->NON_COMPLIANT": 794,
+        "NON_COMPLIANT->NO_PERSON": 1,
+        "NO_PERSON->COMPLIANT": 0,
+        "NO_PERSON->NON_COMPLIANT": 6,
+        "NO_PERSON->NO_PERSON": 1
+      },
+      "images": 1155,
+      "agreement": 0.8009,
+      "violations_caught": 0.9671,
+      "false_alarms": 0.5994,
+      "missed_violations": 0.0317,
+      "truly_non_compliant": 821,
+      "truly_compliant": 327
+    },
+    "PPE-v3m (PR #31)": {
+      "confusion_truth_to_predicted": {
+        "COMPLIANT->COMPLIANT": 224,
+        "COMPLIANT->NON_COMPLIANT": 103,
+        "COMPLIANT->NO_PERSON": 0,
+        "NON_COMPLIANT->COMPLIANT": 76,
+        "NON_COMPLIANT->NON_COMPLIANT": 745,
+        "NON_COMPLIANT->NO_PERSON": 0,
+        "NO_PERSON->COMPLIANT": 1,
+        "NO_PERSON->NON_COMPLIANT": 5,
+        "NO_PERSON->NO_PERSON": 1
+      },
+      "images": 1155,
+      "agreement": 0.8398,
+      "violations_caught": 0.9074,
+      "false_alarms": 0.315,
+      "missed_violations": 0.0926,
+      "truly_non_compliant": 821,
+      "truly_compliant": 327
+    }
+  }
+}

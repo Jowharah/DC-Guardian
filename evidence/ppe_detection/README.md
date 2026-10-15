@@ -158,6 +158,46 @@ This is an independent check on far more helmets and vests than SH17 offers. It 
 - **What is not measured:** compliance, because the dataset has no person labels. Camera images are usually larger than 1024 px, so the 640-px images favour v1 in a way runtime images would not.
 - **Conclusion:** no model dominates across both datasets. The improvement claimed for v2 holds on SH17-like images; on other sources, helmets favour v1 and vests favour v2m. PPE-v2m as the runtime choice is supported for vests and not for helmets. Data-centre images, or training on more varied PPE data, are the way to settle this.
 
+## Third-dataset test: CHV (2026-10-15)
+
+The SH17 locked test and the Kaggle test have both informed decisions (the PPE-v2m runtime choice, PPE-v3 training), so neither is independent any more.
+- **Dataset:** CHV, *Color Helmet and Vest* (Wang et al., *Sensors* 2021), a third public dataset that labels people, vests and helmets. No model was trained, selected or tuned on it.
+- **Protocol:** `src/evaluate_external_chv.py`, committed before running (`1f63311`).
+  - All 1,330 images were used; 175 that are near-duplicates of SH17 or Kaggle images were excluded, leaving 1,155 images with 3,531 people, 3,192 helmets and 1,505 vests.
+  - The four helmet colours map to helmet.
+  - PPE-v3m uses PR #31's weights (hash checked) and runs in the PPE-v2m pipeline settings; no runtime setting changed.
+
+| Model | Helmet mAP@0.5 | Helmet recall at 0.25 | Vest mAP@0.5 | Vest recall at 0.25 | Person mAP@0.5 |
+|---|---:|---:|---:|---:|---:|
+| PPE-v1 | 0.754 | 0.609 | 0.687 | 0.655 | 0.837 |
+| PPE-v2 official (v2s) | 0.866 | 0.773 | 0.707 | 0.645 | 0.862 |
+| PPE-v2m (runtime) | 0.863 | 0.759 | 0.731 | 0.632 | 0.867 |
+| **PPE-v3m (PR #31)** | **0.882** | **0.851** | **0.836** | **0.838** | 0.870 |
+
+The 95% intervals on recall are about ±0.015 for helmets and ±0.025 for vests; v3m's helmet and vest recall intervals do not overlap any other model's.
+
+**Compliance** (the dashboard's image status against the frozen policy applied to the labelled boxes; 821 non-compliant, 327 compliant images):
+
+| Model | Agreement | Violations caught | False alarms | Missed violations |
+|---|---:|---:|---:|---:|
+| PPE-v1 | 81.0% | 95.6% | 54.1% | 4.4% |
+| PPE-v2 official (v2s) | 79.3% | 95.6% | 59.9% | 3.8% |
+| PPE-v2m (runtime) | 80.1% | 96.7% | 59.9% | 3.2% |
+| **PPE-v3m** | **84.0%** | 90.7% | **31.5%** | 9.3% |
+
+**Reading:**
+- **v3m is the best detector on unseen data.** Helmet and vest detection improve clearly over every other model: vest recall 0.84 against 0.63–0.66, vest mAP 0.84 against 0.69–0.73. Person detection is level.
+- **The training-domain effect is now independent evidence.** Unlike the Kaggle test, CHV played no part in v3's training or acceptance, so this is not a same-source result.
+- **v2 beats v1 on helmets here** (mAP 0.86 against 0.75). The v1 helmet lead on the Kaggle test was specific to that dataset.
+- **Compliance trade-off:**
+  - v3m halves the false alarms on compliant workers (31.5% against about 55–60%) and agrees with the labels most often (84%).
+  - It misses more real violations: 9.3% of non-compliant images reported COMPLIANT, against 3.2% for v2m.
+  - It sees PPE more readily, and sometimes PPE that is not there or not on that person. A missed violation is the safety-critical error, so switching the runtime to v3m is a policy decision: fewer false alarms against about three times more missed violations.
+- **Limits:**
+  - construction scenes from online sources, not data-centre cameras;
+  - near-duplicates were removed by difference hash, not by exhaustive search;
+  - compliance ground truth comes from the frozen association rule applied to the labelled boxes, not from human compliance labels.
+
 ## Runtime flow
 
 ```text
