@@ -66,6 +66,7 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
      - for compliance it halves false alarms (31.5% vs 59.9%) but misses more violations (9.3% vs 3.2%).
      - **Operator decision 2026-10-15: the runtime stays on PPE-v2m.** It misses fewer real violations (26 vs 76 of 821 non-compliant CHV images); a missed violation raises no alert for human review, while a false alarm does. PPE-v3m is reported as the better detector. Revisit after re-tuning v3m's vest threshold on validation data and confirming it on fresh images.
    - **Persistent inference workers done 2026-10-14:** median upload SSH 7.3 → 0.56 s, PPE 7.6 → 0.60 s, Face 17.8 → 3.1 s, with identical results; `DCG_PERSISTENT_WORKERS=0` restores the old behaviour.
+10. **Usability study** (proposal evaluation item; kit ready 2026-10-15, `docs/usability_study/`): the team pilots the tasks and fills the answer key, then runs 3–5 sessions with non-team participants; score with `presentation/backend/validation/usability_score.py` and add the results to the report.
 
 ## Acceptance rules
 
