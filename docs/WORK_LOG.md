@@ -6,6 +6,22 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-15 — Usability study kit (proposal evaluation item)
+
+- **Why:** the proposal's evaluation plan promised a usability evaluation, and none had been done.
+- **What:** `docs/usability_study/`:
+  - a protocol with aims, design (3–5 non-team participants, think-aloud, about 40 minutes), measures, ethics and an analysis plan;
+  - a facilitator script with a pre-session checklist (backup, synthetic scenarios, Investigator off unless agreed), consent text and debrief;
+  - 7 task cards plus 2 optional ones, covering the Monitoring Center, a correlated group, a human verdict, the investigation lifecycle, the Review Queue and Analytics;
+  - an answer key to fill in during the pilot;
+  - an observation sheet with Nielsen severity ratings;
+  - a questionnaire: SUS, a 6-item concept check on the system's claims, and trust items with one reverse-intended item;
+  - a CSV results template.
+- **Scoring:** `presentation/backend/validation/usability_score.py` (standard SUS formula, Bangor adjectives, task success, time and SEQ, concept and trust summaries). Tested in `presentation/backend/tests/test_usability_score.py` (3).
+- **Next:** pilot run by the team to fill the answer key, then 3–5 sessions; results go to `docs/usability_study/results.csv` and `results_summary.md`.
+
+---
+
 ## 2026-10-15 — PPE-v3: SH17 plus the Kaggle helmet/jacket training data
 
 - **Why (operator decision):** vests stayed the weak class. The Kaggle *Safety Helmet and Reflective Jacket* dataset (already used for the external test) has a training split with about 14,000 helmets and 11,000 jackets; the operator chose option A (one model; people pseudo-labelled).
