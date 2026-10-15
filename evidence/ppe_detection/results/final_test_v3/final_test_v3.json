@@ -1,0 +1,157 @@
+{
+  "label": "PPE-v3 final test, run once after validation acceptance",
+  "kaggle_test": "same-source held-out (Kaggle train/valid were used in v3 training); SH17 near-duplicates removed",
+  "sh17_locked_test": "already used for PPE-v2 decisions; comparison only",
+  "results": {
+    "PPE-v1": {
+      "sha256": "0f0577e37241e423faac75a3c3999538260abc55c220e0b2626bbe7c4bf5bc74",
+      "image_size": 640,
+      "kaggle_test": {
+        "overall": {
+          "precision": 0.6282,
+          "recall": 0.3959,
+          "map50": 0.4314,
+          "map50_95": 0.204
+        },
+        "helmet": {
+          "precision": 0.7283,
+          "recall": 0.4328,
+          "map50": 0.4947,
+          "map50_95": 0.2355
+        },
+        "safety-vest": {
+          "precision": 0.5281,
+          "recall": 0.3589,
+          "map50": 0.368,
+          "map50_95": 0.1725
+        }
+      },
+      "sh17_locked_test": {
+        "overall": {
+          "precision": 0.6889,
+          "recall": 0.5241,
+          "map50": 0.5447,
+          "map50_95": 0.3363
+        },
+        "person": {
+          "precision": 0.8362,
+          "recall": 0.8543,
+          "map50": 0.8686,
+          "map50_95": 0.6915
+        },
+        "helmet": {
+          "precision": 0.7321,
+          "recall": 0.6026,
+          "map50": 0.6761,
+          "map50_95": 0.4557
+        },
+        "safety-vest": {
+          "precision": 0.6213,
+          "recall": 0.449,
+          "map50": 0.3719,
+          "map50_95": 0.2195
+        }
+      }
+    },
+    "PPE-v2m (runtime)": {
+      "sha256": "ae2e58d55623401035219fbd5800ab706b8b2caa5631d9101e0ab75438cd0a7c",
+      "image_size": 1024,
+      "kaggle_test": {
+        "overall": {
+          "precision": 0.6932,
+          "recall": 0.3683,
+          "map50": 0.4095,
+          "map50_95": 0.2044
+        },
+        "helmet": {
+          "precision": 0.742,
+          "recall": 0.3597,
+          "map50": 0.4014,
+          "map50_95": 0.1996
+        },
+        "safety-vest": {
+          "precision": 0.6443,
+          "recall": 0.3769,
+          "map50": 0.4176,
+          "map50_95": 0.2092
+        }
+      },
+      "sh17_locked_test": {
+        "overall": {
+          "precision": 0.6691,
+          "recall": 0.6118,
+          "map50": 0.6245,
+          "map50_95": 0.4159
+        },
+        "person": {
+          "precision": 0.8071,
+          "recall": 0.8942,
+          "map50": 0.8999,
+          "map50_95": 0.7356
+        },
+        "helmet": {
+          "precision": 0.7528,
+          "recall": 0.6637,
+          "map50": 0.7387,
+          "map50_95": 0.5473
+        },
+        "safety-vest": {
+          "precision": 0.5399,
+          "recall": 0.449,
+          "map50": 0.4157,
+          "map50_95": 0.2627
+        }
+      }
+    },
+    "PPE-v3m (v3m1024)": {
+      "sha256": "92a0a00f94b5166b066f721e4004e46210c1cadcb5c182714952c38baca61471",
+      "image_size": 1024,
+      "kaggle_test": {
+        "overall": {
+          "precision": 0.9356,
+          "recall": 0.8909,
+          "map50": 0.96,
+          "map50_95": 0.7561
+        },
+        "helmet": {
+          "precision": 0.9463,
+          "recall": 0.9029,
+          "map50": 0.9617,
+          "map50_95": 0.7535
+        },
+        "safety-vest": {
+          "precision": 0.925,
+          "recall": 0.8788,
+          "map50": 0.9582,
+          "map50_95": 0.7586
+        }
+      },
+      "sh17_locked_test": {
+        "overall": {
+          "precision": 0.6951,
+          "recall": 0.5906,
+          "map50": 0.6186,
+          "map50_95": 0.4144
+        },
+        "person": {
+          "precision": 0.8559,
+          "recall": 0.8845,
+          "map50": 0.9001,
+          "map50_95": 0.7277
+        },
+        "helmet": {
+          "precision": 0.8,
+          "recall": 0.6538,
+          "map50": 0.7274,
+          "map50_95": 0.5363
+        },
+        "safety-vest": {
+          "precision": 0.5382,
+          "recall": 0.3878,
+          "map50": 0.4422,
+          "map50_95": 0.3073
+        }
+      }
+    }
+  }
+}

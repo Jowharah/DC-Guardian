@@ -6,6 +6,20 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-15 — PPE-v3: SH17 plus the Kaggle helmet/jacket training data
+
+- **Why (operator decision):** vests stayed the weak class. The Kaggle *Safety Helmet and Reflective Jacket* dataset (already used for the external test) has a training split with about 14,000 helmets and 11,000 jackets; the operator chose option A (one model; people pseudo-labelled).
+- **Protocol first:** `train_v3.py` / `evaluate_v3.py` committed and pushed before training (`f23f01e`). Resume support added after the operator paused training at epoch 4 (`ee5071f`); the run resumed from `last.pt` that night.
+- **Data:** SH17 PPE-v1 development split + Kaggle train/valid, minus near-duplicates of any SH17 or Kaggle-test image (377 train and 87 valid dropped): 13,452 training images (13,376 Kaggle helmets, 10,863 vests) and 2,298 validation images. PPE-v2m pseudo-labelled the other classes on Kaggle images (conf ≥ 0.5; 9,626 people in train); helmet and vest labels come only from the dataset.
+- **Candidate:** YOLOv8m at 1024 px from PPE-v2m, 30 epochs, batch 8.
+- **Validation (selection):** criterion v1 0.492, v2m 0.526, v3 0.790; person mAP drop 0.004 → **accepted**. The gain is from the Kaggle half; on SH17 validation v3's helmet mAP is lower (0.636 vs 0.713).
+- **Final test (run once):** Kaggle helmet/vest mAP@0.5 v1 0.495/0.368, v2m 0.401/0.418, **v3 0.962/0.958** (same-source). SH17 locked test (already used): helmet 0.676 / 0.739 / 0.727, vest mAP 0.372 / 0.416 / 0.442, vest recall 0.449 / 0.449 / 0.388, person 0.869 / 0.900 / 0.900, all-class 0.545 / 0.625 / 0.619.
+- **Reading:** v3 learned the Kaggle domain but is not better than PPE-v2m on SH17; PPE accuracy is domain-dependent. Person detection was protected. **Runtime unchanged (PPE-v2m)**; v3 is stored but not selectable until the operator decides.
+- **Tests:** `evidence/ppe_detection/tests/test_ppe_v3_artifacts.py` (4): earlier models unchanged, acceptance follows the rule, no test image in training, final test used the selected weights, runtime default still v2m.
+- **Verified:** full `check_all.py` 14/14 (separate worktree, local environments and private data linked): Evidence 40 passed + 4 GPU-skipped (pass in `.venv-ppe` 3/3 and `.venv-gru` 1/1); backend 413; Playwright 14; live API smoke 0 server errors.
+
+---
+
 ## 2026-10-14 — SSH honeypot dataset source confirmed and cited
 
 - **Why:** the honeypot CSV used for the SSH detector's external behavioural validation had no recorded source (DATASETS_AND_CITATIONS marked it "to confirm"). The operator found the data paper on Zenodo.
