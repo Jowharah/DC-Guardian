@@ -1,3 +1,5 @@
 ﻿evidence/predictive_maintenance/models/rf/temporal_rf_v2.joblib filter=lfs diff=lfs merge=lfs -text
 # Frozen artifact verified by SHA-256: store the exact bytes, never convert line endings.
 evidence/ssh_anomaly/models/autoencoder_log_config.json -text
+# Approved RAG source snapshots: hashes are locked in response/rag/manifests/source_lock.json
+response/rag/knowledge_base/bundled/** -text

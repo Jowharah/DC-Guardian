@@ -48,9 +48,15 @@ def main() -> int:
         config = Path(folder) / "demo_ingestion.json"
         config.write_text(json.dumps({"sources": SOURCES}, indent=2), encoding="utf-8")
         env = {**os.environ, "PYTHONPATH": str(ROOT), "OPENAI_API_KEY": "", "DCG_INVESTIGATOR_ENABLED": "0"}
+        # A new database lacks some relationship types until events exist, so Neo4j logs
+        # long "does not exist" notices for every correlation query; they are harmless here.
+        runner = ("import logging, runpy, sys; "
+                  "logging.getLogger('neo4j.notifications').setLevel(logging.ERROR); "
+                  "sys.argv = ['continuous_ingestion'] + sys.argv[1:]; "
+                  "runpy.run_module('presentation.backend.app.continuous_ingestion', run_name='__main__')")
         done = subprocess.run(  # nosec B603: fixed argv, no shell
-            [sys.executable, "-m", "presentation.backend.app.continuous_ingestion",
-             "--config", str(config), "--state", str(STATE)], cwd=str(ROOT), env=env, check=False)
+            [sys.executable, "-c", runner, "--config", str(config), "--state", str(STATE)],
+            cwd=str(ROOT), env=env, check=False)
     if done.returncode != 0:
         print("Demo data load failed. Check that Neo4j is running and .env is filled in "
               "(docs/INSTALLATION_AND_USER_GUIDE.md, Troubleshooting).")

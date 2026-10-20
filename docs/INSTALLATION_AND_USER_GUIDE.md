@@ -23,19 +23,28 @@ All data is synthetic or public test data.
 | Node.js | 20 or newer | <https://nodejs.org> (LTS) |
 | Neo4j | 5.x or newer | Neo4j Desktop (<https://neo4j.com/download/>) is easiest. Community Server also works. |
 | OpenAI API key | Optional | Only for the AI Investigator and the specialist agents (section 7.3) |
-| Internet | During setup | Packages, the approved knowledge documents, and the face models DeepFace downloads on first use |
+| Internet | During setup | Packages, the embedding model for the knowledge index, and the face models DeepFace downloads on first use |
 
 ## 2. Get the code
 
 Use **git clone**, not "Download ZIP": a ZIP download leaves out the Git LFS model file unless LFS archives are enabled on the repository.
 
 ```powershell
+git lfs install
 git clone https://github.com/Jowharah/DC-Guardian.git
 cd DC-Guardian
 git lfs pull
 ```
 
-The setup script checks the drive-failure model file. If it is still a small text placeholder, run `git lfs pull` again.
+From the course submission repository instead, the code is in `SystemCode/`:
+
+```powershell
+git clone https://github.com/Jowharah/IRS-PM-2026-10-25-AIS-DC-Guardian-System.git
+cd IRS-PM-2026-10-25-AIS-DC-Guardian-System\SystemCode
+git lfs pull
+```
+
+In the rest of this guide, "the project folder" is `DC-Guardian` or `SystemCode`. The setup script checks the drive-failure model file. If it is still a small text placeholder, run `git lfs pull` again.
 
 ## 3. Prepare Neo4j
 
@@ -45,7 +54,7 @@ The setup script checks the drive-failure model file. If it is still a small tex
 
 ## 4. Install (one command)
 
-In PowerShell, in the `DC-GUARDIAN` folder:
+In PowerShell, in the project folder:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File setup.ps1
@@ -59,13 +68,13 @@ It asks for your Neo4j password and a new dashboard password. It takes about 20�
 4. creates `.env` from `.env.example`: Neo4j settings, the dashboard login (user `operator`, role administrator, zones A–C), AI Investigator off;
 5. installs the frontend packages (`npm ci`);
 6. loads the DC-01 data-centre topology into Neo4j (zones, racks, servers, sensors, cameras, staff and their zone access);
-7. downloads the approved public knowledge documents (NIST, CISA, OSHA, U.S. DOE) and builds the local search index for the RAG specialists;
+7. verifies the 13 approved public knowledge documents (NIST, CISA, OSHA, U.S. DOE; bundled in the repository, see `response/rag/knowledge_base/bundled/README.md`) and builds the local search index for the RAG specialists;
 8. loads the demo data (section 6).
 
 **Options:**
 - `-Gpu`: add the GPU environment for PPE.
 - `-Face`: add a separate face environment.
-- `-SkipRag`: no document download; specialists then report knowledge as unavailable.
+- `-SkipRag`: no knowledge index; specialists then report knowledge as unavailable.
 - `-SkipDemo`: no demo data.
 
 The script is safe to re-run.
@@ -88,7 +97,7 @@ foreach ($s in "fetch_sources","parse_sources","preprocess_sources","chunk_sourc
 
 ## 5. Start DC-GUARDIAN
 
-Open two terminals in the `DC-GUARDIAN` folder.
+Open two terminals in the project folder.
 
 ```powershell
 # Terminal 1: backend API
@@ -110,7 +119,7 @@ If ports 5173 or 8000 are taken, set `DCG_FRONTEND_PORT` and `DCG_BACKEND_URL` (
 A five-minute tour:
 
 1. **Monitoring Center:** the summary cards show what needs attention. The event feed lists every result, newest first.
-2. **Open the correlated group in ZONE-B:** the sensor and drive results linked by place and time. The group shows its severity, why it was raised (rule names) and the caveat "validated on the author's labels only". Correlation is context, not proof of cause.
+2. **Open the correlated pair in ZONE-B:** a drive-risk result and a room-temperature result linked by place and time. It shows its Decision severity, the rules that set it, and the Bayesian estimate of how likely the two are related. Correlation is context, not proof of cause. (Three or more linked results form a *unified group*, whose severity carries the caveat "validated on the author's labels only"; add a camera image in ZONE-B through Scenario Lab to see one.)
 3. **Open a single result:** record your **human verdict** (Confirm / Override / Inconclusive, with a reason). The detector's original output is never changed; your verdict is stored beside it.
 4. **Investigation state:** on a group or result, press **Start review**, then **Resolve** with an outcome and a reason of at least 15 characters, and tick the confirmation.
 5. **Scenario Lab:** add your own data, for example a photo of a person in **PPE image validation** for a zone, or an OpenSSH log in **SSH log validation**. New results appear in the Monitoring Center within seconds.
@@ -176,7 +185,8 @@ It runs every test suite (about 5 minutes) and writes `logs\checks\<time>\report
 | Dashboard shows "API unavailable" | The backend is not running, or it runs on another port (section 5) |
 | PPE upload is slow | Normal on CPU (0.5–2 s); the first upload after starting also loads the model (5–15 s) |
 | Face upload: FACE_ENROLLMENT_MISSING | Expected without an enrollment (section 7.2) |
-| Specialists: "approved knowledge unavailable" | Run the RAG step (`setup.ps1` without `-SkipRag`); it needs internet once |
+| Specialists: "approved knowledge unavailable" | Run the RAG step (`setup.ps1` without `-SkipRag`); it downloads the small embedding model once |
+| Setup step 7 shows `FAIL: ...` for an approved document | The 13 approved documents ship in `response/rag/knowledge_base/bundled` and are verified against `response/rag/manifests/source_lock.json`. A mismatch means a copy was changed: run `git checkout -- response/rag/knowledge_base/bundled response/rag/manifests/source_lock.json`, delete the folder `response/rag/knowledge_base/originals`, and re-run `setup.ps1` |
 | `npm` or `pip` certificate errors behind antivirus or corporate TLS inspection | Point Node at your organisation's root certificate: `setx NODE_EXTRA_CA_CERTS <path-to-root.pem>`, then open a new terminal. For pip, use `pip install --cert <path>` |
 | Port already in use | See section 5 (`DCG_FRONTEND_PORT`, `DCG_BACKEND_URL`) |
 | Logs | `logs\errors.log` (start here), `logs\backend.log`, `logs\api_access.log`; inference workers in `logs\workers\` |

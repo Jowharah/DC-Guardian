@@ -71,7 +71,18 @@ Run $Py @("reasoning\graph\load_topology.py")
 
 Step "7/8 Approved knowledge for the RAG specialists"
 if ($SkipRag) { Write-Host "Skipped (-SkipRag): specialists will report that approved knowledge is unavailable." } else {
-    foreach ($s in "fetch_sources", "parse_sources", "preprocess_sources", "chunk_sources", "build_index") { Run $Py @("response\rag\$s.py") }
+    # The locked source snapshots ship in knowledge_base\bundled (see its README): CISA refuses automated
+    # downloads and live web pages change, so fetch_sources verifies these copies instead of downloading.
+    $originals = "response\rag\knowledge_base\originals"
+    New-Item -ItemType Directory -Force $originals | Out-Null
+    Get-ChildItem "response\rag\knowledge_base\bundled" -File | Where-Object { $_.Name -ne "README.md" } |
+        ForEach-Object { if (-not (Test-Path (Join-Path $originals $_.Name))) { Copy-Item $_.FullName $originals } }
+    & $Py "response\rag\fetch_sources.py"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Some approved documents failed verification or download (listed as FAIL above); the index is built from the others." -ForegroundColor Yellow
+        Write-Host "See Troubleshooting in docs\INSTALLATION_AND_USER_GUIDE.md." -ForegroundColor Yellow
+    }
+    foreach ($s in "parse_sources", "preprocess_sources", "chunk_sources", "build_index") { Run $Py @("response\rag\$s.py") }
 }
 
 Step "8/8 Demo data"
