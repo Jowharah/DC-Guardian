@@ -60,7 +60,7 @@ Open the group from T2 and use the **AI Investigator** to ask: *"Why is this gro
 
 ### T9 (optional). Check a camera image
 
-In the Scenario Lab, upload the image the facilitator gives you (`camera_snapshot.jpg`) as a new **PPE image** for zone ZONE-B. Tell us what the system concluded about the person in it.
+In the Scenario Lab, use the **PPE image validation** section to check the image the facilitator gives you (`camera_snapshot.jpg`) for zone ZONE-B. Tell us what the system concluded about the safety equipment of the person in it.
 
 ---
 
