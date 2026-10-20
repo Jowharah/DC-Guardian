@@ -12,7 +12,7 @@
 | `questionnaire.md` | Participant | Background, per-task ease, SUS, concept check, trust |
 | `results_template.csv` | Note-taker | One row per participant: enter the paper sheets here |
 
-Score with `python presentation/backend/validation/usability_score.py docs/usability_study/results.csv`. It writes `docs/usability_study/results_summary.md`.
+Prepare identical data before each session with `python docs/usability_study/prepare_study_data.py prepare` (see the facilitator script). Score with `python presentation/backend/validation/usability_score.py docs/usability_study/results.csv`. It writes `docs/usability_study/results_summary.md`.
 
 ## 1. Aims
 
@@ -28,8 +28,8 @@ Can a person who did not build DC-GUARDIAN:
 - **Participants:** 3–5 people outside the project team, for example classmates, ideally one with IT operations or security experience. Five participants find most major usability problems (Nielsen & Landauer, 1993); results are formative, not statistically representative.
 - **Session:** one participant at a time, about 35–40 minutes, on the operator PC.
   - Roles: a facilitator (reads the script, does not help unless asked) and, if possible, a separate note-taker.
-- **Method:** think-aloud while doing 7 core tasks (plus 2 optional ones), then the questionnaire and a short debrief.
-- **Data:** synthetic scenarios and controlled test images only; no real personal data.
+- **Method:** think-aloud while doing 7 core tasks (plus 3 optional ones: the AI Investigator, and adding a camera image and sensor readings through the Scenario Lab), then the questionnaire and a short debrief.
+- **Data:** rebuilt before every session from fixed inputs (`prepare_study_data.py`): the original demo images and an SSH excerpt from the public LogHub log, plus the ingestion folder's sensor and drive data. No real personal data; no verdicts or reviews at the start.
 - **Account:** the local administrator account, because correlated groups and verdicts are administrator features.
 - **AI Investigator:** off by default (`DCG_INVESTIGATOR_ENABLED=0`). Optional task T8 uses it only if the team agrees beforehand; it sends synthetic Evidence to OpenAI.
 

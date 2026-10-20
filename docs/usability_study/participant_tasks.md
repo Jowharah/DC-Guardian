@@ -60,4 +60,10 @@ Open the group from T2 and use the **AI Investigator** to ask: *"Why is this gro
 
 ### T9 (optional). Check a camera image
 
-Upload the image the facilitator gives you as a new **PPE image** and tell us what the system concluded about the person in it.
+In the Scenario Lab, upload the image the facilitator gives you (`camera_snapshot.jpg`) as a new **PPE image** for zone ZONE-B. Tell us what the system concluded about the person in it.
+
+---
+
+### T10 (optional). Add new sensor readings
+
+In the Scenario Lab, add the sensor file the facilitator gives you (`sensor_readings.csv`) for sensor **SEN-B-01** in zone **ZONE-B**. Then find the new result in the Monitoring Center and tell us what the system found.
