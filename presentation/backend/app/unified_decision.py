@@ -83,7 +83,7 @@ def evaluate(group, specialists, authorization=None):
             "person_to_ppe_verified": False,
             "causal_relationship_established": False,
             "standalone_severity_inherited": False,
-            "note": "Evidence disposition; severity is the group's deterministic DCG-DECISION-v2 Decision (validated on author labels; independent labels pending), never a specialist's."}
+            "note": "Evidence disposition; severity is the group's deterministic DCG-DECISION-v2 Decision (validated on the author's labels only (no independent labelling round)), never a specialist's."}
 
 def member_verdicts_changed(group, principal):
     """True when a member verdict was recorded after the latest group review."""

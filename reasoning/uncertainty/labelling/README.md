@@ -2,6 +2,8 @@
 
 The 40 scenarios in `../scenarios/labelled_scenarios.json` were written and labelled by the same author as the Bayesian model, and seven dev scenarios were scored while being written. Independent labels from a teammate are the strongest available check of the result.
 
+**Status (2026-10-21):** the teammate labelling round was **dropped for time** (operator decision). The project's results use the operator's own blind relabel of scenario set v2 (`results/operator-v2*`) and ChatGPT's labels as a second opinion (`results/llm-chatgpt*`), and are reported as author-validated. The packs and the scorer below remain ready for future independent labelling.
+
 The scenario file cannot be shared as-is: its titles and narratives state the answers. This folder provides a blind version.
 
 ## For the group: how to run a labelling round

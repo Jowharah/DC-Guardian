@@ -59,7 +59,7 @@ The proposal asks whether combining multi-domain Evidence with graph context and
 
 **Limits.**
 - **Synthetic data:** the scenarios and topology are synthetic.
-- **Author labels:** the relatedness labels, the scenarios and the known-mechanism list all come from the same author. ChatGPT's labels on v2 are a second opinion, not independent validation; an independent human labelling round is pending.
+- **Author labels:** the relatedness labels, the scenarios and the known-mechanism list all come from the same author. ChatGPT's labels on v2 are a second opinion, not independent validation. An independent human labelling round was planned but dropped for time; it is the main future-work item for these results.
 - **No severity labels:** the scenarios have no severity labels, so this tests ranking, not whether each level is right.
 - **The baseline is DC-GUARDIAN's own single-event policy, not a commercial tool:** the result measures the value added by correlation.
 - **Response recommendations are not covered:** they need a user evaluation.

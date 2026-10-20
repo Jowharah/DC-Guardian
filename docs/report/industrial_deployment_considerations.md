@@ -43,5 +43,5 @@ Each gap maps to one of the production requirements above.
 ## Limitations
 
 - **Data:** the Evidence components were evaluated on public or controlled datasets, and the data-centre topology is synthetic, so detector performance and correlation behaviour on a real site are not established.
-- **Labels:** the reasoning evaluations (correlation, group severity, Investigator overclaims) use labels written by the project team; an independent labelling round is pending.
+- **Labels:** the reasoning evaluations (correlation, group severity, Investigator overclaims) use labels written by the project team; an independent labelling round was planned but not run, for time, so these results are author-validated.
 - **Users:** the system has not been operated by multiple users or by operators outside the project team.
