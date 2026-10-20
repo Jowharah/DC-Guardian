@@ -84,7 +84,7 @@ const group = {id: GROUP_ID, zone_id: "ZONE-B", domains: ["CYBERSECURITY", "PHYS
     {type: "FACE_SSH_CONTEXT", left: ["face", FACE_ID], right: ["ssh", SSH_ID], source_id: "PAIR-2", zone_id: "ZONE-B", details: {}}],
   source_candidate_ids: ["PAIR-1", "PAIR-2"], status: "CORRELATION_GROUP_CANDIDATE", decision: {incident_status: "REVIEW_REQUIRED", severity: "HIGH", response_mode: "HUMAN_REVIEW", escalation_required: true,
     autonomous_action_allowed: false, decision_rules_triggered: ["LINKED_GROUP_ESCALATION"], rationale: [], policy_version: "DCG-DECISION-v2",
-    validation_status: "VALIDATED_ON_AUTHOR_LABELS_INDEPENDENT_LABELS_PENDING"}, decision_severity: "HIGH",
+    validation_status: "VALIDATED_ON_AUTHOR_LABELS_ONLY"}, decision_severity: "HIGH",
   severity_policy: "DCG-DECISION-v2", severity_rules_triggered: ["CYBERSECURITY_ANOMALY_EVIDENCE", "LINKED_GROUP_ESCALATION"],
   base_severity: "MEDIUM", escalated: true, linkage_rule: "L2_KNOWN_MECHANISM_WITHIN_10_MIN",
   linkage: {same_server: false, same_rack: false, unauthorized_with_cyber: false, known_mechanism: true, time_spread_minutes: 4},

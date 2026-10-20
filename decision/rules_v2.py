@@ -13,7 +13,7 @@ every Decision already saved):
    evaluated once on the held-out test split
    (presentation/backend/validation/decision_v2_validation.py). Those labels
    were written by the scenario author, so the result is "validated on author
-   labels; independent labels pending".
+   labels only" (the independent labelling round was dropped).
 
 Events use the scenario/Bayesian event shape: domain, state, timestamp and,
 where known, authorization, server_id and rack_id. Nothing here infers
@@ -29,7 +29,8 @@ from itertools import combinations
 POLICY = "DCG-DECISION-v2"
 SEVERITY_ORDER = {"LOW": 1, "MEDIUM": 2, "HIGH": 3}
 LEVELS = ("LOW", "MEDIUM", "HIGH")
-VALIDATION_STATUS = "VALIDATED_ON_AUTHOR_LABELS_INDEPENDENT_LABELS_PENDING"
+# 2026-10-21: the independent labelling round was dropped (time); the result rests on the author's labels only.
+VALIDATION_STATUS = "VALIDATED_ON_AUTHOR_LABELS_ONLY"
 
 # --- 1. Single events (policy) ------------------------------------------------
 SINGLE_EVENT_RULES = {

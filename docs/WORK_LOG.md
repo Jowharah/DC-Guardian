@@ -6,6 +6,20 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-21 — Independent labelling dropped; usability sessions completing
+
+- **Decision (operator, time limitation):** the teammate labelling round is dropped.
+  - **What the results use instead:** the evaluations (Bayesian correlation, the Decision v2 group rule, the single-domain baseline) use the operator's blind relabel of scenario set v2, with ChatGPT's labels as a second opinion only.
+  - **Why they are not independent:** the operator also wrote the scenarios, the knowledge base and the rules. The results are therefore stated as **author-validated**, and independent labelling is the main future-work item.
+- **Changed to match:**
+  - **Live group-severity caveat:** now reads "validated on the author's labels only (no independent labelling round)" (dashboard, group Decision note, specialist view).
+  - **Status constant:** `rules_v2.VALIDATION_STATUS` is now `VALIDATED_ON_AUTHOR_LABELS_ONLY`. It is computed per request and never stored with a saved Decision, so no saved record changes and the severity rule itself is unchanged.
+  - **Docs:** CLAUDE.md, the roadmap (item 1 dropped, the feature table and acceptance rule), UNCERTAINTY_REASONING, AI_INVESTIGATOR, the docs index, both report drafts and the labelling README.
+- **Not changed:** generated result files (historical records produced by their scripts) and the labelling packs and scorer, kept for future use (their tests check the packs rebuild byte for byte).
+- **Usability study:** pilot done 2026-10-20 (`docs/usability_study/pilot_2026-10-20.md`); participant sessions complete 2026-10-21, then scoring with `usability_score.py`.
+
+---
+
 ## 2026-10-20 — Installation guide, one-command setup, demo data, CPU fallback — `fff7dc4`, `89f0c91`
 
 - **Why:** the course requires a system others can install and run from the submitted repository (installation and user guide appendix). DC-GUARDIAN previously assumed the operator's PC (GPU environments, built knowledge index, local data).

@@ -154,7 +154,7 @@ What this shows and what it does not:
 
 ## Limitations
 
-- **Author-labelled scenarios.** The same author wrote the knowledge base and the scenarios, so there is a risk of shared assumptions. Seven dev scenarios were also scored by hand while being written. Unscored test scenarios, the unchanged knowledge base and the sensitivity analysis reduce but do not remove this risk. Independent labelling by a classmate or practitioner would strengthen the result; a blind labelling pack is ready (see below).
+- **Author-labelled scenarios.** The same author wrote the knowledge base and the scenarios, so there is a risk of shared assumptions. Seven dev scenarios were also scored by hand while being written. Unscored test scenarios, the unchanged knowledge base and the sensitivity analysis reduce but do not remove this risk. The planned independent labelling round was dropped for time (2026-10-21): the operator's blind v2 relabel removes the narratives' influence but is by the same author, and ChatGPT's labels are a second opinion, not independent validation. Independent labelling remains the main future-work item.
 - **Small sample.** 59 test pairs in 24 scenarios; the bootstrap intervals above are wide, so the size of the gain is uncertain.
 - **Synthetic setting.** One three-zone topology and an assumed cooling dependency; no real multi-domain data exists for the project.
 - **Naive structure.** Conditional independence of the four factors is a simplification (time and topology interact in cascades, as shown above).
@@ -163,7 +163,9 @@ What this shows and what it does not:
 
 ## Independent labelling
 
-`reasoning/uncertainty/labelling/` contains a **blind labelling pack** for teammates: the 40 scenarios with neutral IDs and shuffled order, events only (no titles, narratives, labels, split or model output), a facility brief and a glossary, and a `labels.csv` with the 85 candidate pairs to mark related or not. `score_labels.py` reports agreement with the author (percent and Cohen's kappa) and re-evaluates both methods on the independent labels with bootstrap intervals; a contract test checks the pack reveals no answers. See the folder's README for the procedure.
+**Status (2026-10-21): no independent round was run, for time.** The results rely on the operator's blind relabel (v2) and the ChatGPT second opinion. The tooling below stays for future work.
+
+`reasoning/uncertainty/labelling/` contains a **blind labelling pack** for an independent labeller: the 40 scenarios with neutral IDs and shuffled order, events only (no titles, narratives, labels, split or model output), a facility brief and a glossary, and a `labels.csv` with the 85 candidate pairs to mark related or not. `score_labels.py` reports agreement with the author (percent and Cohen's kappa) and re-evaluates both methods on the independent labels with bootstrap intervals; a contract test checks the pack reveals no answers. See the folder's README for the procedure.
 
 ### LLM rater (ChatGPT), 2026-10-11
 

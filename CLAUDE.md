@@ -20,7 +20,7 @@ Default branch: **`main`** (current code; CI runs on every push). Work happens o
 
 - **Never modify frozen detector output or model artifacts.** Human verdicts and re-evaluations are stored beside them, never in them.
 - **Correlation is contextual.** Never claim causation, identity, physical presence or compromise from shared zone/time.
-- **Severity comes only from deterministic rules,** never from an LLM, a specialist, or a human typing a level. Group severity is DCG-DECISION-v2: most severe member, +1 level only for linked evidence; it is "validated on author labels; independent labels pending" and must be shown with that caveat. v1 stays unchanged so saved Decisions remain reproducible; change rules only as a new version.
+- **Severity comes only from deterministic rules,** never from an LLM, a specialist, or a human typing a level. Group severity is DCG-DECISION-v2: most severe member, +1 level only for linked evidence; it is "validated on the author's labels only (no independent labelling round)" and must be shown with that caveat (operator decision 2026-10-21: no teammate labelling round; the evaluations use the operator's blind v2 labels, with ChatGPT labels as a second opinion only). v1 stays unchanged so saved Decisions remain reproducible; change rules only as a new version.
 - **No autonomous action** anywhere.
 - **Keep research claims precise.** State what evidence shows and what it cannot show (see the uncertainty doc for an example).
 - **Never commit** `.env`, `logs/`, `presentation/backend/data/`, datasets, face photos or enrollment embeddings.

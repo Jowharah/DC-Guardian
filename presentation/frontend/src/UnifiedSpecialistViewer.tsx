@@ -47,7 +47,7 @@ export default function UnifiedSpecialistViewer({id,decision}:{id:string;decisio
    <p>{review.decision.policy_version}</p>
    <ul>{review.decision.review_reasons.map(reason=><li key={reason}>{reason.replaceAll("_"," ")}</li>)}</ul>
    <p className="muted">{review.decision.note} Autonomous action disabled.</p></div>}
-   {decision?.severity?<p className="muted">Unified Decision: <span className={`severity severity-${decision.severity.toLowerCase()}`}>{decision.severity}</span> · {decision.policy_version} · validated on author labels; independent labels pending · Human review required · Autonomous action disabled.</p>
+   {decision?.severity?<p className="muted">Unified Decision: <span className={`severity severity-${decision.severity.toLowerCase()}`}>{decision.severity}</span> · {decision.policy_version} · validated on the author's labels only (no independent labelling round) · Human review required · Autonomous action disabled.</p>
     :<p className="muted">Unified Decision: no active concerns remain after human verdicts · Autonomous action disabled.</p>}
  </section>;
 }
