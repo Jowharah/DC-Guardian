@@ -31,7 +31,11 @@ Can a person who did not build DC-GUARDIAN:
 - **Method:** think-aloud while doing 7 core tasks (plus 3 optional ones: the AI Investigator, and adding a camera image and sensor readings through the Scenario Lab), then the questionnaire and a short debrief.
 - **Data:** rebuilt before every session from fixed inputs (`prepare_study_data.py`): the original demo images and an SSH excerpt from the public LogHub log, plus the ingestion folder's sensor and drive data. No real personal data; no verdicts or reviews at the start.
 - **Account:** the local administrator account, because correlated groups and verdicts are administrator features.
-- **AI Investigator:** off by default (`DCG_INVESTIGATOR_ENABLED=0`). Optional task T8 uses it only if the team agrees beforehand; it sends synthetic Evidence to OpenAI.
+- **AI Investigator:** **on** for optional task T8 (operator decision 2026-10-20).
+  - **What goes out:** synthetic Evidence (usernames, IPs and person IDs pseudonymised) and the participant's typed question are sent to OpenAI (`gpt-4.1-mini`).
+  - **Safeguards:** each question asks for consent in the dashboard first; calls are capped at 10 per minute.
+  - **Consent text** tells participants not to type anything personal.
+  - **Data prep:** `prepare_study_data.py` itself never calls OpenAI.
 
 ## 3. Measures
 
