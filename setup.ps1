@@ -21,8 +21,11 @@ function Fail($text) { Write-Host "SETUP STOPPED: $text" -ForegroundColor Red; e
 function Run($exe, [string[]]$arguments) { & $exe @arguments; if ($LASTEXITCODE -ne 0) { Fail "$exe $($arguments -join ' ') failed (exit $LASTEXITCODE)" } }
 
 Step "1/8 Check prerequisites"
-foreach ($tool in "git", "node", "npm") { if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) { Fail "$tool is not installed or not on PATH" } }
-& git lfs version *> $null; if ($LASTEXITCODE -ne 0) { Fail "Git LFS is not installed (https://git-lfs.com), then run: git lfs install" }
+foreach ($tool in "node", "npm") { if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) { Fail "$tool is not installed or not on PATH" } }
+# A ZIP download is not a Git repository: Git and Git LFS are then not needed if the ZIP already holds the model.
+$inGit = $false
+if (Get-Command git -ErrorAction SilentlyContinue) { $ErrorActionPreference = "Continue"; $inGit = ((& git rev-parse --is-inside-work-tree 2>$null) -eq "true"); $ErrorActionPreference = "Stop" }
+if ($inGit) { & git lfs version *> $null; if ($LASTEXITCODE -ne 0) { Fail "Git LFS is not installed (https://git-lfs.com), then run: git lfs install" } }
 $base = $null
 if (Get-Command py -ErrorAction SilentlyContinue) { & py -3.12 -c "import sys" *> $null; if ($LASTEXITCODE -eq 0) { $base = @("py", "-3.12") } }
 if (-not $base -and (Get-Command python -ErrorAction SilentlyContinue)) { $v = & python -c "import sys;print(f'{sys.version_info[0]}.{sys.version_info[1]}')"; if ($v -eq "3.12") { $base = @("python") } }
@@ -32,9 +35,9 @@ $baseArgs = @(); if ($base -and $base.Count -gt 1) { $baseArgs = $base[1..($base
 Write-Host "OK"
 
 Step "2/8 Fetch large model files (Git LFS)"
-Run "git" @("lfs", "pull")
+if ($inGit) { Run "git" @("lfs", "pull") } else { Write-Host "Not a Git clone (ZIP download?): checking the model file only." }
 $rf = "evidence\predictive_maintenance\models\rf\temporal_rf_v2.joblib"
-if ((Get-Item $rf).Length -lt 1MB) { Fail "$rf is still an LFS pointer. If you downloaded a ZIP, clone with git instead (see the guide)." }
+if ((Get-Item $rf).Length -lt 1MB) { Fail "$rf is a small Git LFS placeholder, not the model. Clone the repository with git and Git LFS instead (see the guide)." }
 Write-Host "OK ($([int]((Get-Item $rf).Length / 1MB)) MB maintenance model present)"
 
 Step "3/8 Python environments"
