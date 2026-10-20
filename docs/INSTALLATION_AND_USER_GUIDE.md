@@ -39,8 +39,8 @@ git lfs pull
 From the course submission repository instead, the code is in `SystemCode/`:
 
 ```powershell
-git clone https://github.com/Jowharah/IRS-PM-2026-10-25-AIS-DC-Guardian-System.git
-cd IRS-PM-2026-10-25-AIS-DC-Guardian-System\SystemCode
+git clone https://github.com/Jowharah/IRS-PM-2026-10-25-AIS-GRP22-DC-Guardian-System.git
+cd IRS-PM-2026-10-25-AIS-GRP22-DC-Guardian-System\SystemCode
 git lfs pull
 ```
 
