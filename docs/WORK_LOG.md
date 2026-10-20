@@ -6,6 +6,17 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-20 — Usability study: AI Investigator on for T8
+
+- **Operator decision:** include optional task T8, so the study backend runs with `DCG_INVESTIGATOR_ENABLED=1`.
+- **What goes out:** each participant question sends synthetic, pseudonymised Evidence and the typed question to OpenAI (`gpt-4.1-mini`).
+- **Safeguards:** consent is asked per question in the dashboard; calls are capped at 10 per minute; the call audit records each call.
+- **Consent text:** a line in the facilitator script asks participants not to type anything personal.
+- **Data prep:** `prepare_study_data.py` still makes no OpenAI calls.
+- **Docs:** facilitator script, README and answer key (T8: answers vary; observe trust, citations and caveats).
+
+---
+
 ## 2026-10-15 — Usability study kit (proposal evaluation item)
 
 - **Why:** the proposal's evaluation plan promised a usability evaluation, and none had been done.

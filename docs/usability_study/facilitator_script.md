@@ -19,7 +19,7 @@ Every participant must see exactly the same dashboard. Verdicts and investigatio
    - clears local test Evidence, verdicts, reviews and investigation progress;
    - re-ingests the study inputs, with no OpenAI calls;
    - prints **READY for the session**.
-3. Start the backend with the Investigator off: set `DCG_INVESTIGATOR_ENABLED=0` (in `.env`, or in the window before starting), then run the backend command from `CLAUDE.md`.
+3. Start the backend with the AI Investigator **on** for T8 (operator decision 2026-10-20): `DCG_INVESTIGATOR_ENABLED=1` (in `.env`, or in the window before starting), then run the backend command from `CLAUDE.md`. To run without T8, use `0` and skip the card.
 4. Open the dashboard on the **Monitoring Center**, logged in, at normal zoom, and refresh the page.
 
 ## Welcome and consent (read)
@@ -27,6 +27,8 @@ Every participant must see exactly the same dashboard. Verdicts and investigatio
 *Thank you for helping. We are testing a prototype monitoring dashboard for a data centre. It combines alerts about cyber attacks, safety equipment, people at doors, equipment health and room conditions. We are testing the software, not you: if something is hard, that is useful for us to know.*
 
 *Please think aloud: say what you are looking for, what you expect and what surprises you. I will give you tasks one at a time. I cannot help much during a task, because we want to see how the dashboard works on its own, but you can give up on any task at any time.*
+
+*One optional task uses an AI assistant provided by OpenAI. Your question and the invented data are sent to OpenAI to produce an answer, so please don't type anything personal.*
 
 *All the data is invented. We will not record your name; you are participant P__. Notes are kept by the project team and used only for our university project report. You can stop at any time without giving a reason. Is that all right?* (Record consent: yes / no. If they agree to audio recording, note it.)
 
