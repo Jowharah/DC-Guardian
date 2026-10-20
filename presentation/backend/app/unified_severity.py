@@ -3,7 +3,7 @@
 Current policy: DCG-DECISION-v2 (decision/rules_v2.py), via group_decision():
 the group starts at its most severe active-concern member and is raised one
 level when the members show a linkage mechanism (known domain mechanism, all
-within 10 minutes). Validated on author labels; independent labels pending.
+within 10 minutes). Validated on the author's labels only (no independent labelling round).
 
 Historical policy, kept for the earlier validation report:
 

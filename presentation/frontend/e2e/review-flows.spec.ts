@@ -143,7 +143,7 @@ test("v2 Decisions show on single events and groups, and the severity filter use
 
   await page.locator("button.feedRow", {hasText: "Unified correlation"}).click();
   await expect(page.getByText("Group Decision · DCG-DECISION-v2")).toBeVisible();
-  await expect(page.getByText(/Unified Decision: HIGH · DCG-DECISION-v2 · validated on author labels/)).toBeVisible();
+  await expect(page.getByText(/Unified Decision: HIGH · DCG-DECISION-v2 · validated on the author's labels only/)).toBeVisible();
 });
 
 test("a single event's specialist evaluation needs consent and is saved", async ({page}) => {

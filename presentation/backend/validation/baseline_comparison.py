@@ -23,7 +23,7 @@ Protocol (fixed before any result was computed, 2026-10-13):
    difference (bootstrap over whole scenarios). The dev split, on which the v2
    linkage rule was selected, is shown for reference only.
 
-Labels were written by the scenario author (independent labels pending).
+Labels were written by the scenario author (no independent labelling round; dropped 2026-10-21).
 
     python presentation/backend/validation/baseline_comparison.py                   # v1 (published)
     python presentation/backend/validation/baseline_comparison.py --set v2          # operator's blind relabel
@@ -220,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
     rng = random.Random(SEED)
     report = {"protocol": "fixed 2026-10-13 before results; see module docstring",
               "policy": rules_v2.POLICY, "linkage_rule": rules_v2.SELECTED_LINKAGE_RULE,
-              "labels": set_labels or "scenario author (independent labels pending)",
+              "labels": set_labels or "scenario author (no independent labelling round)",
               "tie_orders": TIE_ORDERS, "seed": SEED, "splits": {}}
     if set_labels:
         report["scenario_set"] = args.scenario_set
