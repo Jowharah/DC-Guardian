@@ -34,9 +34,9 @@ Find a **safety-equipment (PPE) result** that nobody has reviewed yet. Look at i
 
 ### T5. Work on an investigation
 
-Take an investigation that is still **open**:
-- mark that you are now reviewing it;
-- then close it as handled, with a short explanation.
+Take one of the **correlated groups** that is still open:
+- record that you are now reviewing it;
+- then close it, choosing the outcome you think fits, and give a short reason.
 
 ---
 

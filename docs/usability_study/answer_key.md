@@ -8,7 +8,7 @@ Fill in during the pilot run, for the exact data prepared for the sessions. A ta
 | T2 | Monitoring Center, correlated groups (severity shown) | Group ___ · severity ___ · domains ___ | Severity and every domain |
 | T3 | Group detail (members, graph, linkage) | Linked by: same zone ___ / time ___ / known mechanism ___ | States the shared context, and that it is not proof of cause |
 | T4 | PPE observation → Human verdict (Confirm / Override / Inconclusive, rationale of at least 15 characters) | Observation ___ | A verdict saved, with a rationale |
-| T5 | Investigation state: Start review → Resolve (resolution and reason) | Investigation ___ | State ends RESOLVED, with a reason |
+| T5 | Group detail → Investigation state: Start review → Resolve (resolution: No finding / False positive / Handled outside system / Duplicate; reason of at least 15 characters; acknowledgement ticked) | Either group (both start OPEN) | State ends RESOLVED with a reason; any resolution counts. Note which one they chose and why, and whether the acknowledgement box or the 15-character minimum held them up |
 | T6 | Human Review Queue → item → Open Monitoring Center | Any pending item | Reaches the item's detail |
 | T7 | Analytics Dashboard → Evidence by zone | Zone ___ | The correct zone |
 | T8 | AI Investigator (opt-in) | n/a | Asks the question and gives a reasoned trust judgement |
