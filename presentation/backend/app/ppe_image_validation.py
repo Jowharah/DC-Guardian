@@ -15,7 +15,7 @@ from PIL import Image, UnidentifiedImageError
 from presentation.backend.app.authentication import current_principal, authorize, local_setting
 from presentation.backend.app.authorization import Principal, Permission
 from presentation.backend.app.ppe_observations import save_observation, list_observations, get_observation, image_bytes
-from presentation.backend.app.inference_workers import run_worker
+from presentation.backend.app.inference_workers import component_python, run_worker
 
 router = APIRouter()
 # Runtime PPE detector (operator decision 2026-10-13: PPE-v2m; DCG_PPE_DETECTOR=v1 returns to frozen PPE-v1).
@@ -66,10 +66,9 @@ async def validate_ppe_image(
     finally:
         await image.close()
     project_root = Path(__file__).resolve().parents[3]
-    python_executable = project_root / ".venv-ppe" / "Scripts" / "python.exe"
+    # .venv-ppe (CUDA PyTorch) when installed, otherwise the main environment (CPU).
+    python_executable = component_python(".venv-ppe")
     worker = Path(__file__).with_name("ppe_worker.py")
-    if not python_executable.is_file():
-        raise HTTPException(status_code=503, detail="PPE_GPU_ENVIRONMENT_MISSING")
     if not worker.is_file():
         raise HTTPException(status_code=503, detail="PPE_WORKER_MISSING")
     detector = ppe_detector()

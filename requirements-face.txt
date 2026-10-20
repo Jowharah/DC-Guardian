@@ -1,0 +1,14 @@
+# Optional environment for face recognition (.venv-face). Without it, face uploads run in the main
+# environment, which also contains DeepFace.
+deepface==0.0.101
+tensorflow==2.21.0
+tf_keras==2.21.0
+retina-face==0.0.18
+numpy==2.5.3
+pandas==3.0.6
+pillow==12.3.0
+opencv-python==5.0.0.93
+jsonschema==4.26.0
+neo4j==6.3.1
+python-dotenv==1.2.3
+pytest==9.1.1

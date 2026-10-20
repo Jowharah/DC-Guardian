@@ -22,6 +22,7 @@ import logging
 import os
 import queue
 import subprocess  # nosec B404: fixed interpreter and module paths only, never user input
+import sys
 import threading
 import time
 from dataclasses import dataclass
@@ -33,6 +34,20 @@ logger = logging.getLogger("dcg.workers")
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 LOG_DIR = PROJECT_ROOT / "logs" / "workers"
 STARTUP_TIMEOUT = 300  # first model load (GPU initialisation) can be slow
+
+
+def component_python(venv: str) -> Path:
+    """Interpreter of a component environment (e.g. ``.venv-ppe``), or the backend's own.
+
+    The dedicated environments (GPU PyTorch for PPE, TensorFlow for Face) are
+    optional: the main environment also contains YOLO and DeepFace, so a fresh
+    installation with only ``.venv-dc-guardian`` still runs every upload (PPE on
+    the CPU when no CUDA build is present).
+    """
+    for candidate in (PROJECT_ROOT / venv / "Scripts" / "python.exe", PROJECT_ROOT / venv / "bin" / "python"):
+        if candidate.is_file():
+            return candidate
+    return Path(sys.executable)
 
 
 class WorkerTimeout(Exception):

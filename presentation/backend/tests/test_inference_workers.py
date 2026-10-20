@@ -80,3 +80,12 @@ def test_one_shot_mode_is_used_when_disabled(fake, monkeypatch):
     monkeypatch.setenv("DCG_PERSISTENT_WORKERS", "0")
     first, second = parse(fake("a")), parse(fake("b"))
     assert first["pid"] != second["pid"] and not iw._workers
+
+
+def test_component_python_falls_back_to_the_backend_interpreter(tmp_path, monkeypatch):
+    monkeypatch.setattr(iw, "PROJECT_ROOT", tmp_path)
+    assert iw.component_python(".venv-ppe") == __import__("pathlib").Path(sys.executable)
+    venv = tmp_path / ".venv-ppe" / "Scripts"
+    venv.mkdir(parents=True)
+    (venv / "python.exe").write_text("")
+    assert iw.component_python(".venv-ppe") == venv / "python.exe"
