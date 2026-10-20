@@ -4,6 +4,8 @@ DC-GUARDIAN is a research prototype for multi-domain data-center monitoring, det
 
 > **Current baseline (`main`, 2026-10-11):** The five frozen Evidence domains, Reasoning/Neo4j correlation, approved-knowledge Response, deterministic Decision contracts, and the controlled Presentation dashboard are implemented in the research prototype. The Presentation layer now includes Monitoring Center, Scenario Lab, Analytics Dashboard, Human Review Queue, authenticated human-review audit records, and local audit-integrity verification. The AI Investigator is an opt-in, read-only research prototype (see [docs/AI_INVESTIGATOR.md](docs/AI_INVESTIGATOR.md)). Correlation covers any two events (pairs) and any connected set of three or more events (unified groups) across all five domains. Operators can record audited verdicts on any detector result, and the dashboard shows a research-only Bayesian estimate beside each correlation pair. `python check_all.py` runs every layer, and CI with security scans runs on every push. This is not a production deployment or security certification.
 
+**Install and run on a new computer:** [Installation and User Guide](docs/INSTALLATION_AND_USER_GUIDE.md) (`setup.ps1` installs everything and loads demo data; no GPU needed).
+
 **Documentation:** Start at [docs/README.md](docs/README.md) for the complete documentation index, [Development History](docs/PROJECT_DEVELOPMENT_HISTORY.md), [Validation and Operations](docs/VALIDATION_AND_OPERATIONS.md), and [Remaining Roadmap](docs/REMAINING_ROADMAP.md).
 
 ## Architecture
