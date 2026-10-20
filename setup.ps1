@@ -2,7 +2,7 @@
 DC-GUARDIAN one-time setup on Windows (PowerShell). See docs/INSTALLATION_AND_USER_GUIDE.md.
 
 Prerequisites (install first): Git with Git LFS, Python 3.12, Node.js 20 or newer, and a running
-Neo4j 5.x or newer (for example Neo4j Desktop) whose password you know.
+Neo4j (tested with 2026.08, for example in Neo4j Desktop) whose password you know.
 
     powershell -ExecutionPolicy Bypass -File setup.ps1            # main environment only (CPU)
     powershell -ExecutionPolicy Bypass -File setup.ps1 -Gpu       # also .venv-ppe (NVIDIA GPU for PPE)

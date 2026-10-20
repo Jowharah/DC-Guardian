@@ -21,7 +21,7 @@ All data is synthetic or public test data.
 | Git + **Git LFS** | Git 2.40+, Git LFS 3+ | LFS stores the 310 MB drive-failure model. Install from <https://git-lfs.com>, then run `git lfs install` once |
 | Python | **3.12** | <https://www.python.org/downloads/>; tick "Add python.exe to PATH" |
 | Node.js | 20 or newer | <https://nodejs.org> (LTS) |
-| Neo4j | 5.x or newer | Neo4j Desktop (<https://neo4j.com/download/>) is easiest. Community Server also works. |
+| Neo4j | 2026.08 (tested) | Neo4j Desktop (<https://neo4j.com/download/>) is easiest. Other recent versions and Community Server should work but were not tested. |
 | OpenAI API key | Optional | Only for the AI Investigator and the specialist agents (section 7.3) |
 | Internet | During setup | Packages, the embedding model for the knowledge index, and the face models DeepFace downloads on first use |
 
