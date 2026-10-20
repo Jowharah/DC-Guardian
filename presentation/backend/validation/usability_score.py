@@ -20,7 +20,7 @@ import statistics
 import sys
 from pathlib import Path
 
-TASKS = [f"t{i}" for i in range(1, 10)]
+TASKS = [f"t{i}" for i in range(1, 11)]
 CONCEPT_KEY = {"q1": "F", "q2": "T", "q3": "F", "q4": "F", "q5": "F", "q6": "T"}
 TRUST = {"r1": "Understood why an alert had its severity", "r2": "Could tell detector from human input",
          "r3": "Dashboard showed what the system does not know", "r4": "Would trust it to prioritise my work",

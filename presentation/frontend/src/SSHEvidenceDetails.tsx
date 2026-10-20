@@ -1,11 +1,12 @@
 import type {PublishedSSH} from "./api";
+import {sshLogTime} from "./sshLogTime";
 export default function SSHEvidenceDetails({event}:{event:PublishedSSH}){
  return <section className="evidenceItem">
  <h4>SSH Detector Evidence</h4>
  <p><b>{event.evidence_state}</b> · {event.zone_id} · {event.server_id}</p>
  <div className="standaloneMeta">
  <div><small>Source IP</small><strong>{event.source_ip??"Unknown"}</strong></div>
- <div><small>Original log window</small><strong>{event.window_start??"Unknown"}</strong><small>Historical log timestamp; timezone may be unspecified</small></div>
+ <div><small>Original log window</small><strong>{sshLogTime(event.window_start)}</strong><small>Time as written in the log; SSH logs record no year or time zone</small></div>
  <div><small>Received</small><strong>{new Date(event.received_at).toLocaleString()}</strong></div>
  </div>
  <p>Usernames: {event.usernames.join(", ")||"Unavailable"} · Detector votes: {event.detector_votes}</p>

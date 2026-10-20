@@ -36,6 +36,7 @@ export default function LifecyclePanel({subjectType,subjectId}:{subjectType:stri
    <label htmlFor="lifecycleRationale">Rationale</label><textarea id="lifecycleRationale" value={rationale} onChange={e=>setRationale(e.target.value)} minLength={15} rows={3}/>
    <label className="consentLine"><input type="checkbox" checked={ack} onChange={e=>setAck(e.target.checked)}/> I confirm this resolution is my own review.</label>
    <button type="button" disabled={busy||!ack||rationale.trim().length<15} onClick={()=>void act("RESOLVE")}>Resolve</button>
+   {(!ack||rationale.trim().length<15)&&<small className="muted" role="note">To resolve: {rationale.trim().length<15?`write a rationale of at least 15 characters (${rationale.trim().length}/15)`:"rationale complete"}{!ack?" and tick the confirmation above.":"."}</small>}
   </div>}
   {data.state==="RESOLVED"&&<div className="lifecycleForm">
    <label htmlFor="lifecycleReopen">Reason to reopen</label><textarea id="lifecycleReopen" value={rationale} onChange={e=>setRationale(e.target.value)} rows={2}/>

@@ -4,19 +4,23 @@ Read the parts in *italics* aloud. Do not explain the interface, do not say whet
 
 ## Before the first session (once)
 
-1. **Back up the data:** `python -m presentation.backend.app.backup create` (options in `docs/VALIDATION_AND_OPERATIONS.md`, Operations routine).
-2. **Start the system:** backend and frontend (see `CLAUDE.md`), with `DCG_INVESTIGATOR_ENABLED=0` unless task T8 is planned.
-3. **Prepare the data:** in **Scenario Lab**, run the synthetic scenarios the tasks need, so that the Monitoring Center shows:
-   - at least one correlated group at HIGH severity;
-   - one PPE observation without a human verdict;
-   - one investigation in state OPEN.
-4. **Pilot run:** do the tasks yourself once and fill in `answer_key.md` with the correct answers for this exact data.
-5. **Equipment:** prepare the PPE test image for optional T9, a timer and printed sheets.
+1. **Build the fixed study inputs** (private folder `Documents\dcg-private\study_inputs`, never committed):
+   `python docs/usability_study/prepare_study_data.py build-inputs`
+2. **Equipment:** a timer and printed sheets. The upload files for optional T9 and T10 are in `study_inputs\participant_uploads\`.
+3. **Pilot run (dry run):** prepare the data as below, do every task yourself once, and check the answers in `answer_key.md`.
 
-## Before each session
+## Before each session (about 5 minutes)
 
-- Restore the same starting state: no verdict on the T4 observation, the T5 investigation back to OPEN. Either undo through the interface, or restore the backup and re-run the same scenarios.
-- Open the dashboard on the **Monitoring Center**, logged in, at normal zoom.
+Every participant must see exactly the same dashboard. Verdicts and investigation changes are permanent by design, so the data is rebuilt from the same fixed inputs each time:
+
+1. Close the **backend** window (the frontend can stay open), and make sure Neo4j is running in Neo4j Desktop.
+2. Run `python docs/usability_study/prepare_study_data.py prepare`. It takes about 2–3 minutes and:
+   - backs up the data;
+   - clears local test Evidence, verdicts, reviews and investigation progress;
+   - re-ingests the study inputs, with no OpenAI calls;
+   - prints **READY for the session**.
+3. Start the backend with the Investigator off: set `DCG_INVESTIGATOR_ENABLED=0` (in `.env`, or in the window before starting), then run the backend command from `CLAUDE.md`.
+4. Open the dashboard on the **Monitoring Center**, logged in, at normal zoom, and refresh the page.
 
 ## Welcome and consent (read)
 
