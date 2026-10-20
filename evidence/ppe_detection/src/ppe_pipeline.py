@@ -227,10 +227,11 @@ class PPECompliancePipeline:
         # Runtime environment
         # ----------------------------------------------------
 
-        if not torch.cuda.is_available():
-            raise RuntimeError(
-                "CUDA unavailable for PPE runtime."
-            )
+        # The GPU is used when present; otherwise the same frozen weights
+        # run on the CPU (slower, about 1-2 s per image), so the system
+        # also runs on machines without an NVIDIA GPU (2026-10-21). Small
+        # floating-point differences between devices are possible.
+        self.device = 0 if torch.cuda.is_available() else "cpu"
 
 
         # ----------------------------------------------------
@@ -370,7 +371,7 @@ class PPECompliancePipeline:
                     "image_size"
                 ],
 
-            device=0,
+            device=self.device,
 
             verbose=False,
         )
@@ -538,6 +539,9 @@ class PPECompliancePipeline:
             # Runtime
             "latency_ms":
                 latency_ms,
+
+            "inference_device":
+                "cuda" if self.device == 0 else "cpu",
         }
 
 

@@ -20,6 +20,26 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-20 — Installation guide, one-command setup, demo data, CPU fallback — `fff7dc4`, `89f0c91`
+
+- **Why:** the course requires a system others can install and run from the submitted repository (installation and user guide appendix). DC-GUARDIAN previously assumed the operator's PC (GPU environments, built knowledge index, local data).
+- **What:**
+  - `docs/INSTALLATION_AND_USER_GUIDE.md`: requirements, clone (not ZIP: Git LFS), Neo4j, setup, start, demo tour, optional GPU / face enrollment / OpenAI, screens, checks, troubleshooting, data and licences.
+  - `setup.ps1`: 8 steps (prerequisites, LFS model check, main environment, `.env` from prompts, `npm ci`, topology into Neo4j, knowledge index, demo data); options `-Gpu -Face -SkipRag -SkipDemo`; safe to re-run; nothing sent to OpenAI.
+  - `demo_data/`: four public LogHub SSH lines (ZONE-A) and synthetic drive and sensor files (ZONE-B), loaded through the normal ingestion pipeline by `load_demo_data.py`; gives a correlated drive + temperature pair.
+  - **CPU fallback:** PPE runs on CPU when CUDA is absent (same model and policy; 0.49 s warm, same NON_COMPLIANT result as GPU). PPE and face uploads use the component environment if present, otherwise the main one (`component_python`), so no GPU environment is required.
+  - Pinned `requirements-ppe.txt`, `requirements-face.txt`, `requirements-gru.txt`; `vite.config.ts` reads `DCG_FRONTEND_PORT` / `DCG_BACKEND_URL`.
+  - **Bundled knowledge sources** (`response/rag/knowledge_base/bundled/`, 13 files, 22 MB, U.S. federal works, stored `-text`): setup copies them into `originals/`, where `fetch_sources.py` verifies each against `source_lock.json` instead of downloading.
+- **Found by the fresh-clone test:** CISA refuses automated downloads (HTTP 403), and the U.S. DOE O&M page now differs from its locked copy, so a downloading install could not rebuild the evaluated corpus and the RAG integrity checks failed. Bundling fixed both. Neo4j "relationship type does not exist" notices on a new database are silenced for the demo load only.
+- **Verified:** fresh clone of `feat/install-guide` in a separate folder with a separate Neo4j database (`dcgfresh`): `setup.ps1` completed; index 13 sources, 258 chunks; backend on port 8010 healthy, demo data present (2 drive, 2 sensor results, 1 correlated ZONE-B pair, SSH published); dashboard on port 5180 through the proxy; `check_all.py --skip-live` **11 passed, 0 failed, 2 skipped** (GPU environments not installed). Backend tests 417 passed.
+- **Caveats:**
+  - Windows only tested; the manual steps should work elsewhere but were not run.
+  - A ZIP download omits the LFS model unless LFS archives are enabled on the repository.
+  - `fetch_sources.py` rewrites the lock's `generated_utc` even when nothing changed; harmless, left as is.
+  - Face recognition still needs a local enrollment (biometric data is never committed).
+
+---
+
 ## 2026-10-20 — Usability study: AI Investigator on for T8
 
 - **Operator decision:** include optional task T8, so the study backend runs with `DCG_INVESTIGATOR_ENABLED=1`.

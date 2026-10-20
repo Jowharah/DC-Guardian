@@ -11,6 +11,7 @@ Working on the repository with Claude Code: see [`CLAUDE.md`](../CLAUDE.md) at t
 
 ## Existing reference documents
 
+- [Installation and User Guide](INSTALLATION_AND_USER_GUIDE.md) — install on a new Windows computer with `setup.ps1` (CPU is enough), demo data, a first tour, optional GPU/face/OpenAI features, the dashboard screens, troubleshooting. Also the report's installation appendix.
 - [Report draft: evaluation against single-domain monitoring, and latency](report/evaluation_baseline_and_latency.md) — answers the proposal's research question on the labelled scenarios (held-out test split, bootstrap intervals) and reports per-stage pipeline latency.
 - [Report draft: PPE detector v2](report/ppe_v2_model_enhancement.md) — model enhancement: protocol, validation selection, the official locked test (helmet and overall improved, vest regressed) and the post-hoc evaluation of all candidates.
 - [Report draft: industrial deployment considerations](report/industrial_deployment_considerations.md) — section for the project report: controls in place and how they were verified, production requirements, threat-model summary, limitations.
