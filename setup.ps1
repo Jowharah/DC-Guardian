@@ -93,4 +93,4 @@ if ($SkipDemo) { Write-Host "Skipped (-SkipDemo)." } else { Run $Py @("demo_data
 
 Write-Host "`nSETUP COMPLETE." -ForegroundColor Green
 Write-Host "Start the backend:   .venv-dc-guardian\Scripts\python.exe -m uvicorn presentation.backend.app.main:app --host 127.0.0.1 --port 8000"
-Write-Host "Start the frontend:  cd presentation\frontend; npm run dev     then open http://localhost:5173 (user: operator)"
+Write-Host "Start the frontend:  cd presentation\frontend; npm run dev     then open http://127.0.0.1:5173 (user: operator)"
