@@ -6,6 +6,17 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-20 — Setup works from a ZIP that contains the model
+
+- **Why:** GitHub's repository ZIP replaced the Git LFS model with a 134-byte placeholder even with "Include Git LFS objects in archives" ticked (checked twice, including after a new commit). The course also asks for a repository ZIP, which will be built locally with the real model. `setup.ps1` always ran `git lfs pull`, so it failed on any ZIP folder.
+- **What:**
+  - `setup.ps1` runs the Git and Git LFS steps only inside a Git clone; otherwise it checks the model file alone.
+  - A placeholder model now stops setup with a message to clone instead.
+  - The guide's ZIP note matches.
+- **Verified:** on the extracted GitHub ZIP, setup stopped at step 2 with the new message. With the real model copied in, `setup.ps1 -SkipDemo` completed all 8 steps (13 approved sources).
+
+---
+
 ## 2026-10-21 — Independent labelling dropped; usability sessions completing
 
 - **Decision (operator, time limitation):** the teammate labelling round is dropped.

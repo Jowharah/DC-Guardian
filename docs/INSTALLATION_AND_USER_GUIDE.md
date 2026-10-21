@@ -27,7 +27,7 @@ All data is synthetic or public test data.
 
 ## 2. Get the code
 
-Use **git clone**, not "Download ZIP": a ZIP download leaves out the Git LFS model file unless LFS archives are enabled on the repository.
+Use **git clone** where possible. GitHub's "Download ZIP" replaces the 318 MB Git LFS model with a small placeholder file. A ZIP that does contain the model (for example the course submission ZIP) also works: `setup.ps1` checks the model file and skips the Git steps when the folder is not a Git clone.
 
 ```powershell
 git lfs install
