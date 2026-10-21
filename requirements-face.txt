@@ -6,7 +6,7 @@ tf_keras==2.21.0
 retina-face==0.0.18
 numpy==2.5.3
 pandas==3.0.6
-pillow==12.3.0
+pillow==13.0.0
 opencv-python==5.0.0.93
 jsonschema==4.26.0
 neo4j==6.3.1

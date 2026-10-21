@@ -6,6 +6,26 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-21 — Installation guide checked by an instructor walkthrough
+
+- **Why:** before submission, confirm that an instructor can install and use DC-GUARDIAN by following the guide exactly.
+- **Walkthrough:** a new folder; the published submission repository; the guide's commands typed as written; the two setup prompts answered as a user would.
+  - Section 2: clone and `git lfs pull` gave the real model (318,184,322 bytes).
+  - Section 4: `setup.ps1` created `.env` from the prompts (not covered by earlier tests) and completed all 8 steps.
+  - Section 9: `check_all.py --skip-live` gave 11 passed, 0 failed, 2 skipped (GPU environments).
+  - Sections 5 and 6: backend and dashboard started on the documented alternative ports. A browser (Edge) signed in as `operator` and showed the demo data the tour describes: 5 items needing attention; Cybersecurity, Maintenance and Environmental counts; the ZONE-B Environmental + Maintenance correlation; the drive at risk; the ZONE-A SSH result.
+- **Guide fixes found by reading it as an instructor:**
+  - Manual installation now copies the bundled documents before `fetch_sources` (without that, CISA returns 403).
+  - Model size stated as 318 MB throughout.
+  - Dashboard address is `http://127.0.0.1:5173` (the address the server listens on), in the guide and in `setup.ps1`'s closing message.
+  - Troubleshooting rows match the current setup messages and work for a ZIP folder.
+  - Setup steps 1–2 describe the clone/ZIP behaviour.
+- **Caveats:**
+  - The test PC already had Python, Node.js, Git and Neo4j, and a pip cache, so setup took 5 minutes. A new PC downloads several GB (the guide says 20–40 minutes).
+  - Linux and macOS are not tested.
+
+---
+
 ## 2026-10-20 — Setup works from a ZIP that contains the model
 
 - **Why:** GitHub's repository ZIP replaced the Git LFS model with a 134-byte placeholder even with "Include Git LFS objects in archives" ticked (checked twice, including after a new commit). The course also asks for a repository ZIP, which will be built locally with the real model. `setup.ps1` always ran `git lfs pull`, so it failed on any ZIP folder.

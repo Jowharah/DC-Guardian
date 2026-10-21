@@ -18,7 +18,7 @@ All data is synthetic or public test data.
 | Operating system | Windows 10 or 11 | Tested on Windows 11. The commands in section 4 also work on Linux or macOS with `/` paths and `bin/` instead of `Scripts\` (not tested). |
 | Memory and disk | 16 GB RAM; 15 GB free disk | The Python packages (TensorFlow, PyTorch) are large |
 | GPU | **Not required** | With an NVIDIA GPU, PPE image checks are faster (optional `.venv-ppe`, section 7.1) |
-| Git + **Git LFS** | Git 2.40+, Git LFS 3+ | LFS stores the 310 MB drive-failure model. Install from <https://git-lfs.com>, then run `git lfs install` once |
+| Git + **Git LFS** | Git 2.40+, Git LFS 3+ | LFS stores the 318 MB drive-failure model. Install from <https://git-lfs.com>, then run `git lfs install` once |
 | Python | **3.12** | <https://www.python.org/downloads/>; tick "Add python.exe to PATH" |
 | Node.js | 20 or newer | <https://nodejs.org> (LTS) |
 | Neo4j | 2026.08 (tested) | Neo4j Desktop (<https://neo4j.com/download/>) is easiest. Other recent versions and Community Server should work but were not tested. |
@@ -62,8 +62,8 @@ powershell -ExecutionPolicy Bypass -File setup.ps1
 
 It asks for your Neo4j password and a new dashboard password. It takes about 20–40 minutes, mostly package downloads. It then:
 
-1. checks Git LFS, Python 3.12 and Node.js;
-2. fetches the LFS model file;
+1. checks Python 3.12, Node.js and, in a Git clone, Git LFS;
+2. fetches the LFS model file (in a Git clone) and checks that it is the real model;
 3. creates the Python environment `.venv-dc-guardian` from `requirements.txt`;
 4. creates `.env` from `.env.example`: Neo4j settings, the dashboard login (user `operator`, role administrator, zones A–C), AI Investigator off;
 5. installs the frontend packages (`npm ci`);
@@ -89,6 +89,8 @@ copy .env.example .env        # then fill NEO4J_URI=bolt://127.0.0.1:7687, NEO4J
                               # DCG_LOCAL_ROLE=administrator, DCG_LOCAL_ZONES=ZONE-A,ZONE-B,ZONE-C
 cd presentation\frontend; npm ci; cd ..\..
 $env:PYTHONPATH = (Get-Location).Path
+New-Item -ItemType Directory -Force response\rag\knowledge_base\originals | Out-Null
+Copy-Item response\rag\knowledge_base\bundled\* response\rag\knowledge_base\originals\ -Exclude README.md   # approved documents ship with the code
 .venv-dc-guardian\Scripts\python.exe reasoning\graph\load_topology.py
 foreach ($s in "fetch_sources","parse_sources","preprocess_sources","chunk_sources","build_index") { .venv-dc-guardian\Scripts\python.exe response\rag\$s.py }
 .venv-dc-guardian\Scripts\python.exe demo_data\load_demo_data.py
@@ -108,7 +110,7 @@ cd presentation\frontend
 npm run dev
 ```
 
-Open **<http://localhost:5173>** and sign in as `operator` with the dashboard password you chose. To stop, press Ctrl+C in both terminals.
+Open **<http://127.0.0.1:5173>** and sign in as `operator` with the dashboard password you chose. To stop, press Ctrl+C in both terminals.
 
 If ports 5173 or 8000 are taken, set `DCG_FRONTEND_PORT` and `DCG_BACKEND_URL` (for example `$env:DCG_BACKEND_URL="http://127.0.0.1:8010"`) before `npm run dev`, and start the backend on that port.
 
@@ -180,13 +182,13 @@ It runs every test suite (about 5 minutes) and writes `logs\checks\<time>\report
 
 | Problem | Fix |
 |---|---|
-| "is still an LFS pointer" or a maintenance error | Run `git lfs install` and then `git lfs pull`; do not use a ZIP download |
+| Setup step 2: "is a small Git LFS placeholder", or a maintenance error | The drive-failure model was not downloaded. In a clone, run `git lfs install` and then `git lfs pull`. From GitHub's "Download ZIP", clone the repository instead (section 2) |
 | "Neo4j not reachable" | Start the instance in Neo4j Desktop; check `NEO4J_PASSWORD` in `.env` and use `bolt://127.0.0.1:7687` |
 | Dashboard shows "API unavailable" | The backend is not running, or it runs on another port (section 5) |
 | PPE upload is slow | Normal on CPU (0.5–2 s); the first upload after starting also loads the model (5–15 s) |
 | Face upload: FACE_ENROLLMENT_MISSING | Expected without an enrollment (section 7.2) |
 | Specialists: "approved knowledge unavailable" | Run the RAG step (`setup.ps1` without `-SkipRag`); it downloads the small embedding model once |
-| Setup step 7 shows `FAIL: ...` for an approved document | The 13 approved documents ship in `response/rag/knowledge_base/bundled` and are verified against `response/rag/manifests/source_lock.json`. A mismatch means a copy was changed: run `git checkout -- response/rag/knowledge_base/bundled response/rag/manifests/source_lock.json`, delete the folder `response/rag/knowledge_base/originals`, and re-run `setup.ps1` |
+| Setup step 7 shows `FAIL: ...` for an approved document | The 13 approved documents ship in `response/rag/knowledge_base/bundled` and are verified against `response/rag/manifests/source_lock.json`. A mismatch means a copy was changed: restore them (in a clone, `git checkout -- response/rag/knowledge_base/bundled response/rag/manifests/source_lock.json`; from a ZIP, extract those two folders again), delete the folder `response/rag/knowledge_base/originals`, and re-run `setup.ps1` |
 | `npm` or `pip` certificate errors behind antivirus or corporate TLS inspection | Point Node at your organisation's root certificate: `setx NODE_EXTRA_CA_CERTS <path-to-root.pem>`, then open a new terminal. For pip, use `pip install --cert <path>` |
 | Port already in use | See section 5 (`DCG_FRONTEND_PORT`, `DCG_BACKEND_URL`) |
 | Logs | `logs\errors.log` (start here), `logs\backend.log`, `logs\api_access.log`; inference workers in `logs\workers\` |
