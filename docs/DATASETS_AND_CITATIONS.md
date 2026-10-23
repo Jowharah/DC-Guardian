@@ -30,7 +30,7 @@ Licence terms were checked against the official pages on 2026-10-14. Re-check th
 
 ## 3. Approved knowledge sources (RAG)
 
-The 15 public documents in `response/rag/manifests/knowledge_manifest.json`, cited by publisher, title, version and URL:
+The manifest (`response/rag/manifests/knowledge_manifest.json`) lists 16 sources: **13 are approved and form the knowledge base**; NIST SP 800-34r1 and DOE *O&M in Federal Facilities* are candidates (not used); the project policy is planned (not used). The 15 public documents, cited by publisher, title, version and URL:
 - **NIST:** SP 800-61r3, 800-40r4, 800-53r5 (PE family) and 800-34r1.
 - **CISA:**
   - Incident & Vulnerability Response Playbooks;
@@ -38,7 +38,7 @@ The 15 public documents in `response/rag/manifests/knowledge_manifest.json`, cit
 - **OSHA:** 29 CFR 1910.132, .135, .137, .147 and .38.
 - **U.S. DOE FEMP:** four operations and maintenance and data-centre guides.
 
-The sixteenth source is the project's own *DC-GUARDIAN Operational Response Policy v1*.
+The sixteenth source is the project's own *DC-GUARDIAN Operational Response Policy v1*, planned and **not yet in the knowledge base**.
 
 U.S. federal government works (NIST, OSHA, DOE) are generally in the public domain; CISA documents usually are too. Cite them as references.
 

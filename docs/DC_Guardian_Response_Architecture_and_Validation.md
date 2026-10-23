@@ -50,7 +50,7 @@ Verified foundation:
 - 13/13 parsing contract passed.
 - 13/13 preprocessing/provenance contract passed.
 - 13/13 chunking contract passed.
-- 255 active retrieval chunks (260 before 2026-10-12, when OSHA documents were trimmed to their own CFR section; see 3.1.2).
+- 255 active retrieval chunks at evaluation time; 257 after the pypdf 6.21.1 security update (2026-10-23), with identical retrieval results (260 before 2026-10-12, when OSHA documents were trimmed to their own CFR section; see 3.1.2).
 - Local embedding model: `sentence-transformers/all-MiniLM-L6-v2`.
 - Embedding dimension: 384.
 - Retrieval operates locally/offline after model acquisition.

@@ -1,6 +1,6 @@
 # DC-GUARDIAN — Validation and local operations
 
-**Updated:** 2026-10-10  
+**Updated:** 2026-10-23  
 **Branch:** `main`
 
 ## Environment
@@ -58,6 +58,16 @@ python -m pytest presentation/backend/tests/test_investigator_sources.py present
 ```
 
 Browser demonstrations included live OpenAI responses for unified, operational, and individual SSH Evidence, as well as opt-in history restoration. The latest frontend build and full end-to-end security suite have not been confirmed by this test result. See [AI Investigator](AI_INVESTIGATOR.md).
+
+## Full project check — 2026-10-23 (after the usability-study changes)
+
+`python check_all.py`: **14 passed, 0 failed, 0 skipped**. The suites match the 2026-10-12 list below, with:
+- backend 420 tests;
+- browser tests 24, including the WCAG A/AA scan of both group views and the 10 usability-finding tests.
+
+Dependencies pinned for advisories found by pip-audit: Pillow 13.0.0 (2026-10-21), pypdf 6.21.1 (2026-10-23). After pypdf 6.21.1 the knowledge index has 257 chunks (13 sources); the retrieval evaluation is unchanged (Recall@3 0.961, Precision@3 0.716, MRR 0.97).
+
+Fresh-install checks: a fresh clone of the submission repository and a ZIP folder, with `setup.ps1` and `check_all.py` (11 passed, 2 GPU skipped). See the [Work Log](WORK_LOG.md), 2026-10-20 and 2026-10-21.
 
 ## Full project check — 2026-10-12 (all tests under pytest)
 

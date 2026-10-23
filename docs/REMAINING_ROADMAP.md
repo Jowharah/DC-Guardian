@@ -1,6 +1,24 @@
 # DC-GUARDIAN — Remaining development roadmap
 
-**Updated:** 2026-10-11. Status reflects observed code and reported local tests on `main`, not production readiness.
+**Updated:** 2026-10-23. Status reflects observed code and reported local tests on `main`, not production readiness.
+
+## Status at submission (2026-10-23)
+
+- **Done since the table below was written:**
+  - usability pilot (2026-10-20) and study (P01–P03, 2026-10-21/22; [findings](usability_study/findings_2026-10.md));
+  - dashboard changes from its findings (group and event summaries, simple view, status tabs, date filters, help panel, review progress, readable graph linked to the zone);
+  - installation guide and one-command setup, tested by a fresh-install walkthrough ([guide](INSTALLATION_AND_USER_GUIDE.md));
+  - submission repository with the final code snapshot.
+- **Dropped:** the independent labelling round (2026-10-21, time limitation, operator decision). Results rest on the operator's labels with a ChatGPT sensitivity check.
+- **Future work:**
+  - assignment of review items to people ("Assigned to" tab, team workload, auto-assignment by role, assign instead of inconclusive);
+  - an interactive first-time tour;
+  - independent labels and a real-site pilot;
+  - data-centre PPE images to choose between PPE-v2m and PPE-v3;
+  - a Bayesian network with topology-conditioned timing;
+  - technician dispatch and maintenance scheduling (the search and optimisation technique group);
+  - production hardening ([Production Readiness](PRODUCTION_READINESS.md)).
+- **Re-test:** the post-study changes were not re-tested with participants. A repeat of T3 and the concept check would measure them.
 
 | Feature | Status | Remaining work |
 |---|---|---|
@@ -44,7 +62,7 @@ Done since 2026-10-11: live specialist check, single-event specialists, API acce
 8. ~~Scenario set v2 relabelling~~ (done 2026-10-13). The 8 scenarios that used leak, smoke, airflow or cooling states the detector cannot produce were rewritten with detector-derived readings; all 40 were relabelled blind by the operator, with ChatGPT's labels of the same pack as a sensitivity check ([results](UNCERTAINTY_REASONING.md#results-on-scenario-set-v2-2026-10-13)).
    - Correlation beats isolated single-domain monitoring under every labelling.
    - The Bayesian advantage over the crisp rule is no longer statistically clear on v2 (interval includes zero).
-   - The labellings disagree mainly on whether heat or humidity plus a drive at risk is one incident: item 1 (independent human labels) should settle it.
+   - The labellings disagree mainly on whether heat or humidity plus a drive at risk is one incident: independent human labels would settle it (dropped for time; future work).
 9. **Model enhancement and workflow optimisation** (proposal "optimization", operator interpretation 2026-10-13): new detector versions beside the frozen ones, selected on validation data and evaluated once on the locked test; a persistent inference worker to remove per-upload model loading.
    - **PPE-v2 done 2026-10-13** (YOLOv8s, 1024 px; see `evidence/ppe_detection/README.md`). Locked test: overall mAP@0.5 0.545 → 0.595 and helmet recall 0.603 → 0.654, but safety-vest recall 0.449 → 0.245 (49 vests; validation pointed the other way).
    - **Post-hoc** (after selection; not used to choose): on the locked test, the unselected YOLOv8m matches v1 on vests (recall 0.449, mAP 0.416 vs 0.372) and is best overall (mAP@0.5 0.625). The combined v1-vest detector was therefore not built.

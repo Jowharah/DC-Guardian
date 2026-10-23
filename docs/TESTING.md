@@ -1,6 +1,6 @@
 # DC-GUARDIAN — Testing guide
 
-**Updated:** 2026-10-12. Every automated test in the repository runs under **pytest**. The only exceptions are the two verification tools `verify_runtime.py` and `response/rag/verify_response_rag.py`, which stay scripts, and the browser tests, which use Playwright.
+**Updated:** 2026-10-23. Every automated test in the repository runs under **pytest**. The only exceptions are the two verification tools `verify_runtime.py` and `response/rag/verify_response_rag.py`, which stay scripts, and the browser tests, which use Playwright.
 
 ## 1. What runs where
 
@@ -14,7 +14,7 @@
 | Response agents | `response/agents/tests/` | main environment | One test per check (37) |
 | Decision / integration | `integration/tests/` | main environment | One test per check (12); one module needs Neo4j |
 | Presentation backend | `presentation/backend/tests/` | main environment | Isolated database per test (`conftest.py`), OpenAI blocked |
-| Frontend | `presentation/frontend/e2e/` | Playwright | Mocked API; includes WCAG and keyboard tests |
+| Frontend | `presentation/frontend/e2e/` | Playwright | Mocked API; 24 tests, including WCAG and keyboard tests and one test per usability-study change (`usability-findings.spec.ts`) |
 
 `python check_all.py` runs all of them (14 checks) and writes `logs/checks/<time>/report.md`; each check's log lists every test and every skip reason. CI runs the same script.
 
