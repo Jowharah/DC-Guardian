@@ -11,6 +11,12 @@ from presentation.backend.app.graph_view import project_node
 from reasoning.graph.ingest_event import create_driver,NEO4J_DATABASE
 
 router=APIRouter()
+# Infrastructure an Event points at, and the topology links from it to its zone (usability study:
+# the group graph showed servers and cameras without their zone). No inferred edges.
+INFRASTRUCTURE={"Server","Camera","Sensor","Asset","Equipment"}
+TOPOLOGY_QUERY="""MATCH (n) WHERE elementId(n) IN $infra
+   MATCH path=(n)-[:LOCATED_IN|HOSTED_BY|MONITORS*1..3]->(z:Zone {zone_id:$zone})
+   RETURN path LIMIT 40"""
 REQUIRED=(Permission.INCIDENT_READ,Permission.GRAPH_READ,Permission.SSH_DETAIL,
           Permission.MAINTENANCE_DETAIL,Permission.ENVIRONMENT_DETAIL,
           Permission.CAMERA_DETAIL,Permission.PERSON_DETAIL)
@@ -52,10 +58,10 @@ def unified_graph(group_id:str,principal:Principal=Depends(current_principal)):
     if len(ids)>40:raise HTTPException(409,"Graph exceeds bounded Evidence limit")
     query="""MATCH (e:Event) WHERE e.event_id IN $ids
        OPTIONAL MATCH p=(e)-[r]->(n)
-       WHERE type(r) IN ['OBSERVED_BY','TARGETS','ORIGINATED_FROM','DETECTED_AT']
+       WHERE type(r) IN ['OBSERVED_BY','TARGETS','ORIGINATED_FROM','DETECTED_AT','IDENTIFIES']
          AND NOT n:Event
        RETURN e,p LIMIT 160"""
-    nodes={};edges={};found=set()
+    nodes={};edges={};found=set();infrastructure=set()
     try:
         driver=create_driver()
         try:
@@ -70,10 +76,23 @@ def unified_graph(group_id:str,principal:Principal=Depends(current_principal)):
                     for node in path.nodes:
                         p=project_node(node,principal,group["zone_id"])
                         nodes[p["id"]]=p
+                        if set(node.labels)&INFRASTRUCTURE:infrastructure.add(node.element_id)
                     for rel in path.relationships:
                         rid=str(rel.element_id)
                         edges[rid]={"id":rid,"source":str(rel.start_node.element_id),
                                     "target":str(rel.end_node.element_id),"type":rel.type}
+                # Where the touched infrastructure sits: existing topology links only (rack,
+                # host, monitoring), bounded to three hops, ending at the group's own zone.
+                if infrastructure:
+                    for row in session.run(TOPOLOGY_QUERY,infra=sorted(infrastructure),zone=group["zone_id"]):
+                        path=row["path"]
+                        for node in path.nodes:
+                            p=project_node(node,principal,group["zone_id"])
+                            nodes[p["id"]]=p
+                        for rel in path.relationships:
+                            rid=str(rel.element_id)
+                            edges[rid]={"id":rid,"source":str(rel.start_node.element_id),
+                                        "target":str(rel.end_node.element_id),"type":rel.type}
                 # Separate verified authorization context; never join Person to
                 # camera, PPE detections, or SSH based on a contextual candidate.
                 from presentation.backend.app import face_observations
