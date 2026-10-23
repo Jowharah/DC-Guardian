@@ -25,6 +25,7 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
   - Colour coding by domain; the logo returns to the Monitoring Center.
 - **Tests:** 6 new browser tests in `e2e/usability-findings.spec.ts`, one per finding; existing tests updated for the new wording.
 - **Verified:** `check_all.py` 14 passed, 0 failed, 0 skipped (browser tests 20 passed, including the WCAG A/AA scan; GPU suites passed with Pillow 13.0.0).
+- **Security:** pip-audit reported advisories against pypdf 6.19.0 (published 2026-10-23, fixed in 6.21.1); it is now pinned to 6.21.1. The local knowledge index was rebuilt with it (13 sources, 257 chunks; the evaluated index had 255, a fresh install 258) and the retrieval evaluation re-run with **identical** results (Recall@3 0.961, Precision@3 0.716, MRR 0.97, filtering and provenance 1.00).
 - **Housekeeping:** the local environments are upgraded to Pillow 13.0.0, and the AI Investigator is switched off again in the local `.env` (it was on for T8).
 - **Caveats:**
   - The changes were made after the sessions and **were not re-tested with participants**.
