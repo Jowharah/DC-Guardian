@@ -54,5 +54,5 @@ Intervals: DC-GUARDIAN minus isolated, bootstrap over scenarios (1000 draws, 20 
 
 - **Shows:** on these scenarios, correlation reduces the number of alerts, presents multi-event incidents as one alert instead of fragments, and moves incidents up the review queue, because only linked groups reach HIGH.
 - **Does not show:** performance on real site data (the scenarios and topology are synthetic); that severity levels are correct (the scenarios have relatedness labels, not severity labels); or anything about response recommendations, which need a separate user evaluation.
-- **Bias:** the scenarios, the labels, the linkage rule and its known-mechanism list come from the same author; the linkage rule was selected on the dev split. Independent labels are pending.
+- **Bias:** the scenarios, the labels, the linkage rule and its known-mechanism list come from the same author; the linkage rule was selected on the dev split. No independent labelling round was run (dropped for time).
 - **Baseline design:** isolated monitoring here uses DC-GUARDIAN's own single-event policy, which caps single events at MEDIUM. A real single-domain tool might rank differently; the comparison measures the added value of correlation, not of any particular commercial tool.

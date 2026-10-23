@@ -1,6 +1,6 @@
 # DC-GUARDIAN usability study: protocol
 
-**Prepared:** 2026-10-15. Pilot: 2026-10-20 (`pilot_2026-10-20.md`). **Sessions: completing 2026-10-21.** This closes the gap in the proposal's evaluation plan: usability was promised and not yet measured.
+**Prepared:** 2026-10-15. Pilot: 2026-10-20 (`pilot_2026-10-20.md`). **Sessions: completed 2026-10-21/22 (P01–P03); results and changes in [`findings_2026-10.md`](findings_2026-10.md).** This closes the gap in the proposal's evaluation plan: usability was promised and not yet measured.
 
 | File | Who uses it | Purpose |
 |---|---|---|

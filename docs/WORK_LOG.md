@@ -18,6 +18,22 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-23 — Docs review before submission
+
+- **Reviewed:** all 28 files in `docs/`. None removed: the two historical documents (Project Development History, pre-dashboard Security Assessment) are linked from the READMEs and already labelled historical; no broken links.
+- **Updated:**
+  - Index: start with the installation guide; study findings linked.
+  - Roadmap: status at submission, the dropped labelling round, future work in one place.
+  - Validation: latest full check, dependency pins, fresh-install checks.
+  - Testing: browser-test suite.
+  - Datasets: 13 approved knowledge documents; 2 candidates and the planned policy are listed but not used. This corrects the "sixteenth source" wording.
+  - Response architecture: chunk count after the pypdf update.
+  - Usability kit: sessions completed.
+  - Development history: marked as a 2026-10-11 snapshot.
+- **Verified:** `check_all.py` on `main` with the graph fix: 14 passed, 0 failed, 0 skipped (backend 420, browser 24).
+
+---
+
 ## 2026-10-23 — Group graph: infrastructure linked to its zone; readable layout
 
 - **Why:** operator review. In a group's graph the servers and cameras had no link to their zone, and the relationship labels were hidden under the boxes.

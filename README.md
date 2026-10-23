@@ -2,7 +2,14 @@
 
 DC-GUARDIAN is a research prototype for multi-domain data-center monitoring, deterministic cross-domain reasoning, grounded response, and governed decision support. The architecture is organized as Evidence -> Reasoning -> Response -> Decision, with a controlled Presentation/dashboard prototype and ongoing security validation.
 
-> **Current baseline (`main`, 2026-10-11):** The five frozen Evidence domains, Reasoning/Neo4j correlation, approved-knowledge Response, deterministic Decision contracts, and the controlled Presentation dashboard are implemented in the research prototype. The Presentation layer now includes Monitoring Center, Scenario Lab, Analytics Dashboard, Human Review Queue, authenticated human-review audit records, and local audit-integrity verification. The AI Investigator is an opt-in, read-only research prototype (see [docs/AI_INVESTIGATOR.md](docs/AI_INVESTIGATOR.md)). Correlation covers any two events (pairs) and any connected set of three or more events (unified groups) across all five domains. Operators can record audited verdicts on any detector result, and the dashboard shows a research-only Bayesian estimate beside each correlation pair. `python check_all.py` runs every layer, and CI with security scans runs on every push. This is not a production deployment or security certification.
+> **Status at submission (`main`, 2026-10-23):**
+> - **Implemented and integrated:** all five layers (Evidence, Reasoning, Response, Decision, Presentation).
+> - **Dashboard:** Monitoring Center, Human Review Queue (To do / In progress / Completed), Analytics, Scenario Lab, and the opt-in, read-only AI Investigator (see [docs/AI_INVESTIGATOR.md](docs/AI_INVESTIGATOR.md)).
+> - **Correlation:** any two events (pairs) and any connected set of three or more (correlated groups) across all five domains.
+> - **Review:** verdicts on any detector result, with audit chains.
+> - **Usability study:** completed with three participants; findings and the changes made in response are in [docs/usability_study/findings_2026-10.md](docs/usability_study/findings_2026-10.md).
+> - **Checks:** `python check_all.py` runs every layer (14 checks), and CI with security scans runs on every push.
+> - **Caveat:** a research and industrial prototype, not a production deployment or security certification.
 
 **Install and run on a new computer:** [Installation and User Guide](docs/INSTALLATION_AND_USER_GUIDE.md) (`setup.ps1` installs everything and loads demo data; no GPU needed).
 
@@ -208,7 +215,9 @@ The threshold and enrollment set were not changed during the final test. These a
 
 ### PPE Detection
 
-The frozen PPE-v1 detector uses YOLOv8n trained on SH17. The locked final test contains 810 images.
+**Runtime detector: PPE-v2m** (YOLOv8m at 1,024 px, chosen 2026-10-14; locked-test mAP@0.5 0.625, helmet recall 0.664, vest recall 0.449). PPE-v1 stays frozen and selectable; PPE-v2 and PPE-v3 were trained and tested beside it. See [evidence/ppe_detection/README.md](evidence/ppe_detection/README.md) for every version.
+
+The frozen PPE-v1 baseline uses YOLOv8n trained on SH17. The locked final test contains 810 images.
 
 | Metric | Locked-test result |
 |---|---:|
@@ -303,7 +312,7 @@ The frozen Temporal Random Forest artifact is stored with Git LFS:
 evidence/predictive_maintenance/models/rf/temporal_rf_v2.joblib
 ```
 
-After cloning, ensure Git LFS is installed before relying on that artifact.
+After cloning, ensure Git LFS is installed before relying on that artifact; `setup.ps1` checks it (see the [Installation and User Guide](docs/INSTALLATION_AND_USER_GUIDE.md)).
 
 ## Local Configuration
 
@@ -316,7 +325,11 @@ Local credentials belong in `.env`, which is excluded from Git. `.env.example` d
 3. Response RAG and governed knowledge - IMPLEMENTED / VERIFIED
 4. Grounded specialist reasoning and cross-domain synthesis - IMPLEMENTED / VERIFIED
 5. Deterministic Decision rules - IMPLEMENTED / VERIFIED
-6. Presentation/dashboard integration - IMPLEMENTED (prototype); validation and hardening tracked in [docs/REMAINING_ROADMAP.md](docs/REMAINING_ROADMAP.md)
+6. Presentation/dashboard integration - IMPLEMENTED (prototype)
+7. Usability study and changes from its findings - COMPLETED (2026-10-21/22)
+8. Installation guide, one-command setup and submission snapshot - COMPLETED
+
+Future work (assignment of review items, an interactive tour, independent labels, a real-site pilot, production hardening) is listed in [docs/REMAINING_ROADMAP.md](docs/REMAINING_ROADMAP.md).
 
 ## Security Assessment
 
