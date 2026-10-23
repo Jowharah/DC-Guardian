@@ -145,6 +145,7 @@ test("v2 Decisions show on single events and groups, and the severity filter use
 
   await page.locator("button.feedRow", {hasText: "Correlated group"}).click();
   await expect(page.getByText("Rule-based Decision · DCG-DECISION-v2")).toBeVisible();
+  await page.getByRole("button", {name: "Full detail"}).click();
   await expect(page.getByText(/Unified Decision: HIGH · DCG-DECISION-v2 · validated on the author's labels only/)).toBeVisible();
 });
 

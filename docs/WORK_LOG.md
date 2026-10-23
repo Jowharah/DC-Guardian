@@ -6,6 +6,22 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-23 — Study quick wins: summaries, help, simple view, review progress, graph
+
+- **What (display only):**
+  - Headings no longer forced into Title Case.
+  - Neo4j graph: the zone node is highlighted; crowded graphs stagger columns so nodes do not overlap.
+  - Feed and summary text one size larger.
+  - "At a glance" summary for single events.
+  - "How to read this screen" help panel.
+  - "Who says what" note in the AI specialist and Investigator panels.
+  - Groups open in a Simple view, with Full detail on request.
+  - "Review progress" chart in Analytics.
+- **Rule kept:** the group-severity caveat (validated on the author's labels only) now also appears in the always-visible "At a glance" box, so the simple view never shows severity without it.
+- **Tests:** 2 new browser tests (single-event summary, help and AI note; review progress). The accessibility scan now covers the group in both views; it found a contrast problem in the new chart, which was fixed. Browser tests 24 passed; `check_all.py` 14 passed, 0 failed, 0 skipped.
+
+---
+
 ## 2026-10-23 — Calendar date range; Review Queue status tabs
 
 - **Why:** further study findings.

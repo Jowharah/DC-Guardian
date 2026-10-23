@@ -53,6 +53,14 @@ The changes are display-only: detector outputs, correlation rules, Decision rule
 | Too many Review Queue tabs; wanted completed / not completed / assigned, with outcomes as tags | P01, P03 | Three status tabs, **To do / In progress / Completed** (plus All); the detailed state (for example "Human override", "Group review needed") is a coloured tag on each item; "Inconclusive" counts as in progress, not done |
 | Wanted to filter by event type | P02 | Type filter in the Review Queue |
 | Wanted to choose days, not only 24 h / 7 days; filter by zone | P01 | Calendar date range (from / to) on the Monitoring Center feed and in Analytics; zone filter on the feed |
+| Inconsistent capitalisation in titles | P03 | Headings no longer forced into Title Case; each reads as written |
+| Neo4j graph unclear; wanted the zone highlighted | P01 | The zone node is highlighted in amber with a legend note; crowded graphs stagger columns so nodes no longer overlap |
+| Text too small on a laptop | P02 | Feed rows, domain counts and summary-card details one size larger |
+| Wanted a short summary before the detail | P01 | "At a glance" summary for single events too: result, what it means, review state, who decides |
+| Wanted a short guide to the terms | P03 | "How to read this screen" panel on the Monitoring Center (collapsed by default) |
+| Wanted clearer explanation of AI output versus verdicts | P03 | A "Who says what" note in every AI panel: the detector produced it, the AI only explains, fixed rules set severity, the human verdict counts |
+| Wanted a simpler main view with detail on demand | P03 | Groups open in a **Simple view** (summary, Decision, events and verdicts, investigation state); **Full detail** adds the graph, timeline, AI analysis and source links. The group-severity caveat stays visible in both |
+| SOAR-style status charts (completed, pending) | Facilitator | "Review progress" chart in Analytics: completed / in progress / to do per domain and for groups |
 
 Browser tests cover each change (`presentation/frontend/e2e/usability-findings.spec.ts`).
 
@@ -60,8 +68,7 @@ Browser tests cover each change (`presentation/frontend/e2e/usability-findings.s
 
 - **Work management:** assignment and team workload, and auto-assignment by role (P01, P02).
 - **Filters:** by user or team (needs assignment first).
-- **Onboarding:** a beginner overview page with detail on advanced pages, and a short introductory tour (P03).
-- **Navigation:** SOAR-style status charts such as completed and pending (facilitator).
+- **Onboarding:** an interactive first-time tour (P03). The help panel and the simple view cover part of this.
 - **Recommended next study:** repeat the concept check (Q1–Q6) and T3 with new participants, to measure whether the changes help.
 
 ## Domain remark
