@@ -26,7 +26,7 @@ export default function LifecyclePanel({subjectType,subjectId}:{subjectType:stri
  }
  if(!data)return error?<section className="panel evidenceItem" aria-label="Investigation state"><h4>Investigation state</h4><p role="status">{error}</p></section>:null;
  const canStart=["OPEN","REOPENED","REOPENED_EVIDENCE_CHANGED"].includes(data.state);
- return <section className="panel evidenceItem lifecyclePanel" aria-label="Investigation state">
+ return <section id="investigationState" className="panel evidenceItem lifecyclePanel" aria-label="Investigation state">
   <h4>Investigation state</h4>
   <p><span className={`severity lifecycle-${data.state.toLowerCase()}`}>{words(data.state).toUpperCase()}</span>{data.assignee&&<> · reviewer {data.assignee}</>}{data.resolution&&<> · {words(data.resolution)}</>}</p>
   {data.state==="REOPENED_EVIDENCE_CHANGED"&&<p className="muted">Evidence or a human verdict changed after this was resolved; review it again.</p>}
