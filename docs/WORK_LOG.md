@@ -16,6 +16,11 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
   - Layered layout by hop distance from the zone; nodes not linked to the zone follow by type.
   - 270 px between columns; the canvas widens and scrolls sideways rather than overlapping.
   - Lines are drawn first, then nodes, then relationship labels on top.
+- **Recognized face to person:** dashboard face uploads (`image_evidence_mapping.py`) were written with only OBSERVED_BY. A recognized face now also links to the existing Person with IDENTIFIES, as the face Common Event ingestion does; a Person is never created.
+  - The group graph includes IDENTIFIES.
+  - The two recognized face images already in the local graph were linked once by a one-off script applying the same rule.
+  - Example: Face Identification → IDENTIFIES → P005. P005 is authorized only for ZONE-B, so the graph shows no AUTHORIZED_FOR edge to ZONE-A; that is why the face result is UNAUTHORIZED.
+- **Labels:** relationship labels that would overlap where edges cross are nudged apart.
 - **Tests:** a new backend test checks that only the topology relationship types are followed, that the query is bounded, and which nodes and edges are added. Backend tests 418 passed; browser tests 24 passed.
 
 ---

@@ -56,6 +56,15 @@ def project_observation(kind,observation_id,assessment,metadata):
                 timestamp=metadata["captured_at"],observation_id=observation_id).single()
             if result is None:
                 raise ValueError("Declared camera is not present in Neo4j")
+            # A recognized face identifies an existing staff member: link the Event to that
+            # Person, as the face Common Event ingestion does (ingest_event). Never create a
+            # Person here; identity and authorization belong to the loaded topology.
+            if kind=="face" and state=="RECOGNIZED" and assessment.get("person_id"):
+                session.run("""
+                  MATCH (event:Event {event_id:$event_id})
+                  MATCH (person:Person {person_id:$person_id})
+                  MERGE (event)-[:IDENTIFIES]->(person)
+                """,event_id=event_id,person_id=assessment["person_id"])
     finally:
         driver.close()
     return {"event_id":event_id,"graph_status":"PROJECTED",

@@ -58,7 +58,7 @@ def unified_graph(group_id:str,principal:Principal=Depends(current_principal)):
     if len(ids)>40:raise HTTPException(409,"Graph exceeds bounded Evidence limit")
     query="""MATCH (e:Event) WHERE e.event_id IN $ids
        OPTIONAL MATCH p=(e)-[r]->(n)
-       WHERE type(r) IN ['OBSERVED_BY','TARGETS','ORIGINATED_FROM','DETECTED_AT']
+       WHERE type(r) IN ['OBSERVED_BY','TARGETS','ORIGINATED_FROM','DETECTED_AT','IDENTIFIES']
          AND NOT n:Event
        RETURN e,p LIMIT 160"""
     nodes={};edges={};found=set();infrastructure=set()
