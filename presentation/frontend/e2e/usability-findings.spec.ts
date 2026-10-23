@@ -94,5 +94,5 @@ test("feed and analytics can be limited to calendar dates", async ({page}) => {
   await expect(rows.first()).toBeVisible();
   await expect(page.getByLabel("Filter by zone")).toBeVisible();
   await page.getByRole("button", {name: /Analytics Dashboard/}).click();
-  await expect(page.getByRole("group", {name: "Custom dates: date range"})).toBeVisible();
+  await expect(page.getByRole("group", {name: "Custom period date range"})).toBeVisible();
 });

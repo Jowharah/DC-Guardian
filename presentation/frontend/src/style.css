@@ -474,3 +474,13 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-vi
 .status-in_progress{background:#1E2B4A;border-color:#6EA8FE;color:#DCE8FF}
 .status-done{background:#1F4A3A;border-color:#59C79A;color:#D8FFF0}
 .queueTabList{display:flex;flex-wrap:wrap;gap:8px}
+/* Polish after operator review (2026-10-23): even queue tabs; custom period on its own row. */
+.queueTabList .analyticsRangeOption{flex:0 0 auto;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:10px;white-space:nowrap;padding:12px 22px;font-size:14px}
+.queueTabList .reviewItemCount{min-width:26px;text-align:center}
+.customPeriod{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:12px;padding:10px 14px;border:1px dashed #655080;border-radius:9px;background:rgba(110,88,143,.08)}
+.customPeriod.selected{border-style:solid;border-color:#c9a7eb;background:rgba(128,54,139,.22)}
+.customPeriodTitle{font-size:13px;font-weight:600;color:#f0e7fa}
+.customPeriod .dateRange,.feedFilters .dateRange{font-size:13px;gap:10px}
+.dateRange label{display:inline-flex;align-items:center;gap:8px}
+.dateRange input{padding:9px 10px;font:inherit;font-size:13px;min-height:40px}
+.feedFilters select{min-height:40px}

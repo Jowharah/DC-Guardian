@@ -12,9 +12,9 @@ export function inDateRange(time:string|null|undefined,from:string,to:string){
  const {lower,upper}=dayBounds(from,to);
  return t>=lower&&t<=upper;
 }
-export default function DateRangeInputs({from,to,onChange,label="Received"}:{from:string;to:string;onChange:(from:string,to:string)=>void;label?:string}){
+export default function DateRangeInputs({from,to,onChange,label="Received",fromText}:{from:string;to:string;onChange:(from:string,to:string)=>void;label?:string;fromText?:string}){
  return <span className="dateRange" role="group" aria-label={`${label} date range`}>
-  <label>{label} from <input type="date" value={from} max={to||undefined} onChange={e=>onChange(e.target.value,to)}/></label>
+  <label>{fromText??`${label} from`} <input type="date" value={from} max={to||undefined} onChange={e=>onChange(e.target.value,to)}/></label>
   <label>to <input type="date" value={to} min={from||undefined} onChange={e=>onChange(from,e.target.value)}/></label>
   {(from||to)&&<button type="button" className="linkButton" onClick={()=>onChange("","")}>Clear dates</button>}
  </span>;
