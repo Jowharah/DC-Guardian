@@ -16,14 +16,22 @@ All data is synthetic or public test data.
 | | Minimum | Notes |
 |---|---|---|
 | Operating system | Windows 10 or 11 | Tested on Windows 11. The commands in section 4 also work on Linux or macOS with `/` paths and `bin/` instead of `Scripts\` (not tested). |
-| Memory and disk | 16 GB RAM; 15 GB free disk | The Python packages (TensorFlow, PyTorch) are large |
+| Memory and disk | 16 GB RAM recommended (8 GB works for the demo); 15 GB free disk | The Python packages (TensorFlow, PyTorch) are large. Setup and every check also passed on a laptop with 7.4 GB RAM |
 | GPU | **Not required** | With an NVIDIA GPU, PPE image checks are faster (optional `.venv-ppe`, section 7.1) |
 | Git + **Git LFS** | Git 2.40+, Git LFS 3+ | LFS stores the 318 MB drive-failure model. Install from <https://git-lfs.com>, then run `git lfs install` once |
 | Python | **3.12** | <https://www.python.org/downloads/>; tick "Add python.exe to PATH" |
 | Node.js | 20 or newer | <https://nodejs.org> (LTS) |
 | Neo4j | 2026.08 (tested) | Neo4j Desktop (<https://neo4j.com/download/>) is easiest. Other recent versions and Community Server should work but were not tested. |
-| OpenAI API key | Optional | Only for the AI Investigator and the specialist agents (section 7.3) |
+| OpenAI API key | Optional | For the AI Investigator and the specialist agents (section 7.3). **Without a key**, the Decisions for **SSH events** and for **drive + room-temperature pairs** are not made, because their rules need a specialist analysis first. Correlated groups and single PPE, face, drive and sensor results still get a rule-based severity |
 | Internet | During setup | Packages, the embedding model for the knowledge index, and the face models DeepFace downloads on first use |
+
+After installing the prerequisites, **close and reopen PowerShell (or VS Code)**; otherwise `git` and `node` are "not recognized". Then check them before the long install:
+
+```powershell
+git --version; git lfs version; py -3.12 --version; node --version
+```
+
+Each command should print a version (Git 2.40+, Git LFS 3+, Python 3.12, Node.js 20+).
 
 ## 2. Get the code
 
@@ -48,7 +56,7 @@ In the rest of this guide, "the project folder" is `DC-Guardian` or `SystemCode`
 
 ## 3. Prepare Neo4j
 
-1. Install and open **Neo4j Desktop**. Create a local instance, set a password you will remember, and **Start** it.
+1. Install and open **Neo4j Desktop**. Create a local instance, set a password you will remember, and **Start** it. The instance name can be anything; the database user is always `neo4j`.
 2. The dashboard connects to `bolt://127.0.0.1:7687` with user `neo4j`. Use `127.0.0.1` rather than `localhost`: on Windows, `localhost` adds about 2 seconds per connection.
 3. Keep Neo4j running whenever DC-GUARDIAN runs.
 
@@ -60,12 +68,12 @@ In PowerShell, in the project folder:
 powershell -ExecutionPolicy Bypass -File setup.ps1
 ```
 
-It asks for your Neo4j password and a new dashboard password. It takes about 20–40 minutes, mostly package downloads. It then:
+It asks for your Neo4j password and a new dashboard password. It takes about 15–40 minutes, mostly package downloads (15 minutes on a test laptop with some packages already cached). It then:
 
 1. checks Python 3.12, Node.js and, in a Git clone, Git LFS;
 2. fetches the LFS model file (in a Git clone) and checks that it is the real model;
 3. creates the Python environment `.venv-dc-guardian` from `requirements.txt`;
-4. creates `.env` from `.env.example`: Neo4j settings, the dashboard login (user `operator`, role administrator, zones A–C), AI Investigator off;
+4. creates `.env` from `.env.example`: Neo4j settings, the dashboard login (user `DCG_LOCAL_USER`, `operator` by default; role administrator, zones A–C), AI Investigator off. An existing `.env` is kept;
 5. installs the frontend packages (`npm ci`);
 6. loads the DC-01 data-centre topology into Neo4j (zones, racks, servers, sensors, cameras, staff and their zone access);
 7. verifies the 13 approved public knowledge documents (NIST, CISA, OSHA, U.S. DOE; bundled in the repository, see `response/rag/knowledge_base/bundled/README.md`) and builds the local search index for the RAG specialists;
@@ -76,13 +84,14 @@ It asks for your Neo4j password and a new dashboard password. It takes about 20�
 - `-Face`: add a separate face environment.
 - `-SkipRag`: no knowledge index; specialists then report knowledge as unavailable.
 - `-SkipDemo`: no demo data.
+- `-NeoPassword <pw> -DashboardPassword <pw>`: give both passwords instead of being asked, for an unattended run. They stay in the shell history, so the prompt is safer; creating `.env` yourself before running also works.
 
 The script is safe to re-run.
 
 <details><summary>Manual installation (other operating systems, or step by step)</summary>
 
 ```powershell
-python -m venv .venv-dc-guardian
+py -3.12 -m venv .venv-dc-guardian
 .venv-dc-guardian\Scripts\python.exe -m pip install -r requirements.txt
 copy .env.example .env        # then fill NEO4J_URI=bolt://127.0.0.1:7687, NEO4J_USER=neo4j,
                               # NEO4J_PASSWORD, NEO4J_DATABASE=neo4j, DCG_LOCAL_USER, DCG_LOCAL_PASSWORD,
@@ -110,7 +119,7 @@ cd presentation\frontend
 npm run dev
 ```
 
-Open **<http://127.0.0.1:5173>** and sign in as `operator` with the dashboard password you chose. To stop, press Ctrl+C in both terminals.
+Open **<http://127.0.0.1:5173>** and sign in with the user in `DCG_LOCAL_USER` in `.env` (`operator` unless you changed it) and the dashboard password you chose. To stop, press Ctrl+C in both terminals.
 
 If ports 5173 or 8000 are taken, set `DCG_FRONTEND_PORT` and `DCG_BACKEND_URL` (for example `$env:DCG_BACKEND_URL="http://127.0.0.1:8010"`) before `npm run dev`, and start the backend on that port.
 
@@ -127,7 +136,7 @@ A five-minute tour:
    - The event feed lists every result, newest first, colour-coded by domain. Filter it by date (**Received from … to …**), zone and severity.
 2. **Open the Environmental + Maintenance correlation in ZONE-B:**
    - It links a drive-risk result and a room-temperature result by place and time.
-   - It shows its rule-based Decision, the rules that set it, and the Bayesian estimate of how likely the two are related.
+   - It shows the Bayesian estimate of how likely the two are related. With an OpenAI key, run its specialist evaluation (section 7.3) to get its rule-based Decision and the rules that set it; without a key, the pair has no Decision.
    - Correlation is context, not proof of cause.
    - Three or more linked results form a **correlated group**; add a camera image in ZONE-B through Scenario Lab to see one. A group opens with an **At a glance** box: why grouped, **not proof of cause**, severity **set by fixed rules, not by AI** (with the caveat "validated on the author's labels only"), and the review status. **Simple view** shows the essentials; **Full detail** adds the graph, timeline, AI analysis and source links.
 3. **Open a single result:**
@@ -157,6 +166,8 @@ Face recognition needs an **enrollment** of known staff faces, which is never in
 Without an enrollment, a face upload answers "FACE_ENROLLMENT_MISSING"; everything else works.
 
 ### 7.3 AI Investigator and specialist agents (OpenAI)
+
+The key enables the AI Investigator, the specialist panels, and the Decisions for SSH events and drive + room-temperature pairs (their rules use the specialist's analysis; the severity itself still comes only from the fixed rules).
 
 1. Put your key in `.env` (`OPENAI_API_KEY=...`) and set `DCG_INVESTIGATOR_ENABLED=1`.
 2. Restart the backend.
@@ -192,12 +203,18 @@ How it works when enabled:
 It runs every test suite (about 5 minutes) and writes `logs\checks\<time>\report.md`. On a fresh installation:
 - **Expected skips:** tests needing private data (face photos, training datasets) or a GPU environment skip with a stated reason.
 - **Live API smoke test:** runs only while the backend is running.
+- **No OpenAI calls:** the checks never call OpenAI. Specialist tests use recorded answers, so passing checks do not show that the Decisions needing a key (section 1) exist.
+
+On the test laptop the checks took about 5 minutes: 12 passed, 0 failed, 2 skipped (GPU environments not installed).
 
 ## 10. Troubleshooting
 
 | Problem | Fix |
 |---|---|
 | Setup step 2: "is a small Git LFS placeholder", or a maintenance error | The drive-failure model was not downloaded. In a clone, run `git lfs install` and then `git lfs pull`. From GitHub's "Download ZIP", clone the repository instead (section 2) |
+| "git is not recognized" (or `node`) right after installing it | Close and reopen PowerShell or VS Code (section 1) |
+| A drive + room-temperature pair or an SSH event has no Decision; "Decision unavailable" (503) | Expected without an OpenAI key (section 1). Add a key (section 7.3) and run the specialist evaluation |
+| Harmless setup messages | Expected, no action needed: step 8 "specialist unavailable … OPENAI_API_KEY is not configured" (the demo loader never sends data to OpenAI); npm "install-scripts … esbuild … not yet covered by allowScripts"; Hugging Face "unauthenticated requests to the HF Hub" and a symlink warning while building the index; pip "Connection interrupted … Attempting to resume" |
 | "Neo4j not reachable" | Start the instance in Neo4j Desktop; check `NEO4J_PASSWORD` in `.env` and use `bolt://127.0.0.1:7687` |
 | Dashboard shows "API unavailable" | The backend is not running, or it runs on another port (section 5) |
 | PPE upload is slow | Normal on CPU (0.5–2 s); the first upload after starting also loads the model (5–15 s) |

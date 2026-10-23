@@ -6,6 +6,18 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-23 — Installation guide and setup fixes from a laptop installation test
+
+- **Why:** the operator installed DC-GUARDIAN on a separate laptop by following the guide (Windows 11, 7.4 GB RAM, no NVIDIA GPU, no OpenAI key, clone at `77a2704`). Setup finished all 8 steps, the app started and sign-in worked; `check_all.py` 12 passed, 0 failed, 2 skipped (GPU environments). Timing: prerequisites 15–20 min, `setup.ps1` 15.4 min (some packages cached), checks 5.4 min.
+- **Main finding (guide fixed; code unchanged, operator decision):** without an OpenAI key, the Decisions for SSH events and for drive + room-temperature pairs are not made. Their v1 rules (`decision/rules.py`) take the grounded specialist's assessment as input, so `operational_decision.py` and the SSH pipeline return 503 / PARTIAL without a specialist. Groups and single PPE, face, drive and sensor results (DCG-DECISION-v2) need no key. The guide had called the key optional for everything and promised the pair's Decision in the tour.
+  - Guide: section 1 says what needs the key; tour step 2 and section 7.3 say the pair's Decision comes from its specialist evaluation; section 9 says the checks never call OpenAI and so cannot show these Decisions; Troubleshooting has the "no Decision / 503" case.
+  - Changing the Decision path to run without a specialist would be a new rule version; left as future work.
+- **Other guide fixes:** reopen PowerShell after installing prerequisites, with a version check; "16 GB recommended (8 GB works for the demo)"; the Neo4j instance name is free and the user is always `neo4j`; the login is `DCG_LOCAL_USER` from `.env` (default `operator`); `py -3.12 -m venv` in the manual steps; harmless setup messages (demo loader specialist warning, npm esbuild, Hugging Face, pip resume) listed as expected.
+- **`setup.ps1`:** optional `-NeoPassword` and `-DashboardPassword` for unattended runs (prompts remain the default); the closing message prints the real `DCG_LOCAL_USER`; the model size is shown in decimal MB (318 MB, as in the guide; it printed 303, i.e. MiB).
+- **Verified:** PowerShell parser 0 errors on `setup.ps1`; the login lookup tested with a set user, no user line and an empty value (falls back to `operator`). The guide PDF and its code-version label are regenerated in the final submission refresh.
+
+---
+
 ## 2026-10-23 — Docs review before submission
 
 - **Reviewed:** all 28 files in `docs/`. None removed: the two historical documents (Project Development History, pre-dashboard Security Assessment) are linked from the READMEs and already labelled historical; no broken links.

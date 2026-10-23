@@ -8,10 +8,11 @@ Neo4j (tested with 2026.08, for example in Neo4j Desktop) whose password you kno
     powershell -ExecutionPolicy Bypass -File setup.ps1 -Gpu       # also .venv-ppe (NVIDIA GPU for PPE)
     powershell -ExecutionPolicy Bypass -File setup.ps1 -Face      # also .venv-face
     ... -SkipRag  (no download of the approved knowledge documents) / -SkipDemo (no demo data)
+    ... -NeoPassword <pw> -DashboardPassword <pw>  (unattended run: no prompts; the values stay in the shell history)
 
 Safe to re-run: finished steps are skipped or repeated harmlessly. Nothing is sent to OpenAI.
 #>
-param([switch]$Gpu, [switch]$Face, [switch]$SkipRag, [switch]$SkipDemo)
+param([switch]$Gpu, [switch]$Face, [switch]$SkipRag, [switch]$SkipDemo, [string]$NeoPassword, [string]$DashboardPassword)
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 $Py = Join-Path $PSScriptRoot ".venv-dc-guardian\Scripts\python.exe"
@@ -38,7 +39,7 @@ Step "2/8 Fetch large model files (Git LFS)"
 if ($inGit) { Run "git" @("lfs", "pull") } else { Write-Host "Not a Git clone (ZIP download?): checking the model file only." }
 $rf = "evidence\predictive_maintenance\models\rf\temporal_rf_v2.joblib"
 if ((Get-Item $rf).Length -lt 1MB) { Fail "$rf is a small Git LFS placeholder, not the model. Clone the repository with git and Git LFS instead (see the guide)." }
-Write-Host "OK ($([int]((Get-Item $rf).Length / 1MB)) MB maintenance model present)"
+Write-Host "OK ($([int]((Get-Item $rf).Length / 1000000)) MB maintenance model present)"  # decimal MB, as in the guide
 
 Step "3/8 Python environments"
 if (-not (Test-Path $Py)) { Run $base[0] @($baseArgs + @("-m", "venv", ".venv-dc-guardian")) }
@@ -54,8 +55,8 @@ foreach ($opt in @(@{On = $Gpu; Dir = ".venv-ppe"; Req = "requirements-ppe.txt"}
 
 Step "4/8 Local settings (.env)"
 if (-not (Test-Path ".env")) {
-    $neo = Read-Host "Neo4j password (the one you set in Neo4j)"
-    $dash = Read-Host "Choose a password for the DC-GUARDIAN dashboard login (user: operator)"
+    $neo = $NeoPassword; if (-not $neo) { $neo = Read-Host "Neo4j password (the one you set in Neo4j)" }
+    $dash = $DashboardPassword; if (-not $dash) { $dash = Read-Host "Choose a password for the DC-GUARDIAN dashboard login (user: operator)" }
     (Get-Content ".env.example") `
         -replace '^NEO4J_URI=$', 'NEO4J_URI=bolt://127.0.0.1:7687' -replace '^NEO4J_USER=$', 'NEO4J_USER=neo4j' `
         -replace '^NEO4J_PASSWORD=$', "NEO4J_PASSWORD=$neo" -replace '^NEO4J_DATABASE=$', 'NEO4J_DATABASE=neo4j' `
@@ -93,4 +94,6 @@ if ($SkipDemo) { Write-Host "Skipped (-SkipDemo)." } else { Run $Py @("demo_data
 
 Write-Host "`nSETUP COMPLETE." -ForegroundColor Green
 Write-Host "Start the backend:   .venv-dc-guardian\Scripts\python.exe -m uvicorn presentation.backend.app.main:app --host 127.0.0.1 --port 8000"
-Write-Host "Start the frontend:  cd presentation\frontend; npm run dev     then open http://127.0.0.1:5173 (user: operator)"
+$user = $null; $m = Select-String -Path ".env" -Pattern '^DCG_LOCAL_USER=(.+)$' | Select-Object -First 1; if ($m) { $user = $m.Matches[0].Groups[1].Value.Trim() }
+if (-not $user) { $user = "operator" }
+Write-Host "Start the frontend:  cd presentation\frontend; npm run dev     then open http://127.0.0.1:5173 (user: $user)"
