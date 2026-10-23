@@ -1,11 +1,11 @@
 # DC-GUARDIAN documentation index
 
-**Updated:** 2026-10-11  
+**Updated:** 2026-10-23  
 **Scope:** DC-GUARDIAN research prototype on `main`; controlled/synthetic demonstration, not production certification.
 
 For the current OpenAI-powered investigation feature, see [AI Investigator](AI_INVESTIGATOR.md) (all five Evidence domains, correlations, conversation history, source manifests, privacy and grounding limitations).
 
-Start with [Project Development History](PROJECT_DEVELOPMENT_HISTORY.md) for what has been implemented, the [Work Log](WORK_LOG.md) for dated changes, commits and the agreed testing plan, [Validation and Operations](VALIDATION_AND_OPERATIONS.md) for reproducible commands and tested boundaries, and [Remaining Roadmap](REMAINING_ROADMAP.md) for open work.
+New to the project? Start with the [Installation and User Guide](INSTALLATION_AND_USER_GUIDE.md). For the history: [Project Development History](PROJECT_DEVELOPMENT_HISTORY.md) (snapshot of 2026-10-11), the [Work Log](WORK_LOG.md) for dated changes, commits and the agreed testing plan, [Validation and Operations](VALIDATION_AND_OPERATIONS.md) for reproducible commands and tested boundaries, and [Remaining Roadmap](REMAINING_ROADMAP.md) for open work.
 
 Working on the repository with Claude Code: see [`CLAUDE.md`](../CLAUDE.md) at the repository root for rules, commands and conventions.
 
@@ -15,6 +15,7 @@ Working on the repository with Claude Code: see [`CLAUDE.md`](../CLAUDE.md) at t
 - [Report draft: evaluation against single-domain monitoring, and latency](report/evaluation_baseline_and_latency.md) — answers the proposal's research question on the labelled scenarios (held-out test split, bootstrap intervals) and reports per-stage pipeline latency.
 - [Report draft: PPE detector v2](report/ppe_v2_model_enhancement.md) — model enhancement: protocol, validation selection, the official locked test (helmet and overall improved, vest regressed) and the post-hoc evaluation of all candidates.
 - [Report draft: industrial deployment considerations](report/industrial_deployment_considerations.md) — section for the project report: controls in place and how they were verified, production requirements, threat-model summary, limitations.
+- [Usability study: findings and changes](usability_study/findings_2026-10.md) — results of the October 2026 sessions (P01–P03: tasks, SUS, concept check, trust), the problems found and the dashboard changes made in response; future work.
 - [Usability study kit](usability_study/README.md) — protocol, facilitator script, task cards, answer key, observation sheet, questionnaire (SUS, concept check, trust) and results template; scored with `presentation/backend/validation/usability_score.py`.
 - [Datasets and Citations](DATASETS_AND_CITATIONS.md) — every dataset, pretrained model and knowledge source used, with the citation and licence terms each requires (BibTeX), and what the terms mean for academic versus commercial use.
 - [Testing](TESTING.md) — what each test suite covers, markers and automatic skips, commands, how the script tests were converted to pytest and shown to be equivalent, how to write new tests.

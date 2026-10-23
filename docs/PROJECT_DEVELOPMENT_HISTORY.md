@@ -1,6 +1,6 @@
 # DC-GUARDIAN — Development history and current implementation
 
-**Snapshot:** 2026-10-11, `main` · dated change log: [Work Log](WORK_LOG.md)  
+**Snapshot:** 2026-10-11, `main` · historical; for everything after 2026-10-11 (testing, model enhancement, usability study, installation) see the [Work Log](WORK_LOG.md)  
 **Purpose:** consolidate earlier model, reasoning, response, decision, presentation, and security stages without rewriting historical validation reports.
 
 ## Architecture
