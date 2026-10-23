@@ -6,6 +6,21 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-23 — Calendar date range; Review Queue status tabs
+
+- **Why:** further study findings.
+  - P01 wanted to choose days, not only fixed periods.
+  - P01 and P03 found the eleven Review Queue tabs too many; they wanted completed / not completed / assigned, with outcomes as tags.
+  - P02 wanted a filter by event type.
+- **What (display only):**
+  - Calendar date range (`DateRange.tsx`) on the Monitoring Center feed, with a zone filter, and as custom dates in Analytics.
+  - Review Queue: tabs **To do / In progress / Completed / All** with counts; type filter; the detailed state as a coloured tag on each item. Inconclusive counts as in progress.
+  - Opening an item from another page clears the feed filters, so the item is always visible.
+- **Tests:** 2 new browser tests (status tabs and type filter; date range and zone filter); the override test now checks that a recorded verdict moves the item to Completed. Browser tests 22 passed, including the WCAG A/AA scan.
+- **Caveat:** assignment of items to people is not implemented (future work), so there is no "Assigned" tab.
+
+---
+
 ## 2026-10-23 — Usability study results; dashboard changes from its findings
 
 - **Study:** P01–P03 completed (21–22 Oct), after the pilot on 20 Oct.

@@ -34,7 +34,9 @@ test("operator overrides a PPE result and it shows as human verified", async ({p
   expect(post?.body).toMatchObject({verdict: "OVERRIDDEN", corrected_status: "COMPLIANT", acknowledgment: true});
 
   // The queue and Monitoring Center reflect the override; the detector result stays visible.
-  await expect(item.getByText("HUMAN OVERRIDDEN")).toBeVisible({timeout: 10_000});
+  // A recorded verdict moves the item from "To do" to "Completed", tagged with the outcome.
+  await page.getByRole("tab", {name: /Completed/}).click();
+  await expect(item.locator(".statusTag")).toHaveText("Human override", {timeout: 10_000});
   await page.getByRole("button", {name: /Monitoring Center/}).first().click();
   await expect(page.getByText("COMPLIANT · HUMAN VERIFIED")).toBeVisible({timeout: 10_000});
   // Opening the overridden image must not crash the page (regression: the detail has no top-level status).

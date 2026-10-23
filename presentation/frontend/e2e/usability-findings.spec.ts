@@ -66,3 +66,33 @@ test("the logo returns to the Monitoring Center", async ({page}) => {
   await page.getByRole("button", {name: "DC-GUARDIAN home: Monitoring Center"}).click();
   await expect(page.getByRole("heading", {name: "Security & operations overview"})).toBeVisible();
 });
+
+test("the review queue has three status tabs and tags each item with its detailed state", async ({page}) => {
+  // Finding: eleven category tabs were too many (P01, P03); filter by event type (P02).
+  await installMockApi(page);
+  await signIn(page);
+  await page.getByRole("button", {name: /Human Review Queue/}).click();
+  await expect(page.getByRole("tab")).toHaveText([/To do/, /In progress/, /Completed/, /All/]);
+  await expect(page.getByRole("tab", {name: /To do/})).toHaveAttribute("aria-selected", "true");
+  const ppe = page.locator("article.reviewRecord", {hasText: PPE_ID});
+  await expect(ppe.locator(".statusTag")).toHaveText("Not reviewed");
+  await page.getByLabel("Filter by event type").selectOption("SSH");
+  await expect(ppe).toHaveCount(0);
+  await expect(page.locator("article.reviewRecord", {hasText: SSH_ID}).first()).toBeVisible();
+});
+
+test("feed and analytics can be limited to calendar dates", async ({page}) => {
+  // Finding: P01 wanted to choose days, not only fixed periods; filter by zone (P01).
+  await installMockApi(page);
+  await signIn(page);
+  const rows = page.locator("button.feedRow");
+  await expect(rows.first()).toBeVisible();
+  await page.getByRole("group", {name: "Received date range"}).getByLabel(/from/).fill("2000-01-01");
+  await page.getByRole("group", {name: "Received date range"}).getByLabel(/^to/).fill("2000-01-02");
+  await expect(rows).toHaveCount(0);
+  await page.getByRole("button", {name: "Clear dates"}).click();
+  await expect(rows.first()).toBeVisible();
+  await expect(page.getByLabel("Filter by zone")).toBeVisible();
+  await page.getByRole("button", {name: /Analytics Dashboard/}).click();
+  await expect(page.getByRole("group", {name: "Custom dates: date range"})).toBeVisible();
+});

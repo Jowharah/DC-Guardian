@@ -460,3 +460,17 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-vi
 .meaningNote{background:#3A2B12;border:1px solid #F2B84B;color:#FFE9C2;border-radius:10px;padding:10px 14px;line-height:1.5}
 .groupEventItem{border:1px solid #3E2D55;border-radius:10px;padding:8px 12px;margin:8px 0}
 .groupEventVerdict{margin-top:6px}.groupEventVerdict summary{cursor:pointer;color:#E3B8E0;font-size:13px}
+
+/* Calendar date range and Review Queue status tabs (usability study, P01-P03). */
+.dateRange{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:#C9B6D3}
+.dateRange input{background:#21142D;color:#F4E5F3;border:1px solid #524184;border-radius:8px;padding:6px 8px;color-scheme:dark}
+.feedFilters{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px}
+.feedFilters select{background:#21142D;color:#F4E5F3;border:1px solid #524184;border-radius:8px;padding:8px}
+.queueTabs{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.queueTypeFilter{margin-left:auto;font-size:12px;color:#C9B6D3;display:inline-flex;gap:8px;align-items:center}
+.queueTypeFilter select{background:#21142D;color:#F4E5F3;border:1px solid #524184;border-radius:8px;padding:6px 8px}
+.statusTag{border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;border:1px solid}
+.status-todo{background:#3A2B12;border-color:#F2B84B;color:#FFE9C2}
+.status-in_progress{background:#1E2B4A;border-color:#6EA8FE;color:#DCE8FF}
+.status-done{background:#1F4A3A;border-color:#59C79A;color:#D8FFF0}
+.queueTabList{display:flex;flex-wrap:wrap;gap:8px}

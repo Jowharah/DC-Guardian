@@ -1,4 +1,5 @@
 import {useEffect,useState} from "react";
+import DateRangeInputs,{dayBounds} from "./DateRange";
 import {getUnifiedHumanReviews,type HumanReviewRecord,type LatestEvidenceReview} from "./api";
 import type {Incident,PublishedSSH,PPEObservation,FaceObservation,MaintenanceEvent,EnvironmentalEvent,OperationalCorrelation,UnifiedCorrelationGroup} from "./api";
 type Props={incidents:Incident[];ssh:PublishedSSH[];ppe:PPEObservation[];face:FaceObservation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];operational:OperationalCorrelation[];unified:UnifiedCorrelationGroup[];verdicts?:Record<string,LatestEvidenceReview>;decisions?:DecisionRow[];openMonitoring:()=>void;openEvent?:(id:string)=>void};
@@ -22,6 +23,8 @@ function Bars({items,onSelect}:{items:{name:string;value:number}[];onSelect?:(na
 export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,environment,operational,unified,verdicts={},decisions:allDecisions=[],openMonitoring,openEvent}:Props){
 
  const [range,setRange]=useState("all");
+ const [customFrom,setCustomFrom]=useState("");
+ const [customTo,setCustomTo]=useState("");
  const [audit,setAudit]=useState<Record<string,HumanReviewRecord[]>>({});
  const [auditUnavailable,setAuditUnavailable]=useState<string[]>([]);
  const groupIds=unified.map(g=>g.id).sort().join("|");
@@ -49,7 +52,8 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
 
  const [selection,setSelection]=useState<{type:"domain"|"severity"|"zone"|"correlation"|"review"|"outcome";value:string}|null>(null);
  const cutoff=range==="all"?-Infinity:Date.now()-({"24h":1,"7d":7,"30d":30}[range]??0)*86400000;
- const valid=(value:string|null|undefined)=>{const t=Date.parse(value??"");return Number.isFinite(t)&&t<=Date.now()&&t>=cutoff};
+ const custom=range==="custom"?dayBounds(customFrom,customTo):null;
+ const valid=(value:string|null|undefined)=>{const t=Date.parse(value??"");return Number.isFinite(t)&&t<=Date.now()&&(custom?t>=custom.lower&&t<=custom.upper:t>=cutoff)};
  const sources=[
   ...ssh.map(x=>({id:x.event_id,kind:"Cybersecurity",zone:x.zone_id,time:x.received_at})),
   ...ppe.map(x=>({id:x.observation_id,kind:"Safety / PPE",zone:x.zone_id,time:x.created_at})),
@@ -127,7 +131,7 @@ export default function AnalyticsDashboard({incidents,ssh,ppe,face,maintenance,e
  <section className="panel analyticsFilterPanel" aria-label="Analytics time filters">
   <div className="analyticsFilterHeader"><div><h3>Reporting period</h3><p className="muted">Explore activity using Evidence receipt time.</p></div><span className="analyticsFilterMeta">READ-ONLY · LIVE DATA</span></div>
   <div className="analyticsRangeOptions" role="group" aria-label="Receipt time range">
-   {([{value:"24h",label:"24 hours"},{value:"7d",label:"7 days"},{value:"30d",label:"30 days"},{value:"all",label:"All available"}] as const).map(option=><button key={option.value} type="button" className={range===option.value?"analyticsRangeOption selected":"analyticsRangeOption"} aria-pressed={range===option.value} onClick={()=>setRange(option.value)}>{option.label}</button>)}
+   {([{value:"24h",label:"24 hours"},{value:"7d",label:"7 days"},{value:"30d",label:"30 days"},{value:"all",label:"All available"}] as const).map(option=><button key={option.value} type="button" className={range===option.value?"analyticsRangeOption selected":"analyticsRangeOption"} aria-pressed={range===option.value} onClick={()=>{setRange(option.value);setCustomFrom("");setCustomTo("")}}>{option.label}</button>)}<DateRangeInputs label="Custom dates:" from={customFrom} to={customTo} onChange={(f,t)=>{setCustomFrom(f);setCustomTo(t);setRange(f||t?"custom":"all")}}/>
   </div>
   <p className="muted analyticsFilterNote">Filters use receipt timestamps, not declared capture times. Authorized feed limits still apply.</p>
  </section>

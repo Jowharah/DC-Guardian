@@ -50,13 +50,16 @@ The changes are display-only: detector outputs, correlation rules, Decision rule
 | Read "non-compliant" as proof the PPE was missing (Q5) | P01, P02 | Note on non-compliant PPE results: a required item was **not detected**, which does not prove it was missing |
 | Wanted colour coding by event type | P03 | Feed rows and domain counts colour-coded by domain; domain tags in the group summary |
 | Expected the logo to go home | P03 | Logo returns to the Monitoring Center |
+| Too many Review Queue tabs; wanted completed / not completed / assigned, with outcomes as tags | P01, P03 | Three status tabs, **To do / In progress / Completed** (plus All); the detailed state (for example "Human override", "Group review needed") is a coloured tag on each item; "Inconclusive" counts as in progress, not done |
+| Wanted to filter by event type | P02 | Type filter in the Review Queue |
+| Wanted to choose days, not only 24 h / 7 days; filter by zone | P01 | Calendar date range (from / to) on the Monitoring Center feed and in Analytics; zone filter on the feed |
 
 Browser tests cover each change (`presentation/frontend/e2e/usability-findings.spec.ts`).
 
 ## Not done (future work)
 
 - **Work management:** assignment and team workload, and auto-assignment by role (P01, P02).
-- **Filters:** by event type, user or team, and a calendar or custom date range (P01, P02).
+- **Filters:** by user or team (needs assignment first).
 - **Onboarding:** a beginner overview page with detail on advanced pages, and a short introductory tour (P03).
 - **Navigation:** SOAR-style status charts such as completed and pending (facilitator).
 - **Recommended next study:** repeat the concept check (Q1–Q6) and T3 with new participants, to measure whether the changes help.

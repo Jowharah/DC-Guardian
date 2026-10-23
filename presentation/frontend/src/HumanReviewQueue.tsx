@@ -6,9 +6,28 @@ import {getUnifiedReviewDecision,getUnifiedHumanReviews,getLatestEvidenceReviews
 import type {PPEObservation,FaceObservation,UnifiedCorrelationGroup,PublishedSSH,OperationalCorrelation} from "./api";
 
 type Props={ppe:PPEObservation[];face:FaceObservation[];unified:UnifiedCorrelationGroup[];ssh:PublishedSSH[];operational:OperationalCorrelation[];maintenance:MaintenanceEvent[];environment:EnvironmentalEvent[];openMonitoring:()=>void;openEvent?:(id:string)=>void};
+// Usability study (P01, P03): eleven category tabs were too many. Three status tabs instead;
+// the detailed workflow category stays on each item as a tag.
+type Bucket="TODO"|"IN_PROGRESS"|"DONE";
+const STATUS:Record<string,{bucket:Bucket;label:string}>={
+ AWAITING_SOURCE_REVIEW:{bucket:"TODO",label:"Not reviewed"},
+ CANDIDATE_ASSESSMENT:{bucket:"TODO",label:"Specialists not run"},
+ EVIDENCE_REVIEW_REQUIRED:{bucket:"TODO",label:"Group review needed"},
+ DECISION_REVIEW_REQUIRED:{bucket:"TODO",label:"Decision review needed"},
+ MEMBER_VERDICT_CHANGED:{bucket:"TODO",label:"Re-review: an event verdict changed"},
+ REVIEW_STATUS_UNAVAILABLE:{bucket:"TODO",label:"Review status unavailable"},
+ FOLLOW_UP_OUTSTANDING:{bucket:"IN_PROGRESS",label:"Follow-up outstanding"},
+ HUMAN_REVIEW_INCONCLUSIVE:{bucket:"IN_PROGRESS",label:"Inconclusive: needs another look"},
+ HUMAN_CONFIRMED:{bucket:"DONE",label:"Human confirmed"},
+ HUMAN_OVERRIDDEN:{bucket:"DONE",label:"Human override"},
+ HUMAN_REVIEW_RECORDED:{bucket:"DONE",label:"Group review recorded"},
+};
+const bucketOf=(state:string):Bucket=>STATUS[state]?.bucket??"TODO";
+const TABS:{value:Bucket|"ALL";label:string}[]=[{value:"TODO",label:"To do"},{value:"IN_PROGRESS",label:"In progress"},{value:"DONE",label:"Completed"},{value:"ALL",label:"All"}];
 type QueueItem={id:string;kind:string;zone:string;received:string;state:string;note:string;evidenceKind?:InvestigatorSingleKind};
 export default function HumanReviewQueue({ppe,face,unified,ssh,operational,maintenance,environment,openMonitoring,openEvent}:Props){
- const [filter,setFilter]=useState("ALL");
+ const [tab,setTab]=useState<Bucket|"ALL">("TODO");
+ const [typeFilter,setTypeFilter]=useState("ALL");
  const [selectedGroup,setSelectedGroup]=useState<string|null>(null);
  const [selectedEvidence,setSelectedEvidence]=useState<{kind:InvestigatorSingleKind;id:string}|null>(null);
  const [verdicts,setVerdicts]=useState<Record<string,LatestEvidenceReview>>({});
@@ -73,20 +92,22 @@ export default function HumanReviewQueue({ppe,face,unified,ssh,operational,maint
  ];
  const unique=new Map<string,QueueItem>();
  for(const item of [...sources,...candidates,...decisions])unique.set(item.kind+":"+item.id,item);
- const items=[...unique.values()].filter(x=>filter==="ALL"||x.state===filter).sort((a,b)=>Date.parse(b.received||"1970-01-01")-Date.parse(a.received||"1970-01-01"));
+ const all=[...unique.values()];
+ const kinds=[...new Set(all.map(x=>x.kind))].sort();
+ const ofType=all.filter(x=>typeFilter==="ALL"||x.kind===typeFilter);
+ const tabCount=(value:Bucket|"ALL")=>ofType.filter(x=>value==="ALL"||bucketOf(x.state)===value).length;
+ const items=ofType.filter(x=>tab==="ALL"||bucketOf(x.state)===tab).sort((a,b)=>Date.parse(b.received||"1970-01-01")-Date.parse(a.received||"1970-01-01"));
  const counts={source:sources.filter(x=>x.state==="AWAITING_SOURCE_REVIEW").length,candidate:candidates.filter(x=>x.state==="CANDIDATE_ASSESSMENT").length,unifiedReview:candidates.filter(x=>x.state==="EVIDENCE_REVIEW_REQUIRED").length,decision:decisions.length,recorded:candidates.filter(x=>Boolean(latest(x.id))).length};
  return <section className="analyticsPage">
  <div className="stats"><div className="panel"><small>Source review pending</small><strong>{counts.source}</strong></div><div className="panel"><small>Unified review required</small><strong>{counts.unifiedReview}</strong></div><div className="panel"><small>Decisions requesting review</small><strong>{counts.decision}</strong></div><div className="panel"><small>Groups with recorded human review</small><strong>{counts.recorded}</strong></div></div>
  <section className="panel reviewFilterPanel">
-  <div className="analyticsFilterHeader"><div><h3>Review queue</h3><p className="muted">Read-only triage from authorized Evidence feeds. Select a workflow category to inspect its records.</p></div><span className="analyticsFilterMeta">READ-ONLY · HUMAN REVIEW</span></div>
-  <div className="analyticsRangeOptions" role="group" aria-label="Review queue category">
-   {([{value:"ALL",label:"All items"},{value:"AWAITING_SOURCE_REVIEW",label:"Source review"},{value:"HUMAN_OVERRIDDEN",label:"Human overrides"},{value:"MEMBER_VERDICT_CHANGED",label:"Member verdict changed"},{value:"HUMAN_CONFIRMED",label:"Human confirmed"},{value:"CANDIDATE_ASSESSMENT",label:"Unevaluated candidates"},{value:"EVIDENCE_REVIEW_REQUIRED",label:"Unified review required"},{value:"DECISION_REVIEW_REQUIRED",label:"Decision review"},{value:"FOLLOW_UP_OUTSTANDING",label:"Follow-up outstanding"},{value:"HUMAN_REVIEW_INCONCLUSIVE",label:"Inconclusive"},{value:"HUMAN_REVIEW_RECORDED",label:"Review recorded"}] as const).map(option=><button type="button" key={option.value} className={filter===option.value?"analyticsRangeOption selected":"analyticsRangeOption"} aria-pressed={filter===option.value} onClick={()=>setFilter(option.value)}>{option.label}</button>)}
-  </div><p className="muted analyticsFilterNote">Categories describe workflow states, not severity. Human review outcomes are recorded separately from source Evidence.</p>
+  <div className="analyticsFilterHeader"><div><h3>Review queue</h3><p className="muted">Read-only triage from authorized Evidence feeds. Choose a status, then open an item to review it.</p></div><span className="analyticsFilterMeta">READ-ONLY · HUMAN REVIEW</span></div>
+  <div className="queueTabs"><div className="queueTabList" role="tablist" aria-label="Review status">{TABS.map(t=><button type="button" role="tab" key={t.value} aria-selected={tab===t.value} className={tab===t.value?"analyticsRangeOption selected":"analyticsRangeOption"} onClick={()=>setTab(t.value)}>{t.label} <span className="reviewItemCount">{tabCount(t.value)}</span></button>)}</div><label className="queueTypeFilter">Type <select aria-label="Filter by event type" value={typeFilter} onChange={e=>setTypeFilter(e.target.value)}><option value="ALL">All types</option>{kinds.map(k=><option key={k} value={k}>{k}</option>)}</select></label></div><p className="muted analyticsFilterNote">To do: nothing recorded yet. In progress: a human looked but follow-up is open. Completed: a verdict or review is recorded. The tag on each item gives the detailed state, never severity. Human review outcomes are recorded separately from source Evidence.</p>
  </section>
  <section className="panel reviewItemsPanel">
   <div className="analyticsFilterHeader"><div><h3>Review items <span className="reviewItemCount">{items.length}</span></h3><p className="muted">Most recently received Evidence first</p></div></div>
-  {items.length===0?<p className="muted">No items returned for this category.</p>:<div className="reviewItemList">{items.map(x=><article key={x.kind+":"+x.id} className="reviewRecord">
-   <div className="reviewRecordTop"><div className="reviewRecordTitle"><span className="reviewKind">{x.kind}</span><b>{x.zone}</b></div><span className="reviewStatus">{x.state.replaceAll("_"," ")}</span></div>
+  {items.length===0?<p className="muted">Nothing here for this status and type.</p>:<div className="reviewItemList">{items.map(x=><article key={x.kind+":"+x.id} className="reviewRecord">
+   <div className="reviewRecordTop"><div className="reviewRecordTitle"><span className="reviewKind">{x.kind}</span><b>{x.zone}</b></div><span className={`reviewStatus statusTag status-${bucketOf(x.state).toLowerCase()}`}>{STATUS[x.state]?.label??x.state.replaceAll("_"," ")}</span></div>
    <code className="reviewRecordId">{x.id}</code>
    <p className="reviewRecordNote">{x.note}</p>
    {x.kind==="UNIFIED"&&<button type="button" className="reviewOpenButton" onClick={()=>{setSelectedEvidence(null);setSelectedGroup(x.id)}}>{selectedGroup===x.id?"Selected for review":"Open review & audit history"}</button>}
