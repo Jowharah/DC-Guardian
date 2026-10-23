@@ -120,11 +120,26 @@ If ports 5173 or 8000 are taken, set `DCG_FRONTEND_PORT` and `DCG_BACKEND_URL` (
 
 A five-minute tour:
 
-1. **Monitoring Center:** the summary cards show what needs attention. The event feed lists every result, newest first.
-2. **Open the correlated pair in ZONE-B:** a drive-risk result and a room-temperature result linked by place and time. It shows its Decision severity, the rules that set it, and the Bayesian estimate of how likely the two are related. Correlation is context, not proof of cause. (Three or more linked results form a *unified group*, whose severity carries the caveat "validated on the author's labels only"; add a camera image in ZONE-B through Scenario Lab to see one.)
-3. **Open a single result:** record your **human verdict** (Confirm / Override / Inconclusive, with a reason). The detector's original output is never changed; your verdict is stored beside it.
+1. **Monitoring Center:**
+   - The summary cards show what needs attention.
+   - The domain counts read "N abnormal of M". *Abnormal* means a detector flagged something that is **not yet confirmed by a human**.
+   - **How to read this screen**, under the cards, explains the main terms.
+   - The event feed lists every result, newest first, colour-coded by domain. Filter it by date (**Received from … to …**), zone and severity.
+2. **Open the Environmental + Maintenance correlation in ZONE-B:**
+   - It links a drive-risk result and a room-temperature result by place and time.
+   - It shows its rule-based Decision, the rules that set it, and the Bayesian estimate of how likely the two are related.
+   - Correlation is context, not proof of cause.
+   - Three or more linked results form a **correlated group**; add a camera image in ZONE-B through Scenario Lab to see one. A group opens with an **At a glance** box: why grouped, **not proof of cause**, severity **set by fixed rules, not by AI** (with the caveat "validated on the author's labels only"), and the review status. **Simple view** shows the essentials; **Full detail** adds the graph, timeline, AI analysis and source links.
+3. **Open a single result:**
+   - An **At a glance** summary comes first.
+   - Record your **human verdict** (Confirm / Override / Inconclusive, with a reason); a green **Verdict saved** box confirms it.
+   - The detector's original output is never changed; your verdict is stored beside it. Inside a group, each event has its own **Record verdict** section.
 4. **Investigation state:** on a group or result, press **Start review**, then **Resolve** with an outcome and a reason of at least 15 characters, and tick the confirmation.
-5. **Scenario Lab:** add your own data, for example a photo of a person in **PPE image validation** for a zone, or an OpenSSH log in **SSH log validation**. New results appear in the Monitoring Center within seconds.
+5. **Human Review Queue:**
+   - Work is sorted into **To do**, **In progress** and **Completed**, with a filter by type.
+   - Each item carries a tag with its detailed state (for example "Not reviewed", "Group review needed", "Human override").
+   - Recording a verdict moves the item to Completed.
+6. **Scenario Lab:** add your own data, for example a photo of a person in **PPE image validation** for a zone, or an OpenSSH log in **SSH log validation**. New results appear in the Monitoring Center within seconds.
 
 ## 7. Optional features
 
@@ -155,15 +170,15 @@ How it works when enabled:
 
 | Screen | What it is for |
 |---|---|
-| **Monitoring Center** | Live overview: summary cards (needs attention, abnormal results, correlations, Decisions by severity), a freshness strip per domain, and the feed of all Evidence and correlated groups. Selecting an item opens its detail: detector output, Neo4j graph view, Decision, specialist analysis, your verdict and the investigation state. |
-| **Human Review Queue** | Everything waiting for a human: groups and results without a recorded review. Open an item to review it in the Monitoring Center. |
-| **Analytics Dashboard** | Counts over time: Evidence by domain and by zone, detector outcomes with human verdicts, Decision severity. Click a row to open that record. |
+| **Monitoring Center** | Live overview: summary cards (needs attention, abnormal results, correlations, rule-based Decisions by severity), domain counts ("N abnormal of M"), a **How to read this screen** guide, and the feed of all Evidence and correlated groups, colour-coded by domain, with **date range, zone and severity filters**. Selecting an item opens its detail with an **At a glance** summary first; groups open in a **Simple view**, with **Full detail** for the Neo4j graph (zone highlighted), timeline, AI analysis and source links. |
+| **Human Review Queue** | Everything waiting for a human, in three tabs: **To do** (nothing recorded yet), **In progress** (follow-up open, or inconclusive) and **Completed** (verdict or review recorded), plus All and a type filter. Each item has a coloured tag with its detailed state. Open an item to record a verdict, or view it in the Monitoring Center. |
+| **Analytics Dashboard** | Counts over a chosen period (24 hours, 7 days, 30 days, all, or a **custom period** from a calendar): Evidence by domain and by zone, detector outcomes with human verdicts, Decision severity, and **Review progress** (completed, in progress, to do per domain and for groups). Click a row to open that record. |
 | **Scenario Lab** | Add data through the real detectors: PPE image validation, face recognition, SSH log validation, drive SMART history, sensor readings. It also runs built-in synthetic scenarios. |
-| **AI Investigator** | Inside a group or result: ask questions about that Evidence (optional, section 7.3). |
+| **AI Investigator** | Inside a group or result: ask questions about that Evidence (optional, section 7.3). Like the specialist panels, it carries a **Who says what** note: the detector produced the result, the AI only explains it, fixed rules set severity, and the human verdict is the review that counts. |
 | **Administration & Test Utilities** (in Scenario Lab) | Employee access per zone (stored in Neo4j), audit-integrity checks, test utilities. |
 
 **Rules the system follows (shown on screen):**
-- Severity comes only from fixed rules.
+- Severity comes only from fixed rules, never from the AI.
 - Correlation means shared place and time, never proven cause or identity.
 - Non-compliant PPE means "not detected", not "proven absent".
 - Every result goes to human review, and nothing acts on its own.

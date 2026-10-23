@@ -6,6 +6,17 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-23 — Installation and User Guide: new screens
+
+- Sections 6 (tour) and 8 (screens) describe the dashboard after the usability-study changes.
+  - Domain counts; the help panel; date, zone and severity filters.
+  - At a glance; Simple view and Full detail; Verdict saved.
+  - Review Queue tabs and tags; the custom period and Review progress in Analytics; the "Who says what" note.
+- The rules list now says severity never comes from the AI.
+- Docs only.
+
+---
+
 ## 2026-10-23 — Study quick wins: summaries, help, simple view, review progress, graph
 
 - **What (display only):**
