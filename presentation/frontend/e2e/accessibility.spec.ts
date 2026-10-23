@@ -25,8 +25,8 @@ test("every main screen has no WCAG A/AA violations", async ({page}) => {
   const found: string[] = [];
   await expect(page.getByText("Live · updated").first()).toBeVisible();
   found.push(...(await violations(page)).map(v => "monitoring: " + v));
-  await page.locator("button.feedRow", {hasText: "Unified correlation"}).click();
-  await expect(page.getByText(/Group Decision/)).toBeVisible();
+  await page.locator("button.feedRow", {hasText: "Correlated group"}).click();
+  await expect(page.getByText(/Rule-based Decision ·/)).toBeVisible();
   found.push(...(await violations(page)).map(v => "group detail: " + v));
   await page.locator("button.feedRow", {hasText: PPE_ID}).click();
   await expect(page.getByRole("region", {name: "Single-event specialist evaluation"})).toBeVisible();

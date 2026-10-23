@@ -11,6 +11,7 @@
 | `observation_sheet.md` | Note-taker | Success, time, errors and help per task |
 | `questionnaire.md` | Participant | Background, per-task ease, SUS, concept check, trust |
 | `results_template.csv` | Note-taker | One row per participant: enter the paper sheets here |
+| [`findings_2026-10.md`](findings_2026-10.md) | Everyone | Results of the October 2026 sessions (P01–P03), problems found and the dashboard changes made in response |
 
 Prepare identical data before each session with `python docs/usability_study/prepare_study_data.py prepare` (see the facilitator script). Score with `python presentation/backend/validation/usability_score.py docs/usability_study/results.csv`. It writes `docs/usability_study/results_summary.md`.
 

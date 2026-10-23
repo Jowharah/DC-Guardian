@@ -8,6 +8,7 @@ export const focusLabel=(focus:Focus)=>focus.startsWith("domain:")?focus.slice(7
  {attention:"Items needing attention",abnormal:"Abnormal detector results and the correlations that contain them",
   correlations:"Correlation groups and pairs",decisions:"Saved severity Decisions"}[focus as Exclude<Focus,`domain:${Domain}`>];
 
+const DOMAIN_CLASS:Record<string,string>={"Cybersecurity":"cyber","Safety / PPE":"safety","Physical Security":"physical","Maintenance":"maintenance","Environmental":"environmental"};
 const DAY=86400000;
 const ago=(ms:number)=>ms<60000?`${Math.max(0,Math.round(ms/1000))} s ago`:ms<3600000?`${Math.round(ms/60000)} min ago`:ms<DAY?`${Math.round(ms/3600000)} h ago`:`${Math.round(ms/DAY)} d ago`;
 
@@ -63,9 +64,9 @@ export default function MonitoringSummary({records,decisions,ssh,operational,uni
  return <section aria-label="Monitoring summary">
   <div className="stats summaryCards">
    {card("attention","Needs attention",attention,[toReview?`${toReview} abnormal without verdict`:"",notEvaluated?`${notEvaluated} group${notEvaluated===1?"":"s"} not evaluated`:"",reevaluate?`${reevaluate} Decision${reevaluate===1?"":"s"} to re-evaluate`:""].filter(Boolean).join(" · ")||"Nothing outstanding",attention?"summaryAlert":"")}
-   {card("abnormal","Abnormal detector results",`${abnormal.length} of ${records.length}`,<>{recentAbnormal} in the last 24 h · display only, not severity</>)}
+   {card("abnormal","Abnormal detector results",`${abnormal.length} of ${records.length}`,<>{recentAbnormal} in the last 24 h · not yet human-confirmed · not severity</>)}
    {card("correlations","Correlations",`${unified.length} group${unified.length===1?"":"s"}`,<>{pairCount} pair{pairCount===1?"":"s"} · {notEvaluated} group{notEvaluated===1?"":"s"} awaiting specialists</>)}
-   {card("decisions","Decisions",severities.length,<><span className="severity severity-high">HIGH {count("HIGH")}</span> <span className="severity severity-medium">MED {count("MEDIUM")}</span> <span className="severity severity-low">LOW {count("LOW")}</span>{reevaluate?<> · ⚠ {reevaluate} re-evaluate</>:null}</>)}
+   {card("decisions","Rule-based Decisions",severities.length,<><span className="severity severity-high">HIGH {count("HIGH")}</span> <span className="severity severity-medium">MED {count("MEDIUM")}</span> <span className="severity severity-low">LOW {count("LOW")}</span>{reevaluate?<> · ⚠ {reevaluate} re-evaluate</>:null}</>)}
   </div>
   <div className="domainStrip" role="group" aria-label="Domain status">
    {DOMAINS.map(domain=>{
@@ -74,12 +75,12 @@ export default function MonitoringSummary({records,decisions,ssh,operational,uni
     const age=Number.isFinite(latest)?now-latest:Infinity;
     const fresh=age<3600000?"fresh":age<DAY?"recent":"stale";
     const id=`domain:${domain}` as Focus;
-    return <button type="button" key={domain} className={`domainChip ${focus===id?"selected":""}`} aria-pressed={focus===id} onClick={()=>toggle(id)}
+    return <button type="button" key={domain} className={`domainChip kind-${DOMAIN_CLASS[domain]} ${focus===id?"selected":""}`} aria-pressed={focus===id} onClick={()=>toggle(id)}
       title={Number.isFinite(age)?`Last Evidence received ${ago(age)}`:"No Evidence received"}>
-     <span className={`freshDot fresh-${fresh}`}/><b>{domain}</b> {items.filter(r=>r.abnormal).length}/{items.length}
+     <span className={`freshDot fresh-${fresh}`}/><b>{domain}</b> {items.filter(r=>r.abnormal).length} abnormal of {items.length}
      <small>{Number.isFinite(age)?ago(age):"no data"}</small></button>;
    })}
-   <span className="muted domainStripNote">abnormal / total · last received</span>
+   <span className="muted domainStripNote">Abnormal = detector output, not yet confirmed by a human · time since the last result</span>
   </div>
   {attention>0&&focus==="attention"&&<p className="muted">Human verdicts and group reviews are recorded in the <button type="button" className="linkButton" onClick={openReview}>Human Review Queue</button>.</p>}
  </section>;

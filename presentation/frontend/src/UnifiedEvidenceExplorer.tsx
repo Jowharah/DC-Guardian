@@ -1,6 +1,15 @@
 import SSHEvidenceDetails from "./SSHEvidenceDetails";
 import PPEObservationViewer from "./PPEObservationViewer";
 import FaceObservationViewer from "./FaceObservationViewer";
+import EvidenceReviewPanel from "./EvidenceReviewPanel";
+import type {InvestigatorSingleKind} from "./api";
+import {useState} from "react";
+
+// The verdict form mounts only while open: one form at a time, so its field IDs stay unique.
+function GroupEventVerdict({kind,id}:{kind:InvestigatorSingleKind;id:string}){
+ const [open,setOpen]=useState(false);
+ return <details className="groupEventVerdict" onToggle={e=>setOpen((e.currentTarget as HTMLDetailsElement).open)}><summary>Record verdict · {id}</summary>{open&&<EvidenceReviewPanel kind={kind} id={id}/>}</details>;
+}
 import type {UnifiedCorrelationGroup,PublishedSSH,MaintenanceEvent,EnvironmentalEvent} from "./api";
 
 type Props={
@@ -10,8 +19,8 @@ type Props={
  environment:EnvironmentalEvent[];
 };
 export default function UnifiedEvidenceExplorer({group,ssh,maintenance,environment}:Props){
- return <section><h4>Unified Evidence Explorer</h4>
- <p className="muted">Original retained observations, not regenerated model predictions. Individual source assessments may predate this correlation.</p>
+ return <section><h4>Open an event: detector result and your verdict</h4>
+ <p className="muted">Open an event to see its original detector result and record your verdict on it. Results are the retained originals, not regenerated predictions.</p>
  {group.evidence.map(ref=>{
  const key=ref.kind+":"+ref.observation_id;
  if(ref.kind==="ppe")return <details key={key}><summary>PPE · {ref.observation_id}</summary><PPEObservationViewer id={ref.observation_id}/></details>;
@@ -38,6 +47,10 @@ export default function UnifiedEvidenceExplorer({group,ssh,maintenance,environme
  </div>:<p className="muted">Environmental source unavailable or not returned by the authorized Evidence API.</p>}</details>
  }
  return <p key={key}>Unsupported Evidence type: {ref.kind}</p>
+ }).map((node,i)=>{
+ const ref=group.evidence[i];
+ const reviewable=["ssh","ppe","face","maintenance","environment"].includes(ref.kind);
+ return <div key={ref.kind+":"+ref.observation_id} className="groupEventItem">{node}{reviewable&&<GroupEventVerdict kind={ref.kind as InvestigatorSingleKind} id={ref.observation_id}/>}</div>
  })}
  </section>
 }

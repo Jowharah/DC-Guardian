@@ -32,16 +32,16 @@ export default function EvidenceReviewPanel({kind,id}:{kind:InvestigatorSingleKi
   try{
    await recordEvidenceReview(kind,id,{verdict,corrected_status:needsStatus?corrected:null,rationale:rationale.trim(),acknowledgment:true});
    await load(()=>true);
-   setMessage("Verdict recorded in the audit chain. The detector output is unchanged.");
+   setMessage("✓ Verdict saved. Recorded in the audit chain; the detector output is unchanged.");
    setRationale("");setAck(false);setCorrected("");
   }catch(e){setError(e instanceof Error&&e.message.includes("(403)")?"Your role cannot record verdicts for this Evidence domain or zone.":e instanceof Error?e.message:"Verdict could not be recorded")}
   finally{setBusy(false)}
  }
  return <section className="panel reviewFormPanel">
   <h3>Human verdict</h3>
-  {effective?<p><b>{effective.source==="HUMAN_OVERRIDE"?"Human override":effective.verdict==="CONFIRMED"?"Human confirmed":"Human review inconclusive"}:</b> {label(effective.effective_status)}
+  {effective?<p className="verdictState verdictStateDone" role="status"><b>{effective.source==="HUMAN_OVERRIDE"?"Human override":effective.verdict==="CONFIRMED"?"Human confirmed":"Human review inconclusive"}:</b> {label(effective.effective_status)}
    {effective.source==="HUMAN_OVERRIDE"&&<> · detector reported {label(effective.model_status)}</>} · {effective.reviewer} · {new Date(effective.recorded_at).toLocaleString()}</p>
-   :<p className="muted">No human verdict recorded. Detector result: {label(modelStatus)}.</p>}
+   :<p className="verdictState verdictStatePending" role="status"><b>Not reviewed yet.</b> Detector result: {label(modelStatus)}.</p>}
   <p className="muted">The detector output stays frozen and visible. A verdict is stored beside it in a tamper-evident audit chain; an override changes whether this event is treated as abnormal for correlation, and the AI Investigator reports both.</p>
   <label htmlFor="evidenceVerdict">Verdict</label>
   <select id="evidenceVerdict" value={verdict} disabled={!ready||busy} onChange={e=>{setVerdict(e.target.value as EvidenceVerdict);setCorrected("")}}>
