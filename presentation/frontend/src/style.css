@@ -515,3 +515,4 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-vi
 .progressEmpty{color:#C9B6D3;font-size:12px;padding-left:8px;align-self:center}
 @media(max-width:650px){.progressRow{grid-template-columns:1fr}}
 .glanceCaveat{display:block;font-size:12px;color:#C9B6D3;margin-top:4px}
+.graphScroll{overflow-x:auto;border-radius:12px}

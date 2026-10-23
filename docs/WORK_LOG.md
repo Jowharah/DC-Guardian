@@ -6,6 +6,20 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-23 — Group graph: infrastructure linked to its zone; readable layout
+
+- **Why:** operator review. In a group's graph the servers and cameras had no link to their zone, and the relationship labels were hidden under the boxes.
+- **Backend** (`unified_graph.py`): from the infrastructure the group's events point at (server, camera, sensor, asset, equipment), the group graph now follows the existing topology links (LOCATED_IN, HOSTED_BY, MONITORS) to the group's own zone.
+  - Bounded to 3 hops and 40 paths; read-only; no inferred edges.
+  - Example: ZONE-A ← RACK-A1 ← SRV-A1-02, and ZONE-A ← CAM-A-01.
+- **Frontend** (`GraphViewer.tsx`):
+  - Layered layout by hop distance from the zone; nodes not linked to the zone follow by type.
+  - 270 px between columns; the canvas widens and scrolls sideways rather than overlapping.
+  - Lines are drawn first, then nodes, then relationship labels on top.
+- **Tests:** a new backend test checks that only the topology relationship types are followed, that the query is bounded, and which nodes and edges are added. Backend tests 418 passed; browser tests 24 passed.
+
+---
+
 ## 2026-10-23 — Study quick wins: summaries, help, simple view, review progress, graph
 
 - **What (display only):**
