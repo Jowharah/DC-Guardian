@@ -22,7 +22,7 @@ export default function UnifiedSpecialistViewer({id,decision}:{id:string;decisio
    finally{setBusy(false)}
  }
  return <section className="evidenceItem">
-   <h4>Unified Specialist Agent Analysis</h4>
+   <h4>AI specialist analysis</h4><p className="whoDecides"><b>Who says what:</b> the <b>detector</b> produced the result; these <b>AI specialists only explain them</b> with cited guidance; <b>fixed rules</b> set severity; <b>your human verdict</b> is the review that counts.</p>
    <p className="muted">Grounded, domain-scoped Response only. Specialists cannot assign a unified severity or attribute SSH activity to a recognized person.</p>
    <button disabled={busy} onClick={()=>void evaluate()}>{busy?"Evaluating…":saved?"Re-evaluate Specialists":"Evaluate Specialists"}</button>
    {message&&<p role="status">{message}</p>}

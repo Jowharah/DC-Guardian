@@ -25,7 +25,7 @@ export default function SingleSpecialistPanel({kind,id}:{kind:Kind;id:string}){
  }
  return <section className="panel evidenceItem singleSpecialist" aria-label="Single-event specialist evaluation">
   <h4>Specialist evaluation · {SPECIALIST[kind]}</h4>
-  <p className="muted">Grounded in approved knowledge, for this Evidence record alone. Specialists never assign severity; the Decision comes from the deterministic rules.</p>
+  <p className="whoDecides"><b>Who says what:</b> the <b>detector</b> produced the result; this <b>AI specialist only explains it</b> with cited guidance; <b>fixed rules</b> set severity; <b>your human verdict</b> is the review that counts.</p><p className="muted">Grounded in approved knowledge, for this Evidence record alone.</p>
   {saved&&<>
    <p>Evaluated {new Date(saved.evaluated_at).toLocaleString()}{saved.evidence_changed_since&&<b className="staleNote"> · Evidence or human verdict changed since; re-run to update</b>}</p>
    {Object.entries(saved.specialists).map(([name,a])=><details key={name} className="evidenceItem"><summary>{name.replaceAll("_"," ").toUpperCase()} · {a.grounding_status} · View assessment</summary>

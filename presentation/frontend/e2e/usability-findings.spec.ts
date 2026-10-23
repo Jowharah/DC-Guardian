@@ -15,7 +15,11 @@ test("a group states first why it was grouped, that it is not proof of cause, an
   await expect(glance).toContainText("Not proof of cause.");
   await expect(glance).toContainText("set by fixed rules (DCG-DECISION-v2), not by AI");
   await expect(glance.locator(".domainTag")).toHaveText(["Cybersecurity", "Physical security", "Safety / PPE"]);
-  // The long explanations are folded away until asked for.
+  // The caveat on group severity is always visible, also in the simple view.
+  await expect(glance).toContainText("validated on the author's labels only");
+  // Simple view first; full detail on request, with long explanations still folded.
+  await expect(page.getByText("What the graph shows, and what it does not")).toHaveCount(0);
+  await page.getByRole("button", {name: "Full detail"}).click();
   await expect(page.getByText("What the graph shows, and what it does not")).toBeVisible();
   await expect(page.getByText(/Selected mapped Evidence and existing infrastructure relationships/)).toBeHidden();
 });
@@ -65,4 +69,58 @@ test("the logo returns to the Monitoring Center", async ({page}) => {
   await page.getByRole("button", {name: /Analytics Dashboard/}).click();
   await page.getByRole("button", {name: "DC-GUARDIAN home: Monitoring Center"}).click();
   await expect(page.getByRole("heading", {name: "Security & operations overview"})).toBeVisible();
+});
+
+test("the review queue has three status tabs and tags each item with its detailed state", async ({page}) => {
+  // Finding: eleven category tabs were too many (P01, P03); filter by event type (P02).
+  await installMockApi(page);
+  await signIn(page);
+  await page.getByRole("button", {name: /Human Review Queue/}).click();
+  await expect(page.getByRole("tab")).toHaveText([/To do/, /In progress/, /Completed/, /All/]);
+  await expect(page.getByRole("tab", {name: /To do/})).toHaveAttribute("aria-selected", "true");
+  const ppe = page.locator("article.reviewRecord", {hasText: PPE_ID});
+  await expect(ppe.locator(".statusTag")).toHaveText("Not reviewed");
+  await page.getByLabel("Filter by event type").selectOption("SSH");
+  await expect(ppe).toHaveCount(0);
+  await expect(page.locator("article.reviewRecord", {hasText: SSH_ID}).first()).toBeVisible();
+});
+
+test("feed and analytics can be limited to calendar dates", async ({page}) => {
+  // Finding: P01 wanted to choose days, not only fixed periods; filter by zone (P01).
+  await installMockApi(page);
+  await signIn(page);
+  const rows = page.locator("button.feedRow");
+  await expect(rows.first()).toBeVisible();
+  await page.getByRole("group", {name: "Received date range"}).getByLabel(/from/).fill("2000-01-01");
+  await page.getByRole("group", {name: "Received date range"}).getByLabel(/^to/).fill("2000-01-02");
+  await expect(rows).toHaveCount(0);
+  await page.getByRole("button", {name: "Clear dates"}).click();
+  await expect(rows.first()).toBeVisible();
+  await expect(page.getByLabel("Filter by zone")).toBeVisible();
+  await page.getByRole("button", {name: /Analytics Dashboard/}).click();
+  await expect(page.getByRole("group", {name: "Custom period date range"})).toBeVisible();
+});
+
+test("a single event opens with a short summary, and the screen explains its terms", async ({page}) => {
+  // Findings: summary before detail (P01); a short guide to the terms (P03); AI output vs verdicts (P03).
+  await installMockApi(page);
+  await signIn(page);
+  await page.getByText("How to read this screen").click();
+  await expect(page.getByText(/set by fixed, versioned rules/)).toBeVisible();
+  await page.locator("button.feedRow", {hasText: SSH_ID}).click();
+  const glance = page.getByRole("region", {name: "Event at a glance"});
+  await expect(glance).toContainText("not yet confirmed by a human");
+  await expect(glance).toContainText("Not reviewed yet");
+  await expect(page.getByText(/AI specialist only explains it/)).toBeVisible();
+});
+
+test("analytics shows review progress per domain", async ({page}) => {
+  // Facilitator suggestion: SOAR-style completed / in progress / to do status chart.
+  await installMockApi(page);
+  await signIn(page);
+  await page.getByRole("button", {name: /Analytics Dashboard/}).click();
+  const progress = page.getByRole("region", {name: "Review progress"});
+  await expect(progress).toContainText("All results");
+  await expect(progress).toContainText("Correlated groups");
+  await expect(progress.getByRole("img").first()).toHaveAttribute("aria-label", /completed, .* in progress, .* to do/);
 });

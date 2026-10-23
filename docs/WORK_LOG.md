@@ -6,6 +6,37 @@ Conventions: commit hashes are in the history of `main` (PR #2 used a merge comm
 
 ---
 
+## 2026-10-23 — Study quick wins: summaries, help, simple view, review progress, graph
+
+- **What (display only):**
+  - Headings no longer forced into Title Case.
+  - Neo4j graph: the zone node is highlighted; crowded graphs stagger columns so nodes do not overlap.
+  - Feed and summary text one size larger.
+  - "At a glance" summary for single events.
+  - "How to read this screen" help panel.
+  - "Who says what" note in the AI specialist and Investigator panels.
+  - Groups open in a Simple view, with Full detail on request.
+  - "Review progress" chart in Analytics.
+- **Rule kept:** the group-severity caveat (validated on the author's labels only) now also appears in the always-visible "At a glance" box, so the simple view never shows severity without it.
+- **Tests:** 2 new browser tests (single-event summary, help and AI note; review progress). The accessibility scan now covers the group in both views; it found a contrast problem in the new chart, which was fixed. Browser tests 24 passed; `check_all.py` 14 passed, 0 failed, 0 skipped.
+
+---
+
+## 2026-10-23 — Calendar date range; Review Queue status tabs
+
+- **Why:** further study findings.
+  - P01 wanted to choose days, not only fixed periods.
+  - P01 and P03 found the eleven Review Queue tabs too many; they wanted completed / not completed / assigned, with outcomes as tags.
+  - P02 wanted a filter by event type.
+- **What (display only):**
+  - Calendar date range (`DateRange.tsx`) on the Monitoring Center feed, with a zone filter, and as custom dates in Analytics.
+  - Review Queue: tabs **To do / In progress / Completed / All** with counts; type filter; the detailed state as a coloured tag on each item. Inconclusive counts as in progress.
+  - Opening an item from another page clears the feed filters, so the item is always visible.
+- **Tests:** 2 new browser tests (status tabs and type filter; date range and zone filter); the override test now checks that a recorded verdict moves the item to Completed. Browser tests 22 passed, including the WCAG A/AA scan.
+- **Caveat:** assignment of items to people is not implemented (future work), so there is no "Assigned" tab.
+
+---
+
 ## 2026-10-23 — Usability study results; dashboard changes from its findings
 
 - **Study:** P01–P03 completed (21–22 Oct), after the pilot on 20 Oct.
