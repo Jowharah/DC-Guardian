@@ -255,7 +255,7 @@ def main(argv: list[str] | None = None) -> int:
              "levels are correct (the scenarios have relatedness labels, not severity labels); or anything about response "
              "recommendations, which need a separate user evaluation.",
              "- **Bias:** the scenarios, the labels, the linkage rule and its known-mechanism list come from the same "
-             "author; the linkage rule was selected on the dev split. Independent labels are pending."
+             "author; the linkage rule was selected on the dev split. No independent labelling round was run (dropped for time)."
              + ("" if args.scenario_set != "v2-chatgpt" else
                 " Here ChatGPT's labels replace the author's, which removes the author from the labels but not from "
                 "the scenarios or the rule."),

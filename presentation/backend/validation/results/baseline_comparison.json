@@ -2,7 +2,7 @@
   "protocol": "fixed 2026-10-13 before results; see module docstring",
   "policy": "DCG-DECISION-v2",
   "linkage_rule": "L2_KNOWN_MECHANISM_WITHIN_10_MIN",
-  "labels": "scenario author (independent labels pending)",
+  "labels": "scenario author (no independent labelling round)",
   "tie_orders": 500,
   "seed": 20261013,
   "splits": {
